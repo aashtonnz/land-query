@@ -4,10 +4,12 @@ Every fetched source is written to data/raw/ and recorded in data/provenance.jso
 URL, fetch time, sha256, feature count and licence note. Nothing is invented: a source
 that fails is recorded as failed.
 """
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import hashlib, json, os, sys, time, datetime as dt
 import requests
 
-TILE = dict(xmin=1769000, ymin=5468400, xmax=1770000, ymax=5469400)  # NZTM2000 (EPSG:2193)
+TILE = dict(xmin=_X, ymin=_Y, xmax=_X + 1000, ymax=_Y + 1000)  # NZTM2000 (EPSG:2193)
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(OUT, "raw"); os.makedirs(RAW, exist_ok=True)
 KC = "https://maps.kapiticoast.govt.nz/server/rest/services/Public"

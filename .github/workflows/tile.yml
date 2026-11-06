@@ -1,0 +1,53 @@
+name: Compile one tile
+
+# Fetches one 1 km × 1 km NZTM2000 tile from public sources, compiles it on parcels and runs the inverse
+# queries. Uses the LINZ_API_KEY repository secret, so the key never passes through a chat or session.
+# Results (provenance and query rows, not raw data) are pushed to the `tile-results` branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      xmin: { description: "Tile west edge, NZTM2000 easting (multiple of 1000)", default: "1769000", required: true }
+      ymin: { description: "Tile south edge, NZTM2000 northing", default: "5468400", required: true }
+
+permissions:
+  contents: write
+
+jobs:
+  tile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TILE_XMIN: ${{ inputs.xmin }}
+      TILE_YMIN: ${{ inputs.ymin }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pyproj shapely rasterio numpy duckdb pandas requests scipy
+      - name: Fetch, compile, query
+        working-directory: pipeline/tile_test
+        env:
+          LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
+        run: |
+          /usr/bin/time -v python3 fetch_tile.py data 2> time_fetch.txt
+          python3 fetch_lidar.py data
+          python3 fetch_parcels_kcdc.py data
+          python3 fetch_parcels.py data
+          /usr/bin/time -v python3 compile_tile.py data 2> time_compile.txt
+          python3 inverse_queries.py data | tee summary.md
+          grep -h -E "Elapsed|Maximum resident" time_*.txt | tee -a summary.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tile-${{ inputs.xmin }}-${{ inputs.ymin }}
+          path: pipeline/tile_test/data/
+          retention-days: 7
+      - name: Push results to tile-results branch
+        run: |
+          D=results/${TILE_XMIN}_${TILE_YMIN}
+          cp -r pipeline/tile_test/data /tmp/tiledata && cp pipeline/tile_test/summary.md /tmp/tiledata/
+          git fetch origin tile-results && git checkout tile-results || git checkout --orphan tile-results
+          git rm -rq --cached . 2>/dev/null || true
+          mkdir -p "$D" && cp /tmp/tiledata/{provenance.json,inverse_queries.json,summary.md} "$D/"
+          git add "$D" && git -c user.name="tile workflow" -c user.email="actions@github.com" \
+            commit -qm "Tile ${TILE_XMIN},${TILE_YMIN}: run ${{ github.run_id }}" && git push -q origin tile-results

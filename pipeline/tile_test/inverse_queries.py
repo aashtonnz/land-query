@@ -4,6 +4,8 @@ Each query is a plain filter over raw primitives (no scores). Every returned row
 appellation, the values it was selected on, and the provenance (URL, sha256, fetch time, licence) of each
 source those values came from. Output: data/inverse_queries.json and a markdown summary on stdout.
 """
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import json, os, sys
 import duckdb
 
@@ -64,7 +66,7 @@ Q = [
 def prov(keys):
     return {k: {f: PROV[k].get(f) for f in ("url", "sha256", "fetched", "licence", "features")} for k in keys if k in PROV}
 
-out = dict(tile=[1769000, 5468400, 1770000, 5469400], universe=db.execute(f"SELECT count(*) {BASE}").fetchone()[0],
+out = dict(tile=[_X, _Y, _X + 1000, _Y + 1000], universe=db.execute(f"SELECT count(*) {BASE}").fetchone()[0],
            queries=[])
 for q in Q:
     res = db.execute(q["sql"]); cols = [c[0] for c in res.description]

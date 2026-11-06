@@ -1,11 +1,13 @@
 """Fetch LINZ primary parcels (as linz_parcels, for comparison with the KCDC mirror), titles and non-primary parcels (incl. easements) via LDS WFS (needs LINZ_API_KEY; CC BY 4.0)."""
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import hashlib, json, os, sys, time
 import requests
 
 KEY = os.environ.get("LINZ_API_KEY")
 if not KEY: sys.exit("LINZ_API_KEY not set")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
-TILE = (1769000, 5468400, 1770000, 5469400)
+TILE = (_X, _Y, _X + 1000, _Y + 1000)
 LAYERS = {"linz_parcels": 50823, "titles": 50804, "nonprimary_parcels": 50782}
 
 def wfs(layer):

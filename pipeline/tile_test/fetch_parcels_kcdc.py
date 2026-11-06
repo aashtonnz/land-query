@@ -4,11 +4,13 @@ The layer mirrors LINZ NZ Primary Parcels (same fields: LINZ parcel id, appellat
 so parcel ids join to LINZ. Mirror refresh date is not published; see the findings for the cross-check.
 Writes data/raw/parcels.geojson, which compile_tile.py then uses as its unit. Run after fetch_tile.py.
 """
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import hashlib, json, os, sys, time
 import requests
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
-TILE = (1769000, 5468400, 1770000, 5469400)
+TILE = (_X, _Y, _X + 1000, _Y + 1000)
 URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
 
 t0 = time.time(); feats = []; offset = 0

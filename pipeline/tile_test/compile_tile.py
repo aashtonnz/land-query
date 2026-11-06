@@ -4,6 +4,8 @@ Unit = LINZ parcel if data/raw/parcels.geojson exists, otherwise KCDC building o
 labelled as such). Every column group names its source key in provenance.json. No scores,
 no opinions: overlaps, distances, elevations and the raw attributes of the nearest assets.
 """
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import json, os, sys, time, math
 import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
@@ -14,7 +16,7 @@ from shapely.ops import unary_union
 D = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(D, "raw")
 t0 = time.time()
-TILE_BOX = box(1769000, 5468400, 1770000, 5469400)
+TILE_BOX = box(_X, _Y, _X + 1000, _Y + 1000)
 
 def load(name):
     p = os.path.join(RAW, name + ".geojson")

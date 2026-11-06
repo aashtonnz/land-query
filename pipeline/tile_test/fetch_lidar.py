@@ -1,11 +1,13 @@
 """Read the tile window from LINZ elevation COGs (s3://nz-elevation, CC BY 4.0) without downloading whole files."""
+import os as _os
+_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import json, os, sys, time, hashlib
 import numpy as np, requests, rasterio
 from rasterio.windows import from_bounds
 from rasterio.merge import merge
 from pyproj import Transformer
 
-TILE = (1769000, 5468400, 1770000, 5469400)
+TILE = (_X, _Y, _X + 1000, _Y + 1000)
 BASE = "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
