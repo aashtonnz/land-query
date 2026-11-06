@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 18:15 (Pacific/Auckland)
+Last updated: 2026-11-06 18:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -21,7 +21,7 @@ Standing priorities:
 - T-18: Local statutory PDF parser test: Run the deterministic regex/AST parser (`dredge_raw_statutory_text_zero_cost`) on 10 real downloaded KCDC `s42A` officer reports and LIM PDFs (early test for R-3).
 - T-19: Gate: Statutory regex parser accuracy: Does the deterministic parser extract DP numbers, rule breaches, and imperial pipe depths accurately on at least 9 of 10 real KCDC PDFs? If no: add a local Ollama (`qwen2.5-coder:7b`) fallback pass for unstructured paragraphs.
 - T-20: Sentinel-1 & Sentinel-2 STAC bounding-box test: Fetch one real Sentinel-2 COG scene over Kāpiti (`60GUV`) from Element84 Earth Search STAC API (`earth-search.aws.element84.com/v1`) and verify `NDVI`/`NDWI` parcel clipping (early test for R-4).
-- T-21: Full Kāpiti Coast 54-tile batch compilation: Run the crash-resumable tile batch compiler across all 54 Kāpiti tiles (`24,800` parcels) into local SQLite WAL + FTS5.
+- T-21: Full Kāpiti Coast 54-tile batch compilation (workflow `tile.yml` ready: one tile in 2.5 min on GitHub Actions, results on the `tile-results` branch): Run the crash-resumable tile batch compiler across all 54 Kāpiti tiles (`24,800` parcels) into local SQLite WAL + FTS5.
 - T-22: Cross-check audit on live Kāpiti data: Run the 15-pillar cross-checker across the compiled Kāpiti database and inspect false-positive rate on datum offsets and building floor-area deltas (early test for R-5).
 - T-23: Enable GitHub Pages and test Claude Desktop MCP connection: Point `claude_desktop_config.json` at `toponz_weekend1_kapiti_ingester.py --serve-mcp` and test live agent queries.
 
@@ -39,6 +39,7 @@ Phase 3 — Trans-Tasman (NSW / VIC) Federation:
 - Build automated Section 32 / Section 33 Council Rating Valuation Objection letter generator from `cross_silo_contradictions_70d`.
 
 ## Done (last two weeks, newest first)
+- Tile workflow on GitHub Actions: `.github/workflows/tile.yml` fetches, compiles and queries any tile using the `LINZ_API_KEY` repository secret; first run matched the local results exactly (2.5 min end to end, compile 12 s, 274 MB peak). [Workflow](.github/workflows/tile.yml) 2026-11-06.
 - T-34: LINZ titles, easements and non-primary parcels: 667 titles (type only, no owners), 322 easements and 6 land covenants joined to the tile's parcels. KCDC's mirror matches LINZ exactly for the 582 shared parcels, shows no lag, and omits only railway parcels. Key supplied in chat for this run only and not stored; sessions started from the Claude app do not get Claude Code environment variables. [Findings](docs/findings/2026-11-06-inverse-queries.md#parcels-without-a-linz-key) 2026-11-06.
 - T-33: Inverse query on live parcels: five region-wide queries (infill candidates, floor level above ground, old poor sewers, ground change, heritage and trees) over 472 parcels in under 0.2 s, every row with source URL, sha256, fetch time and licence. For Kāpiti, neither Landsight nor Relab can answer the first four. [Findings](docs/findings/2026-11-06-inverse-queries.md) 2026-11-06.
 - T-16: Single-tile live Kāpiti test: 34 public sources, three LiDAR rasters and 582 parcels (keyless, from KCDC's LINZ mirror, D-11) fetched live and compiled on parcels. Titles and easements moved to T-34. [Findings](docs/findings/2026-11-06-live-tile-test.md) 2026-11-06.
