@@ -19,6 +19,11 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
   outlines; cut and fill to make a level platform of a given size; an approximate AS/NZS 1170.2 terrain and shielding
   category. Each gets one independent check (for example overland flow against KCDC overflow paths, roof area against
   building outlines). In `SOURCES.md`, each compiled column is marked published, derived or modelled, with its method.
+- **T-39: Fresh-eyes review**
+  Start a new session with only the repository: the code, `SOURCES.md`, D-12 and the latest results, not earlier
+  summaries. Review the fetchers, compiler, QA checks and queries for wrong joins, unit or datum mistakes, edge effects
+  and misleading column meanings, and check a sample of result rows against the raw sources. Each fix comes with a check
+  that fails on the old code and passes on the new. Do this before T-36 is offered outside.
 - **T-36: Query service**
   A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users

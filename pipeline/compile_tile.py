@@ -52,16 +52,24 @@ T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=
                                                     ws_pipes=ws_pipes, rbl=rbl).items() if v}
 bld_geoms = [g for g, _ in load("buildings_2021")]
 
-dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
-dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
-z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
+HAVE_LIDAR = all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in ("dem_2025", "dsm_2025", "dem_2021"))
+if not HAVE_LIDAR:  # outside the LiDAR surveys (for example the Tararua foothills): terrain columns stay empty
+    print("no LiDAR for this window")
+    class _NoDem: transform = rasterio.transform.from_origin(0, 0, 1, 1)
+    dem = _NoDem(); Z = dsm = z21 = np.full((3, 3), np.nan, dtype="float32")
+else:
+    dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
+    dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
+    z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
 gy, gx = np.gradient(Z, 1.0)
 SLOPE = np.degrees(np.arctan(np.hypot(gx, gy)))
 CANOPY = (dsm - Z) > 3.0
-BLDMASK = ~geometry_mask(bld_geoms, out_shape=Z.shape, transform=dem.transform) if bld_geoms else np.zeros_like(Z, bool)
+BLDMASK = ~geometry_mask(bld_geoms, out_shape=Z.shape, transform=dem.transform) if bld_geoms and HAVE_LIDAR else np.zeros_like(Z, bool)
+T_BLD = STRtree(bld_geoms) if bld_geoms else None
 
 def window_mask(g):
     """Cells of the parcel, computed in a small window around it: (row slice, col slice, mask)."""
+    if not HAVE_LIDAR: return slice(0, 0), slice(0, 0), np.zeros((0, 0), bool)
     T_ = dem.transform; x0, y0, x1, y1 = g.bounds
     c0, c1 = int(math.floor((x0 - T_.c) / T_.a)) - 1, int(math.ceil((x1 - T_.c) / T_.a)) + 1
     r0, r1 = int(math.floor((y1 - T_.f) / T_.e)) - 1, int(math.ceil((y0 - T_.f) / T_.e)) + 1
@@ -128,9 +136,10 @@ for uid, (g, p) in enumerate(units):
     r.update(lidar_cells=int(np.isfinite(z).sum()), ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
-             building_2021_m2=int((m & Bw).sum()), open_ground_m2=int(open_ground.sum()),
-             open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()),
-             canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1),
+             building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),
+             open_ground_m2=int(open_ground.sum()) if HAVE_LIDAR else None,
+             open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()) if HAVE_LIDAR else None,
+             canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1) if HAVE_LIDAR else None,
              dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
     d, np_ = nearest("ww_nodes", ww_nodes, g)

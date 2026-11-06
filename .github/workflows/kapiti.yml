@@ -87,7 +87,7 @@ jobs:
       - name: Merge and query
         working-directory: pipeline
         run: |
-          python3 merge_blocks.py ../blocks ../district | tee ../district/merge_log.txt
+          mkdir -p ../district && python3 merge_blocks.py ../blocks ../district | tee ../district/merge_log.txt
           python3 inverse_queries.py ../district ../district/district.duckdb | tee ../district/summary.md
       - name: Push results to kapiti-results branch
         run: |

@@ -15,8 +15,9 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-21: Full Kāpiti compile: run `tile.yml` over every tile that overlaps the district and merge the results into one database, with QA checks on every tile (manhole lids and building ground heights against LiDAR, LiDAR epoch offset, parcel areas against LINZ).
+- T-21: Full Kāpiti compile (in progress: 46 blocks of 5 km, `kapiti.yml`): run `tile.yml` over every tile that overlaps the district and merge the results into one database, with QA checks on every tile (manhole lids and building ground heights against LiDAR, LiDAR epoch offset, parcel areas against LINZ).
 - T-37: Cheap computed measures: add sun hours and winter shading, horizon and view angles, overland flow and catchment, roof planes and solar potential, cut/fill for a level platform, and an approximate wind exposure category; check each once against something independent; mark every column published, derived or modelled in `SOURCES.md`.
+- T-39: Fresh-eyes review: a new session, starting from the code, `SOURCES.md` and D-12 rather than earlier summaries, reviews the pipeline and the query results for errors before T-36 is offered to anyone outside. Fixes come with a check that fails before and passes after.
 - T-36: Query service: a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: five changed parcels not explained by recent subdivisions (T-33), checked against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.

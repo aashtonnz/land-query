@@ -26,6 +26,11 @@ def summary(d):
     return dict(n=int(d.size), median=round(float(q[2]), 3), iqr=[round(float(q[1]), 3), round(float(q[3]), 3)],
                 p5_p95=[round(float(q[0]), 3), round(float(q[4]), 3)], share_abs_gt_0_5m=round(float((np.abs(d) > 0.5).mean()), 3))
 
+if not all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in ("dem_2025", "dsm_2025", "dem_2021")):
+    db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)
+    n = db.execute("SELECT count(*) FROM units").fetchone()[0]
+    json.dump(dict(no_lidar_window=True, parcels=dict(n=n, no_lidar=n)), open(os.path.join(D, "qa.json"), "w"), indent=1)
+    print(f"QA: no LiDAR for this window; {n} parcels without terrain"); sys.exit(0)
 dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
 z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
 dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
