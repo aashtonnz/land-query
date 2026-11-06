@@ -26,7 +26,7 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install pyproj shapely rasterio numpy duckdb pandas requests scipy
       - name: Fetch, compile, query
-        working-directory: pipeline/tile_test
+        working-directory: pipeline
         env:
           LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
         run: |
@@ -40,12 +40,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: tile-${{ inputs.xmin }}-${{ inputs.ymin }}
-          path: pipeline/tile_test/data/
+          path: pipeline/data/
           retention-days: 7
       - name: Push results to tile-results branch
         run: |
           D=results/${TILE_XMIN}_${TILE_YMIN}
-          cp -r pipeline/tile_test/data /tmp/tiledata && cp pipeline/tile_test/summary.md /tmp/tiledata/
+          cp -r pipeline/data /tmp/tiledata && cp pipeline/summary.md /tmp/tiledata/
           git fetch origin tile-results && git checkout tile-results || git checkout --orphan tile-results
           git rm -rq --cached . 2>/dev/null || true
           mkdir -p "$D" && cp /tmp/tiledata/{provenance.json,inverse_queries.json,summary.md} "$D/"

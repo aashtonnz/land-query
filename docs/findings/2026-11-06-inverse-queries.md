@@ -3,7 +3,7 @@
 Follows the [live tile test](2026-11-06-live-tile-test.md). Same Paraparaumu tile (NZTM2000 1769000–1770000 E,
 5468400–5469400 N), now compiled on real parcels and queried in reverse: "which parcels match these conditions?"
 rather than "tell me about this address". Full results with SQL and provenance:
-[`2026-11-06-inverse-queries.json`](2026-11-06-inverse-queries.json). Scripts: [`pipeline/tile_test`](../../pipeline/tile_test/).
+[`2026-11-06-inverse-queries.json`](2026-11-06-inverse-queries.json). Scripts: [`pipeline`](../../pipeline/).
 
 ## Parcels without a LINZ key
 

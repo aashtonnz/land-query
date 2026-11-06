@@ -1,10 +1,9 @@
-# land-query (TopoNZ / TopoAU 96-Domain Plot Truth Engine v39.0)
-> Pre-joined, physics-compressed, 15-pillar cross-checked 96-Domain (2,746-primitive) property, building, natural-resource, and satellite EO spine for New Zealand and Australia.
+# land-query
+> Area-queryable parcel facts for New Zealand, starting with Kāpiti Coast. Built from public data (LINZ, Kāpiti Coast District Council, Greater Wellington Regional Council). Every value carries its source, fetch time, licence and a fit-for-parcel flag.
 
 - Repository: https://github.com/aashtonnz/land-query
-- Interactive 37-Tab Engine: ./index.html (`nz_topological_parcel_engine.html`)
-- Standalone $0.00 SQLite + FTS5 + 12-Physics Compiler & JSON-RPC 2.0 MCP Server: `./toponz_weekend1_kapiti_ingester.py`
-- MCP Manifest: `./.well-known/mcp.json`
-- Complete JSON Schemas & Verification Benchmarks: `./schemas/`
+- Pipeline (fetch, compile and query one 1 km tile): ./pipeline/
+- Sources, licences and column definitions: ./SOURCES.md
+- Example results with provenance: ./docs/findings/2026-11-06-inverse-queries.json
 
-> Demonstration data is fictional: the three benchmark parcels (10 Example St, 16 Sample St, 114 Specimen Rd) and every fact about them, including parcel, plan, consent and title numbers and company names, are invented for illustration. Real data comes only from the live pipeline in pipeline/tile_test.
+Status: tested on one Paraparaumu tile. No query service is running yet. The prototype in ./archive/ uses fictional data and is not a source of facts.

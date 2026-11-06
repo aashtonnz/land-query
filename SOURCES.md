@@ -1,6 +1,6 @@
 # Sources: licence and resolution register
 
-Last checked: 2026-11-06. One row per source used by the live tile pipeline ([`pipeline/tile_test`](pipeline/tile_test/)).
+Last checked: 2026-11-06. One row per source used by the live tile pipeline ([`pipeline`](pipeline/)).
 This is a working record, not legal advice. Keys match `provenance.json` and the `inverse_queries.json` provenance.
 
 **Licence status:** ✅ licence stated for the dataset · ◐ covered by a portal-wide statement, but no licence on the dataset itself ·
