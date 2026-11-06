@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 19:20 (Pacific/Auckland)
+Last updated: 2026-11-06 19:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -12,11 +12,11 @@ Standing priorities:
 ## Doing (at most 3)
 
 ## Waiting on you
+- T-32: Approve the reset proposal: [`docs/proposals/2026-11-06-reset.md`](docs/proposals/2026-11-06-reset.md) proposes D-12 (product scope), a keep/defer/drop schema, corrected assumptions, a cleaner repo layout and a revised board. Approve all or part. Raised 2026-11-06.
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
 - T-29: Check LiDAR change candidates: 25 of the 30 changed parcels are recent subdivisions (T-33), so start with the other five; compare the 37 tile patches with more than 1 m of ground change (2021 to 2024–25, after the +0.08 m offset) against aerial imagery to tell earthworks from classification artefacts.
-- T-32: Reset proposal: a proposed decision (D-12), restated Shared-DP assumption (about 3.7 lots per plan measured, not 1:64), pruned schema based on the sourceability audit, and revised board and plan, for approval before the repo is changed.
 - T-18: Local statutory PDF parser test: Run the deterministic regex/AST parser (`dredge_raw_statutory_text_zero_cost`) on 10 real downloaded KCDC `s42A` officer reports and LIM PDFs (early test for R-3).
 - T-19: Gate: Statutory regex parser accuracy: Does the deterministic parser extract DP numbers, rule breaches, and imperial pipe depths accurately on at least 9 of 10 real KCDC PDFs? If no: add a local Ollama (`qwen2.5-coder:7b`) fallback pass for unstructured paragraphs.
 - T-20: Sentinel-1 & Sentinel-2 STAC bounding-box test: Fetch one real Sentinel-2 COG scene over Kāpiti (`60GUV`) from Element84 Earth Search STAC API (`earth-search.aws.element84.com/v1`) and verify `NDVI`/`NDWI` parcel clipping (early test for R-4).
