@@ -15,7 +15,7 @@
         "SIM-05/SIM-06"
       ],
       "why_impossible_before": "Traditional tools inspect one parcel at a time. Joining the 3D terrain and pipe invert graph across touching parcels reveals positive-sum bilateral trades between neighbours.",
-      "concrete_example_in_spine": "Uphill Lot A (16 Ngahina St) has a 710m\u00b2 flat pad but sits -0.35m below Ngahina St sewer grade ($45,000 pump station required). Touching downhill Lot B (10 Tararua St, `LINZ-5041821`) has a 150mm uPVC sewer main at 12.68m invert (+1.45m gravity fall from Lot A). Granting a 1.5m\u00d712m private drainage easement across Lot B's boundary strip for $12,000 saves Lot A $45,000 (+$33,000 net value created out of thin air).",
+      "concrete_example_in_spine": "Uphill Lot A (16 Sample St) has a 710m\u00b2 flat pad but sits -0.35m below Sample St sewer grade ($45,000 pump station required). Touching downhill Lot B (10 Example St, `DEMO-5041821`) has a 150mm uPVC sewer main at 12.68m invert (+1.45m gravity fall from Lot A). Granting a 1.5m\u00d712m private drainage easement across Lot B's boundary strip for $12,000 saves Lot A $45,000 (+$33,000 net value created out of thin air).",
       "sql_join_primitive": "JOIN parcel_boundary_edges e ON a.parcel_id = e.self_id JOIN plot_primitives_36d b ON e.adj_id = b.parcel_id WHERE a.self_sewer_fall_m < 0 AND (a.rear_pad_elev_m - b.sewer_main_invert_m) / (a.pad_to_edge_m + b.edge_to_main_m) >= 0.0167"
     },
     {
@@ -29,7 +29,7 @@
         "D58 (Council CSR Callouts)"
       ],
       "why_impossible_before": "Satellite InSAR, historical 1940s aerial stereo pairs, street-view retaining wall lean, and council sewer callouts sit in 5 completely disconnected government silos.",
-      "concrete_example_in_spine": "Intersecting `SIM-10` (+1.1m 1985 uncompacted fill over peat swale on `114 Otaihanga Rd`) with `D52` (-3.4 mm/yr Sentinel-1 InSAR subsidence), `D56` (+1.8\u00b0 boundary wall tilt since 2012), and `D21` (2013 NHC resin injection claim) predicts foundation/pipe shear failure before visible surface collapse occurs.",
+      "concrete_example_in_spine": "Intersecting `SIM-10` (+1.1m 1985 uncompacted fill over peat swale on `114 Specimen Rd`) with `D52` (-3.4 mm/yr Sentinel-1 InSAR subsidence), `D56` (+1.8\u00b0 boundary wall tilt since 2012), and `D21` (2013 NHC resin injection claim) predicts foundation/pipe shear failure before visible surface collapse occurs.",
       "sql_join_primitive": "WHERE sim10_historical_fill_depth_m >= 0.50 AND d52_insar_vlm_mm_yr <= -2.0 AND (d56_wall_tilt_deg_decade >= 1.0 OR d58_sewer_blockage_callouts >= 2)"
     },
     {

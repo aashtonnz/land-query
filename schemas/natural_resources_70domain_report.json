@@ -4,18 +4,18 @@
   "cash_cost_nzd": 0.0,
   "coasean_easement_swaps_discovered": [
     {
-      "uphill_parcel_id": "LINZ-5041819-UPHILL",
-      "uphill_address": "16 Ngahina Street, Paraparaumu (Rear Uphill Neighbour)",
+      "uphill_parcel_id": "DEMO-5041819-UPHILL",
+      "uphill_address": "16 Sample Street, Paraparaumu (Rear Uphill Neighbour)",
       "uphill_own_street_grade": -0.0125,
-      "downhill_neighbour_id": "LINZ-5041821",
-      "downhill_neighbour_address": "10 Tararua Street, Paraparaumu",
+      "downhill_neighbour_id": "DEMO-5041821",
+      "downhill_neighbour_address": "10 Example Street, Paraparaumu",
       "cross_boundary_easement_grade_ratio": 0.0571
     }
   ],
   "predictive_subsurface_failures_flagged": [
     {
-      "parcel_id": "LINZ-5042110",
-      "address": "114 Otaihanga Road, \u014ctaihanga",
+      "parcel_id": "DEMO-5042110",
+      "address": "114 Specimen Road, \u014ctaihanga",
       "sim10_hist_fill_m": 1.15,
       "d52_insar_vlm_mm_yr": -3.6,
       "d56_curbside_wall_tilt_deg": 2.1,
@@ -24,7 +24,7 @@
   ],
   "autonomous_watchtower_targets_verified": [
     {
-      "target_id": "WT-NZ-LINZ-01",
+      "target_id": "WT-NZ-DEMO-01",
       "agency_name": "Toit\u016b Te Whenua LINZ Data Service & Elevation GitHub",
       "active_data_protocol": "WFS 2.0 + Koordinates REST + Upcoming STAC Item Search API (#571)",
       "mcp_or_llms_txt_detected": 0,
@@ -62,7 +62,7 @@
   "building_subspine_1_to_n_verified": [
     {
       "building_id": "BLD-5041821-01",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "structure_role": "Primary Dwelling (Relocatable 1974 Bunglaow)",
       "d59_bedrooms_count": 3,
       "d59_bathrooms_count": 1.5,
@@ -76,7 +76,7 @@
     },
     {
       "building_id": "BLD-5041821-02",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "structure_role": "Detached Rear Garage + Unconsented Studio Sleepout",
       "d59_bedrooms_count": 1,
       "d59_bathrooms_count": 1.0,
@@ -90,7 +90,7 @@
     },
     {
       "building_id": "BLD-5041819-01",
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "structure_role": "Primary Dwelling (1998 Split-Level)",
       "d59_bedrooms_count": 4,
       "d59_bathrooms_count": 2.5,
@@ -104,7 +104,7 @@
     },
     {
       "building_id": "BLD-5042110-01",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "structure_role": "Primary Dwelling (1982 Timber Pole House)",
       "d59_bedrooms_count": 3,
       "d59_bathrooms_count": 1.0,
@@ -119,7 +119,7 @@
   ],
   "natural_resources_70d_verified": [
     {
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M exploration/mining permits)",
       "d65_subsurface_aggregate_resource": "Holocene dune sand over dense alluvial greywacke gravel at 2.4m (Clean fill / roading sub-base)",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -142,7 +142,7 @@
       "d70_riparian_fish_passage_note": "No surface stream on parcel"
     },
     {
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M permits)",
       "d65_subsurface_aggregate_resource": "Consolidated sand/silt dune ridge (Zero quarry aggregate)",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -165,7 +165,7 @@
       "d70_riparian_fish_passage_note": "No surface stream on parcel"
     },
     {
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d65_nzpam_mineral_permit_status": "NZP&M Historical Greywacke Alluvial Aggregate Zone (Waikanae Fan)",
       "d65_subsurface_aggregate_resource": "High-value alluvial greywacke gravel bed at 3.2m BGL beneath 1.15m fill & peat lens",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -192,14 +192,14 @@
     "dredge_latency_ms": 4.403,
     "llm_api_cost_nzd": 0.0,
     "dp_plans_detected": [
-      "DP 24819"
+      "DP 9924819"
     ],
     "consent_ids_detected": [
-      "RM260144"
+      "RM99260144"
     ],
     "title_refs_detected": [
       "24819",
-      "WN42B/881"
+      "WN9942B/881"
     ],
     "imperial_to_metric_conversions": [
       {

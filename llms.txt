@@ -6,3 +6,5 @@
 - Standalone $0.00 SQLite + FTS5 + 12-Physics Compiler & JSON-RPC 2.0 MCP Server: `./toponz_weekend1_kapiti_ingester.py`
 - MCP Manifest: `./.well-known/mcp.json`
 - Complete JSON Schemas & Verification Benchmarks: `./schemas/`
+
+> Demonstration data is fictional: the three benchmark parcels (10 Example St, 16 Sample St, 114 Specimen Rd) and every fact about them, including parcel, plan, consent and title numbers and company names, are invented for illustration. Real data comes only from the live pipeline in pipeline/tile_test.

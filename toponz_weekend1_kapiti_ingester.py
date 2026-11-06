@@ -5,6 +5,8 @@ TopoNZ / TopoAU — Weekend-1 $0.00 Production Compiler & JSON-RPC 2.0 MCP Serve
 A complete, self-contained, zero-budget ($0.00) local compiler and Model Context Protocol
 (MCP) server that builds and serves the 58-Domain (1,606-Primitive) Plot Context Spine:
 
+Demonstration data is fictional: the three benchmark parcels (10 Example St, 16 Sample St, 114 Specimen Rd) and every fact about them, including parcel, plan, consent and title numbers and company names, are invented for illustration. Real data comes only from the live pipeline in pipeline/tile_test.
+
 1. STREAM-AND-DISCARD 1m LiDAR + 12 VECTORIZED PHYSICS KERNELS (`SIM-01` to `SIM-12`):
    Processes 1m DEM/DSM tiles in memory using vectorized NumPy array math (horizon angles,
    7-threshold parametric cut/fill curves, D-infinity upslope catchments, 3D roof facets,
@@ -198,15 +200,15 @@ def run_agent_eval_benchmark() -> Dict[str, Any]:
         },
         {
             "eval_id": "EVAL-02-COASEAN-GRAVITY-SEWER-RESCUE",
-            "scenario": "Uphill Lot Below Street Sewer Grade (`16 Ngahina St` -> `10 Tararua St`)",
-            "baseline_agent_outcome": "FAIL: Budgets $45,000 pumped rising-main system or abandons deal because rear pad sits -0.35m below Ngahina St main.",
-            "toponz_58d_agent_outcome": "PASS (0.18 ms): `toponz_find_coasean_swaps` discovers +5.71% gravity fall across rear boundary into 10 Tararua St's 12.68m uPVC main ($12k easement saves $45k pump).",
+            "scenario": "Uphill Lot Below Street Sewer Grade (`16 Sample St` -> `10 Example St`)",
+            "baseline_agent_outcome": "FAIL: Budgets $45,000 pumped rising-main system or abandons deal because rear pad sits -0.35m below Sample St main.",
+            "toponz_58d_agent_outcome": "PASS (0.18 ms): `toponz_find_coasean_swaps` discovers +5.71% gravity fall across rear boundary into 10 Example St's 12.68m uPVC main ($12k easement saves $45k pump).",
             "net_economic_advantage_nzd": 33000,
             "domains_used": ["D05", "D07", "D27", "SIM-06"]
         },
         {
             "eval_id": "EVAL-03-HISTORICAL-FILL-INSAR-TIMEBOMB",
-            "scenario": "Unrecorded 1985 Farm Gullies & Peat Subsidence (`114 Otaihanga Rd`)",
+            "scenario": "Unrecorded 1985 Farm Gullies & Peat Subsidence (`114 Specimen Rd`)",
             "baseline_agent_outcome": "FAIL: 2026 surface LiDAR looks flat; misses 1.15m of uncompacted 1985 fill over peat swale (-$240,000 piled foundation blowout).",
             "toponz_58d_agent_outcome": "PASS (0.15 ms): `toponz_forensic_subsurface_scan` flags `SIM-10 = +1.15m fill` (1942 Retrolens stereo diff) + `D52 = -3.6mm/yr InSAR` + `D58 = 3 sewer callouts`.",
             "net_economic_advantage_nzd": 240000,
@@ -214,7 +216,7 @@ def run_agent_eval_benchmark() -> Dict[str, Any]:
         },
         {
             "eval_id": "EVAL-04-EXPIRED-COVENANT-SUNSET-ARBITRAGE",
-            "scenario": "Pre-2001 Cross-Lease & Subdivision Sunset Clause (`DP 24819` Sibling Propagation)",
+            "scenario": "Pre-2001 Cross-Lease & Subdivision Sunset Clause (`DP 9924819` Sibling Propagation)",
             "baseline_agent_outcome": "FAIL: Sees 'Fencing & Building Covenant' on title summary and skips 64-lot subdivision, or spends $384 ($6x64) pulling individual instruments.",
             "toponz_58d_agent_outcome": "PASS (0.11 ms): Shared-DP deduplicator parses 1 instrument for all 64 lots and flags that the single-dwelling covenant expired on its 25-year sunset date.",
             "net_economic_advantage_nzd": 310000,
@@ -224,15 +226,15 @@ def run_agent_eval_benchmark() -> Dict[str, Any]:
             "eval_id": "EVAL-05-REVEALED-LAW-HIRB-WAIVER",
             "scenario": "Recession Plane (+1.25m HIRB) Non-Notified Waiver Actuarial Probability",
             "baseline_agent_outcome": "FAIL: Reads strict District Plan rule (`GRZ-R6`) and assumes a +1.25m breach triggers public notification (6-month delay + $60k holding/legal cost).",
-            "toponz_58d_agent_outcome": "PASS (0.19 ms): Joins `D12` s42A precedent (`RM260144`) + `SIM-05` 0.0hr habitable window shadow + `D24` neighbour blank garage wall -> 94.2% non-notified s95A approval.",
+            "toponz_58d_agent_outcome": "PASS (0.19 ms): Joins `D12` s42A precedent (`RM99260144`) + `SIM-05` 0.0hr habitable window shadow + `D24` neighbour blank garage wall -> 94.2% non-notified s95A approval.",
             "net_economic_advantage_nzd": 60000,
             "domains_used": ["D11", "D12", "D16", "D24", "SIM-05"]
         },
         {
             "eval_id": "EVAL-06-LAPSED-S125-CONSENT-SALVAGE",
-            "scenario": "Salvaging Lapsed 5-Year `s125` Engineering CAD & CPT Geotech (`10 Tararua St`)",
+            "scenario": "Salvaging Lapsed 5-Year `s125` Engineering CAD & CPT Geotech (`10 Example St`)",
             "baseline_agent_outcome": "FAIL: Commissions brand-new survey, CPT rig, and civil CAD from scratch ($48,000 + 14 weeks).",
-            "toponz_58d_agent_outcome": "PASS (0.12 ms): Detects `lapsed_s125_cad_on_file_flag = 1` (`RM190218` Cuttriss CAD + NZGD CPT logs already on KCDC file, reusable under 30 Oct 2026 Planning Act transition).",
+            "toponz_58d_agent_outcome": "PASS (0.12 ms): Detects `lapsed_s125_cad_on_file_flag = 1` (`RM99190218` Cuttriss CAD + NZGD CPT logs already on KCDC file, reusable under 30 Oct 2026 Planning Act transition).",
             "net_economic_advantage_nzd": 48000,
             "domains_used": ["D09", "D12", "D53", "D57"]
         }
@@ -272,9 +274,9 @@ def build_weekend1_database() -> Dict[str, Any]:
     cur.executemany(
         "INSERT INTO dp_shared_instrument_vault VALUES (?,?,?,?,?,?,?)",
         [
-            ("DP 24819", "NONE", None, "Paraparaumu Estates Ltd", 1, "NONE — Pre-RMA 1963 Fee Simple subdivision.", 4),
-            ("DP 61092", "819204.2", None, "Kapiti Orchards Ltd", 1, "s221 Notice 819204.2: Specific geotechnical engineer foundation design required due to interbedded peat lenses.", 4),
-            ("DP 84910", "B684120.3", "2023-12-31", "Kapiti Coast Developments 1998 Ltd", 1, "Covenant B684120.3: Single dwelling covenant expired under 25-year sunset clause on 31 Dec 2023; developer entity dissolved 2006.", 64),
+            ("DP 9924819", "NONE", None, "Fictional Estates Ltd", 1, "NONE — Pre-RMA 1963 Fee Simple subdivision.", 4),
+            ("DP 9961092", "819204.2", None, "Fictional Orchards Ltd", 1, "s221 Notice 819204.2: Specific geotechnical engineer foundation design required due to interbedded peat lenses.", 4),
+            ("DP 9984910", "B684120.3", "2023-12-31", "Fictional Developments 1998 Ltd", 1, "Covenant B684120.3: Single dwelling covenant expired under 25-year sunset clause on 31 Dec 2023; developer entity dissolved 2006.", 64),
         ],
     )
 
@@ -345,7 +347,7 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     watchtower_seed = [
-        ("WT-NZ-LINZ-01", "Toitū Te Whenua LINZ Data Service & Elevation GitHub", "NZ-National",
+        ("WT-NZ-DEMO-01", "Toitū Te Whenua LINZ Data Service & Elevation GitHub", "NZ-National",
          json.dumps(["/.well-known/mcp.json", "/llms.txt", "/stac/collections", "github.com/linz/elevation/issues/571"]),
          "WFS 2.0 + Koordinates REST + Upcoming STAC Item Search API (#571)", 0, "sha256:8a41f92c00e41b12",
          "ASSIMILATED_STAC_COG_READY", "STAC/COG HTTP Range-Read adapter ready; eliminates full ZIP downloads."),
@@ -399,8 +401,8 @@ def build_weekend1_database() -> Dict[str, Any]:
     """)
 
     buildings_seed = [
-        # 10 Tararua St: Main 1974 Weatherboard House (Relocatable for +$18k!) + Detached 1988 Garage w/ unconsented 24m² sleepout
-        ("BLD-5041821-01", "LINZ-5041821", "LINZ-BO-1849201", "Primary Dwelling (Relocatable 1974 Bunglaow)",
+        # 10 Example St: Main 1974 Weatherboard House (Relocatable for +$18k!) + Detached 1988 Garage w/ unconsented 24m² sleepout
+        ("BLD-5041821-01", "DEMO-5041821", "LINZ-BO-1849201", "Primary Dwelling (Relocatable 1974 Bunglaow)",
          3, 1.5, 1, 0, 132.0, 132.0, 0.0, 1974,
          "Concrete perimeter ring + repiled H5 timber piles (NZS 3604)",
          "Bevel-back heart rimu / radiata weatherboard (Consented)",
@@ -409,7 +411,7 @@ def build_weekend1_database() -> Dict[str, Any]:
          1, "8.2kW Mitsubishi Heat Pump + R3.6 ceiling + R1.8 underfloor + polythene barrier",
          100.0, "N/A (Residential Single Dwelling)", "Pre-1992 Safe & Sanitary + BC-2019-0412 CCC Issued",
          680, 18000),
-        ("BLD-5041821-02", "LINZ-5041821", "LINZ-BO-1849202", "Detached Rear Garage + Unconsented Studio Sleepout",
+        ("BLD-5041821-02", "DEMO-5041821", "LINZ-BO-1849202", "Detached Rear Garage + Unconsented Studio Sleepout",
          1, 1.0, 0, 2, 54.0, 78.0, 24.0, 1988,
          "100mm unreinforced concrete slab-on-grade",
          "Harditex fibre-cement sheet (pre-1987 trace chrysotile risk on soffits)",
@@ -418,8 +420,8 @@ def build_weekend1_database() -> Dict[str, Any]:
          0, "No fixed heater in sleepout; uninsulated slab",
          85.0, "N/A", "WARNING: 24m² Studio + Bathroom lacks CCC / Certificate of Acceptance (s96)",
          290, -6500),
-        # 16 Ngahina St: 1998 Monolithic Direct-Fixed Stucco Dwelling (Leaky Building + Dux Qest risk)
-        ("BLD-5041819-01", "LINZ-5041819-UPHILL", "LINZ-BO-1849188", "Primary Dwelling (1998 Split-Level)",
+        # 16 Sample St: 1998 Monolithic Direct-Fixed Stucco Dwelling (Leaky Building + Dux Qest risk)
+        ("BLD-5041819-01", "DEMO-5041819-UPHILL", "LINZ-BO-1849188", "Primary Dwelling (1998 Split-Level)",
          4, 2.5, 2, 2, 215.0, 215.0, 0.0, 1998,
          "Concrete slab-on-grade (lower) + timber mid-floor",
          "HIGH RISK: Direct-fixed monolithic texture-coated polystyrene (EIFS, zero cavity, zero eaves) + untreated kiln-dried framing",
@@ -428,8 +430,8 @@ def build_weekend1_database() -> Dict[str, Any]:
          1, "9.0kW Ducted Heat Pump + R2.6 ceiling insulation",
          90.0, "N/A", "CCC Issued 1999 (High Weathertightness Re-Clad Risk: -$220,000)",
          790, -32000),
-        # 114 Otaihanga Rd: 1982 Pole House on subsiding peat fill
-        ("BLD-5042110-01", "LINZ-5042110", "LINZ-BO-1902114", "Primary Dwelling (1982 Timber Pole House)",
+        # 114 Specimen Rd: 1982 Pole House on subsiding peat fill
+        ("BLD-5042110-01", "DEMO-5042110", "LINZ-BO-1902114", "Primary Dwelling (1982 Timber Pole House)",
          3, 1.0, 1, 1, 148.0, 176.0, 28.0, 1982,
          "Driven 3.6m timber piles over peat swale (differential settlement 42mm)",
          "Rusticated cedar weatherboard + Super Six corrugated fibrolite roof (Asbestos)",
@@ -469,7 +471,7 @@ def build_weekend1_database() -> Dict[str, Any]:
     """)
 
     natres_seed = [
-        ("LINZ-5041821",
+        ("DEMO-5041821",
          "Clear (Zero active NZP&M exploration/mining permits)",
          "Holocene dune sand over dense alluvial greywacke gravel at 2.4m (Clean fill / roading sub-base)",
          1,
@@ -480,7 +482,7 @@ def build_weekend1_database() -> Dict[str, Any]:
          "Non-forest urban land (Zero ETS liability)", 0, 0.0,
          1465.0, 6.4, 2.15,
          "Zero QEII / DOC covenants", 0, "No surface stream on parcel"),
-        ("LINZ-5041819-UPHILL",
+        ("DEMO-5041819-UPHILL",
          "Clear (Zero active NZP&M permits)",
          "Consolidated sand/silt dune ridge (Zero quarry aggregate)",
          1,
@@ -491,7 +493,7 @@ def build_weekend1_database() -> Dict[str, Any]:
          "Non-forest urban land", 0, 0.0,
          1490.0, 7.1, 2.05,
          "Zero QEII / DOC covenants", 0, "No surface stream on parcel"),
-        ("LINZ-5042110",
+        ("DEMO-5042110",
          "NZP&M Historical Greywacke Alluvial Aggregate Zone (Waikanae Fan)",
          "High-value alluvial greywacke gravel bed at 3.2m BGL beneath 1.15m fill & peat lens",
          1,
@@ -522,7 +524,7 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     tiles_seed = [
-        ("NZTM-1760-5472", "Paraparaumu Central & Tararua St", "[1760000, 5472000, 1761000, 5473000]", 462, 618, 19, 174.2, "MERKLE_SEALED_70D", "sha256:4f91a082c71e8831"),
+        ("NZTM-1760-5472", "Paraparaumu Central & Example St", "[1760000, 5472000, 1761000, 5473000]", 462, 618, 19, 174.2, "MERKLE_SEALED_70D", "sha256:4f91a082c71e8831"),
         ("NZTM-1758-5473", "Paraparaumu Beach & Marine Parade", "[1758000, 5473000, 1759000, 5474000]", 518, 690, 22, 189.6, "MERKLE_SEALED_70D", "sha256:9c20b418e55d1024"),
         ("NZTM-1757-5469", "Raumati Beach & Raumati South", "[1757000, 5469000, 1758000, 5470000]", 485, 640, 21, 181.0, "MERKLE_SEALED_70D", "sha256:7a11d930f42c6190"),
         ("NZTM-1762-5475", "Ōtaihanga & Waikanae River Corridor", "[1762000, 5475000, 1763000, 5476000]", 194, 275, 14, 98.4, "MERKLE_SEALED_70D", "sha256:2e88c501a39b7742"),
@@ -545,28 +547,28 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     contradictions_seed = [
-        ("CONTRA-01-FLOOR-DELTA", "LINZ-5041821",
+        ("CONTRA-01-FLOOR-DELTA", "DEMO-5041821",
          "D59 Council RID Valuation Roll (KCDC)", "D06 LINZ 1m LiDAR DSM + Layer 101292 Building Outlines",
          "UNCONSENTED_FLOOR_AREA_DISCREPANCY",
          "Detached garage BLD-5041821-02 recorded as 54.0 m² utility shed with 0 bedrooms/bathrooms",
          "3D LiDAR + Orthophoto measures 78.0 m² (+24.0 m² enclosed studio sleepout + 2014 gully-trap bathroom)",
          -18500,
          "Demand vendor s96 Certificate of Acceptance (COA) or -$18,500 price reduction before unconditional."),
-        ("CONTRA-02-FLOOD-INSURANCE", "LINZ-5041821",
+        ("CONTRA-02-FLOOD-INSURANCE", "DEMO-5041821",
          "D10 Coarse 2D Insurer Flood Risk Polygon", "D06 Surveyed FFL (14.42m) + D60 H5 Pile Elevation vs 1% AEP Flood RL (13.50m)",
          "FALSE_POSITIVE_INSURANCE_FLOOD_LOADING",
          "Coarse insurer postcode/street flood buffer flags parcel for +$1,850/yr flood risk surcharge",
          "1m LiDAR + repiled subfloor proves FFL sits +0.92m above 100-year flood RL (nearly double 0.50m freeboard rule)",
          18500,
          "Auto-generate Cryptographic Flood Freeboard Exemption Certificate (NPV +$18,500 over 10 yrs)."),
-        ("CONTRA-03-RATES-OVERVALUATION", "LINZ-5042110",
+        ("CONTRA-03-RATES-OVERVALUATION", "DEMO-5042110",
          "D15 Council Mass-Appraisal Land Value ($670,000)", "D67 NPS-HPL LUC 2w Lock + D70 20m Esplanade Forfeiture + SIM-10 1.15m Peat Fill",
          "STATUTORY_LAND_VALUATION_OVERASSESSMENT",
          "Mass appraisal prices 4,900m² lot as unconstrained lifestyle subdivision land",
          "Combined NPS-HPL Class 2 soil lock + 20m stream forfeiture + 1.15m peat fill blocks standard subdivision",
          24000,
          "File automated s32/s33 Rating Valuation Objection -> reduces annual council rates by ~$2,400/yr (10-yr NPV +$24k)."),
-        ("CONTRA-04-ETS-ZONING-CONFLICT", "LINZ-5042110",
+        ("CONTRA-04-ETS-ZONING-CONFLICT", "DEMO-5042110",
          "D11 District Plan Permitted Shelterbelt Clearance", "D68 MfE LUCAS Pre-1990 Forest Polygon (0.18 ha)",
          "HIDDEN_ETS_DEFORESTATION_SURRENDER_TRAP",
          "Council District Plan allows routine rural shelterbelt removal without resource consent",
@@ -592,21 +594,21 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     sat_seed = [
-        ("LINZ-5041821",
+        ("DEMO-5041821",
          "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
          "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
          0.58, 0.04, "CLEAR: Zero unconsented canopy/roof change in last 180 days; +24m² sleepout roof added in 2014 epoch",
          -14.2, 4.8,
          json.dumps(["L1_LINZ_5CM_ORTHO", "L2_CADASTRE_EASEMENTS", "L3_LIDAR_PAD_SLOPE", "L4_BLDG_DELTAS_RED", "L5_SEWER_COASEAN_VECTOR", "L6_SENTINEL_EO"]),
-         "VLM_PROOF: Red +24m² unconsented garage extension polygon clearly visible between Council 54m² RID footprint and 78m² LiDAR/5cm Ortho footprint; green Coasean sewer arrow from 16 Ngahina St."),
-        ("LINZ-5041819-UPHILL",
+         "VLM_PROOF: Red +24m² unconsented garage extension polygon clearly visible between Council 54m² RID footprint and 78m² LiDAR/5cm Ortho footprint; green Coasean sewer arrow from 16 Sample St."),
+        ("DEMO-5041819-UPHILL",
          "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
          "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
          0.62, -0.02, "CLEAR: Stable 710m² rear lawn; high winter solar exposure on north roof plane",
          -15.1, 5.4,
          json.dumps(["L1_LINZ_5CM_ORTHO", "L2_CADASTRE_EASEMENTS", "L3_LIDAR_PAD_SLOPE", "L4_BLDG_DELTAS_RED", "L5_SEWER_COASEAN_VECTOR", "L6_SENTINEL_EO"]),
-         "VLM_PROOF: Rear 710m² pad slopes south toward 10 Tararua St boundary; visual HGL profile confirms +5.71% gravity drainage via neighbour easement."),
-        ("LINZ-5042110",
+         "VLM_PROOF: Rear 710m² pad slopes south toward 10 Example St boundary; visual HGL profile confirms +5.71% gravity drainage via neighbour easement."),
+        ("DEMO-5042110",
          "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
          "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
          0.74, 0.38, "ALERT: High winter NDWI (+0.38) & Sentinel-1 SAR backscatter (-9.4 dB) confirm perched water pooling over 1985 filled peat gully",
@@ -631,15 +633,15 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     indirect_seed = [
-        ("LINZ-5041821",
+        ("DEMO-5041821",
          "D73 SAR/InSAR: Zero pipe-leak dielectric anomaly (-14.2 dB); PS-InSAR corner-to-corner roof phase diff = 0.1 mm/yr (Zero foundation rotation).",
          "D74 Spectral/Thermal: Main house roof nocturnal ΔT = -0.3°C vs street baseline (Confirms R3.6 ceiling insulation); Rear garage sleepout ΔT = +2.8°C (Uninsulated roof); Zero chrysotile SWIR 2.32μm absorption.",
          "D75 LiDAR Intensity & Wires: Driveway remission = 0.42 ( Brushed concrete, 92% intact); Street 400V overhead wire catenary clearance = 5.45m (Clear for 4.8m house relocation truck without line lift!).",
          "D76 Curbside Time-Machine (2008-2026): 2 letterboxes (10 & 10A) + 2 sets of wheelie bins detected since 2015 (Confirms rear garage studio is occupied as separate flat); 8 subfloor pile vents visible (Confirms crawlspace access).",
          "D77 Utility Side-Channels: Chorus API shows 2 active ONT fibre records (Main + Rear Studio); EMI ICP shows 60A single-phase + ripple hot-water; Reservoir TWL minus LiDAR RL = 540 kPa static / 28.4 L/s fire flow.",
-         "D78 Shadow Signals: Ghost Consent RM190218 (3-lot subdivision granted 2019, zero BC/224c lodged -> $48k Cuttriss CAD & CPT salvageable); Automated online insurance quote = PASS (Green).",
+         "D78 Shadow Signals: Ghost Consent RM99190218 (3-lot subdivision granted 2019, zero BC/224c lodged -> $48k Cuttriss CAD & CPT salvageable); Automated online insurance quote = PASS (Green).",
          3, 66000),
-        ("LINZ-5041819-UPHILL",
+        ("DEMO-5041819-UPHILL",
          "D73 SAR/InSAR: Stable soil dielectric (-15.1 dB); PS-InSAR shows 0.2 mm/yr uniform phase.",
          "D74 Spectral/Thermal: High SWIR moisture retention on north parapet junctions (+1.4°C thermal bridging anomaly consistent with moisture ingress in 1998 untreated framing).",
          "D75 LiDAR Intensity & Wires: Asphalt driveway (remission 0.18); Rear lawn 100% pervious grass (Impervious coverage = 31.2% vs 50% District Plan max).",
@@ -647,13 +649,13 @@ def build_weekend1_database() -> Dict[str, Any]:
          "D77 Utility Side-Channels: 3-phase 63A underground pillar box at front boundary; Chorus UFB underground ducted; Street sewer main invert 14.40m is +0.35m too shallow for rear pad.",
          "D78 Shadow Signals: Property withdrawn from sale 5 months ago after 3 collapsed conditional offers (Classic building-inspection weathertightness walk-away signature).",
          4, -187000),
-        ("LINZ-5042110",
+        ("DEMO-5042110",
          "D73 SAR/InSAR: High winter VH/VV dielectric (-9.4 dB) + 6.8mm seasonal peat swell/shrink oscillation + 1.9 mm/yr NE-to-SW roof corner tilt (Active differential pile settlement!).",
          "D74 Spectral/Thermal: Strong 2.32μm Mg-OH SWIR absorption + moss/hydrocarbon NIR signature on main roof (Confirms 1982 Super Six chrysotile asbestos-cement roof); Septic plume NDVI spike in Feb drought.",
          "D75 LiDAR Intensity & Wires: Last-return sub-canopy pulses reveal incised 2.4m stream bank erosion inside 20m Esplanade strip; Roof plane-fit residual = 44mm mid-span ridge sag.",
          "D76 Curbside Time-Machine: Boundary timber crib retaining wall rotated +2.1° toward road between 2012 and 2026 epochs with white calcium efflorescence streaks.",
-         "D77 Utility Side-Channels: Outside Chorus UFB footprint (5G Fixed Wireless LOS to Paraparaumu tower = -78 dBm); RAMM heavy-vehicle road vibration on Otaihanga Rd = 1.8 mm/s PPV.",
-         "D78 Shadow Signals: Resource consent RM210044 WITHDRAWN after s92 HAIL/CPT request; Public insurer online quote-gate triggers 'Manual Underwriter Referral Required' (EQC/NHC 2013 claim shadow).",
+         "D77 Utility Side-Channels: Outside Chorus UFB footprint (5G Fixed Wireless LOS to Paraparaumu tower = -78 dBm); RAMM heavy-vehicle road vibration on Specimen Rd = 1.8 mm/s PPV.",
+         "D78 Shadow Signals: Resource consent RM99210044 WITHDRAWN after s92 HAIL/CPT request; Public insurer online quote-gate triggers 'Manual Underwriter Referral Required' (EQC/NHC 2013 claim shadow).",
          6, -268000)
     ]
     cur.executemany("INSERT INTO plot_indirect_inferences_78d VALUES (?,?,?,?,?,?,?,?,?)", indirect_seed)
@@ -682,17 +684,17 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     crosscheck_seed = [
-        ("LINZ-5041821",
+        ("DEMO-5041821",
          "AUTO-CORRECTED (+0.38m Datum Shift): KCDC MH-4491 rim recorded as 14.20m (Legacy Wgtn1953 datum) vs 13.82m on LINZ 1m LiDAR (NZVD2016); pipe invert auto-normalized by -0.38m to 12.68m NZVD2016.",
          "CONSERVATION_ALERT (+24.0m² Bldg Delta): Land area matches across Title (1,040.0m²), Layer 50772 (1,040.2m²), and RID (1,040m²). Building area diverges: RID (186m²) vs 3D LiDAR + Layer 101292 + 5cm Ortho (210m²).",
          "5/5 SENSOR CONSENSUS (99.6% Conf): S-map (Dune Sand) + NZGD CPT (qc=14.8 MPa) + Retrolens 1942 (+0.02m diff) + Sentinel-1 InSAR (-0.2mm/yr) + NHC (0 claims) all confirm stable TC1 sand.",
          "4/5 WITNESS OVERRIDE (Unconsented 2nd Unit): RID claims 1 unit, but Chorus API (2 ONTs) + Curbside Vision (2 letterboxes/bin sets) + Thermal IR (+2.8°C heated garage) + Tie Card (2014 bathroom) prove 2 occupied units.",
-         "CLEAR (5/5 Verified): 150mm uPVC sewer main in Tararua St road reserve matches manhole lid visible on 5cm LINZ Ortho within 0.11m; zero unregistered on-site pipe encroachments.",
+         "CLEAR (5/5 Verified): 150mm uPVC sewer main in Example St road reserve matches manhole lid visible on 5cm LINZ Ortho within 0.11m; zero unregistered on-site pipe encroachments.",
          "EPOCH VIOLATION CAUGHT (2014): +24m² garage extension appeared between 2012 and 2015 aerial epochs during a window with 0 Building Consents (D13) -> Flagged for s96 COA.",
-         "PASS (Kirchhoff Pipe & Edge Conservation): Upstream MH-4490 (13.12m) -> MH-4491 (12.68m) -> Downstream MH-4492 (12.19m) strictly monotonic (1:110 grade, 150mm->225mm dia); shared boundary with 16 Ngahina St has 0.00m sliver gap.",
-         "PASS (Fee Simple Estate Verified): Title WN42B/881 is 1/1 Fee Simple (not Cross-Lease); hence the +24m² garage studio does NOT trigger a $28k Defective Cross-Lease Flats-Plan re-survey.",
+         "PASS (Kirchhoff Pipe & Edge Conservation): Upstream MH-4490 (13.12m) -> MH-4491 (12.68m) -> Downstream MH-4492 (12.19m) strictly monotonic (1:110 grade, 150mm->225mm dia); shared boundary with 16 Sample St has 0.00m sliver gap.",
+         "PASS (Fee Simple Estate Verified): Title WN9942B/881 is 1/1 Fee Simple (not Cross-Lease); hence the +24m² garage studio does NOT trigger a $28k Defective Cross-Lease Flats-Plan re-survey.",
          "MINOR FENCE OFFSET (+0.18m East): 5cm Ortho + LiDAR curb step shows eastern timber fence sits 0.18m inside legal boundary (within 0.25m tolerance; zero adverse possession risk).",
-         "PASS (Active Entity Standing): Proprietor 'Tararua Holdings 2025 Ltd' verified ACTIVE on MBIE Register (NZBN 9429048821901, 0 insolvency notices, 0 tax caveats, matches sibling 12 Tararua St director).",
+         "PASS (Active Entity Standing): Proprietor 'Example Holdings 2025 Ltd' verified ACTIVE on MBIE Register (NZBN 9429048821901, 0 insolvency notices, 0 tax caveats, matches sibling 12 Example St director).",
          "ARBITRAGE VERIFIED (Flood Map False Positive): Coarse 2D flood buffer touches street frontage, but SIM-03 D-Infinity spill + 14.42m FFL + Sentinel-2 NDWI (+0.04 dry) prove +0.92m freeboard.",
          "PASS (5-Tier Statutory Lattice): Infill 4-unit townhousing passes Property Law Covenants (0) ∩ NES-CS HAIL (Clear) ∩ NPS-FM Wetlands (Clear) ∩ GWRC NRP (Permitted) ∩ KCDC PC2 PRECx1 (Permitted/Controlled).",
          "DE-BIASED (Emissivity ε=0.91 vs 0.32): BLD-01 Colorsteel (ε=0.91) vs BLD-02 unpainted galvanized iron (ε=0.32) emissivity-corrected before computing +2.8°C sleepout ceiling heat-loss anomaly.",
@@ -700,16 +702,16 @@ def build_weekend1_database() -> Dict[str, Any]:
          "61 / 64 Invariants Passed (1 Auto-Datum Fix, 1 Unconsented Studio Caught, 1 Flood False-Positive Reversed)",
          0.996,
          "RECONCILED_INSTITUTIONAL_GRADE_WITH_S96_HOLDBACK"),
-        ("LINZ-5041819-UPHILL",
-         "PASS (0.02m Tolerance): Ngahina St sewer manhole rim matches LINZ NZVD2016 LiDAR within 0.02m; confirms rear pad sits -0.35m below own street sewer grade.",
+        ("DEMO-5041819-UPHILL",
+         "PASS (0.02m Tolerance): Sample St sewer manhole rim matches LINZ NZVD2016 LiDAR within 0.02m; confirms rear pad sits -0.35m below own street sewer grade.",
          "PASS (100% Conservation): Legal title (980.0m²), Layer 50772 polygon (980.1m²), and building footprint (215.0m² across RID, LiDAR, and 5cm Ortho) agree within 0.1%.",
          "5/5 SENSOR CONSENSUS (99.4% Conf): NZGD CPT (qc=15.1 MPa) + S-map + InSAR (-0.1mm/yr) + Retrolens 1942 confirm stable consolidated dune ridge.",
          "5/5 WITNESS CONSENSUS (Single 4-Bed Dwelling): RID, 1 Chorus ONT, 1 ICP meter, 1 letterbox, and uniform thermal roof signature all confirm single-household occupancy.",
-         "COASEAN OPPORTUNITY VERIFIED: Zero existing easement across southern boundary (Layer 50782), but 3D LiDAR + Tararua St pipe invert cross-check proves +5.71% gravity grade via 10 Tararua St.",
+         "COASEAN OPPORTUNITY VERIFIED: Zero existing easement across southern boundary (Layer 50782), but 3D LiDAR + Example St pipe invert cross-check proves +5.71% gravity grade via 10 Example St.",
          "TEMPORAL WARNING (1998 Cladding Era): BC issued 1998 + CCC 1999 coincides with SWIR parapet moisture anomaly (+1.4°C) and 3 collapsed conditional sales in 2026.",
-         "PASS (Cross-Parcel Graph Reciprocity): Shared 20.52m rear boundary edge with 10 Tararua St (LINZ-5041821) topologically watertight; downstream Tararua St 150mm main has 14.2 L/s spare wet-weather capacity.",
+         "PASS (Cross-Parcel Graph Reciprocity): Shared 20.52m rear boundary edge with 10 Example St (DEMO-5041821) topologically watertight; downstream Example St 150mm main has 14.2 L/s spare wet-weather capacity.",
          "PASS (Fee Simple 1/1): Not a Cross-Lease or Unit Title.",
-         "ENCROACHMENT CAUGHT (-0.65m Road Reserve): Front garden retaining wall encroaches 0.65m into Ngahina St legal road reserve (requires KCDC Encroachment Licence).",
+         "ENCROACHMENT CAUGHT (-0.65m Road Reserve): Front garden retaining wall encroaches 0.65m into Sample St legal road reserve (requires KCDC Encroachment Licence).",
          "PASS (Natural Person Ownership): Private individual title; first-ranking bank mortgage only.",
          "PASS (Uphill Shedding): SIM-03 D-Infinity confirms 0.0m³ surface ponding; overland flow discharges south.",
          "PASS (5-Tier Statutory Lattice): Rear infill subdivision passes all 5 statutory tiers once bilateral Coasean drainage easement is registered.",
@@ -718,17 +720,17 @@ def build_weekend1_database() -> Dict[str, Any]:
          "60 / 64 Invariants Passed (1 EIFS Reclad Risk, 1 Road-Reserve Wall Encroachment, 1 Coasean Swap Verified)",
          0.993,
          "RECONCILED_COASEAN_SWAP_READY_WITH_RECLAD_DEDUCTION"),
-        ("LINZ-5042110",
+        ("DEMO-5042110",
          "AUTO-CORRECTED (+1.44m Imperial + Datum Fix): 1982 tie card depth '4ft 9in' converted to 1.45m and tied to 2025 LiDAR ground RL (8.40m NZVD2016).",
          "CRITICAL AREA & BLDG DIVERGENCE: Gross title is 4,900m², but D70 stream cross-check deducts 680m² for mandatory 20m Esplanade Strip forfeiture on subdivision; Building LiDAR (176m²) exceeds RID (148m²) by +28m².",
          "SILO OVERRIDE (4 Sensors Override Coarse Map): Coarse zoning looks buildable, but Retrolens 1942 (+1.15m fill) + Sentinel-1 InSAR (-3.6mm/yr) + NZGD CPT (1.85 MPa) + Sentinel-2 NDWI (+0.38) prove active peat subsidence.",
          "5/5 WITNESS CONSENSUS: Single 3-bedroom pole house with unconsented +28m² enclosed sunroom deck.",
          "ORPHAN LATERAL SHEAR DETECTED: 3 council CSR sewer callouts (D58) spatially align with the exact 1942 Retrolens peat-swale boundary edge and +2.1° crib-wall tilt.",
-         "CAUSAL CHAIN VERIFIED: 1985 farm gully filling -> 2013 EQC/NHC resin claim -> 2021 RM210044 s92 withdrawal -> 2026 insurer online quote-gate refusal.",
-         "FAIL (Downstream Culvert Bottleneck): Stream culvert under Otaihanga Rd (900mm concrete) is undersized for SIM-03 1% AEP upslope catchment flow -> causes backwater ponding over rear peat swale.",
+         "CAUSAL CHAIN VERIFIED: 1985 farm gully filling -> 2013 EQC/NHC resin claim -> 2021 RM99210044 s92 withdrawal -> 2026 insurer online quote-gate refusal.",
+         "FAIL (Downstream Culvert Bottleneck): Stream culvert under Specimen Rd (900mm concrete) is undersized for SIM-03 1% AEP upslope catchment flow -> causes backwater ponding over rear peat swale.",
          "PASS (Fee Simple Lifestyle Block): 1/1 share, subject to s221 Consent Notice 819204.2.",
          "STREAM BOUNDARY ACCRETION/EROSION SHIFT (-2.4m): 2025 LiDAR last-return stream bank has eroded 2.4m inland inside the 1982 surveyed title boundary!",
-         "WARNING (Struck-Off Sibling Developer Entity): Previous applicant company on withdrawn RM210044 was removed from MBIE Companies Register in 2023.",
+         "WARNING (Struck-Off Sibling Developer Entity): Previous applicant company on withdrawn RM99210044 was removed from MBIE Companies Register in 2023.",
          "CRITICAL HYDRO CONFLICT: SIM-03 backwater + Sentinel-2 NDWI (+0.38) prove active winter surface saturation outside the published 2014 KCDC flood polygon.",
          "BLOCKED AT 4 OF 5 STATUTORY TIERS: Blocked by (1) s221 Geotech Notice, (2) NES-CS HAIL A10 Orchard Shed, (3) NPS-HPL LUC 2w Soil Lock, and (4) NPS-FM 10m Wetland Setback + Pre-1990 ETS Penalty.",
          "DE-BIASED (Look-Angle & Phenology Calibrated): Sentinel-1 ascending & descending tracks both confirm -3.6mm/yr vertical subsidence (zero horizontal look-angle artifact); NDWI normalized against NIWA SPI rainfall.",
@@ -754,41 +756,41 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     dag_seed = [
-        ("DAG-SUB-1973-DP24819",
+        ("DAG-SUB-1973-DP9924819",
          json.dumps(["LINZ-PARENT-1922-SEC14"]),
-         json.dumps(["LINZ-5041821", "LINZ-5041822", "LINZ-5041819-UPHILL", "LINZ-ROAD-TARARUA"]),
+         json.dumps(["DEMO-5041821", "DEMO-5041822", "DEMO-5041819-UPHILL", "LINZ-ROAD-TARARUA"]),
          "SUBDIVISION_1_TO_64_AND_ROAD_VESTING",
-         "DP 24819 (Surveyed 1973)",
+         "DP 9924819 (Surveyed 1973)",
          "1973-11-14",
-         "Point CPTs & 1942 Retrolens elevation grids clipped to each child lot polygon (1,040m² to LINZ-5041821).",
-         "Parent DP 24819 drainage easements & fencing covenant (expired 1998) broadcast to all 64 sibling lots.",
-         "Tararua St & Ngahina St road polygons vested in KCDC as legal road (parcel_intent='Road')."),
+         "Point CPTs & 1942 Retrolens elevation grids clipped to each child lot polygon (1,040m² to DEMO-5041821).",
+         "Parent DP 9924819 drainage easements & fencing covenant (expired 1998) broadcast to all 64 sibling lots.",
+         "Example St & Sample St road polygons vested in KCDC as legal road (parcel_intent='Road')."),
         ("DAG-AMALG-2026-TARARUA",
-         json.dumps(["LINZ-5041821", "LINZ-5041822"]),
-         json.dumps(["LINZ-5099901-SUPERLOT"]),
+         json.dumps(["DEMO-5041821", "DEMO-5041822"]),
+         json.dumps(["DEMO-5099901-SUPERLOT"]),
          "AMALGAMATION_2_TO_1_S220_RMA",
-         "LT 618400 (Proposed Stealth Assembly Super-Lot · 2,055 m²)",
+         "LT 99618400 (Proposed Stealth Assembly Super-Lot · 2,055 m²)",
          "2026-11-05",
          "Union of both parent polygons (1,040m² + 1,015m² = 2,055m²) + union of all 3 buildings (BLD-01, BLD-02, BLD-12-01).",
-         "Union of RM260144 s42A HIRB waiver precedent + RM190218 Cuttriss CAD + both street frontage crossings (41.0m combined frontage).",
+         "Union of RM99260144 s42A HIRB waiver precedent + RM99190218 Cuttriss CAD + both street frontage crossings (41.0m combined frontage).",
          "MERGER OF TITLE EXTINGUISHMENT: Reciprocal internal side-boundary right-of-way & eaves easement between #10 and #12 automatically extinguished upon amalgamation!"),
-        ("DAG-SUB-1982-DP61092",
+        ("DAG-SUB-1982-DP9961092",
          json.dumps(["LINZ-PARENT-1940-NGARARA-FARM"]),
-         json.dumps(["LINZ-5042110", "LINZ-HYDRO-WAIKANAE-09"]),
+         json.dumps(["DEMO-5042110", "LINZ-HYDRO-WAIKANAE-09"]),
          "SUBDIVISION_AND_BOUNDARY_ADJUSTMENT",
-         "DP 61092 (Surveyed 1982)",
+         "DP 9961092 (Surveyed 1982)",
          "1982-06-18",
-         "1942 Retrolens peat swale (-1.15m gully) & 1966 orchard shed HAIL A10 footprint clipped to LINZ-5042110.",
+         "1942 Retrolens peat swale (-1.15m gully) & 1966 orchard shed HAIL A10 footprint clipped to DEMO-5042110.",
          "Consent Notice 819204.2 (s221 specific foundation design over peat) & 1.8 L/s bore allocation inherited from parent farm.",
          "Stream bed parcel (LINZ-HYDRO-WAIKANAE-09) partitioned; movable water boundary subject to -2.4m erosion & 20m Esplanade Strip forfeiture."),
         ("DAG-SPLIT-2027-INFILL",
-         json.dumps(["LINZ-5041821"]),
-         json.dumps(["LINZ-619001-LOT1-FRONT", "LINZ-619002-LOT2-REAR", "LINZ-619003-LOT3-REAR", "LINZ-619004-COAL-DRIVE"]),
+         json.dumps(["DEMO-5041821"]),
+         json.dumps(["DEMO-619001-LOT1-FRONT", "DEMO-619002-LOT2-REAR", "DEMO-619003-LOT3-REAR", "DEMO-619004-COAL-DRIVE"]),
          "SUBDIVISION_1_TO_4_FEE_SIMPLE_PLUS_COAL",
-         "LT 619200 (4-Lot Infill Subdivision)",
+         "LT 99619200 (4-Lot Infill Subdivision)",
          "2027-02-01",
          "BLD-5041821-01 (1974 Bungalow) clipped to Lot 1 (418m²); Rear 622m² pad split into Lot 2 (260m²), Lot 3 (262m²), and Common Access Lot 4 (100m²).",
-         "All 4 child lots inherit 1974 tie-card lineage, TC1 sand CPT (qc=14.8 MPa), and Coasean easement revenue share from 16 Ngahina St.",
+         "All 4 child lots inherit 1974 tie-card lineage, TC1 sand CPT (qc=14.8 MPa), and Coasean easement revenue share from 16 Sample St.",
          "Lot 4 (COAL) held as 1/3 undivided share each by Lots 1–3 with reciprocal utility & vehicle access easements under s220 RMA.")
     ]
     cur.executemany("INSERT INTO cadastral_lineage_dag_85d VALUES (?,?,?,?,?,?,?,?,?)", dag_seed)
@@ -809,31 +811,31 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     split_zone_seed = [
-        ("SZ-5041821-A", "LINZ-5041821",
+        ("SZ-5041821-A", "DEMO-5041821",
          "General Residential Zone — Precinct PRECx1 (6-Storey Rail Catchment)",
          962.0, 92.5, 21.0, 60.0,
          "OPERATIVE_PC2_IPI (Legal Weight = 1.00 · Planning Act 2026 Locked)",
          json.dumps({"1973_Scheme": "Residential A (1 house/600m²)", "1999_Plan": "Living Zone", "2021_PDP": "General Residential (8m)", "2023_PC2": "GRZ PRECx1 (21m / 6-Storey)"}),
          "1974 Bungalow (BLD-01) & 1988 Garage (BLD-02) hold protected s10 Existing Use Rights for original setbacks; 2014 studio bathroom requires s96 COA."),
-        ("SZ-5041821-B", "LINZ-5041821",
+        ("SZ-5041821-B", "DEMO-5041821",
          "Frontage Road-Widening & Street-Tree Root Protection Strip",
          78.0, 7.5, 0.0, 25.0,
          "OPERATIVE_OVERLAY (Legal Weight = 1.00)",
          json.dumps({"1973_Scheme": "4.5m Front Yard", "2023_PC2": "1.5m Front Setback + Berm Utility Corridor"}),
          "Zero habitable buildings permitted inside 78m² front berm/setback slice; vehicle crossing width capped at 6.0m."),
-        ("SZ-5042110-A", "LINZ-5042110",
+        ("SZ-5042110-A", "DEMO-5042110",
          "Rural Lifestyle Zone (RLZ — General Rural Fringe)",
          3120.0, 63.7, 8.0, 15.0,
          "OPERATIVE_WITH_NPS_HPL_LOCK (Legal Weight = 1.00)",
          json.dumps({"1973_Scheme": "Rural A", "1999_Plan": "Rural Dunes & Peat", "2021_PDP": "Rural Lifestyle Zone (1ha min lot)", "2025_NPS_HPL": "LUC 2w Highly Productive Land Lock"}),
          "1982 Pole House (148m²) enjoys Existing Use Rights, but LUC 2w soil lock + 4,900m² area (<2ha min) prohibits further lifestyle subdivision."),
-        ("SZ-5042110-B", "LINZ-5042110",
+        ("SZ-5042110-B", "DEMO-5042110",
          "GWRC Natural Resources Plan — Schedule F Indigenous Wetland & 10m NPS-FM Setback",
          1100.0, 22.4, 0.0, 0.0,
          "STATUTORY_PROHIBITED_EARTHWORKS (Legal Weight = 1.00 · NES-F / NPS-FM)",
          json.dumps({"1973_Scheme": "Unmapped Farm Swale", "2020_NPS_FM": "Natural Inland Wetland 10m Earthworks/Drainage Prohibition"}),
          "STRICT NO-BUILD / NO-DRAINAGE SLICE: Any vegetation clearance, filling, or water diversion within this 1,100m² slice is a Non-Complying/Prohibited Activity."),
-        ("SZ-5042110-C", "LINZ-5042110",
+        ("SZ-5042110-C", "DEMO-5042110",
          "Riparian 20m Esplanade Strip & Stream Floodway Corridor",
          680.0, 13.9, 0.0, 0.0,
          "STATUTORY_FORFEITURE_ON_SUBDIVISION (s230 RMA / Natural Environment Act 2026)",
@@ -862,15 +864,15 @@ def build_weekend1_database() -> Dict[str, Any]:
          "Department of Conservation (Te Papa Atawhai — NaPALIS GIS)",
          "Reserve / Crown Land (Conservation)",
          "Inalienable Crown Conservation Land; public foot access; DOC Concession required for any commercial/drone/easement activity.",
-         "LINZ-5042110",
+         "DEMO-5042110",
          "BOUNDARY EFFECT: Guarantees 0.0hr future build shading on western outlook (+amenity), but triggers mandatory Predator-Free Kāpiti cat/dog covenant, 20m wildfire buffer, and strict ecological lighting controls."),
         ("LINZ-KCDC-RES-8812",
          "COUNCIL_RECREATION_AND_ESPLANADE_RESERVE",
-         "Tararua / Kaitawa Local Purpose & Recreation Reserve Network (Reserves Act 1977 s17 & s23)",
+         "Example / Kaitawa Local Purpose & Recreation Reserve Network (Reserves Act 1977 s17 & s23)",
          "Kāpiti Coast District Council (Parks & Open Space)",
          "Reserve",
          "Perpetual public open space; zero residential/commercial alienation; council reserve management plan applies.",
-         "LINZ-5041821",
+         "DEMO-5041821",
          "BOUNDARY EFFECT (+$45,000 Value Uplift): Permanently locks open green space & solar sky-view factor within 120m walk (SIM-12); qualifies infill development for reduced on-site private open space waiver under GRZ-R11."),
         ("LINZ-HYDRO-WAIKANAE-09",
          "HYDRO_RIVERBED_AND_20M_MARGINAL_STRIP",
@@ -878,15 +880,15 @@ def build_weekend1_database() -> Dict[str, Any]:
          "Crown / Greater Wellington Regional Council (GWRC Flood Protection)",
          "Hydro",
          "Bed vested in Crown/Council; movable boundary doctrine (accretion/erosion) applies unless fixed marginal strip.",
-         "LINZ-5042110",
-         "BOUNDARY EFFECT (-2.4m Erosion Loss): Active stream bank migration has eroded 2.4m into LINZ-5042110; triggers 20m Esplanade Strip forfeiture and GWRC river-works bylaw."),
+         "DEMO-5042110",
+         "BOUNDARY EFFECT (-2.4m Erosion Loss): Active stream bank migration has eroded 2.4m into DEMO-5042110; triggers 20m Esplanade Strip forfeiture and GWRC river-works bylaw."),
         ("LINZ-ROAD-PAPER-OTAI-04",
          "UNFORMED_LEGAL_ROAD_PAPER_ROAD",
-         "Unformed Legal Crown Road ('Paper Road' off Otaihanga Domain Corridor · Local Government Act 1974 s316)",
+         "Unformed Legal Crown Road ('Paper Road' off Specimen Domain Corridor · Local Government Act 1974 s316)",
          "Kāpiti Coast District Council (Roading Authority)",
          "Road (Unformed)",
          "Full legal public right of passage on foot/horse/vehicle (Walking Access Act 2008 / Herenga Ā Nuku); cannot be fenced off without formal Road Stopping (s342 LGA).",
-         "LINZ-5042110",
+         "DEMO-5042110",
          "BOUNDARY EFFECT (Dual-Edged): Provides potential secondary legal road frontage if formed at developer cost ($1,800/m), but exposes eastern boundary to public walking access."),
         ("LINZ-MAORI-MLC-NGARARA",
          "MAORI_FREEHOLD_LAND_AND_S338_RESERVATION",
@@ -894,7 +896,7 @@ def build_weekend1_database() -> Dict[str, Any]:
          "Ahu Whenua Trust / Māori Land Court (Te Kooti Whenua Māori)",
          "Maori / Covenant (s338 Non-Primary Parcel)",
          "Preferred class of alienees (hapū/whānau) retention; exempt from forced rating sales (Local Government Rating Act 2002); KCDC Papakāinga Zone rules enable communal housing without subdivision.",
-         "LINZ-5042110",
+         "DEMO-5042110",
          "BOUNDARY EFFECT: Triggers statutory Iwi/Hapū cultural values consultation (Ātiawa ki Whakarongotai) on any earthworks or wastewater discharge within 100m of statutory acknowledgement / Wāhi Tapu corridor.")
     ]
     cur.executemany("INSERT INTO non_private_and_special_tenure_88d VALUES (?,?,?,?,?,?,?,?)", nonprivate_seed)
@@ -915,40 +917,40 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     ancestral_seed = [
-        ("ANC-5041821-1938-DRAIN", "LINZ-5041821",
-         "1886 Kaitawa Block VIII Sec 14 (420 ha) -> 1922 Dairy Farm Lot 2 DP 6104 (68 ha) -> 1973 DP 24819 (64 Residential Lots) -> 2026 LINZ-5041821 (1,040 m²)",
-         1938, "Lot 2 DP 6104 (Paraparaumu Dairy Farm)",
+        ("ANC-5041821-1938-DRAIN", "DEMO-5041821",
+         "1886 Kaitawa Block VIII Sec 14 (420 ha) -> 1922 Dairy Farm Lot 2 DP 996104 (68 ha) -> 1973 DP 9924819 (64 Residential Lots) -> 2026 DEMO-5041821 (1,040 m²)",
+         1938, "Lot 2 DP 996104 (Paraparaumu Dairy Farm)",
          "CLASS_3_SUBSURFACE_CONDUIT_PERSISTENCE",
          "1938 Hutt River/Kaitawa Catchment Board 4-inchglazed clay agricultural field-tile sub-drain running NE-to-SW at 1.1m BGL across former Paddock 4.",
          "18.4 m linear run across rear buildable pad (36.8 m² trench zone = 3.5% of modern plot)",
-         "Avoided blanketing all 64 lots of DP 24819; pinpointed the exact 7 child lots crossed by the 1938 clay field-tile line.",
+         "Avoided blanketing all 64 lots of DP 9924819; pinpointed the exact 7 child lots crossed by the 1938 clay field-tile line.",
          "ACTIVE PHYSICAL IMPACT: When excavating foundations on rear 622m² pad, contractor must intercept and reconnect live 1938 clay field-tile drain to stormwater to prevent sub-slab groundwater damming."),
-        ("ANC-5041821-1954-DIP-AVOIDED", "LINZ-5041821",
-         "1922 Dairy Farm Lot 2 DP 6104 (68 ha) -> 1973 DP 24819 (64 Lots)",
-         1954, "Lot 2 DP 6104 (NE Homestead Corner)",
+        ("ANC-5041821-1954-DIP-AVOIDED", "DEMO-5041821",
+         "1922 Dairy Farm Lot 2 DP 996104 (68 ha) -> 1973 DP 9924819 (64 Lots)",
+         1954, "Lot 2 DP 996104 (NE Homestead Corner)",
          "CLASS_1_LOCALIZED_FOOTPRINT_CLIP (NEGATIVE PROOF / CLEARED)",
-         "1954 Parent Farm Arsenic Sheep-Dip & Tractor Fuel Tank (HAIL A8/A10) located 340m North-East on what is now Lot 48 & Lot 49 DP 24819.",
-         "0.0 m² overlap with LINZ-5041821 (Distance to 1954 dip footprint = 342.0 m)",
-         "CRITICAL FALSE-POSITIVE SMEAR PREVENTED: Naive parent-title HAIL inheritance flags all 64 lots on DP 24819 as HAIL-contaminated; sub-polygon clip proves LINZ-5041821 is 342m up-gradient and 100% clean!",
-         "ZERO NES-CS HAIL TRIGGER: Saves $14,500 Preliminary/Detailed Site Investigation (PSI/DSI) cost on 10 Tararua St via negative spatial proof."),
-        ("ANC-5041821-1922-STOCKRACE", "LINZ-5041821",
-         "1922 Dairy Farm Lot 2 DP 6104 -> 1973 DP 24819",
+         "1954 Parent Farm Arsenic Sheep-Dip & Tractor Fuel Tank (HAIL A8/A10) located 340m North-East on what is now Lot 48 & Lot 49 DP 9924819.",
+         "0.0 m² overlap with DEMO-5041821 (Distance to 1954 dip footprint = 342.0 m)",
+         "CRITICAL FALSE-POSITIVE SMEAR PREVENTED: Naive parent-title HAIL inheritance flags all 64 lots on DP 9924819 as HAIL-contaminated; sub-polygon clip proves DEMO-5041821 is 342m up-gradient and 100% clean!",
+         "ZERO NES-CS HAIL TRIGGER: Saves $14,500 Preliminary/Detailed Site Investigation (PSI/DSI) cost on 10 Example St via negative spatial proof."),
+        ("ANC-5041821-1922-STOCKRACE", "DEMO-5041821",
+         "1922 Dairy Farm Lot 2 DP 996104 -> 1973 DP 9924819",
          1922, "Transfer 149822 (Stock Water-Race Easement)",
          "CLASS_5_EXTINGUISHED_ON_SUBDIVISION",
          "1922 right to convey stock water across former farm boundary.",
-         "Surrendered on deposit of DP 24819 (14 Nov 1973)",
+         "Surrendered on deposit of DP 9924819 (14 Nov 1973)",
          "Prevents AI agent from treating historical 1922 stock water-race memorial as an active building restriction.",
-         "EXTINGUISHED: Zero legal effect on modern 2026 title WN42B/881."),
-        ("ANC-5042110-1966-ORCHARD", "LINZ-5042110",
-         "1881 Ngarara West B Block -> 1940 Mixed Orchard & Grazing Block (32 ha) -> 1982 DP 61092 (8 Lifestyle Lots) -> 2026 LINZ-5042110 (4,900 m²)",
+         "EXTINGUISHED: Zero legal effect on modern 2026 title WN9942B/881."),
+        ("ANC-5042110-1966-ORCHARD", "DEMO-5042110",
+         "1881 Ngarara West B Block -> 1940 Mixed Orchard & Grazing Block (32 ha) -> 1982 DP 9961092 (8 Lifestyle Lots) -> 2026 DEMO-5042110 (4,900 m²)",
          1966, "Pt Ngarara West B (Ōtaihanga Orchard Block)",
          "CLASS_1_LOCALIZED_FOOTPRINT_CLIP (POSITIVE HIT)",
          "1966 Aerial SN1844 shows concrete-floored orchard agrichemical mixing shed & lead-arsenate/DDT spray washdown apron directly inside modern south-west paddock.",
          "215.0 m² direct footprint + 15m leachate halo = 640.0 m² (13.1% of modern 4,900m² plot)",
-         "Cleared 6 of the 8 sibling lifestyle lots on DP 61092, while localizing the exact 640m² HAIL A10 hotspot inside LINZ-5042110.",
+         "Cleared 6 of the 8 sibling lifestyle lots on DP 9961092, while localizing the exact 640m² HAIL A10 hotspot inside DEMO-5042110.",
          "MANDATORY NES-CS SOIL SAMPLING: Triggers NES-CS Controlled/Restricted Discretionary soil remediation if disturbing >25m³ of soil within the 640m² SW hotspot."),
-        ("ANC-5042110-1948-BORE", "LINZ-5042110",
-         "1940 Mixed Orchard Block -> 1982 DP 61092 -> 2026 LINZ-5042110",
+        ("ANC-5042110-1948-BORE", "DEMO-5042110",
+         "1940 Mixed Orchard Block -> 1982 DP 9961092 -> 2026 DEMO-5042110",
          1948, "Catchment Board Well Permit #W-1948-19",
          "CLASS_3_SUBSURFACE_CONDUIT_PERSISTENCE",
          "Unplugged 1948 2-inch galvanized steel artesian farm stock well buried under 1985 farm gully fill (+1.15m) near centre of parcel.",
@@ -974,25 +976,25 @@ def build_weekend1_database() -> Dict[str, Any]:
         )
     """)
     adv96_seed = [
-        ("ADV96-5041821", "LINZ-5041821",
-         "D91 3D Stratum & Unit Title Option: Eligible for 4-Unit Fee Simple + COAL (LT 619200) OR Staged Unit Title Plan (PU1-PU4 + AU1-AU4 carparks under Unit Titles Act 2010; zero Cross-Lease conversion needed).",
-         "D92 In-Flight & PWA Status: Lapsed RM190218 s223 survey dataset salvagable in Landonline XML; zero Public Works Act (PWA) severance notices; +0.0m² road-stopping opportunity.",
+        ("ADV96-5041821", "DEMO-5041821",
+         "D91 3D Stratum & Unit Title Option: Eligible for 4-Unit Fee Simple + COAL (LT 99619200) OR Staged Unit Title Plan (PU1-PU4 + AU1-AU4 carparks under Unit Titles Act 2010; zero Cross-Lease conversion needed).",
+         "D92 In-Flight & PWA Status: Lapsed RM99190218 s223 survey dataset salvagable in Landonline XML; zero Public Works Act (PWA) severance notices; +0.0m² road-stopping opportunity.",
          "D93 Designations & Overlays: CLEAR of NZTA, KiwiRail, MoE, and Electra Requiring Authority Designations (s176); outside Kapiti Airport obstacle limitation surface (OLS) conical flightpath.",
          "D94 Bonus / Inclusionary Zoning: Qualifies for PRECx1 6-storey rail catchment bonus height (21.0m) + 0-carpark minimum + KCDC recreation-reserve proximity open-space waiver.",
          "D95 Crown / RFR / s40 Audit: Private Fee Simple (never Crown-acquired post-1948 -> zero s40 Public Works Act offer-back risk; zero Treaty RFR memorial on title).",
          "D96 Coastal / River Boundary: Inland dune terrace (+13.78m RL, 1.8km east of Mean High Water Springs MHWS; zero coastal erosion or CMCA jurisdiction).",
          99.4,
-         "UNLOCK: 100% clear of Designations (s176), Airport OLS height caps, and PWA s40 offer-back risks; Landonline XML survey from lapsed RM190218 cuts 4 months off s223/s224c title deposit."),
-        ("ADV96-5041819", "LINZ-5041819-UPHILL",
-         "D91 3D Stratum & Appurtenant Easement: Rear subdivision creates 3D subterranean pipe stratum easement (RL 12.68m to RL 14.10m, 1.5m wide) across 10 Tararua St.",
-         "D92 In-Flight & Road Stopping: Front retaining wall encroaches -0.65m into Ngahina St road reserve -> eligible for KCDC Encroachment Licence or minor s342 LGA Road Stopping purchase (+13.3 m²).",
+         "UNLOCK: 100% clear of Designations (s176), Airport OLS height caps, and PWA s40 offer-back risks; Landonline XML survey from lapsed RM99190218 cuts 4 months off s223/s224c title deposit."),
+        ("ADV96-5041819", "DEMO-5041819-UPHILL",
+         "D91 3D Stratum & Appurtenant Easement: Rear subdivision creates 3D subterranean pipe stratum easement (RL 12.68m to RL 14.10m, 1.5m wide) across 10 Example St.",
+         "D92 In-Flight & Road Stopping: Front retaining wall encroaches -0.65m into Sample St road reserve -> eligible for KCDC Encroachment Licence or minor s342 LGA Road Stopping purchase (+13.3 m²).",
          "D93 Designations & Overlays: CLEAR of Requiring Authority Designations; sits 42m below Kapiti Airport outer horizontal flightpath surface (no crane height restriction up to 14m).",
          "D94 Bonus / Inclusionary Zoning: General Residential Zone standard 3-unit as-of-right density once Coasean gravity sewer easement is registered.",
          "D95 Crown / RFR / s40 Audit: Private Fee Simple; zero RFR or s40 offer-back encumbrances.",
          "D96 Coastal / River Boundary: Elevated dune ridge (+14.95m RL); zero MHWS or river avulsion exposure.",
          99.1,
-         "UNLOCK: Formalizes the Coasean sewer swap as a 3D subterranean stratum easement (RL 12.68m–14.10m) so 10 Tararua St retains surface lawn use above the pipe!"),
-        ("ADV96-5042110", "LINZ-5042110",
+         "UNLOCK: Formalizes the Coasean sewer swap as a 3D subterranean stratum easement (RL 12.68m–14.10m) so 10 Example St retains surface lawn use above the pipe!"),
+        ("ADV96-5042110", "DEMO-5042110",
          "D91 3D Stratum & Conservation Covenant: Cannot create standard residential lots, but eligible to register a perpetual QEII / GWRC Wetland Covenant over the 1,100m² Slice B.",
          "D92 Avulsion vs Erosion & PWA: Stream boundary lost -2.4m via gradual erosion (moves legal title boundary inward under common law), whereas 1998 flood avulsion cut is fixed; adjoins NZTA Expressway designation corridor.",
          "D93 Designations (s176 Block): Eastern corner lies within 35m of NZTA State Highway / Expressway Designation buffer (DES-NZTA-018 -> requires NZTA written s176/reverse-sensitivity acoustic consent).",
@@ -1013,9 +1015,9 @@ def build_weekend1_database() -> Dict[str, Any]:
 
     sample_plots = [
         {
-            "parcel_id": "LINZ-5041821",
-            "dp_plan_ref": "DP 24819",
-            "address": "10 Tararua Street, Paraparaumu",
+            "parcel_id": "DEMO-5041821",
+            "dp_plan_ref": "DP 9924819",
+            "address": "10 Example Street, Paraparaumu",
             "suburb": "Paraparaumu",
             "legal_area_sqm": 1040.0,
             "unencumbered_pad_sqm": 622.0,
@@ -1033,19 +1035,19 @@ def build_weekend1_database() -> Dict[str, Any]:
             "north_neighbour_lv_cv_ratio": 0.36,
             "withdrawn_listing_months_ago": 0,
             "lapsed_s125_cad_on_file_flag": 1,
-            "covenant_txt": "WN42B/881 Fee Simple. Zero restrictive covenants. Zero s221 notices.",
-            "s42a_txt": "RM260144 s42A Officer Report: GRZ-R6 HIRB +1.25m waived non-notified; faces blank corrugated steel garage wall on 12 Tararua St. Lapsed RM190218 Cuttriss CAD + soakage on file.",
+            "covenant_txt": "WN9942B/881 Fee Simple. Zero restrictive covenants. Zero s221 notices.",
+            "s42a_txt": "RM99260144 s42A Officer Report: GRZ-R6 HIRB +1.25m waived non-notified; faces blank corrugated steel garage wall on 12 Example St. Lapsed RM99190218 Cuttriss CAD + soakage on file.",
             "tie_card_txt": "KCDC Drainage Field Card BP-1974-0812: 4in earthenware lateral, invert 4ft 2in at boundary peg, wye junction 18ft east of MH-4491.",
         },
         {
-            "parcel_id": "LINZ-5041819-UPHILL",
-            "dp_plan_ref": "DP 24819",
-            "address": "16 Ngahina Street, Paraparaumu (Rear Uphill Neighbour)",
+            "parcel_id": "DEMO-5041819-UPHILL",
+            "dp_plan_ref": "DP 9924819",
+            "address": "16 Sample Street, Paraparaumu (Rear Uphill Neighbour)",
             "suburb": "Paraparaumu",
             "legal_area_sqm": 980.0,
             "unencumbered_pad_sqm": 710.0,
             "rear_pad_elev_m": 14.95,
-            "street_sewer_invert_m": 14.40,  # Too shallow to drain rear pad to Ngahina St (-0.35m after 0.9m cover!)
+            "street_sewer_invert_m": 14.40,  # Too shallow to drain rear pad to Sample St (-0.35m after 0.9m cover!)
             "street_sewer_dist_m": 28.0,
             "downstream_moratorium_flag": 0,
             "cpt_qc_mpa": 15.1,
@@ -1058,14 +1060,14 @@ def build_weekend1_database() -> Dict[str, Any]:
             "north_neighbour_lv_cv_ratio": 0.42,
             "withdrawn_listing_months_ago": 5,
             "lapsed_s125_cad_on_file_flag": 0,
-            "covenant_txt": "WN42B/879 Fee Simple. Zero restrictive covenants.",
-            "s42a_txt": "Pre-app note: Rear pad sits below Ngahina St sewer main hydraulic grade; requires pump station UNLESS private gravity easement obtained through 10 Tararua St.",
+            "covenant_txt": "WN9942B/879 Fee Simple. Zero restrictive covenants.",
+            "s42a_txt": "Pre-app note: Rear pad sits below Sample St sewer main hydraulic grade; requires pump station UNLESS private gravity easement obtained through 10 Example St.",
             "tie_card_txt": "KCDC Drainage Field Card 1972: Front gully trap only; rear lawn unserviced.",
         },
         {
-            "parcel_id": "LINZ-5042110",
-            "dp_plan_ref": "DP 61092",
-            "address": "114 Otaihanga Road, Ōtaihanga",
+            "parcel_id": "DEMO-5042110",
+            "dp_plan_ref": "DP 9961092",
+            "address": "114 Specimen Road, Ōtaihanga",
             "suburb": "Ōtaihanga",
             "legal_area_sqm": 4900.0,
             "unencumbered_pad_sqm": 3250.0,
@@ -1083,8 +1085,8 @@ def build_weekend1_database() -> Dict[str, Any]:
             "north_neighbour_lv_cv_ratio": 1.0,
             "withdrawn_listing_months_ago": 9,
             "lapsed_s125_cad_on_file_flag": 0,
-            "covenant_txt": "WN31C/109. Consent Notice 819204.2 (s221): Specific geotechnical engineer foundation design required due to interbedded peat lenses.",
-            "s42a_txt": "RM210044 WITHDRAWN after s92 Request for Detailed Site Investigation (DSI) on 1966 orchard pesticide shed (HAIL A10) and 15m CPT logs.",
+            "covenant_txt": "WN9931C/109. Consent Notice 819204.2 (s221): Specific geotechnical engineer foundation design required due to interbedded peat lenses.",
+            "s42a_txt": "RM99210044 WITHDRAWN after s92 Request for Detailed Site Investigation (DSI) on 1966 orchard pesticide shed (HAIL A10) and 15m CPT logs.",
             "tie_card_txt": "KCDC Card BP-1982-0309: Driven timber piles (3.6m); 3 council sewer callouts for lateral shear displacement over peat boundary.",
         },
     ]
@@ -1127,10 +1129,10 @@ def build_weekend1_database() -> Dict[str, Any]:
             (p["parcel_id"], p["address"], p["covenant_txt"], p["s42a_txt"], p["tie_card_txt"]),
         )
 
-    # Insert Touching Adjacency Edge between Uphill Lot (`LINZ-5041819-UPHILL`) and Downhill Lot (`LINZ-5041821`)
+    # Insert Touching Adjacency Edge between Uphill Lot (`DEMO-5041819-UPHILL`) and Downhill Lot (`DEMO-5041821`)
     cur.execute(
         "INSERT INTO parcel_adjacency_edges VALUES (?,?,?,?,?)",
-        ("LINZ-5041819-UPHILL", "SOUTH_REAR_BOUNDARY", 20.52, "LINZ-5041821", 24.0),
+        ("DEMO-5041819-UPHILL", "SOUTH_REAR_BOUNDARY", 20.52, "DEMO-5041821", 24.0),
     )
 
     conn.commit()
@@ -1210,7 +1212,7 @@ def build_weekend1_database() -> Dict[str, Any]:
         "ancestral_farm_to_lot_backfill_90d": anc_rows,
         "advanced_mutations_zoning_and_crown_estate_96d": adv96_rows,
         "zero_cost_statutory_dredger_sample": dredge_raw_statutory_text_zero_cost(
-            "DP 24819 | WN42B/881 | RM260144 s42A Officer Report: GRZ-R6 HIRB +1.25m waived non-notified under s95A; "
+            "DP 9924819 | WN9942B/881 | RM99260144 s42A Officer Report: GRZ-R6 HIRB +1.25m waived non-notified under s95A; "
             "KCDC Drainage Card BP-1974-0812: 4in earthenware lateral, invert 4ft 2in at boundary peg, 18ft 6in east of MH-4491. "
             "Covenant expires on 14 May 2021."
         ),
@@ -1226,7 +1228,7 @@ def build_weekend1_database() -> Dict[str, Any]:
 # ==============================================================================
 # 8. UNIFIED 1-CALL MASTER 84-DOMAIN DOSSIER GENERATOR (<1.5 MS FULL JOIN)
 # ==============================================================================
-def generate_master_84d_plot_dossier(parcel_id: str = "LINZ-5041821") -> Dict[str, Any]:
+def generate_master_84d_plot_dossier(parcel_id: str = "DEMO-5041821") -> Dict[str, Any]:
     """
     Executes a single-pass relational join across all SQLite tables (Land 58D,
     FTS5 Verbatim, Coasean Adjacency Swaps, 1:N Buildings D59-D64, Natural
@@ -1332,16 +1334,16 @@ def serve_mcp_stdio():
                 rows = [dict(r) for r in cur.execute("SELECT * FROM watchtower_endpoint_registry").fetchall()]
                 result = {"tool": tool_name, "monitored_agencies_count": 108, "sample_targets": rows}
             elif tool_name == "toponz_dredge_raw_document":
-                raw_txt = args.get("raw_text", "DP 24819 | RM260144 s42A: +1.25m waived non-notified s95A | Tie card invert 4ft 2in")
+                raw_txt = args.get("raw_text", "DP 9924819 | RM99260144 s42A: +1.25m waived non-notified s95A | Tie card invert 4ft 2in")
                 result = {"tool": tool_name, "extracted_primitives": dredge_raw_statutory_text_zero_cost(raw_txt)}
             elif tool_name == "toponz_run_agent_eval":
                 result = {"tool": tool_name, "eval_report": run_agent_eval_benchmark()}
             elif tool_name == "toponz_audit_plot_buildings":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM plot_buildings_and_units_64d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "buildings_count": len(rows), "buildings_64d": rows}
             elif tool_name == "toponz_audit_natural_resources":
-                pid = args.get("parcel_id", "LINZ-5042110")
+                pid = args.get("parcel_id", "DEMO-5042110")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM plot_natural_resources_70d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "natural_resources_70d": rows}
             elif tool_name == "toponz_detect_cross_silo_contradictions":
@@ -1352,36 +1354,36 @@ def serve_mcp_stdio():
                 total_p = sum(r["parcels_in_tile"] for r in rows)
                 result = {"tool": tool_name, "tiles_completed": len(rows), "total_parcels_compiled_in_batch": total_p, "tiles": rows}
             elif tool_name == "toponz_render_satellite_and_visual_stack":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM plot_satellite_eo_and_visual_layers_72d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "satellite_and_visual_72d": rows}
             elif tool_name == "toponz_run_indirect_xray_inference":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM plot_indirect_inferences_78d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "indirect_inferences_78d": rows}
             elif tool_name == "toponz_run_80d_crosscheck_audit":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM plot_crosscheck_reconciliation_80d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "crosscheck_reconciliation_80d": rows}
             elif tool_name == "toponz_generate_master_84d_dossier":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 result = generate_master_84d_plot_dossier(pid)
             elif tool_name == "toponz_audit_lineage_zoning_and_tenure":
-                pid = args.get("parcel_id", "LINZ-5042110")
+                pid = args.get("parcel_id", "DEMO-5042110")
                 dag = [dict(r) for r in cur.execute("SELECT * FROM cadastral_lineage_dag_85d WHERE parent_parcel_ids_json LIKE ? OR child_parcel_ids_json LIKE ?", (f"%{pid}%", f"%{pid}%")).fetchall()]
                 sz = [dict(r) for r in cur.execute("SELECT * FROM parcel_split_zoning_and_epochs_86d WHERE parcel_id = ?", (pid,)).fetchall()]
                 np_land = [dict(r) for r in cur.execute("SELECT * FROM non_private_and_special_tenure_88d WHERE adjoining_private_parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "cadastral_lineage_dag_85d": dag, "split_zoning_slices_86d": sz, "adjoining_non_private_land_88d": np_land}
             elif tool_name == "toponz_trace_ancestral_backfill":
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM ancestral_farm_to_lot_backfill_90d WHERE modern_parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "ancestral_backfill_records": rows}
             elif tool_name == "toponz_audit_96d_completeness":
-                pid = args.get("parcel_id", "LINZ-5042110")
+                pid = args.get("parcel_id", "DEMO-5042110")
                 rows = [dict(r) for r in cur.execute("SELECT * FROM advanced_mutations_zoning_and_crown_estate_96d WHERE parcel_id = ?", (pid,)).fetchall()]
                 result = {"tool": tool_name, "parcel_id": pid, "advanced_96d_records": rows}
             else:
-                pid = args.get("parcel_id", "LINZ-5041821")
+                pid = args.get("parcel_id", "DEMO-5041821")
                 rows = [dict(r) for r in cur.execute(
                     "SELECT p.*, f.verbatim_covenant_and_s221, f.verbatim_s42a_and_s92_consents, f.verbatim_1970s_drainage_tie_card FROM plot_spine_58d p JOIN plot_verbatim_fts5 f ON p.parcel_id = f.parcel_id WHERE p.parcel_id = ?",
                     (pid,)

@@ -4,18 +4,18 @@
   "cash_cost_nzd": 0.0,
   "coasean_easement_swaps_discovered": [
     {
-      "uphill_parcel_id": "LINZ-5041819-UPHILL",
-      "uphill_address": "16 Ngahina Street, Paraparaumu (Rear Uphill Neighbour)",
+      "uphill_parcel_id": "DEMO-5041819-UPHILL",
+      "uphill_address": "16 Sample Street, Paraparaumu (Rear Uphill Neighbour)",
       "uphill_own_street_grade": -0.0125,
-      "downhill_neighbour_id": "LINZ-5041821",
-      "downhill_neighbour_address": "10 Tararua Street, Paraparaumu",
+      "downhill_neighbour_id": "DEMO-5041821",
+      "downhill_neighbour_address": "10 Example Street, Paraparaumu",
       "cross_boundary_easement_grade_ratio": 0.0571
     }
   ],
   "predictive_subsurface_failures_flagged": [
     {
-      "parcel_id": "LINZ-5042110",
-      "address": "114 Otaihanga Road, \u014ctaihanga",
+      "parcel_id": "DEMO-5042110",
+      "address": "114 Specimen Road, \u014ctaihanga",
       "sim10_hist_fill_m": 1.15,
       "d52_insar_vlm_mm_yr": -3.6,
       "d56_curbside_wall_tilt_deg": 2.1,
@@ -24,7 +24,7 @@
   ],
   "autonomous_watchtower_targets_verified": [
     {
-      "target_id": "WT-NZ-LINZ-01",
+      "target_id": "WT-NZ-DEMO-01",
       "agency_name": "Toit\u016b Te Whenua LINZ Data Service & Elevation GitHub",
       "active_data_protocol": "WFS 2.0 + Koordinates REST + Upcoming STAC Item Search API (#571)",
       "mcp_or_llms_txt_detected": 0,
@@ -62,7 +62,7 @@
   "building_subspine_1_to_n_verified": [
     {
       "building_id": "BLD-5041821-01",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "structure_role": "Primary Dwelling (Relocatable 1974 Bunglaow)",
       "d59_bedrooms_count": 3,
       "d59_bathrooms_count": 1.5,
@@ -76,7 +76,7 @@
     },
     {
       "building_id": "BLD-5041821-02",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "structure_role": "Detached Rear Garage + Unconsented Studio Sleepout",
       "d59_bedrooms_count": 1,
       "d59_bathrooms_count": 1.0,
@@ -90,7 +90,7 @@
     },
     {
       "building_id": "BLD-5041819-01",
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "structure_role": "Primary Dwelling (1998 Split-Level)",
       "d59_bedrooms_count": 4,
       "d59_bathrooms_count": 2.5,
@@ -104,7 +104,7 @@
     },
     {
       "building_id": "BLD-5042110-01",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "structure_role": "Primary Dwelling (1982 Timber Pole House)",
       "d59_bedrooms_count": 3,
       "d59_bathrooms_count": 1.0,
@@ -119,7 +119,7 @@
   ],
   "natural_resources_70d_verified": [
     {
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M exploration/mining permits)",
       "d65_subsurface_aggregate_resource": "Holocene dune sand over dense alluvial greywacke gravel at 2.4m (Clean fill / roading sub-base)",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -142,7 +142,7 @@
       "d70_riparian_fish_passage_note": "No surface stream on parcel"
     },
     {
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M permits)",
       "d65_subsurface_aggregate_resource": "Consolidated sand/silt dune ridge (Zero quarry aggregate)",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -165,7 +165,7 @@
       "d70_riparian_fish_passage_note": "No surface stream on parcel"
     },
     {
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d65_nzpam_mineral_permit_status": "NZP&M Historical Greywacke Alluvial Aggregate Zone (Waikanae Fan)",
       "d65_subsurface_aggregate_resource": "High-value alluvial greywacke gravel bed at 3.2m BGL beneath 1.15m fill & peat lens",
       "d65_crown_minerals_s8_reservation_flag": 1,
@@ -191,7 +191,7 @@
   "spatial_1km_tile_batch_checkpoints": [
     {
       "nztm_tile_id": "NZTM-1760-5472",
-      "suburb_cluster": "Paraparaumu Central & Tararua St",
+      "suburb_cluster": "Paraparaumu Central & Example St",
       "nztm_bbox_epsg2193": "[1760000, 5472000, 1761000, 5473000]",
       "parcels_in_tile": 462,
       "buildings_in_tile": 618,
@@ -248,7 +248,7 @@
   "cross_silo_contradictions_detected": [
     {
       "contradiction_id": "CONTRA-01-FLOOR-DELTA",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "silo_a_source": "D59 Council RID Valuation Roll (KCDC)",
       "silo_b_source": "D06 LINZ 1m LiDAR DSM + Layer 101292 Building Outlines",
       "contradiction_type": "UNCONSENTED_FLOOR_AREA_DISCREPANCY",
@@ -259,7 +259,7 @@
     },
     {
       "contradiction_id": "CONTRA-02-FLOOD-INSURANCE",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "silo_a_source": "D10 Coarse 2D Insurer Flood Risk Polygon",
       "silo_b_source": "D06 Surveyed FFL (14.42m) + D60 H5 Pile Elevation vs 1% AEP Flood RL (13.50m)",
       "contradiction_type": "FALSE_POSITIVE_INSURANCE_FLOOD_LOADING",
@@ -270,7 +270,7 @@
     },
     {
       "contradiction_id": "CONTRA-03-RATES-OVERVALUATION",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "silo_a_source": "D15 Council Mass-Appraisal Land Value ($670,000)",
       "silo_b_source": "D67 NPS-HPL LUC 2w Lock + D70 20m Esplanade Forfeiture + SIM-10 1.15m Peat Fill",
       "contradiction_type": "STATUTORY_LAND_VALUATION_OVERASSESSMENT",
@@ -281,7 +281,7 @@
     },
     {
       "contradiction_id": "CONTRA-04-ETS-ZONING-CONFLICT",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "silo_a_source": "D11 District Plan Permitted Shelterbelt Clearance",
       "silo_b_source": "D68 MfE LUCAS Pre-1990 Forest Polygon (0.18 ha)",
       "contradiction_type": "HIDDEN_ETS_DEFORESTATION_SURRENDER_TRAP",
@@ -293,7 +293,7 @@
   ],
   "satellite_eo_and_visual_layers_72d": [
     {
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "d71_linz_5cm_aerial_wmts_template": "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
       "d71_sentinel2_stac_cog_scene_id": "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
       "d71_sentinel2_ndvi_summer_min": 0.58,
@@ -302,10 +302,10 @@
       "d71_sentinel1_sar_vh_vv_moisture_db": -14.2,
       "d71_landsat9_lst_winter_frost_deg_c": 4.8,
       "d72_maplibre_pmtiles_layer_stack_json": "[\"L1_LINZ_5CM_ORTHO\", \"L2_CADASTRE_EASEMENTS\", \"L3_LIDAR_PAD_SLOPE\", \"L4_BLDG_DELTAS_RED\", \"L5_SEWER_COASEAN_VECTOR\", \"L6_SENTINEL_EO\"]",
-      "d72_vlm_multimodal_visual_anomaly_tag": "VLM_PROOF: Red +24m\u00b2 unconsented garage extension polygon clearly visible between Council 54m\u00b2 RID footprint and 78m\u00b2 LiDAR/5cm Ortho footprint; green Coasean sewer arrow from 16 Ngahina St."
+      "d72_vlm_multimodal_visual_anomaly_tag": "VLM_PROOF: Red +24m\u00b2 unconsented garage extension polygon clearly visible between Council 54m\u00b2 RID footprint and 78m\u00b2 LiDAR/5cm Ortho footprint; green Coasean sewer arrow from 16 Sample St."
     },
     {
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "d71_linz_5cm_aerial_wmts_template": "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
       "d71_sentinel2_stac_cog_scene_id": "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
       "d71_sentinel2_ndvi_summer_min": 0.62,
@@ -314,10 +314,10 @@
       "d71_sentinel1_sar_vh_vv_moisture_db": -15.1,
       "d71_landsat9_lst_winter_frost_deg_c": 5.4,
       "d72_maplibre_pmtiles_layer_stack_json": "[\"L1_LINZ_5CM_ORTHO\", \"L2_CADASTRE_EASEMENTS\", \"L3_LIDAR_PAD_SLOPE\", \"L4_BLDG_DELTAS_RED\", \"L5_SEWER_COASEAN_VECTOR\", \"L6_SENTINEL_EO\"]",
-      "d72_vlm_multimodal_visual_anomaly_tag": "VLM_PROOF: Rear 710m\u00b2 pad slopes south toward 10 Tararua St boundary; visual HGL profile confirms +5.71% gravity drainage via neighbour easement."
+      "d72_vlm_multimodal_visual_anomaly_tag": "VLM_PROOF: Rear 710m\u00b2 pad slopes south toward 10 Example St boundary; visual HGL profile confirms +5.71% gravity drainage via neighbour easement."
     },
     {
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d71_linz_5cm_aerial_wmts_template": "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp",
       "d71_sentinel2_stac_cog_scene_id": "S2B_60GUV_20261028_0_L2A (Element84 Earth Search COG)",
       "d71_sentinel2_ndvi_summer_min": 0.74,
@@ -331,18 +331,18 @@
   ],
   "indirect_inferences_78d": [
     {
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "d73_sar_subsurface_leak_and_tilt_inference": "D73 SAR/InSAR: Zero pipe-leak dielectric anomaly (-14.2 dB); PS-InSAR corner-to-corner roof phase diff = 0.1 mm/yr (Zero foundation rotation).",
       "d74_spectral_asbestos_and_thermal_rvalue_inference": "D74 Spectral/Thermal: Main house roof nocturnal \u0394T = -0.3\u00b0C vs street baseline (Confirms R3.6 ceiling insulation); Rear garage sleepout \u0394T = +2.8\u00b0C (Uninsulated roof); Zero chrysotile SWIR 2.32\u03bcm absorption.",
       "d75_lidar_intensity_surface_and_wire_sag_inference": "D75 LiDAR Intensity & Wires: Driveway remission = 0.42 ( Brushed concrete, 92% intact); Street 400V overhead wire catenary clearance = 5.45m (Clear for 4.8m house relocation truck without line lift!).",
       "d76_curbside_meters_bins_and_joinery_inference": "D76 Curbside Time-Machine (2008-2026): 2 letterboxes (10 & 10A) + 2 sets of wheelie bins detected since 2015 (Confirms rear garage studio is occupied as separate flat); 8 subfloor pile vents visible (Confirms crawlspace access).",
       "d77_chorus_ont_icp_and_hydraulic_sidechannel": "D77 Utility Side-Channels: Chorus API shows 2 active ONT fibre records (Main + Rear Studio); EMI ICP shows 60A single-phase + ripple hot-water; Reservoir TWL minus LiDAR RL = 540 kPa static / 28.4 L/s fire flow.",
-      "d78_ghost_consent_and_insurer_triage_shadow_signal": "D78 Shadow Signals: Ghost Consent RM190218 (3-lot subdivision granted 2019, zero BC/224c lodged -> $48k Cuttriss CAD & CPT salvageable); Automated online insurance quote = PASS (Green).",
+      "d78_ghost_consent_and_insurer_triage_shadow_signal": "D78 Shadow Signals: Ghost Consent RM99190218 (3-lot subdivision granted 2019, zero BC/224c lodged -> $48k Cuttriss CAD & CPT salvageable); Automated online insurance quote = PASS (Green).",
       "indirect_anomalies_count": 3,
       "estimated_hidden_value_or_risk_nzd": 66000
     },
     {
-      "parcel_id": "LINZ-5041819-UPHILL",
+      "parcel_id": "DEMO-5041819-UPHILL",
       "d73_sar_subsurface_leak_and_tilt_inference": "D73 SAR/InSAR: Stable soil dielectric (-15.1 dB); PS-InSAR shows 0.2 mm/yr uniform phase.",
       "d74_spectral_asbestos_and_thermal_rvalue_inference": "D74 Spectral/Thermal: High SWIR moisture retention on north parapet junctions (+1.4\u00b0C thermal bridging anomaly consistent with moisture ingress in 1998 untreated framing).",
       "d75_lidar_intensity_surface_and_wire_sag_inference": "D75 LiDAR Intensity & Wires: Asphalt driveway (remission 0.18); Rear lawn 100% pervious grass (Impervious coverage = 31.2% vs 50% District Plan max).",
@@ -353,30 +353,30 @@
       "estimated_hidden_value_or_risk_nzd": -187000
     },
     {
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d73_sar_subsurface_leak_and_tilt_inference": "D73 SAR/InSAR: High winter VH/VV dielectric (-9.4 dB) + 6.8mm seasonal peat swell/shrink oscillation + 1.9 mm/yr NE-to-SW roof corner tilt (Active differential pile settlement!).",
       "d74_spectral_asbestos_and_thermal_rvalue_inference": "D74 Spectral/Thermal: Strong 2.32\u03bcm Mg-OH SWIR absorption + moss/hydrocarbon NIR signature on main roof (Confirms 1982 Super Six chrysotile asbestos-cement roof); Septic plume NDVI spike in Feb drought.",
       "d75_lidar_intensity_surface_and_wire_sag_inference": "D75 LiDAR Intensity & Wires: Last-return sub-canopy pulses reveal incised 2.4m stream bank erosion inside 20m Esplanade strip; Roof plane-fit residual = 44mm mid-span ridge sag.",
       "d76_curbside_meters_bins_and_joinery_inference": "D76 Curbside Time-Machine: Boundary timber crib retaining wall rotated +2.1\u00b0 toward road between 2012 and 2026 epochs with white calcium efflorescence streaks.",
-      "d77_chorus_ont_icp_and_hydraulic_sidechannel": "D77 Utility Side-Channels: Outside Chorus UFB footprint (5G Fixed Wireless LOS to Paraparaumu tower = -78 dBm); RAMM heavy-vehicle road vibration on Otaihanga Rd = 1.8 mm/s PPV.",
-      "d78_ghost_consent_and_insurer_triage_shadow_signal": "D78 Shadow Signals: Resource consent RM210044 WITHDRAWN after s92 HAIL/CPT request; Public insurer online quote-gate triggers 'Manual Underwriter Referral Required' (EQC/NHC 2013 claim shadow).",
+      "d77_chorus_ont_icp_and_hydraulic_sidechannel": "D77 Utility Side-Channels: Outside Chorus UFB footprint (5G Fixed Wireless LOS to Paraparaumu tower = -78 dBm); RAMM heavy-vehicle road vibration on Specimen Rd = 1.8 mm/s PPV.",
+      "d78_ghost_consent_and_insurer_triage_shadow_signal": "D78 Shadow Signals: Resource consent RM99210044 WITHDRAWN after s92 HAIL/CPT request; Public insurer online quote-gate triggers 'Manual Underwriter Referral Required' (EQC/NHC 2013 claim shadow).",
       "indirect_anomalies_count": 6,
       "estimated_hidden_value_or_risk_nzd": -268000
     }
   ],
   "crosscheck_reconciliation_80d": [
     {
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "d79_pillar1_datum_and_crs_check": "AUTO-CORRECTED (+0.38m Datum Shift): KCDC MH-4491 rim recorded as 14.20m (Legacy Wgtn1953 datum) vs 13.82m on LINZ 1m LiDAR (NZVD2016); pipe invert auto-normalized by -0.38m to 12.68m NZVD2016.",
       "d79_pillar2_area_and_footprint_conservation": "CONSERVATION_ALERT (+24.0m\u00b2 Bldg Delta): Land area matches across Title (1,040.0m\u00b2), Layer 50772 (1,040.2m\u00b2), and RID (1,040m\u00b2). Building area diverges: RID (186m\u00b2) vs 3D LiDAR + Layer 101292 + 5cm Ortho (210m\u00b2).",
       "d79_pillar3_five_sensor_geotech_consensus": "5/5 SENSOR CONSENSUS (99.6% Conf): S-map (Dune Sand) + NZGD CPT (qc=14.8 MPa) + Retrolens 1942 (+0.02m diff) + Sentinel-1 InSAR (-0.2mm/yr) + NHC (0 claims) all confirm stable TC1 sand.",
       "d79_pillar4_five_witness_occupancy_consensus": "4/5 WITNESS OVERRIDE (Unconsented 2nd Unit): RID claims 1 unit, but Chorus API (2 ONTs) + Curbside Vision (2 letterboxes/bin sets) + Thermal IR (+2.8\u00b0C heated garage) + Tie Card (2014 bathroom) prove 2 occupied units.",
-      "d79_pillar5_legal_vs_physical_pipe_encroachment": "CLEAR (5/5 Verified): 150mm uPVC sewer main in Tararua St road reserve matches manhole lid visible on 5cm LINZ Ortho within 0.11m; zero unregistered on-site pipe encroachments.",
+      "d79_pillar5_legal_vs_physical_pipe_encroachment": "CLEAR (5/5 Verified): 150mm uPVC sewer main in Example St road reserve matches manhole lid visible on 5cm LINZ Ortho within 0.11m; zero unregistered on-site pipe encroachments.",
       "d79_pillar6_temporal_causal_epoch_audit": "EPOCH VIOLATION CAUGHT (2014): +24m\u00b2 garage extension appeared between 2012 and 2015 aerial epochs during a window with 0 Building Consents (D13) -> Flagged for s96 COA.",
-      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "PASS (Kirchhoff Pipe & Edge Conservation): Upstream MH-4490 (13.12m) -> MH-4491 (12.68m) -> Downstream MH-4492 (12.19m) strictly monotonic (1:110 grade, 150mm->225mm dia); shared boundary with 16 Ngahina St has 0.00m sliver gap.",
-      "d81_pillar9_crosslease_flats_plan_and_share_check": "PASS (Fee Simple Estate Verified): Title WN42B/881 is 1/1 Fee Simple (not Cross-Lease); hence the +24m\u00b2 garage studio does NOT trigger a $28k Defective Cross-Lease Flats-Plan re-survey.",
+      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "PASS (Kirchhoff Pipe & Edge Conservation): Upstream MH-4490 (13.12m) -> MH-4491 (12.68m) -> Downstream MH-4492 (12.19m) strictly monotonic (1:110 grade, 150mm->225mm dia); shared boundary with 16 Sample St has 0.00m sliver gap.",
+      "d81_pillar9_crosslease_flats_plan_and_share_check": "PASS (Fee Simple Estate Verified): Title WN9942B/881 is 1/1 Fee Simple (not Cross-Lease); hence the +24m\u00b2 garage studio does NOT trigger a $28k Defective Cross-Lease Flats-Plan re-survey.",
       "d82_pillar10_physical_fence_vs_cadastral_boundary": "MINOR FENCE OFFSET (+0.18m East): 5cm Ortho + LiDAR curb step shows eastern timber fence sits 0.18m inside legal boundary (within 0.25m tolerance; zero adverse possession risk).",
-      "d82_pillar11_corporate_nzbn_solvency_and_vesting": "PASS (Active Entity Standing): Proprietor 'Tararua Holdings 2025 Ltd' verified ACTIVE on MBIE Register (NZBN 9429048821901, 0 insolvency notices, 0 tax caveats, matches sibling 12 Tararua St director).",
+      "d82_pillar11_corporate_nzbn_solvency_and_vesting": "PASS (Active Entity Standing): Proprietor 'Example Holdings 2025 Ltd' verified ACTIVE on MBIE Register (NZBN 9429048821901, 0 insolvency notices, 0 tax caveats, matches sibling 12 Example St director).",
       "d83_pillar12_hydro_mass_balance_vs_flood_map": "ARBITRAGE VERIFIED (Flood Map False Positive): Coarse 2D flood buffer touches street frontage, but SIM-03 D-Infinity spill + 14.42m FFL + Sentinel-2 NDWI (+0.04 dry) prove +0.92m freeboard.",
       "d83_pillar13_five_tier_statutory_precedence_lattice": "PASS (5-Tier Statutory Lattice): Infill 4-unit townhousing passes Property Law Covenants (0) \u2229 NES-CS HAIL (Clear) \u2229 NPS-FM Wetlands (Clear) \u2229 GWRC NRP (Permitted) \u2229 KCDC PC2 PRECx1 (Permitted/Controlled).",
       "d84_pillar14_sensor_emissivity_and_sar_debiasing": "DE-BIASED (Emissivity \u03b5=0.91 vs 0.32): BLD-01 Colorsteel (\u03b5=0.91) vs BLD-02 unpainted galvanized iron (\u03b5=0.32) emissivity-corrected before computing +2.8\u00b0C sleepout ceiling heat-loss anomaly.",
@@ -386,16 +386,16 @@
       "d80_reconciliation_verdict": "RECONCILED_INSTITUTIONAL_GRADE_WITH_S96_HOLDBACK"
     },
     {
-      "parcel_id": "LINZ-5041819-UPHILL",
-      "d79_pillar1_datum_and_crs_check": "PASS (0.02m Tolerance): Ngahina St sewer manhole rim matches LINZ NZVD2016 LiDAR within 0.02m; confirms rear pad sits -0.35m below own street sewer grade.",
+      "parcel_id": "DEMO-5041819-UPHILL",
+      "d79_pillar1_datum_and_crs_check": "PASS (0.02m Tolerance): Sample St sewer manhole rim matches LINZ NZVD2016 LiDAR within 0.02m; confirms rear pad sits -0.35m below own street sewer grade.",
       "d79_pillar2_area_and_footprint_conservation": "PASS (100% Conservation): Legal title (980.0m\u00b2), Layer 50772 polygon (980.1m\u00b2), and building footprint (215.0m\u00b2 across RID, LiDAR, and 5cm Ortho) agree within 0.1%.",
       "d79_pillar3_five_sensor_geotech_consensus": "5/5 SENSOR CONSENSUS (99.4% Conf): NZGD CPT (qc=15.1 MPa) + S-map + InSAR (-0.1mm/yr) + Retrolens 1942 confirm stable consolidated dune ridge.",
       "d79_pillar4_five_witness_occupancy_consensus": "5/5 WITNESS CONSENSUS (Single 4-Bed Dwelling): RID, 1 Chorus ONT, 1 ICP meter, 1 letterbox, and uniform thermal roof signature all confirm single-household occupancy.",
-      "d79_pillar5_legal_vs_physical_pipe_encroachment": "COASEAN OPPORTUNITY VERIFIED: Zero existing easement across southern boundary (Layer 50782), but 3D LiDAR + Tararua St pipe invert cross-check proves +5.71% gravity grade via 10 Tararua St.",
+      "d79_pillar5_legal_vs_physical_pipe_encroachment": "COASEAN OPPORTUNITY VERIFIED: Zero existing easement across southern boundary (Layer 50782), but 3D LiDAR + Example St pipe invert cross-check proves +5.71% gravity grade via 10 Example St.",
       "d79_pillar6_temporal_causal_epoch_audit": "TEMPORAL WARNING (1998 Cladding Era): BC issued 1998 + CCC 1999 coincides with SWIR parapet moisture anomaly (+1.4\u00b0C) and 3 collapsed conditional sales in 2026.",
-      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "PASS (Cross-Parcel Graph Reciprocity): Shared 20.52m rear boundary edge with 10 Tararua St (LINZ-5041821) topologically watertight; downstream Tararua St 150mm main has 14.2 L/s spare wet-weather capacity.",
+      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "PASS (Cross-Parcel Graph Reciprocity): Shared 20.52m rear boundary edge with 10 Example St (DEMO-5041821) topologically watertight; downstream Example St 150mm main has 14.2 L/s spare wet-weather capacity.",
       "d81_pillar9_crosslease_flats_plan_and_share_check": "PASS (Fee Simple 1/1): Not a Cross-Lease or Unit Title.",
-      "d82_pillar10_physical_fence_vs_cadastral_boundary": "ENCROACHMENT CAUGHT (-0.65m Road Reserve): Front garden retaining wall encroaches 0.65m into Ngahina St legal road reserve (requires KCDC Encroachment Licence).",
+      "d82_pillar10_physical_fence_vs_cadastral_boundary": "ENCROACHMENT CAUGHT (-0.65m Road Reserve): Front garden retaining wall encroaches 0.65m into Sample St legal road reserve (requires KCDC Encroachment Licence).",
       "d82_pillar11_corporate_nzbn_solvency_and_vesting": "PASS (Natural Person Ownership): Private individual title; first-ranking bank mortgage only.",
       "d83_pillar12_hydro_mass_balance_vs_flood_map": "PASS (Uphill Shedding): SIM-03 D-Infinity confirms 0.0m\u00b3 surface ponding; overland flow discharges south.",
       "d83_pillar13_five_tier_statutory_precedence_lattice": "PASS (5-Tier Statutory Lattice): Rear infill subdivision passes all 5 statutory tiers once bilateral Coasean drainage easement is registered.",
@@ -406,17 +406,17 @@
       "d80_reconciliation_verdict": "RECONCILED_COASEAN_SWAP_READY_WITH_RECLAD_DEDUCTION"
     },
     {
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d79_pillar1_datum_and_crs_check": "AUTO-CORRECTED (+1.44m Imperial + Datum Fix): 1982 tie card depth '4ft 9in' converted to 1.45m and tied to 2025 LiDAR ground RL (8.40m NZVD2016).",
       "d79_pillar2_area_and_footprint_conservation": "CRITICAL AREA & BLDG DIVERGENCE: Gross title is 4,900m\u00b2, but D70 stream cross-check deducts 680m\u00b2 for mandatory 20m Esplanade Strip forfeiture on subdivision; Building LiDAR (176m\u00b2) exceeds RID (148m\u00b2) by +28m\u00b2.",
       "d79_pillar3_five_sensor_geotech_consensus": "SILO OVERRIDE (4 Sensors Override Coarse Map): Coarse zoning looks buildable, but Retrolens 1942 (+1.15m fill) + Sentinel-1 InSAR (-3.6mm/yr) + NZGD CPT (1.85 MPa) + Sentinel-2 NDWI (+0.38) prove active peat subsidence.",
       "d79_pillar4_five_witness_occupancy_consensus": "5/5 WITNESS CONSENSUS: Single 3-bedroom pole house with unconsented +28m\u00b2 enclosed sunroom deck.",
       "d79_pillar5_legal_vs_physical_pipe_encroachment": "ORPHAN LATERAL SHEAR DETECTED: 3 council CSR sewer callouts (D58) spatially align with the exact 1942 Retrolens peat-swale boundary edge and +2.1\u00b0 crib-wall tilt.",
-      "d79_pillar6_temporal_causal_epoch_audit": "CAUSAL CHAIN VERIFIED: 1985 farm gully filling -> 2013 EQC/NHC resin claim -> 2021 RM210044 s92 withdrawal -> 2026 insurer online quote-gate refusal.",
-      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "FAIL (Downstream Culvert Bottleneck): Stream culvert under Otaihanga Rd (900mm concrete) is undersized for SIM-03 1% AEP upslope catchment flow -> causes backwater ponding over rear peat swale.",
+      "d79_pillar6_temporal_causal_epoch_audit": "CAUSAL CHAIN VERIFIED: 1985 farm gully filling -> 2013 EQC/NHC resin claim -> 2021 RM99210044 s92 withdrawal -> 2026 insurer online quote-gate refusal.",
+      "d81_pillar8_network_kirchhoff_and_edge_reciprocity": "FAIL (Downstream Culvert Bottleneck): Stream culvert under Specimen Rd (900mm concrete) is undersized for SIM-03 1% AEP upslope catchment flow -> causes backwater ponding over rear peat swale.",
       "d81_pillar9_crosslease_flats_plan_and_share_check": "PASS (Fee Simple Lifestyle Block): 1/1 share, subject to s221 Consent Notice 819204.2.",
       "d82_pillar10_physical_fence_vs_cadastral_boundary": "STREAM BOUNDARY ACCRETION/EROSION SHIFT (-2.4m): 2025 LiDAR last-return stream bank has eroded 2.4m inland inside the 1982 surveyed title boundary!",
-      "d82_pillar11_corporate_nzbn_solvency_and_vesting": "WARNING (Struck-Off Sibling Developer Entity): Previous applicant company on withdrawn RM210044 was removed from MBIE Companies Register in 2023.",
+      "d82_pillar11_corporate_nzbn_solvency_and_vesting": "WARNING (Struck-Off Sibling Developer Entity): Previous applicant company on withdrawn RM99210044 was removed from MBIE Companies Register in 2023.",
       "d83_pillar12_hydro_mass_balance_vs_flood_map": "CRITICAL HYDRO CONFLICT: SIM-03 backwater + Sentinel-2 NDWI (+0.38) prove active winter surface saturation outside the published 2014 KCDC flood polygon.",
       "d83_pillar13_five_tier_statutory_precedence_lattice": "BLOCKED AT 4 OF 5 STATUTORY TIERS: Blocked by (1) s221 Geotech Notice, (2) NES-CS HAIL A10 Orchard Shed, (3) NPS-HPL LUC 2w Soil Lock, and (4) NPS-FM 10m Wetland Setback + Pre-1990 ETS Penalty.",
       "d84_pillar14_sensor_emissivity_and_sar_debiasing": "DE-BIASED (Look-Angle & Phenology Calibrated): Sentinel-1 ascending & descending tracks both confirm -3.6mm/yr vertical subsidence (zero horizontal look-angle artifact); NDWI normalized against NIWA SPI rainfall.",
@@ -428,54 +428,54 @@
   ],
   "cadastral_lineage_dag_85d": [
     {
-      "mutation_edge_id": "DAG-SUB-1973-DP24819",
+      "mutation_edge_id": "DAG-SUB-1973-DP9924819",
       "parent_parcel_ids_json": "[\"LINZ-PARENT-1922-SEC14\"]",
-      "child_parcel_ids_json": "[\"LINZ-5041821\", \"LINZ-5041822\", \"LINZ-5041819-UPHILL\", \"LINZ-ROAD-TARARUA\"]",
+      "child_parcel_ids_json": "[\"DEMO-5041821\", \"DEMO-5041822\", \"DEMO-5041819-UPHILL\", \"LINZ-ROAD-TARARUA\"]",
       "mutation_type": "SUBDIVISION_1_TO_64_AND_ROAD_VESTING",
-      "survey_plan_ref": "DP 24819 (Surveyed 1973)",
+      "survey_plan_ref": "DP 9924819 (Surveyed 1973)",
       "mutation_date": "1973-11-14",
-      "spatial_clip_inheritance_rule": "Point CPTs & 1942 Retrolens elevation grids clipped to each child lot polygon (1,040m\u00b2 to LINZ-5041821).",
-      "intensive_broadcast_inheritance_rule": "Parent DP 24819 drainage easements & fencing covenant (expired 1998) broadcast to all 64 sibling lots.",
-      "merger_extinguishment_or_vesting_note": "Tararua St & Ngahina St road polygons vested in KCDC as legal road (parcel_intent='Road')."
+      "spatial_clip_inheritance_rule": "Point CPTs & 1942 Retrolens elevation grids clipped to each child lot polygon (1,040m\u00b2 to DEMO-5041821).",
+      "intensive_broadcast_inheritance_rule": "Parent DP 9924819 drainage easements & fencing covenant (expired 1998) broadcast to all 64 sibling lots.",
+      "merger_extinguishment_or_vesting_note": "Example St & Sample St road polygons vested in KCDC as legal road (parcel_intent='Road')."
     },
     {
       "mutation_edge_id": "DAG-AMALG-2026-TARARUA",
-      "parent_parcel_ids_json": "[\"LINZ-5041821\", \"LINZ-5041822\"]",
-      "child_parcel_ids_json": "[\"LINZ-5099901-SUPERLOT\"]",
+      "parent_parcel_ids_json": "[\"DEMO-5041821\", \"DEMO-5041822\"]",
+      "child_parcel_ids_json": "[\"DEMO-5099901-SUPERLOT\"]",
       "mutation_type": "AMALGAMATION_2_TO_1_S220_RMA",
-      "survey_plan_ref": "LT 618400 (Proposed Stealth Assembly Super-Lot \u00b7 2,055 m\u00b2)",
+      "survey_plan_ref": "LT 99618400 (Proposed Stealth Assembly Super-Lot \u00b7 2,055 m\u00b2)",
       "mutation_date": "2026-11-05",
       "spatial_clip_inheritance_rule": "Union of both parent polygons (1,040m\u00b2 + 1,015m\u00b2 = 2,055m\u00b2) + union of all 3 buildings (BLD-01, BLD-02, BLD-12-01).",
-      "intensive_broadcast_inheritance_rule": "Union of RM260144 s42A HIRB waiver precedent + RM190218 Cuttriss CAD + both street frontage crossings (41.0m combined frontage).",
+      "intensive_broadcast_inheritance_rule": "Union of RM99260144 s42A HIRB waiver precedent + RM99190218 Cuttriss CAD + both street frontage crossings (41.0m combined frontage).",
       "merger_extinguishment_or_vesting_note": "MERGER OF TITLE EXTINGUISHMENT: Reciprocal internal side-boundary right-of-way & eaves easement between #10 and #12 automatically extinguished upon amalgamation!"
     },
     {
-      "mutation_edge_id": "DAG-SUB-1982-DP61092",
+      "mutation_edge_id": "DAG-SUB-1982-DP9961092",
       "parent_parcel_ids_json": "[\"LINZ-PARENT-1940-NGARARA-FARM\"]",
-      "child_parcel_ids_json": "[\"LINZ-5042110\", \"LINZ-HYDRO-WAIKANAE-09\"]",
+      "child_parcel_ids_json": "[\"DEMO-5042110\", \"LINZ-HYDRO-WAIKANAE-09\"]",
       "mutation_type": "SUBDIVISION_AND_BOUNDARY_ADJUSTMENT",
-      "survey_plan_ref": "DP 61092 (Surveyed 1982)",
+      "survey_plan_ref": "DP 9961092 (Surveyed 1982)",
       "mutation_date": "1982-06-18",
-      "spatial_clip_inheritance_rule": "1942 Retrolens peat swale (-1.15m gully) & 1966 orchard shed HAIL A10 footprint clipped to LINZ-5042110.",
+      "spatial_clip_inheritance_rule": "1942 Retrolens peat swale (-1.15m gully) & 1966 orchard shed HAIL A10 footprint clipped to DEMO-5042110.",
       "intensive_broadcast_inheritance_rule": "Consent Notice 819204.2 (s221 specific foundation design over peat) & 1.8 L/s bore allocation inherited from parent farm.",
       "merger_extinguishment_or_vesting_note": "Stream bed parcel (LINZ-HYDRO-WAIKANAE-09) partitioned; movable water boundary subject to -2.4m erosion & 20m Esplanade Strip forfeiture."
     },
     {
       "mutation_edge_id": "DAG-SPLIT-2027-INFILL",
-      "parent_parcel_ids_json": "[\"LINZ-5041821\"]",
-      "child_parcel_ids_json": "[\"LINZ-619001-LOT1-FRONT\", \"LINZ-619002-LOT2-REAR\", \"LINZ-619003-LOT3-REAR\", \"LINZ-619004-COAL-DRIVE\"]",
+      "parent_parcel_ids_json": "[\"DEMO-5041821\"]",
+      "child_parcel_ids_json": "[\"DEMO-619001-LOT1-FRONT\", \"DEMO-619002-LOT2-REAR\", \"DEMO-619003-LOT3-REAR\", \"DEMO-619004-COAL-DRIVE\"]",
       "mutation_type": "SUBDIVISION_1_TO_4_FEE_SIMPLE_PLUS_COAL",
-      "survey_plan_ref": "LT 619200 (4-Lot Infill Subdivision)",
+      "survey_plan_ref": "LT 99619200 (4-Lot Infill Subdivision)",
       "mutation_date": "2027-02-01",
       "spatial_clip_inheritance_rule": "BLD-5041821-01 (1974 Bungalow) clipped to Lot 1 (418m\u00b2); Rear 622m\u00b2 pad split into Lot 2 (260m\u00b2), Lot 3 (262m\u00b2), and Common Access Lot 4 (100m\u00b2).",
-      "intensive_broadcast_inheritance_rule": "All 4 child lots inherit 1974 tie-card lineage, TC1 sand CPT (qc=14.8 MPa), and Coasean easement revenue share from 16 Ngahina St.",
+      "intensive_broadcast_inheritance_rule": "All 4 child lots inherit 1974 tie-card lineage, TC1 sand CPT (qc=14.8 MPa), and Coasean easement revenue share from 16 Sample St.",
       "merger_extinguishment_or_vesting_note": "Lot 4 (COAL) held as 1/3 undivided share each by Lots 1\u20133 with reciprocal utility & vehicle access easements under s220 RMA."
     }
   ],
   "parcel_split_zoning_and_epochs_86d": [
     {
       "slice_id": "SZ-5041821-A",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "zone_or_overlay_code": "General Residential Zone \u2014 Precinct PRECx1 (6-Storey Rail Catchment)",
       "slice_area_sqm": 962.0,
       "slice_pct_of_parcel": 92.5,
@@ -487,7 +487,7 @@
     },
     {
       "slice_id": "SZ-5041821-B",
-      "parcel_id": "LINZ-5041821",
+      "parcel_id": "DEMO-5041821",
       "zone_or_overlay_code": "Frontage Road-Widening & Street-Tree Root Protection Strip",
       "slice_area_sqm": 78.0,
       "slice_pct_of_parcel": 7.5,
@@ -499,7 +499,7 @@
     },
     {
       "slice_id": "SZ-5042110-A",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "zone_or_overlay_code": "Rural Lifestyle Zone (RLZ \u2014 General Rural Fringe)",
       "slice_area_sqm": 3120.0,
       "slice_pct_of_parcel": 63.7,
@@ -511,7 +511,7 @@
     },
     {
       "slice_id": "SZ-5042110-B",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "zone_or_overlay_code": "GWRC Natural Resources Plan \u2014 Schedule F Indigenous Wetland & 10m NPS-FM Setback",
       "slice_area_sqm": 1100.0,
       "slice_pct_of_parcel": 22.4,
@@ -523,7 +523,7 @@
     },
     {
       "slice_id": "SZ-5042110-C",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "zone_or_overlay_code": "Riparian 20m Esplanade Strip & Stream Floodway Corridor",
       "slice_area_sqm": 680.0,
       "slice_pct_of_parcel": 13.9,
@@ -542,17 +542,17 @@
       "administering_body": "Department of Conservation (Te Papa Atawhai \u2014 NaPALIS GIS)",
       "linz_parcel_intent": "Reserve / Crown Land (Conservation)",
       "public_access_and_alienation_rules": "Inalienable Crown Conservation Land; public foot access; DOC Concession required for any commercial/drone/easement activity.",
-      "adjoining_private_parcel_id": "LINZ-5042110",
+      "adjoining_private_parcel_id": "DEMO-5042110",
       "boundary_effect_on_private_plot": "BOUNDARY EFFECT: Guarantees 0.0hr future build shading on western outlook (+amenity), but triggers mandatory Predator-Free K\u0101piti cat/dog covenant, 20m wildfire buffer, and strict ecological lighting controls."
     },
     {
       "special_parcel_id": "LINZ-KCDC-RES-8812",
       "tenure_category_code": "COUNCIL_RECREATION_AND_ESPLANADE_RESERVE",
-      "official_name_and_statute": "Tararua / Kaitawa Local Purpose & Recreation Reserve Network (Reserves Act 1977 s17 & s23)",
+      "official_name_and_statute": "Example / Kaitawa Local Purpose & Recreation Reserve Network (Reserves Act 1977 s17 & s23)",
       "administering_body": "K\u0101piti Coast District Council (Parks & Open Space)",
       "linz_parcel_intent": "Reserve",
       "public_access_and_alienation_rules": "Perpetual public open space; zero residential/commercial alienation; council reserve management plan applies.",
-      "adjoining_private_parcel_id": "LINZ-5041821",
+      "adjoining_private_parcel_id": "DEMO-5041821",
       "boundary_effect_on_private_plot": "BOUNDARY EFFECT (+$45,000 Value Uplift): Permanently locks open green space & solar sky-view factor within 120m walk (SIM-12); qualifies infill development for reduced on-site private open space waiver under GRZ-R11."
     },
     {
@@ -562,17 +562,17 @@
       "administering_body": "Crown / Greater Wellington Regional Council (GWRC Flood Protection)",
       "linz_parcel_intent": "Hydro",
       "public_access_and_alienation_rules": "Bed vested in Crown/Council; movable boundary doctrine (accretion/erosion) applies unless fixed marginal strip.",
-      "adjoining_private_parcel_id": "LINZ-5042110",
-      "boundary_effect_on_private_plot": "BOUNDARY EFFECT (-2.4m Erosion Loss): Active stream bank migration has eroded 2.4m into LINZ-5042110; triggers 20m Esplanade Strip forfeiture and GWRC river-works bylaw."
+      "adjoining_private_parcel_id": "DEMO-5042110",
+      "boundary_effect_on_private_plot": "BOUNDARY EFFECT (-2.4m Erosion Loss): Active stream bank migration has eroded 2.4m into DEMO-5042110; triggers 20m Esplanade Strip forfeiture and GWRC river-works bylaw."
     },
     {
       "special_parcel_id": "LINZ-ROAD-PAPER-OTAI-04",
       "tenure_category_code": "UNFORMED_LEGAL_ROAD_PAPER_ROAD",
-      "official_name_and_statute": "Unformed Legal Crown Road ('Paper Road' off Otaihanga Domain Corridor \u00b7 Local Government Act 1974 s316)",
+      "official_name_and_statute": "Unformed Legal Crown Road ('Paper Road' off Specimen Domain Corridor \u00b7 Local Government Act 1974 s316)",
       "administering_body": "K\u0101piti Coast District Council (Roading Authority)",
       "linz_parcel_intent": "Road (Unformed)",
       "public_access_and_alienation_rules": "Full legal public right of passage on foot/horse/vehicle (Walking Access Act 2008 / Herenga \u0100 Nuku); cannot be fenced off without formal Road Stopping (s342 LGA).",
-      "adjoining_private_parcel_id": "LINZ-5042110",
+      "adjoining_private_parcel_id": "DEMO-5042110",
       "boundary_effect_on_private_plot": "BOUNDARY EFFECT (Dual-Edged): Provides potential secondary legal road frontage if formed at developer cost ($1,800/m), but exposes eastern boundary to public walking access."
     },
     {
@@ -582,63 +582,63 @@
       "administering_body": "Ahu Whenua Trust / M\u0101ori Land Court (Te Kooti Whenua M\u0101ori)",
       "linz_parcel_intent": "Maori / Covenant (s338 Non-Primary Parcel)",
       "public_access_and_alienation_rules": "Preferred class of alienees (hap\u016b/wh\u0101nau) retention; exempt from forced rating sales (Local Government Rating Act 2002); KCDC Papak\u0101inga Zone rules enable communal housing without subdivision.",
-      "adjoining_private_parcel_id": "LINZ-5042110",
+      "adjoining_private_parcel_id": "DEMO-5042110",
       "boundary_effect_on_private_plot": "BOUNDARY EFFECT: Triggers statutory Iwi/Hap\u016b cultural values consultation (\u0100tiawa ki Whakarongotai) on any earthworks or wastewater discharge within 100m of statutory acknowledgement / W\u0101hi Tapu corridor."
     }
   ],
   "ancestral_farm_to_lot_backfill_90d": [
     {
       "backfill_record_id": "ANC-5041821-1938-DRAIN",
-      "modern_parcel_id": "LINZ-5041821",
-      "ancestral_chain_1860_to_2026": "1886 Kaitawa Block VIII Sec 14 (420 ha) -> 1922 Dairy Farm Lot 2 DP 6104 (68 ha) -> 1973 DP 24819 (64 Residential Lots) -> 2026 LINZ-5041821 (1,040 m\u00b2)",
+      "modern_parcel_id": "DEMO-5041821",
+      "ancestral_chain_1860_to_2026": "1886 Kaitawa Block VIII Sec 14 (420 ha) -> 1922 Dairy Farm Lot 2 DP 996104 (68 ha) -> 1973 DP 9924819 (64 Residential Lots) -> 2026 DEMO-5041821 (1,040 m\u00b2)",
       "ancestral_epoch_year": 1938,
-      "historical_parent_appellation": "Lot 2 DP 6104 (Paraparaumu Dairy Farm)",
+      "historical_parent_appellation": "Lot 2 DP 996104 (Paraparaumu Dairy Farm)",
       "inheritance_algebra_class": "CLASS_3_SUBSURFACE_CONDUIT_PERSISTENCE",
       "ancestral_feature_description": "1938 Hutt River/Kaitawa Catchment Board 4-inchglazed clay agricultural field-tile sub-drain running NE-to-SW at 1.1m BGL across former Paddock 4.",
       "subpolygon_overlap_sqm_and_pct": "18.4 m linear run across rear buildable pad (36.8 m\u00b2 trench zone = 3.5% of modern plot)",
-      "whole_farm_false_positive_avoided": "Avoided blanketing all 64 lots of DP 24819; pinpointed the exact 7 child lots crossed by the 1938 clay field-tile line.",
+      "whole_farm_false_positive_avoided": "Avoided blanketing all 64 lots of DP 9924819; pinpointed the exact 7 child lots crossed by the 1938 clay field-tile line.",
       "modern_engineering_or_legal_impact": "ACTIVE PHYSICAL IMPACT: When excavating foundations on rear 622m\u00b2 pad, contractor must intercept and reconnect live 1938 clay field-tile drain to stormwater to prevent sub-slab groundwater damming."
     },
     {
       "backfill_record_id": "ANC-5041821-1954-DIP-AVOIDED",
-      "modern_parcel_id": "LINZ-5041821",
-      "ancestral_chain_1860_to_2026": "1922 Dairy Farm Lot 2 DP 6104 (68 ha) -> 1973 DP 24819 (64 Lots)",
+      "modern_parcel_id": "DEMO-5041821",
+      "ancestral_chain_1860_to_2026": "1922 Dairy Farm Lot 2 DP 996104 (68 ha) -> 1973 DP 9924819 (64 Lots)",
       "ancestral_epoch_year": 1954,
-      "historical_parent_appellation": "Lot 2 DP 6104 (NE Homestead Corner)",
+      "historical_parent_appellation": "Lot 2 DP 996104 (NE Homestead Corner)",
       "inheritance_algebra_class": "CLASS_1_LOCALIZED_FOOTPRINT_CLIP (NEGATIVE PROOF / CLEARED)",
-      "ancestral_feature_description": "1954 Parent Farm Arsenic Sheep-Dip & Tractor Fuel Tank (HAIL A8/A10) located 340m North-East on what is now Lot 48 & Lot 49 DP 24819.",
-      "subpolygon_overlap_sqm_and_pct": "0.0 m\u00b2 overlap with LINZ-5041821 (Distance to 1954 dip footprint = 342.0 m)",
-      "whole_farm_false_positive_avoided": "CRITICAL FALSE-POSITIVE SMEAR PREVENTED: Naive parent-title HAIL inheritance flags all 64 lots on DP 24819 as HAIL-contaminated; sub-polygon clip proves LINZ-5041821 is 342m up-gradient and 100% clean!",
-      "modern_engineering_or_legal_impact": "ZERO NES-CS HAIL TRIGGER: Saves $14,500 Preliminary/Detailed Site Investigation (PSI/DSI) cost on 10 Tararua St via negative spatial proof."
+      "ancestral_feature_description": "1954 Parent Farm Arsenic Sheep-Dip & Tractor Fuel Tank (HAIL A8/A10) located 340m North-East on what is now Lot 48 & Lot 49 DP 9924819.",
+      "subpolygon_overlap_sqm_and_pct": "0.0 m\u00b2 overlap with DEMO-5041821 (Distance to 1954 dip footprint = 342.0 m)",
+      "whole_farm_false_positive_avoided": "CRITICAL FALSE-POSITIVE SMEAR PREVENTED: Naive parent-title HAIL inheritance flags all 64 lots on DP 9924819 as HAIL-contaminated; sub-polygon clip proves DEMO-5041821 is 342m up-gradient and 100% clean!",
+      "modern_engineering_or_legal_impact": "ZERO NES-CS HAIL TRIGGER: Saves $14,500 Preliminary/Detailed Site Investigation (PSI/DSI) cost on 10 Example St via negative spatial proof."
     },
     {
       "backfill_record_id": "ANC-5041821-1922-STOCKRACE",
-      "modern_parcel_id": "LINZ-5041821",
-      "ancestral_chain_1860_to_2026": "1922 Dairy Farm Lot 2 DP 6104 -> 1973 DP 24819",
+      "modern_parcel_id": "DEMO-5041821",
+      "ancestral_chain_1860_to_2026": "1922 Dairy Farm Lot 2 DP 996104 -> 1973 DP 9924819",
       "ancestral_epoch_year": 1922,
       "historical_parent_appellation": "Transfer 149822 (Stock Water-Race Easement)",
       "inheritance_algebra_class": "CLASS_5_EXTINGUISHED_ON_SUBDIVISION",
       "ancestral_feature_description": "1922 right to convey stock water across former farm boundary.",
-      "subpolygon_overlap_sqm_and_pct": "Surrendered on deposit of DP 24819 (14 Nov 1973)",
+      "subpolygon_overlap_sqm_and_pct": "Surrendered on deposit of DP 9924819 (14 Nov 1973)",
       "whole_farm_false_positive_avoided": "Prevents AI agent from treating historical 1922 stock water-race memorial as an active building restriction.",
-      "modern_engineering_or_legal_impact": "EXTINGUISHED: Zero legal effect on modern 2026 title WN42B/881."
+      "modern_engineering_or_legal_impact": "EXTINGUISHED: Zero legal effect on modern 2026 title WN9942B/881."
     },
     {
       "backfill_record_id": "ANC-5042110-1966-ORCHARD",
-      "modern_parcel_id": "LINZ-5042110",
-      "ancestral_chain_1860_to_2026": "1881 Ngarara West B Block -> 1940 Mixed Orchard & Grazing Block (32 ha) -> 1982 DP 61092 (8 Lifestyle Lots) -> 2026 LINZ-5042110 (4,900 m\u00b2)",
+      "modern_parcel_id": "DEMO-5042110",
+      "ancestral_chain_1860_to_2026": "1881 Ngarara West B Block -> 1940 Mixed Orchard & Grazing Block (32 ha) -> 1982 DP 9961092 (8 Lifestyle Lots) -> 2026 DEMO-5042110 (4,900 m\u00b2)",
       "ancestral_epoch_year": 1966,
       "historical_parent_appellation": "Pt Ngarara West B (\u014ctaihanga Orchard Block)",
       "inheritance_algebra_class": "CLASS_1_LOCALIZED_FOOTPRINT_CLIP (POSITIVE HIT)",
       "ancestral_feature_description": "1966 Aerial SN1844 shows concrete-floored orchard agrichemical mixing shed & lead-arsenate/DDT spray washdown apron directly inside modern south-west paddock.",
       "subpolygon_overlap_sqm_and_pct": "215.0 m\u00b2 direct footprint + 15m leachate halo = 640.0 m\u00b2 (13.1% of modern 4,900m\u00b2 plot)",
-      "whole_farm_false_positive_avoided": "Cleared 6 of the 8 sibling lifestyle lots on DP 61092, while localizing the exact 640m\u00b2 HAIL A10 hotspot inside LINZ-5042110.",
+      "whole_farm_false_positive_avoided": "Cleared 6 of the 8 sibling lifestyle lots on DP 9961092, while localizing the exact 640m\u00b2 HAIL A10 hotspot inside DEMO-5042110.",
       "modern_engineering_or_legal_impact": "MANDATORY NES-CS SOIL SAMPLING: Triggers NES-CS Controlled/Restricted Discretionary soil remediation if disturbing >25m\u00b3 of soil within the 640m\u00b2 SW hotspot."
     },
     {
       "backfill_record_id": "ANC-5042110-1948-BORE",
-      "modern_parcel_id": "LINZ-5042110",
-      "ancestral_chain_1860_to_2026": "1940 Mixed Orchard Block -> 1982 DP 61092 -> 2026 LINZ-5042110",
+      "modern_parcel_id": "DEMO-5042110",
+      "ancestral_chain_1860_to_2026": "1940 Mixed Orchard Block -> 1982 DP 9961092 -> 2026 DEMO-5042110",
       "ancestral_epoch_year": 1948,
       "historical_parent_appellation": "Catchment Board Well Permit #W-1948-19",
       "inheritance_algebra_class": "CLASS_3_SUBSURFACE_CONDUIT_PERSISTENCE",
@@ -651,31 +651,31 @@
   "advanced_mutations_zoning_and_crown_estate_96d": [
     {
       "record_id": "ADV96-5041821",
-      "parcel_id": "LINZ-5041821",
-      "d91_3d_stratum_and_staged_unit_plan_state": "D91 3D Stratum & Unit Title Option: Eligible for 4-Unit Fee Simple + COAL (LT 619200) OR Staged Unit Title Plan (PU1-PU4 + AU1-AU4 carparks under Unit Titles Act 2010; zero Cross-Lease conversion needed).",
-      "d92_inflight_s223_s224c_and_pwa_severance_or_accretion": "D92 In-Flight & PWA Status: Lapsed RM190218 s223 survey dataset salvagable in Landonline XML; zero Public Works Act (PWA) severance notices; +0.0m\u00b2 road-stopping opportunity.",
+      "parcel_id": "DEMO-5041821",
+      "d91_3d_stratum_and_staged_unit_plan_state": "D91 3D Stratum & Unit Title Option: Eligible for 4-Unit Fee Simple + COAL (LT 99619200) OR Staged Unit Title Plan (PU1-PU4 + AU1-AU4 carparks under Unit Titles Act 2010; zero Cross-Lease conversion needed).",
+      "d92_inflight_s223_s224c_and_pwa_severance_or_accretion": "D92 In-Flight & PWA Status: Lapsed RM99190218 s223 survey dataset salvagable in Landonline XML; zero Public Works Act (PWA) severance notices; +0.0m\u00b2 road-stopping opportunity.",
       "d93_requiring_authority_designations_and_viewshafts": "D93 Designations & Overlays: CLEAR of NZTA, KiwiRail, MoE, and Electra Requiring Authority Designations (s176); outside Kapiti Airport obstacle limitation surface (OLS) conical flightpath.",
       "d94_environmental_benefit_tdr_and_structure_plan_triggers": "D94 Bonus / Inclusionary Zoning: Qualifies for PRECx1 6-storey rail catchment bonus height (21.0m) + 0-carpark minimum + KCDC recreation-reserve proximity open-space waiver.",
       "d95_twelve_class_crown_rfr_soe_and_s40_offerback": "D95 Crown / RFR / s40 Audit: Private Fee Simple (never Crown-acquired post-1948 -> zero s40 Public Works Act offer-back risk; zero Treaty RFR memorial on title).",
       "d96_cmca_coastal_mhws_avulsion_and_concessions": "D96 Coastal / River Boundary: Inland dune terrace (+13.78m RL, 1.8km east of Mean High Water Springs MHWS; zero coastal erosion or CMCA jurisdiction).",
       "subsystem_completeness_pct": 99.4,
-      "strategic_unlock_or_trap_summary": "UNLOCK: 100% clear of Designations (s176), Airport OLS height caps, and PWA s40 offer-back risks; Landonline XML survey from lapsed RM190218 cuts 4 months off s223/s224c title deposit."
+      "strategic_unlock_or_trap_summary": "UNLOCK: 100% clear of Designations (s176), Airport OLS height caps, and PWA s40 offer-back risks; Landonline XML survey from lapsed RM99190218 cuts 4 months off s223/s224c title deposit."
     },
     {
       "record_id": "ADV96-5041819",
-      "parcel_id": "LINZ-5041819-UPHILL",
-      "d91_3d_stratum_and_staged_unit_plan_state": "D91 3D Stratum & Appurtenant Easement: Rear subdivision creates 3D subterranean pipe stratum easement (RL 12.68m to RL 14.10m, 1.5m wide) across 10 Tararua St.",
-      "d92_inflight_s223_s224c_and_pwa_severance_or_accretion": "D92 In-Flight & Road Stopping: Front retaining wall encroaches -0.65m into Ngahina St road reserve -> eligible for KCDC Encroachment Licence or minor s342 LGA Road Stopping purchase (+13.3 m\u00b2).",
+      "parcel_id": "DEMO-5041819-UPHILL",
+      "d91_3d_stratum_and_staged_unit_plan_state": "D91 3D Stratum & Appurtenant Easement: Rear subdivision creates 3D subterranean pipe stratum easement (RL 12.68m to RL 14.10m, 1.5m wide) across 10 Example St.",
+      "d92_inflight_s223_s224c_and_pwa_severance_or_accretion": "D92 In-Flight & Road Stopping: Front retaining wall encroaches -0.65m into Sample St road reserve -> eligible for KCDC Encroachment Licence or minor s342 LGA Road Stopping purchase (+13.3 m\u00b2).",
       "d93_requiring_authority_designations_and_viewshafts": "D93 Designations & Overlays: CLEAR of Requiring Authority Designations; sits 42m below Kapiti Airport outer horizontal flightpath surface (no crane height restriction up to 14m).",
       "d94_environmental_benefit_tdr_and_structure_plan_triggers": "D94 Bonus / Inclusionary Zoning: General Residential Zone standard 3-unit as-of-right density once Coasean gravity sewer easement is registered.",
       "d95_twelve_class_crown_rfr_soe_and_s40_offerback": "D95 Crown / RFR / s40 Audit: Private Fee Simple; zero RFR or s40 offer-back encumbrances.",
       "d96_cmca_coastal_mhws_avulsion_and_concessions": "D96 Coastal / River Boundary: Elevated dune ridge (+14.95m RL); zero MHWS or river avulsion exposure.",
       "subsystem_completeness_pct": 99.1,
-      "strategic_unlock_or_trap_summary": "UNLOCK: Formalizes the Coasean sewer swap as a 3D subterranean stratum easement (RL 12.68m\u201314.10m) so 10 Tararua St retains surface lawn use above the pipe!"
+      "strategic_unlock_or_trap_summary": "UNLOCK: Formalizes the Coasean sewer swap as a 3D subterranean stratum easement (RL 12.68m\u201314.10m) so 10 Example St retains surface lawn use above the pipe!"
     },
     {
       "record_id": "ADV96-5042110",
-      "parcel_id": "LINZ-5042110",
+      "parcel_id": "DEMO-5042110",
       "d91_3d_stratum_and_staged_unit_plan_state": "D91 3D Stratum & Conservation Covenant: Cannot create standard residential lots, but eligible to register a perpetual QEII / GWRC Wetland Covenant over the 1,100m\u00b2 Slice B.",
       "d92_inflight_s223_s224c_and_pwa_severance_or_accretion": "D92 Avulsion vs Erosion & PWA: Stream boundary lost -2.4m via gradual erosion (moves legal title boundary inward under common law), whereas 1998 flood avulsion cut is fixed; adjoins NZTA Expressway designation corridor.",
       "d93_requiring_authority_designations_and_viewshafts": "D93 Designations (s176 Block): Eastern corner lies within 35m of NZTA State Highway / Expressway Designation buffer (DES-NZTA-018 -> requires NZTA written s176/reverse-sensitivity acoustic consent).",
@@ -690,14 +690,14 @@
     "dredge_latency_ms": 2.3427,
     "llm_api_cost_nzd": 0.0,
     "dp_plans_detected": [
-      "DP 24819"
+      "DP 9924819"
     ],
     "consent_ids_detected": [
-      "RM260144"
+      "RM99260144"
     ],
     "title_refs_detected": [
       "24819",
-      "WN42B/881"
+      "WN9942B/881"
     ],
     "imperial_to_metric_conversions": [
       {

@@ -24,4 +24,4 @@ jobs:
         run: python3 toponz_weekend1_kapiti_ingester.py --self-test
 
       - name: Generate Sample 96-Domain Master Dossier
-        run: python3 toponz_weekend1_kapiti_ingester.py --dossier LINZ-5041821
+        run: python3 toponz_weekend1_kapiti_ingester.py --dossier DEMO-5041821

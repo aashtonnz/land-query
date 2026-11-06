@@ -4,8 +4,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Live Kāpiti Coast Hydration & Verification)
 
-- **T-30: Replace invented benchmark fixtures**
-  The benchmark records for 10 Tararua St, 16 Ngahina St and 114 Otaihanga Rd describe real addresses with invented physical, legal and ownership facts. Replace with clearly fictional addresses (or real fetched data) in the compiler, schemas and `index.html` before GitHub Pages or `llms.txt` publish anything.
 - **T-31: Licence and resolution register**
   A table (for example `SOURCES.md`) with one row per source: owner, URL, licence and commercial-use terms, attribution text, update frequency, spatial resolution, and whether values are fit for parcel-level use. Starts from the licence notes in the T-16 findings.
 - **T-29: Check LiDAR change candidates**

@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 18:20 (Pacific/Auckland)
+Last updated: 2026-11-06 18:45 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -14,7 +14,6 @@ Standing priorities:
 ## Waiting on you
 
 ## Next (in order, at most about 10)
-- T-30: Replace invented benchmark fixtures: the three benchmark parcels use real addresses with invented facts (10 Tararua Street is really a 2,427 m² lot with one building). Replace with clearly fictional addresses or real fetched data before anything is published.
 - T-31: Licence and resolution register: one entry per source with licence, commercial-use terms, attribution, update frequency and spatial resolution or fit-for-parcel flag, plus a plain definition of each compiled column (T-33 showed a misread flood level; confirm KCDC pipe condition grade 0 means not assessed) (early test for R-9 and R-10).
 - T-29: Check LiDAR change candidates: 25 of the 30 changed parcels are recent subdivisions (T-33), so start with the other five; compare the 37 tile patches with more than 1 m of ground change (2021 to 2024–25, after the +0.08 m offset) against aerial imagery to tell earthworks from classification artefacts.
 - T-32: Reset proposal: a proposed decision (D-12), restated Shared-DP assumption (about 3.7 lots per plan measured, not 1:64), pruned schema based on the sourceability audit, and revised board and plan, for approval before the repo is changed.
@@ -39,6 +38,7 @@ Phase 3 — Trans-Tasman (NSW / VIC) Federation:
 - Build automated Section 32 / Section 33 Council Rating Valuation Objection letter generator from `cross_silo_contradictions_70d`.
 
 ## Done (last two weeks, newest first)
+- T-30: Replace invented benchmark fixtures: the three benchmark parcels are now fictional (10 Example St, 16 Sample St, 114 Specimen Rd), along with 15 other real street addresses, invented companies with plausible names and one real consultancy. Parcel ids carry a `DEMO-` prefix, and plan, consent and title numbers sit in never-issued ranges (for example DP 9924819), so the parser still reads them. 1,956 replacements across the compiler, both HTML copies, 16 schemas, README and `llms.txt`; self-test output unchanged apart from the renames. A fictional-data notice is shown on the page, in `llms.txt` and in the README; `AGENTS.md` now forbids invented facts about real places, companies or people. Left as is: real town and school names (for example Paraparaumu College) used as context. 2026-11-06.
 - Tile workflow on GitHub Actions: `.github/workflows/tile.yml` fetches, compiles and queries any tile using the `LINZ_API_KEY` repository secret; first run matched the local results exactly (2.5 min end to end, compile 12 s, 274 MB peak). [Workflow](.github/workflows/tile.yml) 2026-11-06.
 - T-34: LINZ titles, easements and non-primary parcels: 667 titles (type only, no owners), 322 easements and 6 land covenants joined to the tile's parcels. KCDC's mirror matches LINZ exactly for the 582 shared parcels, shows no lag, and omits only railway parcels. Key supplied in chat for this run only and not stored; sessions started from the Claude app do not get Claude Code environment variables. [Findings](docs/findings/2026-11-06-inverse-queries.md#parcels-without-a-linz-key) 2026-11-06.
 - T-33: Inverse query on live parcels: five region-wide queries (infill candidates, floor level above ground, old poor sewers, ground change, heritage and trees) over 472 parcels in under 0.2 s, every row with source URL, sha256, fetch time and licence. For Kāpiti, neither Landsight nor Relab can answer the first four. [Findings](docs/findings/2026-11-06-inverse-queries.md) 2026-11-06.

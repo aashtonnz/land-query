@@ -58,9 +58,9 @@
   "give_to_get_vault_flywheel_simulation": {
     "event": "User or AI Agent uploads `LIM_Report_14_Kowhai_Rd_Paraparaumu.pdf` to `/v1/vault/contribute`",
     "autonomous_pipeline_steps": [
-      "1. SHA-256 dedup check confirms PDF is a new KCDC LIM + Title pack on Deposited Plan `DP 84910`.",
+      "1. SHA-256 dedup check confirms PDF is a new KCDC LIM + Title pack on Deposited Plan `DP 9984910`.",
       "2. Local deterministic parser extracts Covenant Instrument `B684120.3` (25-yr sunset clause), Consent Notice `819204.2`, and 1978 As-Built Drainage Card.",
-      "3. Shared-DP Propagator attaches the extracted covenant & subdivision geotech primitives to ALL 64 sibling lots on `DP 84910` simultaneously.",
+      "3. Shared-DP Propagator attaches the extracted covenant & subdivision geotech primitives to ALL 64 sibling lots on `DP 9984910` simultaneously.",
       "4. Recomputes 58-Domain Merkle Roots for all 64 lots and credits the uploader's API key with `+25 Free Plot Queries` ($0.00 cash cost to TopoNZ)."
     ],
     "plots_hydrated_from_single_upload": 64,

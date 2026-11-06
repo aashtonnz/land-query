@@ -7,7 +7,7 @@
       "title": "1. Free LINZ Title Memorials Summary Table (Layer 50804 + Related Memorials CSV)",
       "replaces_cost": "$19,600,000 retail / $300,000 deduplicated title search fees",
       "actual_cost_nzd": 0.0,
-      "how_it_works": "LINZ Data Service publishes the NZ Property Titles layer (50804) and Title Memorials summary table under a 100% free CC-BY 4.0 licence. Every parcel's exact memorial strings ('Land Covenant in Transfer B684120.3', 'Consent Notice s221 RMA 819204.2', 'Subject to s72 Building Act', 'Easement Marked A DP 84910') are already in the free bulk CSV\u2014giving 100% covenant/s221/s72 detection nationwide for $0.00."
+      "how_it_works": "LINZ Data Service publishes the NZ Property Titles layer (50804) and Title Memorials summary table under a 100% free CC-BY 4.0 licence. Every parcel's exact memorial strings ('Land Covenant in Transfer B684120.3', 'Consent Notice s221 RMA 819204.2', 'Subject to s72 Building Act', 'Easement Marked A DP 9984910') are already in the free bulk CSV\u2014giving 100% covenant/s221/s72 detection nationwide for $0.00."
     },
     {
       "workaround_id": "FREE_WORKAROUND_02_COUNCIL_LGOIMA_S221_REGISTERS",
