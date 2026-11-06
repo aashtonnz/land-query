@@ -13,5 +13,5 @@ python3 compile_tile.py data        # per-parcel primitives into data/tile.duckd
 python3 inverse_queries.py data     # five inverse queries with provenance into data/inverse_queries.json
 ```
 
-Fetched data (`data/`) is not committed; it is reproducible from these scripts. Set `ONLY=name1,name2` to refetch
+Licences, fit-for-parcel flags and column definitions: [`SOURCES.md`](../../SOURCES.md). Fetched data (`data/`) is not committed; it is reproducible from these scripts. Set `ONLY=name1,name2` to refetch
 selected layers in `fetch_tile.py`.

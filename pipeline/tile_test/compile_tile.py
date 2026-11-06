@@ -41,9 +41,11 @@ point_layers = ["ovl_heritage_places", "ovl_notable_trees"]
 L = {n: load(n) for n in poly_layers + point_layers}
 trees = {n: STRtree([g for g, _ in v]) for n, v in L.items() if v}
 
-ww_nodes = [(g, p) for g, p in load("ww_node") if p.get("invert_level_nzvd2016") is not None]
-sw_nodes = [(g, p) for g, p in load("sw_point") if p.get("invert_level_nzvd2016") is not None]
-ww_pipes = load("ww_pipe"); ws_pipes = load("ws_pipe")
+# council-owned assets in use only (status INUS = "KCDC"); excludes private, abandoned, removed and proposed assets
+council = lambda items: [(g, p) for g, p in items if p.get("status") == "INUS"]
+ww_nodes = [(g, p) for g, p in council(load("ww_node")) if p.get("invert_level_nzvd2016") is not None]
+sw_nodes = [(g, p) for g, p in council(load("sw_point")) if p.get("invert_level_nzvd2016") is not None]
+ww_pipes = council(load("ww_pipe")); ws_pipes = council(load("ws_pipe"))
 rbl = load("flood_rbl_nzvd2016")
 T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=sw_nodes, ww_pipes=ww_pipes,
                                                     ws_pipes=ws_pipes, rbl=rbl).items() if v}

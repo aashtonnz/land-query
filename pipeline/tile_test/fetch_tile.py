@@ -13,7 +13,7 @@ TILE = dict(xmin=_X, ymin=_Y, xmax=_X + 1000, ymax=_Y + 1000)  # NZTM2000 (EPSG:
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(OUT, "raw"); os.makedirs(RAW, exist_ok=True)
 KC = "https://maps.kapiticoast.govt.nz/server/rest/services/Public"
-KC_LIC = "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)"
+KC_LIC = "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)"
 
 ARCGIS = {
     # name: (layer URL, licence note)
@@ -46,11 +46,11 @@ ARCGIS = {
     "tsunami_zones": (f"{KC}/Tsunami/MapServer/3", KC_LIC),
     "earthworks": (f"{KC}/Earthworks/MapServer/1", KC_LIC),
     "gw_liquefaction": ("https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10",
-                        "GWRC (licence to confirm)"),
+                        "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)"),
     "gw_eq_slope_failure": ("https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/11",
-                            "GWRC (licence to confirm)"),
+                            "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)"),
     "buildings_2021": ("https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
-                       "KCDC Building Outlines 2021 (licence to confirm)"),
+                       "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)"),
 }
 
 def sha(b): return hashlib.sha256(b).hexdigest()

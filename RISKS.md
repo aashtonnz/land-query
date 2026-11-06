@@ -1,17 +1,17 @@
 # Risks
 
-Last updated: 2026-11-06 18:05 (Pacific/Auckland)
+Last updated: 2026-11-06 19:20 (Pacific/Auckland)
 Follows: risk list v1.1 (ai-working-practices)
 
 ## R-9: Licences that do not permit commercial reuse
 **Why it matters.** The product is to be sold. Some sources are non-commercial (S-map, GNS active faults), some have registration terms (NZGD), and several KCDC layers state no licence at all. Building on a source that cannot be resold means rework or legal exposure later.
 **What we can likely do.** Keep a licence register and admit a source to the product only when its terms allow commercial redistribution; use council fault and hazard overlays instead of restricted national datasets; ask councils to confirm licences (a person, not an agent, makes that contact).
-**Early test.** Build the register for every source used in the tile and count how many are cleanly CC BY or equivalent (T-31).
+**Early test.** Done for the tile (T-31, 2026-11-06, [`SOURCES.md`](SOURCES.md)): all 23 source rows are CC BY 4.0. 11 carry the licence on the dataset; 12 rely on a portal-wide KCDC or GWRC statement. The council's 2012 map-viewer terms (viewing only) conflict on their face but cover the viewer website. Remaining step: written confirmation from KCDC and GWRC (T-35, owner only). Still open for every new council and for sources outside the tile (S-map, NZGD, GNS faults).
 
 ## R-10: Coarse data presented as parcel-level fact
 **Why it matters.** Some layers are regional (GWRC liquefaction in the tile is one 32 km² polygon from 1:250,000 geology) while others are point-dense. An agent given an overlap percentage cannot tell the difference, and a confident wrong answer about a property is the fastest way to lose trust.
 **What we can likely do.** Record spatial resolution and a fit-for-parcel flag for every source, and return them alongside every value.
-**Early test.** Add resolution to the licence register and check that the compiled tile can carry it per column (T-31).
+**Early test.** Done (T-31): fit-for-parcel flags and plain column definitions are in [`SOURCES.md`](SOURCES.md); GWRC liquefaction is flagged not fit for parcel use. Not yet returned with each query row: carry the flag in `inverse_queries.json` provenance (T-32).
 
 ## R-1: Upstream WFS / LiDAR rate-limiting or memory exhaustion during bulk suburb compilation
 **Why it matters.** Compiling all 24,800 Kāpiti Coast parcels from live LINZ Data Service WFS and `1m` LiDAR rasters on a single laptop could hit HTTP rate limits or exhaust RAM if full regional GeoTIFFs are loaded at once.

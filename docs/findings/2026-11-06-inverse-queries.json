@@ -438,7 +438,7 @@
      "ww_pipe_dist_m": 3.4,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 3870802,
@@ -447,7 +447,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 8076460,
@@ -456,7 +456,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 4062257,
@@ -465,7 +465,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 4040716,
@@ -474,7 +474,7 @@
      "ww_pipe_dist_m": 2.4,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 3849572,
@@ -483,7 +483,7 @@
      "ww_pipe_dist_m": 3.6,
      "ww_pipe_material": "EW",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 5.0
+     "ww_pipe_condition_grade": 5
     },
     {
      "unit_id": 3898031,
@@ -492,7 +492,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3814011,
@@ -501,7 +501,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3802393,
@@ -510,7 +510,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3833643,
@@ -519,7 +519,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3749717,
@@ -528,7 +528,7 @@
      "ww_pipe_dist_m": 0.0,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 4064855,
@@ -537,7 +537,7 @@
      "ww_pipe_dist_m": 18.2,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3899843,
@@ -546,7 +546,7 @@
      "ww_pipe_dist_m": 6.3,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 4049569,
@@ -555,7 +555,7 @@
      "ww_pipe_dist_m": 6.4,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 6568943,
@@ -564,7 +564,7 @@
      "ww_pipe_dist_m": 6.5,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 6568942,
@@ -573,7 +573,7 @@
      "ww_pipe_dist_m": 6.5,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 3781124,
@@ -582,7 +582,7 @@
      "ww_pipe_dist_m": 6.4,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     },
     {
      "unit_id": 8076459,
@@ -591,7 +591,7 @@
      "ww_pipe_dist_m": 13.6,
      "ww_pipe_material": "AC",
      "ww_pipe_year": 1976.0,
-     "ww_pipe_condition_grade": 4.0
+     "ww_pipe_condition_grade": 4
     }
    ]
   },

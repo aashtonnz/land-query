@@ -4,8 +4,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Live Kāpiti Coast Hydration & Verification)
 
-- **T-31: Licence and resolution register**
-  A table (for example `SOURCES.md`) with one row per source: owner, URL, licence and commercial-use terms, attribution text, update frequency, spatial resolution, and whether values are fit for parcel-level use. Starts from the licence notes in the T-16 findings.
 - **T-29: Check LiDAR change candidates**
   For the 37 patches of ≥100 m² changed by more than 1 m between the 2021 and 2024–25 DEMs (after the +0.08 m systematic offset), compare against LINZ aerial imagery from both periods and classify each as earthworks, construction, vegetation or artefact.
 - **T-32: Reset proposal**
