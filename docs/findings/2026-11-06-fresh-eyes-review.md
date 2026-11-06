@@ -164,3 +164,40 @@ run through GitHub Actions, which can reach those hosts.
   - The tile has full LiDAR, so the query counts are unchanged; partly covered parcels are elsewhere (117 district-wide).
 - **Tests.** Three new tests: a 10 m tree with the sun overhead, a viewpoint among trees, and a 12 m sliver against a
   20 m lot. They test new functions, so each fails on the old code.
+
+## T-44: QA and query wording (fixed in code, 7 Nov 2026)
+
+- **The Te Horo manhole block, settled.**
+  - Of the in-use points with a cover level inside block 1775000–1780000 E, 5480000–5485000 N, all 38 are
+    stormwater: 19 culvert outlets and 12 inlets (wingwalls), and 7 sumps. There are no wastewater points.
+  - Every point's NZVD2016 and Wellington 1953 cover levels differ by the usual −0.37 m, so the levels were not
+    converted twice.
+  - The cause is the asset type: a culvert end's level sits in the drain, below a 1 m LiDAR cell that takes in the
+    bank or road.
+  - QA check 1 now compares true manholes only (node types WWMH and SWMH), reported separately for wastewater and
+    stormwater. On GitHub (tile run 42297523979, the 5 km block) it gives 24 wastewater manholes at a median −0.11 m
+    and 11 stormwater manholes at −0.06 m, none more than 0.5 m off. The block itself has 0 wastewater manholes; the
+    24 lie where its download area reaches about 0.8 km north into Ōtaki.
+- **Nearest manhole columns.** `ww_mh_*` and `sw_mh_*` now use manholes only. Before, `ww_mh_*` took any wastewater
+  node with an invert, including cleaning eyes and valves; 3 of 535 parcels on the test tile change their nearest
+  manhole.
+- **Private assets.** The reviewer suspected private assets were included. They are not: only status `INUS` is used,
+  which excludes private (`PRV`), NZTA, rail and GWRC assets.
+- **Area check.**
+  - The area check now compares each parcel with the LINZ parcel of the same id, and runs in every block, including
+    those without LiDAR.
+  - It used to compare KCDC's polygon with KCDC's own `calc_area`.
+  - Te Horo block: 753 parcels, none missing from LINZ, largest difference 0.1 m².
+- **Q4.**
+  - The query is renamed "Ground level changed since 2021": the old name said "not explained by buildings", but it had
+    no building condition. Ground surfaces exclude buildings anyway, so the change is mostly earthworks.
+  - It now subtracts each block's own epoch offset, the new column `lidar_epoch_offset_block_m`, instead of one 0.08 m
+    for the district.
+- **Q5.** Heritage and tree points count only if they are inside or on the parcel boundary (before: within 1 m, so a
+  boundary point counted on both neighbours). Each point now carries its KCDC id.
+- **Paging.** A shared helper (`pipeline/arcgis.py`) pages at the layer's own record limit, reads the
+  transfer-limit flag where GeoJSON puts it, and fails the run if the total differs from the server's count.
+- **Ids.** A parcel without an id now stops the run instead of getting an invented one.
+- **Tests.** Two new tests (paging against a server limited to 500 records, and a point 0.5 m outside a parcel). Both
+  fail on the old code. The manhole split and the area check were checked on the Te Horo block on GitHub. The per-block
+  offset in Q4 will be checked against each block's QA offset at the T-45 rebuild.

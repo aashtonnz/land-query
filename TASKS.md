@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-07 06:10 (Pacific/Auckland)
+Last updated: 2026-11-07 10:45 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -15,9 +15,8 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-44: QA and query wording: split manhole QA into wastewater and stormwater (explains the Te Horo block), area check against LINZ in every block, Q4 per-block epoch offset and honest name, Q5 containment, paging guards, no invented ids.
 - T-45: Raw-source sample check: compare 10 or more parcels across block types with the raw KCDC, GWRC and LINZ layers, run through GitHub Actions (the review session could not reach those hosts), then one district rebuild with T-40 to T-44.
-- T-36: Query service (after T-44 and T-45): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
+- T-36: Query service (after T-45): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
@@ -37,6 +36,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-44: QA and query wording: the Te Horo "manholes" were stormwater culvert ends and sumps (no wastewater points in the block; datum levels converted once), so QA now compares true manholes only, wastewater and stormwater separately (Te Horo block: medians −0.11 and −0.06 m, none over 0.5 m); nearest-manhole columns use manholes only; area check against LINZ in every block (Te Horo: 753 parcels, max 0.1 m²); Q4 renamed and uses each block's epoch offset; Q5 counts points inside the parcel, with ids; paging with a count check; no invented ids. Private assets were already excluded. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-44-qa-and-query-wording-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-43: Ground-level measures: winter sun now counts only ground with nothing above it and is averaged over clear open ground, with a new `open_ground_clear_pct` (on wooded test-tile parcels 1.1 h between the trees, against 4.3 h measured on the canopy before); viewpoint never under trees; platform estimate only where a 15 × 15 m square fits on open ground (441 → 135 parcels on the tile); new `lidar_coverage_pct`, required at 99% by the terrain queries. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-43-ground-level-measures-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-42: Window edges: whole-catchment flow on a 10 m district mosaic of LINZ's national DEM (new `catchment_area_max_m2`; Waikanae 148 km², Ōtaki 374 km² near their mouths), built once per run and cached; pysheds replaced by priority-flood D8 after it was found stopping rivers on flat valley floors; 1 m upslope area flagged where it reaches the window edge; flow path in metres; wind relative height with the sea at 0 m; LiDAR read 300 m beyond each window, with sheets chosen from all four corners. Known limit: embankments without culverts divert flow on the plain north of Ōtaki. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-42-window-edges-fixed-in-code-6-nov-2026) 2026-11-07.
 - T-41: Query provenance: every fetcher records fetch time (UTC) and sha256 per source, the merge keeps them per block, and each query row carries the sha256 and fetch time of the data its own block was compiled from, with URL and licence once per query. Feature counts are no longer summed across overlapping windows. On a live re-fetch of the test tile, 0 of 568 provenance entries are missing (in the published district results, all 23 query-level entries are null). [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-41-query-provenance-fixed-in-code-6-nov-2026) 2026-11-06.

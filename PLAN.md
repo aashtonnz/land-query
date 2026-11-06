@@ -5,11 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-44: QA and query wording**
-  Split QA check 1 by network and asset type, and settle the Te Horo block from its asset types and both datum levels.
-  Run the area check in every block, against LINZ. Q4 uses each block's epoch offset and is renamed or given a building
-  condition; Q5 uses containment and returns feature ids. Paging reads `properties.exceededTransferLimit` and compares
-  totals with `returnCountOnly`. A parcel without an id fails the run.
 - **T-45: Raw-source sample check**
   Through GitHub Actions, fetch the raw features for 10 or more named parcels (urban, rural, coastal, block edge) and
   compare their compiled values; then rebuild the district once with T-40 to T-44 and record the before and after counts.
