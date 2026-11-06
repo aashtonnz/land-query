@@ -14,13 +14,17 @@ db = duckdb.connect(DBF, read_only=True)
 PROV = {k: json.loads(v) for k, v in db.execute("SELECT source, json FROM provenance").fetchall()}
 LIDAR_OFFSET_M = 0.08  # systematic 2024-25 minus 2021 offset on flat ground (findings, 6 Nov 2026)
 
+FLOOD_LAYERS = ["flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
+                "flood_fill_control", "flood_storage", "flood_ponding", "flood_residual_ponding", "flood_shallow_surface"]
+NO_NEW_FLOOD = " AND ".join(f"{c} IS NULL" for c in FLOOD_LAYERS)
+
 # Only parcels wholly inside the tile, so terrain and overlay values cover the whole parcel.
 BASE = "FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20"
 
 Q = [
     dict(id="Q1", name="Gravity-serviceable infill candidates",
          question="High or General Residential parcels of at least 800 m², under 25% covered by 2021 buildings, "
-                  "90th-percentile slope under 10°, no KCDC flood hazard overlay, and a wastewater manhole with a "
+                  "90th-percentile slope under 10°, outside every KCDC flood layer (the 2021 District Plan overlay and the newer modelled extents), and a wastewater manhole with a "
                   "recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground. Title type and easement "
                   "count returned (cross-lease and unit titles complicate subdivision); freehold first.",
          sql=f"""SELECT unit_id, appellation, title_types, easements_n, area_m2, building_2021_m2, slope_p90_deg, zones,
@@ -28,9 +32,9 @@ Q = [
                  AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
                       OR json_extract(zones,'$."General Residential Zone"')::DOUBLE >= 90)
                  AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10
-                 AND ovl_flood_hazard IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1
+                 AND ovl_flood_hazard IS NULL AND {NO_NEW_FLOOD} AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1
                  ORDER BY (title_types = 'Freehold') DESC, area_m2 DESC""",
-         sources=["parcels", "titles", "nonprimary_parcels", "zones", "buildings_2021", "dem_2025", "ovl_flood_hazard", "ww_node"]),
+         sources=["parcels", "titles", "nonprimary_parcels", "zones", "buildings_2021", "dem_2025", "ovl_flood_hazard", *FLOOD_LAYERS, "ww_node"]),
     dict(id="Q2", name="Recommended floor level well above ground",
          question="Built-on parcels where the highest KCDC recommended building level (a minimum floor level, "
                   "NZVD2016, including freeboard) inside the parcel is more than 1 m above the parcel's mean LiDAR "

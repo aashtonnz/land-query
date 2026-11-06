@@ -9,6 +9,7 @@ import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
+from overlays import class_shares
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -35,8 +36,9 @@ units = load(unit_src)
 print("unit source:", unit_src, len(units))
 
 poly_layers = ["zones", "ovl_flood_hazard", "ovl_ecological_sites", "ovl_noise_corridor", "ovl_coastal_env",
-               "flood_stream_corridor", "flood_overflow_path", "flood_storage", "flood_ponding",
-               "wind_stainless", "wind_very_high", "tsunami_zones", "ovl_fault_avoidance",
+               "flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
+               "flood_fill_control", "flood_storage", "flood_ponding", "flood_residual_ponding", "flood_shallow_surface",
+               "wind_stainless", "wind_very_high", "tsunami_zones", "earthworks", "ovl_fault_avoidance",
                "gw_liquefaction", "gw_eq_slope_failure"]
 point_layers = ["ovl_heritage_places", "ovl_notable_trees"]
 L = {n: load(n) for n in poly_layers + point_layers}
@@ -159,14 +161,7 @@ for uid, (g, p) in enumerate(units):
     # zones and polygon overlays: overlap percentage per class value
     for n in poly_layers:
         if n not in trees: r[n] = None; continue
-        hits = {}
-        for i in trees[n].query(g):
-            pg, pp = L[n][i]
-            a = pg.intersection(g).area
-            if a > 0.5:
-                label = (pp.get("PDP_ZONE") or pp.get("ZONE") or pp.get("Liquefaction") or pp.get("SEVERITY")
-                         or pp.get("NAME") or pp.get("Name") or n)
-                hits[label] = round(hits.get(label, 0) + 100 * a / g.area, 1)
+        hits = class_shares(n, g, [L[n][i] for i in trees[n].query(g)])
         r[n] = json.dumps(hits) if hits else None
     for n in point_layers:
         gb = g.buffer(1)

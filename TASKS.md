@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 22:30 (Pacific/Auckland)
+Last updated: 2026-11-06 23:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -15,13 +15,12 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-40: Zone and overlay labels: take the union of overlapping features instead of summing (1,719 parcels above 100%), map legacy and proposed-plan zone names, use each layer's class field (tsunami zone), compile the six fetched layers left out, and point Q1 at the mapped zone and every flood layer.
 - T-41: Query provenance: record sha256 and fetch time for each source in every fetcher and carry them through the merge to each query row (all null today); count distinct features.
 - T-42: Window edges: overland flow on a district mosaic with a truncation flag, sea filled at 0 m and full 500 m context for wind relative height, LiDAR sheets chosen from their real bounds.
 - T-43: Ground-level measures: winter sun, horizon and viewpoint at ground level under trees; no platform estimate where 15 × 15 m doesn't fit; a LiDAR coverage column used by the queries.
 - T-44: QA and query wording: split manhole QA into wastewater and stormwater (explains the Te Horo block), area check against LINZ in every block, Q4 per-block epoch offset and honest name, Q5 containment, paging guards, no invented ids.
 - T-45: Raw-source sample check: compare 10 or more parcels across block types with the raw KCDC, GWRC and LINZ layers, run through GitHub Actions (the review session could not reach those hosts), then one district rebuild with T-40 to T-44.
-- T-36: Query service (after T-40 to T-45): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
+- T-36: Query service (after T-41 to T-45): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
@@ -41,6 +40,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-40: Zone and overlay labels: zones now read the operative District Plan zone (`ePlan_Zone`; the compiler had read `PDP_ZONE`, which holds older names), overlapping features of a class are unioned rather than summed, each layer uses its own class field (tsunami evacuation zone, fault certainty, noise boundary), and the five newer flood layers and `earthworks` are compiled (83 columns). Q1 excludes every flood layer. The reviewer's 200% examples are 100% on live data; three tests fail before and pass after. District results change at the T-45 rebuild. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-40-zone-and-overlay-labels-fixed-in-code-6-nov-2026) 2026-11-06.
 - T-39: Fresh-eyes review: a separate reviewer, starting from the repository alone, found 15 problems. The most serious: zone shares summed across overlapping features (1,719 parcels above 100%), null sha256 and fetch time on all query provenance, overland flow cut off at window edges, and winter sun measured on tree canopy. The "inland Waikanae" manhole block is Te Horo, unsewered, with QA mixing in stormwater points. Fixed now: a council staff email in stored copyright text (D-12). The rest are T-40 to T-45. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md) 2026-11-06.
 - T-37: Cheap computed measures: 16 new columns for all 27,614 parcels (winter sun, roof pitch and orientation, relative roof solar exposure, overland flow, levelling and platform earthworks, horizon and sky view, wind exposure inputs), each marked derived or modelled in `SOURCES.md`, with known-answer tests and checks against KCDC data. Overland flow agrees only weakly with KCDC flood areas (pipes not modelled); roofs agree with KCDC photogrammetry to about 0.5 m. A modelled wind exposure class failed its check against KCDC's wind zones and is withheld. A full district rebuild now takes 39 minutes and 308 Actions minutes. [Findings](docs/findings/2026-11-06-kapiti-district.md#computed-measures-t-37-run-42179435755) 2026-11-06.
 - T-21: Full Kāpiti compile: 27,614 parcels (the whole district) × 61 columns in one 18.5-minute Actions run (46 blocks of 5 km, 160 billable minutes), with QA checks on every block. Manholes, buildings and both LiDAR flights agree to within about 0.1 m district-wide; one Te Horo block's "manholes" are off by about 0.5 m (stormwater points; see T-39). District queries: 288 infill candidates, 633 high floor levels, 555 old poor sewers, 554 ground changes (54% on recent subdivisions), 1,398 heritage, tree or ecology parcels. [Findings](docs/findings/2026-11-06-kapiti-district.md) 2026-11-06.

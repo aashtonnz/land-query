@@ -50,3 +50,30 @@ run through GitHub Actions, which can reach those hosts.
 - No violations of: ground minimum ≤ mean ≤ maximum; wastewater head = ground minimum − invert; RBL arithmetic; slope,
   roof and open-ground areas within their parents; sky view 0–100%; horizon ≤ 90°; winter sun ≤ 8 h.
 - Titles: types only, no owner names. Q2 and Q3 match their descriptions.
+
+## T-40: zone and overlay labels (fixed in code, 6 Nov 2026)
+
+- **Cause.** The KCDC zones layer has no `ZONE` field. Its `ePlan_Zone` field holds the operative District Plan zone,
+  and `PDP_ZONE` holds older names for about a third of features ("Residential", "Beach Residential", "Industrial").
+  The compiler read `PDP_ZONE`. Some zone features also overlap features of the same zone, and the compiler summed the
+  overlaps.
+- **Fix.** `pipeline/overlays.py` labels each feature from its layer's own class field and unions overlapping features
+  of a class before measuring them. The five newer flood layers and `earthworks` are compiled (83 columns). Q1 now
+  excludes parcels in any KCDC flood layer, not only the District Plan overlay.
+- **Checked on live data.** The reviewer's three example parcels, read again from the KCDC layers:
+
+  | Parcel | Before | After |
+  | --- | --- | --- |
+  | Lot 14 DP 43617 | High Density Residential Zone 200% | High Density Residential Zone 100% |
+  | Lot 27 DP 22450 | Residential 200% | General Residential Zone 100% |
+  | Lot 44 DP 7203 | Residential 100%, Beach Residential 100% | General Residential Zone 100% |
+
+- **Test tile.** On the test tile (1769000 E, 5468400 N, 535 parcels), the zone counts are unchanged and the labels now
+  use operative names: 69 "Industrial" become "General Industrial Zone", and 58 "Outer Business Centre Zone" become
+  "Mixed Use Zone". The query counts are Q1 16, Q2 10, Q3 18, Q4 30 and Q5 23.
+- **Tests.** Three new tests in `pipeline/test_review.py` cover overlap union, the operative zone name, and class labels
+  that are never the column name. Each fails on the old code.
+- **One label is not in the source.** One Noise Corridor feature (9.4 km²) has no name or id in the source, so it is
+  labelled "Noise Corridor (no name in source)". It is probably the road and rail corridor, but nothing in the source
+  says so.
+- **Rebuild.** The district results change at the next rebuild (T-45).

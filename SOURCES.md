@@ -55,13 +55,13 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 ## Compiled columns (per parcel, table `units`)
 
-> **Known problems in the current results (T-39 review, 6 Nov 2026)**, being fixed in T-40 to T-44: zone and overlay
-> shares can exceed 100% where features overlap, and some carry legacy zone names or the layer name instead of a class;
-> query provenance lacks sha256 and fetch time; `upslope_area_max_m2` and `flow_path_m` stop at the block's fetch
+> **Known problems in the current results (T-39 review, 6 Nov 2026)**, being fixed in T-40 to T-44: until the next
+> district rebuild (T-45), zone and overlay shares in the published results can exceed 100% and some carry older zone
+> names or the layer name (fixed in the code by T-40); query provenance lacks sha256 and fetch time; `upslope_area_max_m2` and `flow_path_m` stop at the block's fetch
 > window (`flow_path_m` is a count of 1 m cells); winter sun, horizon and sky view are measured on the tree canopy where
 > there are trees; `wind_rel_height_m` is biased low near the sea; the platform estimate is given for parcels too small
-> to hold one; terrain values are given for parcels only partly covered by LiDAR. Five newer KCDC flood layers and
-> `earthworks` are fetched but not yet compiled. See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
+> to hold one; terrain values are given for parcels only partly covered by LiDAR. The five newer KCDC flood layers and
+> `earthworks` are compiled from T-40 on. See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
 
 **Kind:** **published** = a value as the source publishes it · **derived** = calculated exactly from published data
 (an overlap, a distance, a statistic of LiDAR cells) · **modelled** = an estimate from a model with stated simplifications.
@@ -74,7 +74,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `lidar_cells` | derived | 1 m LiDAR cells with ground values on the parcel; 0 means outside the LiDAR surveys and terrain columns are empty |
 | `title_types`, `title_count` | published | Distinct LINZ title types on the parcel (for example Freehold, Cross lease) and number of title references |
 | `easements_n`, `land_covenants_n` | derived | LINZ easement and covenant parcels overlapping it by more than 1 m² |
-| `zones`, `ovl_*`, `flood_*` (polygon layers), `wind_*`, `tsunami_zones`, `gw_*` | derived | JSON of class name → % of parcel area covered (overlaps under 0.5 m² ignored) |
+| `zones`, `ovl_*`, `flood_*` (polygon layers), `wind_*`, `tsunami_zones`, `earthworks`, `gw_*` | derived | JSON of class name → % of parcel area covered. Overlapping features of the same class count once; overlaps under 0.5 m² are ignored. Class field: `zones` the operative District Plan zone (`ePlan_Zone`; the layer's `PDP_ZONE` holds older names for some features); `ovl_flood_hazard` and `flood_*` the flood class (`ZONE`); `tsunami_zones` the evacuation zone; `ovl_fault_avoidance` fault name and certainty; `ovl_noise_corridor` the boundary id; `gw_liquefaction` and `gw_eq_slope_failure` their class. Layers without a class field (`ovl_coastal_env`, `wind_*`, `earthworks`) give the overlay's name. Before T-40 (6 Nov 2026) shares were summed across overlapping features and could exceed 100% |
 | `ovl_heritage_places`, `ovl_notable_trees` | derived | JSON list of heritage or tree points within 1 m of the parcel |
 | `ground_min_m`, `ground_mean_m`, `ground_max_m` | derived | 2024–25 LiDAR ground height over the parcel, metres NZVD2016 |
 | `slope_p50_deg`, `slope_p90_deg` | derived | Median and 90th-percentile ground slope over the parcel's 1 m cells |

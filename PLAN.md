@@ -5,11 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-40: Zone and overlay labels**
-  Per label, take the union of overlapping features before dividing by parcel area. Record which field each label came
-  from, map legacy `ZONE` names to the proposed-plan names, and give each layer an explicit class field. Compile the five
-  newer KCDC flood layers and `earthworks`. Q1 uses the mapped zone and excludes every flood layer. Check: no class above
-  100.5%; a unit test with two overlapping same-label polygons gives 100.
 - **T-41: Query provenance**
   Every fetcher writes `fetched` (UTC) and `sha256` per source; the merge keeps them per block; each query row carries its
   own block's values. Feature counts are of distinct features. Check: no null sha256 or fetch time in `inverse_queries.json`.
