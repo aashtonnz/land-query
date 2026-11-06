@@ -52,3 +52,29 @@ against 5.8% of all parcels. Most ground change is new subdivision earthworks. T
 - The inland Waikanae manhole block above.
 - Q5 counts every heritage or tree point within 1 m; check it isn't picking up road-reserve features on boundaries.
 - `zones` and overlay percentages for parcels clipped at the district boundary are shares of the clipped area.
+
+## Computed measures (T-37, run 42179435755)
+
+16 new columns per parcel (77 in all): winter sun on open ground, roof pitch, flat and north-facing roof area, relative
+roof solar exposure, overland flow (upslope area and flow-path length), levelling cut and fill, a 15 m platform estimate,
+wind exposure inputs, horizon and sky view. Definitions and kinds (derived or modelled) are in [`SOURCES.md`](../../SOURCES.md).
+
+The district run now takes 39 minutes and 308 billable Actions minutes (the densest block 15 minutes, 4.6 GB peak memory), so a full
+rebuild uses about 15% of the free monthly allowance.
+
+**Checks**
+
+| Measure | Check | Result |
+| --- | --- | --- |
+| Sun position | Solstice noon altitudes for Wellington (known answer) | Within 0.3° |
+| Shadows | 10 m wall, sun at 45° (known answer) | 10 m shadow, exact |
+| Horizon | Flat ground; wall 10 m high at 10 m (known answers) | 0° and 45° |
+| Overland flow | Tilted plane (known answer); KCDC flood hazard areas (independent) | Exact on the plane. District-wide, parcels with a modelled flow path are in a KCDC flood hazard area 1.14 times as often as all parcels: weak, as expected from a surface model that cannot see stormwater pipes |
+| Overland flow and floor levels | KCDC recommended building levels (independent) | Parcels whose floor level must sit more than 1 m above ground are 1.66 times as likely to carry a modelled flow path |
+| Roof surface | KCDC 2021 photogrammetric building heights (independent) | 27,375 buildings; median of block medians −0.54 m (all blocks with more than two buildings between −0.77 and −0.44 m) |
+| Wind exposure class | KCDC very-high-wind and coastal corrosion zones (independent) | **Failed.** Low surrounding obstruction is half as common inside KCDC's wind zones as outside (lift 0.50 and 0.46). Coastal exposure in Kāpiti comes from open sea and westerlies, which an obstruction-and-height rule misses. The class is withheld; its two inputs are kept as derived values |
+
+The earlier query counts are unchanged, as expected: the measures are new columns, and the existing ones did not move.
+
+**A note on the viewpoint.** The first version measured horizon and sky view from the parcel's representative point,
+which often falls inside the house (median sky view 34%). It now uses the most open spot on the section (median 67%).

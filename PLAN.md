@@ -5,13 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-37: Cheap computed measures**
-  From the 1 m DEM and DSM already fetched: sun hours on the open ground of each parcel at the winter solstice and
-  annually, and the share in shade; horizon angle and view openness; overland flow paths and upslope catchment
-  (D-infinity) across the parcel; roof planes (pitch, aspect, area) and solar potential from the DSM within building
-  outlines; cut and fill to make a level platform of a given size; an approximate AS/NZS 1170.2 terrain and shielding
-  category. Each gets one independent check (for example overland flow against KCDC overflow paths, roof area against
-  building outlines). In `SOURCES.md`, each compiled column is marked published, derived or modelled, with its method.
 - **T-39: Fresh-eyes review**
   Start a new session with only the repository: the code, `SOURCES.md`, D-12 and the latest results, not earlier
   summaries. Review the fetchers, compiler, QA checks and queries for wrong joins, unit or datum mistakes, edge effects

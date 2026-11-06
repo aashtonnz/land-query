@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 20:55 (Pacific/Auckland)
+Last updated: 2026-11-06 21:00 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -15,7 +15,6 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-37: Cheap computed measures: add sun hours and winter shading, horizon and view angles, overland flow and catchment, roof planes and solar potential, cut/fill for a level platform, and an approximate wind exposure category; check each once against something independent; mark every column published, derived or modelled in `SOURCES.md`.
 - T-39: Fresh-eyes review: a new session, starting from the code, `SOURCES.md` and D-12 rather than earlier summaries, reviews the pipeline and the query results for errors before T-36 is offered to anyone outside. Fixes come with a check that fails before and passes after.
 - T-36: Query service: a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
@@ -27,6 +26,7 @@ Phase 2 — Greater Wellington:
 - T-38: Rest of Greater Wellington: Wellington City, Hutt, Upper Hutt and Porirua, once T-24 shows the adapter cost.
 
 ## Later / ideas
+- Wind exposure model that accounts for open sea and prevailing westerlies (the obstruction-and-height class failed against KCDC zones, T-37).
 - T-18, T-19: Statutory PDF parser test and accuracy gate (deferred with consents and plan text, D-12).
 - T-20: Sentinel-1/2 as labelled area context (not parcel facts).
 - T-26: Hosted read replica (for example Cloudflare free tier); document uploads deferred for privacy and licence reasons.
@@ -36,6 +36,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-37: Cheap computed measures: 16 new columns for all 27,614 parcels (winter sun, roof pitch and orientation, relative roof solar exposure, overland flow, levelling and platform earthworks, horizon and sky view, wind exposure inputs), each marked derived or modelled in `SOURCES.md`, with known-answer tests and checks against KCDC data. Overland flow agrees only weakly with KCDC flood areas (pipes not modelled); roofs agree with KCDC photogrammetry to about 0.5 m. A modelled wind exposure class failed its check against KCDC's wind zones and is withheld. A full district rebuild now takes 39 minutes and 308 Actions minutes. [Findings](docs/findings/2026-11-06-kapiti-district.md#computed-measures-t-37-run-42179435755) 2026-11-06.
 - T-21: Full Kāpiti compile: 27,614 parcels (the whole district) × 61 columns in one 18.5-minute Actions run (46 blocks of 5 km, 160 billable minutes), with QA checks on every block. Manholes, buildings and both LiDAR flights agree to within about 0.1 m district-wide; one inland Waikanae block's manholes are off by about 0.5 m (for T-39). District queries: 288 infill candidates, 633 high floor levels, 555 old poor sewers, 554 ground changes (54% on recent subdivisions), 1,398 heritage, tree or ecology parcels. [Findings](docs/findings/2026-11-06-kapiti-district.md) 2026-11-06.
 - T-32: Reset applied: decision D-12 (product scope), keep/defer/drop schema, corrected assumptions, prototype archived, pipeline moved to `pipeline/`, README, `llms.txt`, `AGENTS.md` and `STYLE.md` rewritten, board revised. [Proposal](docs/proposals/2026-11-06-reset.md) 2026-11-06.
 - T-31: Licence and resolution register: [`SOURCES.md`](SOURCES.md) lists every source with licence, update date, fit-for-parcel flag and notes, plus a plain definition of every compiled column. Every source is CC BY 4.0: LINZ directly, KCDC through its open data portal (11 rows with a dataset licence, 12 on the portal statement), and GWRC through its regional statement. GWRC liquefaction is flagged as not fit for parcel use. Also fixed: the compiler now uses only in-use council pipes and manholes (results unchanged). KCDC condition grade 0 has no published definition. [`SOURCES.md`](SOURCES.md) 2026-11-06.
