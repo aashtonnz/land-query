@@ -13,7 +13,7 @@ D = sys.argv[1] if len(sys.argv) > 1 else "data"
 DBF = sys.argv[2] if len(sys.argv) > 2 else os.path.join(D, "tile.duckdb")
 db = duckdb.connect(DBF, read_only=True)
 PROV = {k: json.loads(v) for k, v in db.execute("SELECT source, json FROM provenance").fetchall()}
-LIDAR_OFFSET_M = 0.08  # systematic 2024-25 minus 2021 offset on flat ground (findings, 6 Nov 2026)
+LIDAR_OFFSET_M = 0.08  # fallback only, for a block with too little flat open ground to measure its own offset
 
 FLOOD_LAYERS = ["flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
                 "flood_fill_control", "flood_storage", "flood_ponding", "flood_residual_ponding", "flood_shallow_surface"]
@@ -54,17 +54,23 @@ Q = [
                  ww_pipe_condition_grade {BASE} AND ww_pipe_dist_m <= 20 AND ww_pipe_year < 1980
                  AND ww_pipe_condition_grade >= 4 ORDER BY ww_pipe_condition_grade DESC, ww_pipe_year""",
          sources=["parcels", "ww_pipe"]),
-    dict(id="Q4", name="Ground change since 2021 not explained by buildings",
-         question=f"Parcels where some 1 m cell changed by more than 1 m between the 2021 and 2024–25 LiDAR and the "
-                  f"parcel mean changed by more than 0.3 m after removing the {LIDAR_OFFSET_M} m epoch offset. "
-                  "Unverified: may be earthworks, new buildings, or vegetation classed as ground (see T-29).",
+    dict(id="Q4", name="Ground level changed since 2021",
+         question="Parcels where some 1 m cell of LiDAR ground changed by more than 1 m between the 2021 and 2024–25 "
+                  "surveys, and the parcel's mean ground changed by more than 0.3 m after removing its block's epoch "
+                  "offset (the median change on flat, open, unbuilt ground in the block). Ground surfaces exclude "
+                  "buildings, so this is mostly earthworks, but it may also be vegetation classed as ground or a "
+                  "survey artefact (unverified, see T-29).",
          sql=f"""SELECT unit_id, appellation, area_m2, building_2021_m2, dz_2021_2025_mean_m,
-                 round(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}, 3) AS dz_mean_corrected_m, dz_2021_2025_absmax_m
-                 {BASE} {TERRAIN} AND dz_2021_2025_absmax_m > 1 AND abs(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}) > 0.3
-                 ORDER BY abs(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}) DESC""",
+                 coalesce(lidar_epoch_offset_block_m, {LIDAR_OFFSET_M}) AS epoch_offset_m,
+                 round(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, {LIDAR_OFFSET_M}), 3) AS dz_mean_corrected_m,
+                 dz_2021_2025_absmax_m
+                 {BASE} {TERRAIN} AND dz_2021_2025_absmax_m > 1
+                 AND abs(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, {LIDAR_OFFSET_M})) > 0.3
+                 ORDER BY abs(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, {LIDAR_OFFSET_M})) DESC""",
          sources=["parcels", "dem_2025", "dem_2021", "buildings_2021"]),
     dict(id="Q5", name="Heritage, notable tree or ecological site on the parcel",
-         question="Parcels containing a KCDC heritage place or notable tree point, or overlapping an ecological site.",
+         question="Parcels with a KCDC heritage place or notable tree point inside or on their boundary (with the "
+                  "feature id), or overlapping an ecological site.",
          sql=f"""SELECT unit_id, appellation, area_m2, ovl_heritage_places, ovl_notable_trees, ovl_ecological_sites
                  {BASE} AND (ovl_heritage_places <> '[]' OR ovl_notable_trees <> '[]' OR ovl_ecological_sites IS NOT NULL)""",
          sources=["parcels", "ovl_heritage_places", "ovl_notable_trees", "ovl_ecological_sites"]),

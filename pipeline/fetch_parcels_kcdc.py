@@ -5,29 +5,18 @@ join to LINZ (D-11). A parcel belongs to this block if its representative point 
 the union of those parcels' bounds plus 30 m, capped at MAX_BUFFER beyond the block (tile_env.py). Run this first.
 """
 import hashlib, json, os, sys, time
-import requests
 from shapely.geometry import shape, box
 import tile_env as te
+import arcgis
 from provenance import utc_now
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
 os.makedirs(os.path.join(OUT, "raw"), exist_ok=True)
 
-t0 = time.time(); feats = []; offset = 0
-while True:
-    p = dict(geometry=",".join(map(str, te.BLOCK)), geometryType="esriGeometryEnvelope", inSR=2193,
-             spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193, f="geojson",
-             resultOffset=offset, resultRecordCount=2000, orderByFields="OBJECTID")
-    for attempt in range(4):
-        try:
-            r = requests.get(URL + "/query", params=p, timeout=300); r.raise_for_status(); break
-        except requests.exceptions.RequestException:
-            if attempt == 3: raise
-            time.sleep(5 * (attempt + 1))
-    batch = r.json().get("features", [])
-    feats += batch; offset += len(batch)
-    if len(batch) < 2000: break
+t0 = time.time()
+feats = arcgis.query_all(URL, dict(geometry=",".join(map(str, te.BLOCK)), geometryType="esriGeometryEnvelope", inSR=2193,
+                                   spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193))
 
 blk = box(*te.BLOCK); kept = []
 for f in feats:

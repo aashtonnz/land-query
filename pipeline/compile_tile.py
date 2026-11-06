@@ -9,7 +9,7 @@ import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
-from overlays import class_shares
+from overlays import class_shares, points_on
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -46,8 +46,9 @@ trees = {n: STRtree([g for g, _ in v]) for n, v in L.items() if v}
 
 # council-owned assets in use only (status INUS = "KCDC"); excludes private, abandoned, removed and proposed assets
 council = lambda items: [(g, p) for g, p in items if p.get("status") == "INUS"]
-ww_nodes = [(g, p) for g, p in council(load("ww_node")) if p.get("invert_level_nzvd2016") is not None]
-sw_nodes = [(g, p) for g, p in council(load("sw_point")) if p.get("invert_level_nzvd2016") is not None]
+# manholes only (node types WWMH, SWMH): not cleaning eyes, valves, culvert ends, sumps or soakage (T-44)
+ww_nodes = [(g, p) for g, p in council(load("ww_node")) if p.get("node_type") == "WWMH" and p.get("invert_level_nzvd2016") is not None]
+sw_nodes = [(g, p) for g, p in council(load("sw_point")) if p.get("node_type") == "SWMH" and p.get("invert_level_nzvd2016") is not None]
 ww_pipes = council(load("ww_pipe")); ws_pipes = council(load("ws_pipe"))
 rbl = load("flood_rbl_nzvd2016")
 T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=sw_nodes, ww_pipes=ww_pipes,
@@ -87,6 +88,10 @@ def stat(f, a, nd=2):
     a = a[np.isfinite(a)]
     return None if a.size == 0 else round(float(f(a)), nd)
 DZ = Z - z21
+# the block's own LiDAR epoch offset: median 2024-25 minus 2021 on flat, open, unbuilt ground (as QA check 3)
+_flat = (SLOPE < 2) & ((dsm - Z) < 0.5) & ~BLDMASK & np.isfinite(DZ)
+EPOCH_OFFSET = round(float(np.median(DZ[_flat])), 3) if _flat.sum() >= 1000 else None
+del _flat
 
 # district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
 DF_PATH = os.path.join(RAW, "district_flow.tif")
@@ -197,7 +202,9 @@ for uid, (g, p) in enumerate(units):
                if NONPRI[i][0].intersection(g).area > 1]
     extra = dict(title_types=", ".join(tts) or None, title_count=len(tnos),
                  easements_n=np_hits.count("Easement"), land_covenants_n=np_hits.count("Covenant - Land"))
-    r = dict(unit_id=p.get("id") or p.get("ID") or f"U{uid}", unit_source=unit_src, block_id=te.BLOCK_ID,
+    pid = p.get("id") or p.get("ID")
+    if pid is None: raise SystemExit(f"parcel {uid} has no id: refusing to invent one")
+    r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,
              appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
              # share of the parcel inside the fetch window: terrain and overlay values cover only that share
@@ -208,9 +215,8 @@ for uid, (g, p) in enumerate(units):
         hits = class_shares(n, g, [L[n][i] for i in trees[n].query(g)])
         r[n] = json.dumps(hits) if hits else None
     for n in point_layers:
-        gb = g.buffer(1)
-        r[n] = json.dumps([L[n][i][1].get("SIGNIFICANCE") for i in (trees[n].query(gb) if n in trees else [])
-                           if gb.contains(L[n][i][0])])
+        idk = "BUILDING_ID" if n == "ovl_heritage_places" else "TREE_ID"
+        r[n] = json.dumps(points_on(g, [L[n][i] for i in (trees[n].query(g) if n in trees else [])], idk))
     # terrain (LINZ LiDAR 2024-25, 2021)
     rs, cs, m = window_mask(g)
     Zw, Sw, Bw, Cw, Dw = Z[rs, cs], SLOPE[rs, cs], BLDMASK[rs, cs], CANOPY[rs, cs], DZ[rs, cs]
@@ -224,7 +230,7 @@ for uid, (g, p) in enumerate(units):
              open_ground_m2=int(open_ground.sum()) if HAVE_LIDAR else None,
              open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()) if HAVE_LIDAR else None,
              canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1) if HAVE_LIDAR else None,
-             dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
+             dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), lidar_epoch_offset_block_m=EPOCH_OFFSET, dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
     d, np_ = nearest("ww_nodes", ww_nodes, g)
     r.update(ww_mh_dist_m=None if d is None else round(d, 1), ww_mh_id=np_ and np_["asset_id"],

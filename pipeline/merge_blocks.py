@@ -44,10 +44,15 @@ n, nl, part = db.execute("SELECT count(*), count(*) FILTER (WHERE lidar_cells = 
 qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks if b["failed_sources"]),
           blocks_outside_lidar=sum(1 for b in blocks if b["no_coverage"]), parcels=n,
           duplicates_removed=dups, parcels_without_lidar=nl, parcels_partly_outside_window=part,
-          manhole_cover_minus_lidar_m=pooled("manhole_cover_minus_lidar_m"),
+          ww_manhole_cover_minus_lidar_m=pooled("ww_manhole_cover_minus_lidar_m"),
+          sw_manhole_cover_minus_lidar_m=pooled("sw_manhole_cover_minus_lidar_m"),
           building_ground_minus_lidar_m=pooled("building_ground_minus_lidar_m"),
           lidar_2025_minus_2021_flat_m=pooled("lidar_2025_minus_2021_flat_m"),
           roof_dsm_minus_kcdc_bld_ave_m=pooled("roof_dsm_minus_kcdc_bld_ave_m"),
-          parcel_area_max_abs_diff_m2=max((b["qa"].get("parcel_area_minus_linz_calc_m2", {}).get("max_abs") or 0) for b in blocks) if blocks else None)
+          parcel_area_vs_linz=dict(
+              n=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("n", 0) for b in blocks),
+              not_in_linz=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("not_in_linz", 0) for b in blocks),
+              n_abs_gt_1=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("n_abs_gt_1", 0) for b in blocks),
+              max_abs=max((b["qa"].get("parcel_area_minus_linz_m2", {}).get("max_abs") or 0) for b in blocks) if blocks else None))
 json.dump(qs, open(os.path.join(OUT, "qa_summary.json"), "w"), indent=1)
 print(json.dumps(qs, indent=1))

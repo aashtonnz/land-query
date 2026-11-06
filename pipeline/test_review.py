@@ -124,6 +124,24 @@ def test_no_platform_where_15m_square_does_not_fit():
     assert M.platform_centres(lot).sum() == 36                                       # 6 × 6 centres
 
 
+def test_paging_continues_when_the_server_returns_fewer_than_asked_and_flags_it_in_properties():
+    from arcgis import page_through
+    data = list(range(1234))
+    def server(offset, n):  # a server whose own limit is 500, flagging truncation where f=geojson puts it
+        fs = data[offset:offset + min(n, 500)]
+        return {"features": fs, "properties": {"exceededTransferLimit": offset + len(fs) < len(data)}}
+    assert len(page_through(server, 1000)) == 1234
+
+
+def test_heritage_point_just_outside_the_parcel_is_not_counted():
+    from shapely.geometry import Point, box
+    from overlays import points_on
+    parcel = box(0, 0, 20, 20)
+    pts = [(Point(20.5, 10), {"TREE_ID": "T1"}), (Point(20, 10), {"TREE_ID": "T2", "SIGNIFICANCE": ""}),
+           (Point(5, 5), {"TREE_ID": "T3", "SIGNIFICANCE": "Group A"})]
+    assert points_on(parcel, pts, "TREE_ID") == [dict(id="T2", significance=None), dict(id="T3", significance="Group A")]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

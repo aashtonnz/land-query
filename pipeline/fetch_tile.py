@@ -8,6 +8,7 @@ import hashlib, json, os, sys, time
 from provenance import utc_now
 import requests
 import tile_env as te
+import arcgis
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 _W = te.fetch_bbox(OUT)  # block grown to cover its parcels (fetch_parcels_kcdc.py)
@@ -57,31 +58,11 @@ ARCGIS = {
 def sha(b): return hashlib.sha256(b).hexdigest()
 
 def arcgis_query(url):
-    """Page through an ArcGIS layer for features intersecting the fetch window, as GeoJSON in EPSG:2193."""
-    feats, offset = [], 0
-    try: page = int(requests.get(url, params={"f": "json"}, timeout=60).json().get("maxRecordCount") or 1000)
-    except Exception: page = 1000
-    page = max(1000, min(page, 5000))
+    """Every feature of an ArcGIS layer intersecting the fetch window, as GeoJSON in EPSG:2193."""
     env = f"{TILE['xmin']},{TILE['ymin']},{TILE['xmax']},{TILE['ymax']}"
-    while True:
-        p = dict(where="1=1", geometry=env, geometryType="esriGeometryEnvelope", inSR=2193,
-                 spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193,
-                 returnGeometry="true", f="geojson", resultOffset=offset, resultRecordCount=page)
-        for attempt in range(4):
-            try:
-                r = requests.get(url + "/query", params=p, timeout=120)
-                r.raise_for_status()
-                break
-            except requests.exceptions.RequestException:
-                if attempt == 3: raise
-                time.sleep(5 * (attempt + 1))
-        j = r.json()
-        if "error" in j: raise RuntimeError(j["error"])
-        fs = j.get("features", [])
-        feats += fs
-        if len(fs) < page and not j.get("exceededTransferLimit"): break
-        offset += len(fs)
-    return {"type": "FeatureCollection", "features": feats}
+    q = dict(where="1=1", geometry=env, geometryType="esriGeometryEnvelope", inSR=2193,
+             spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193, returnGeometry="true")
+    return {"type": "FeatureCollection", "features": arcgis.query_all(url, q)}
 
 def main():
     pp = os.path.join(OUT, "provenance.json")

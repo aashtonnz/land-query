@@ -29,3 +29,8 @@ def class_shares(layer, parcel, features):
         a = pg.intersection(parcel)
         if a.area > 0.5: parts.setdefault(class_label(layer, pp), []).append(a)
     return {k: round(100 * unary_union(v).area / parcel.area, 1) for k, v in parts.items()}
+
+
+def points_on(parcel, features, id_field):
+    """Point features inside or on the boundary of the parcel, as [{id, significance}] (T-44: not within 1 m)."""
+    return [dict(id=p.get(id_field), significance=p.get("SIGNIFICANCE") or None) for g, p in features if parcel.covers(g)]
