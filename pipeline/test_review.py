@@ -95,6 +95,35 @@ def test_wind_relative_height_counts_the_sea_at_sea_level():
     assert abs(float(m[50, 50]) - 10.0) < 0.5, m[50, 50]              # half sea at 0 m, half land at 20 m
 
 
+def test_no_winter_sun_on_the_ground_under_a_tree():
+    import numpy as np
+    import measures as M
+    dem = np.zeros((60, 60), np.float32); dsm = dem.copy(); dsm[25:35, 25:35] = 10.0   # a 10 m tree on flat ground
+    lit = M.sunlit(dsm, 0.0, 89.0)                                                   # sun nearly overhead
+    ground = lit & M.ground_clear(dsm, dem)
+    assert lit[30, 30] and not ground[30, 30]   # the canopy top is lit, the ground beneath it is not
+    assert ground[5, 5]
+
+
+def test_viewpoint_is_never_under_trees():
+    import numpy as np
+    import measures as M
+    og = np.zeros((40, 40), bool); og[2:38, 2:38] = True
+    clear = np.ones_like(og); clear[10:30, 10:30] = False                            # trees in the middle of the section
+    r, c = M.viewpoint(og, clear)
+    assert clear[r, c] and og[r, c]
+    assert M.viewpoint(og, np.zeros_like(og)) is None
+
+
+def test_no_platform_where_15m_square_does_not_fit():
+    import numpy as np
+    import measures as M
+    sliver = np.zeros((40, 40), bool); sliver[5:35, 10:22] = True                    # 12 m wide: too narrow
+    assert not M.platform_centres(sliver).any()
+    lot = np.zeros((40, 40), bool); lot[5:25, 5:25] = True                           # 20 m × 20 m
+    assert M.platform_centres(lot).sum() == 36                                       # 6 × 6 centres
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

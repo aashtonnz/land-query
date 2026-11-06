@@ -5,10 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-43: Ground-level measures**
-  Treat cells where DSM − DEM > 0.5 m as shaded at ground level; choose the viewpoint from clear cells. No platform
-  estimate unless the open ground holds a 15 × 15 m square. Add `lidar_coverage_pct`; queries require at least 99. Checks:
-  a synthetic 10 m tree gives 0 h of sun beneath it; no platform estimate where open ground is under 225 m².
 - **T-44: QA and query wording**
   Split QA check 1 by network and asset type, and settle the Te Horo block from its asset types and both datum levels.
   Run the area check in every block, against LINZ. Q4 uses each block's epoch offset and is renamed or given a building

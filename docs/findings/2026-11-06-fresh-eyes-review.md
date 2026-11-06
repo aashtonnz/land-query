@@ -141,3 +141,26 @@ run through GitHub Actions, which can reach those hosts.
   four-corner search each fail on the old code.
 - **On GitHub Actions** (tile workflow run 42251507841 on this branch): district flow 2 min 18 s, whole run 5.5
   minutes, same query counts as the local run, and an identical district flow sha256, so the mosaic is reproducible.
+
+## T-43: ground-level measures (fixed in code, 7 Nov 2026)
+
+- **Winter sun.**
+  - A cell counts as sunlit at ground level only where nothing stands more than 0.5 m above it (DSM − DEM).
+  - The mean and the 3-hour share are now taken over clear open ground, and a new `open_ground_clear_pct` column says
+    how much of the open ground is clear.
+  - My first attempt averaged ground under trees in as 0 h. That also counted every hedge, fence, shrub and vehicle,
+    which cover about 15% of open ground on the test tile, so it mixed "how much ground is clear" with "how sunny the
+    clear ground is". The two are now separate columns.
+- **Viewpoint.** Horizon and sky view are taken from the clear open-ground cell farthest from buildings, trees and the
+  boundary, so never from under a canopy.
+- **Platform.** A platform estimate is given only where a whole 15 m × 15 m square lies on the parcel's open ground.
+- **LiDAR coverage.** New `lidar_coverage_pct`; queries Q1, Q2 and Q4 (terrain-based) need at least 99%.
+- **Test tile** (live, 535 parcels):
+  - Parcels with at least half their open ground under canopy (80): winter sun 4.27 h before, measured on the canopy,
+    against 1.08 h now, on the clear ground between the trees. Viewpoint sky view 19.8% before, 52.7% now.
+  - Parcels with under 10% canopy (196): 4.28 h before, 3.78 h now, the difference being shade from fences and shrubs
+    on the ground beside them.
+  - Platform estimates: 441 parcels before, 135 now, and none with under 225 m² of open ground.
+  - The tile has full LiDAR, so the query counts are unchanged; partly covered parcels are elsewhere (117 district-wide).
+- **Tests.** Three new tests: a 10 m tree with the sun overhead, a viewpoint among trees, and a 12 m sliver against a
+  20 m lot. They test new functions, so each fails on the old code.

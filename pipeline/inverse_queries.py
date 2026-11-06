@@ -21,6 +21,8 @@ NO_NEW_FLOOD = " AND ".join(f"{c} IS NULL" for c in FLOOD_LAYERS)
 
 # Only parcels wholly inside the tile, so terrain and overlay values cover the whole parcel.
 BASE = "FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20"
+# terrain-based queries also need LiDAR over the whole parcel (T-43)
+TERRAIN = "AND lidar_coverage_pct >= 99"
 
 Q = [
     dict(id="Q1", name="Gravity-serviceable infill candidates",
@@ -29,7 +31,7 @@ Q = [
                   "recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground. Title type and easement "
                   "count returned (cross-lease and unit titles complicate subdivision); freehold first.",
          sql=f"""SELECT unit_id, appellation, title_types, easements_n, area_m2, building_2021_m2, slope_p90_deg, zones,
-                 ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m {BASE}
+                 ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m {BASE} {TERRAIN}
                  AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
                       OR json_extract(zones,'$."General Residential Zone"')::DOUBLE >= 90)
                  AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10
@@ -42,7 +44,7 @@ Q = [
                   "ground. A floor-height requirement for rebuilding, not a flood depth.",
          sql=f"""SELECT unit_id, appellation, building_2021_m2, ground_mean_m, rbl_in_parcel_n,
                  rbl_in_parcel_max_nzvd2016, rbl_in_parcel_max_minus_ground_mean_m, ovl_flood_hazard
-                 {BASE} AND building_2021_m2 > 0 AND rbl_in_parcel_max_minus_ground_mean_m > 1
+                 {BASE} {TERRAIN} AND building_2021_m2 > 0 AND rbl_in_parcel_max_minus_ground_mean_m > 1
                  ORDER BY rbl_in_parcel_max_minus_ground_mean_m DESC""",
          sources=["parcels", "buildings_2021", "dem_2025", "flood_rbl_nzvd2016", "ovl_flood_hazard"]),
     dict(id="Q3", name="Nearest sewer is old and in poor condition",
@@ -58,7 +60,7 @@ Q = [
                   "Unverified: may be earthworks, new buildings, or vegetation classed as ground (see T-29).",
          sql=f"""SELECT unit_id, appellation, area_m2, building_2021_m2, dz_2021_2025_mean_m,
                  round(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}, 3) AS dz_mean_corrected_m, dz_2021_2025_absmax_m
-                 {BASE} AND dz_2021_2025_absmax_m > 1 AND abs(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}) > 0.3
+                 {BASE} {TERRAIN} AND dz_2021_2025_absmax_m > 1 AND abs(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}) > 0.3
                  ORDER BY abs(dz_2021_2025_mean_m - {LIDAR_OFFSET_M}) DESC""",
          sources=["parcels", "dem_2025", "dem_2021", "buildings_2021"]),
     dict(id="Q5", name="Heritage, notable tree or ecological site on the parcel",

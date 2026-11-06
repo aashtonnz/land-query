@@ -136,7 +136,8 @@ if HAVE_LIDAR:
     ASPECT = (np.degrees(np.arctan2(-dgx, dgy)) % 360).astype(np.float32)   # direction the surface faces, from north
     del dgx, dgy
     sb, cb = np.sin(np.radians(PITCH)), np.cos(np.radians(PITCH))
-    WINTER = np.zeros(Z.shape, np.uint8)        # hours of direct sun on 21 June (hourly, NZST)
+    CLEAR = M.ground_clear(dsm, Z)              # nothing above the ground: sun on the ground, not on a canopy
+    WINTER = np.zeros(Z.shape, np.uint8)        # hours of direct sun on the ground on 21 June (hourly, NZST)
     IRR = np.zeros(Z.shape, np.float32)          # clear-sky direct irradiation on the surface, 3 representative days
     IRR_FLAT = 0.0                               # the same for an unshaded horizontal surface
     for (mo, dd) in ((6, 21), (3, 20), (12, 21)):
@@ -148,7 +149,7 @@ if HAVE_LIDAR:
                            np.cos(np.radians(az - ASPECT)), 0, None)
             IRR += (dni * cosi * lit).astype(np.float32)
             IRR_FLAT += dni * math.sin(math.radians(alt))
-            if mo == 6: WINTER += lit.astype(np.uint8)
+            if mo == 6: WINTER += (lit & CLEAR).astype(np.uint8)
             del lit, cosi
     del sb, cb
     # flow may enter the window across its edge, or from unsurveyed land next to a LiDAR gap (not from the sea)
@@ -215,7 +216,8 @@ for uid, (g, p) in enumerate(units):
     Zw, Sw, Bw, Cw, Dw = Z[rs, cs], SLOPE[rs, cs], BLDMASK[rs, cs], CANOPY[rs, cs], DZ[rs, cs]
     z = Zw[m]; s = Sw[m]
     open_ground = m & ~Bw
-    r.update(lidar_cells=int(np.isfinite(z).sum()), ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
+    r.update(lidar_cells=int(np.isfinite(z).sum()),
+             lidar_coverage_pct=round(100 * float(np.isfinite(z).sum()) / z.size, 1) if z.size else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
              building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),
@@ -246,7 +248,7 @@ for uid, (g, p) in enumerate(units):
     r.update(rbl_max_nzvd2016=max(lv) if lv else None,
              ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv and r["ground_min_m"] is not None else None)
     # computed measures (T-37); modelled or derived, see SOURCES.md
-    keys = ["winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
+    keys = ["open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
             "roof_north_m2", "roof_solar_rel_pct", "upslope_area_max_m2", "upslope_area_truncated", "flow_path_m", "level_open_cut_m3",
             "level_open_fill_m3", "platform_15m_earthworks_min_m3", "wind_obstruction_pct", "wind_rel_height_m",
             "horizon_mean_deg", "horizon_north_deg", "sky_view_pct"]
@@ -254,8 +256,10 @@ for uid, (g, p) in enumerate(units):
         r.update({k: None for k in keys})
     else:
         og = open_ground & np.isfinite(Zw); roof = m & Bw
-        wh = WINTER[rs, cs][og]
-        r.update(winter_sun_hours_open_mean=round(float(wh.mean()), 1) if wh.size else None,
+        ogc = og & CLEAR[rs, cs]   # open ground with nothing standing above it (no tree, shrub, fence or new roof)
+        wh = WINTER[rs, cs][ogc]
+        r.update(open_ground_clear_pct=round(100 * float(ogc.sum()) / og.sum(), 1) if og.any() else None,
+                 winter_sun_hours_open_mean=round(float(wh.mean()), 1) if wh.size else None,
                  winter_sun_open_ge3h_pct=round(100 * float((wh >= 3).mean()), 1) if wh.size else None)
         pr, ar, ir = PITCH[rs, cs][roof], ASPECT[rs, cs][roof], IRR[rs, cs][roof]
         north = (pr >= 5) & ((ar >= 315) | (ar < 45))
@@ -275,14 +279,13 @@ for uid, (g, p) in enumerate(units):
             r.update(level_open_cut_m3=round(float(np.clip(zo - med, 0, None).sum()), 0),
                      level_open_fill_m3=round(float(np.clip(med - zo, 0, None).sum()), 0))
         else: r.update(level_open_cut_m3=None, level_open_fill_m3=None)
-        r.update(platform_15m_earthworks_min_m3=stat(np.min, PLAT[rs, cs][m], 0))
-        # viewpoint: the most open spot on the section, the open-ground cell farthest from buildings and the boundary
-        from scipy.ndimage import distance_transform_edt
-        if og.any():
-            dist = distance_transform_edt(og)
-            kk = np.unravel_index(int(np.argmax(dist)), dist.shape)
-            pr_, pc = int(kk[0] + rs.start), int(kk[1] + cs.start)
-        if og.any() and np.isfinite(Z[pr_, pc]):
+        # platform: only where a whole 15 m × 15 m square fits on the parcel's open ground
+        r.update(platform_15m_earthworks_min_m3=stat(np.min, PLAT[rs, cs][M.platform_centres(og)], 0))
+        # viewpoint: the most open spot on the section, the clear open-ground cell farthest from buildings, trees and
+        # the boundary (none if every open cell is under trees)
+        kk = M.viewpoint(og, CLEAR[rs, cs])
+        if kk is not None: pr_, pc = int(kk[0] + rs.start), int(kk[1] + cs.start)
+        if kk is not None and np.isfinite(Z[pr_, pc]):
             # wind: the inputs only. A modelled exposure class disagreed with KCDC's wind zones (T-37) and is withheld.
             ob = float(OBS[pr_, pc]) * 100
             vx, vy = dem.transform * (pc + 0.5, pr_ + 0.5)

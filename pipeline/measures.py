@@ -105,3 +105,27 @@ def horizon(dsm, dem, row, col, res=1.0, n=16, maxd=MAX_HORIZON_M):
         ang = np.degrees(np.arctan2(z - z0, d)); ang = ang[np.isfinite(ang)]
         out.append(float(max(0.0, ang.max())) if ang.size else 0.0)
     return out
+
+
+CLEAR_M = 0.5  # ground counts as open to the sky where the DSM is within this of the DEM (no tree, roof or fence above)
+
+
+def ground_clear(dsm, dem, clear_m=CLEAR_M):
+    """True where nothing stands above the ground (DSM within clear_m of the DEM); False under trees or where no data."""
+    with np.errstate(invalid="ignore"):
+        return (dsm - dem) <= clear_m
+
+
+def platform_centres(open_mask, k=15):
+    """Cells at the centre of a k × k square lying wholly on open_mask (the parcel's open ground)."""
+    from scipy.ndimage import binary_erosion
+    return binary_erosion(open_mask, structure=np.ones((k, k), bool), border_value=0)
+
+
+def viewpoint(open_mask, clear):
+    """The open, clear-sky cell farthest from buildings, trees and the boundary: (row, col), or None if there is none."""
+    from scipy.ndimage import distance_transform_edt
+    ok = open_mask & clear
+    if not ok.any(): return None
+    d = distance_transform_edt(ok)
+    return np.unravel_index(int(np.argmax(d)), d.shape)
