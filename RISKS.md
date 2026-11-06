@@ -1,17 +1,22 @@
 # Risks
 
-Last updated: 2026-11-06 (Pacific/Auckland)
+Last updated: 2026-11-06 17:20 (Pacific/Auckland)
 Follows: risk list v1.1 (ai-working-practices)
+
+## R-9: Licences that do not permit commercial reuse
+**Why it matters.** The product is to be sold. Some sources are non-commercial (S-map, GNS active faults), some have registration terms (NZGD), and several KCDC layers state no licence at all. Building on a source that cannot be resold means rework or legal exposure later.
+**What we can likely do.** Keep a licence register and admit a source to the product only when its terms allow commercial redistribution; use council fault and hazard overlays instead of restricted national datasets; ask councils to confirm licences (a person, not an agent, makes that contact).
+**Early test.** Build the register for every source used in the tile and count how many are cleanly CC BY or equivalent (T-31).
+
+## R-10: Coarse data presented as parcel-level fact
+**Why it matters.** Some layers are regional (GWRC liquefaction in the tile is one 32 km² polygon from 1:250,000 geology) while others are point-dense. An agent given an overlap percentage cannot tell the difference, and a confident wrong answer about a property is the fastest way to lose trust.
+**What we can likely do.** Record spatial resolution and a fit-for-parcel flag for every source, and return them alongside every value.
+**Early test.** Add resolution to the licence register and check that the compiled tile can carry it per column (T-31).
 
 ## R-1: Upstream WFS / LiDAR rate-limiting or memory exhaustion during bulk suburb compilation
 **Why it matters.** Compiling all 24,800 Kāpiti Coast parcels from live LINZ Data Service WFS and `1m` LiDAR rasters on a single laptop could hit HTTP rate limits or exhaust RAM if full regional GeoTIFFs are loaded at once.
 **What we can likely do.** Process one `1 km × 1 km` (`EPSG:2193`) tile at a time (`~450` parcels/tile) using HTTP Range requests on Cloud-Optimized GeoTIFFs (COGs) and save tile status in `tile_checkpoint_manifest` so interrupted runs resume cleanly.
-**Early test.** Run live ingestion on one `1 km × 1 km` Paraparaumu tile (`NZTM-1760-5472`) and measure wall-clock time and peak RAM against the 5-second / 2 GB gate (`T-16`, `T-17`).
-
-## R-2: Vertical datum mismatches (`Wellington 1953` vs `NZVD2016`) in council pipe invert data
-**Why it matters.** A `0.38 m` vertical datum offset between legacy council manhole records and `NZVD2016` LiDAR can flip a gravity sewer feasibility calculation from pass to fail.
-**What we can likely do.** Enforce Pillar 1 of the cross-checker (`D79`): compare every council manhole rim elevation (`D07`) against the `NZVD2016` `1m` LiDAR ground elevation (`D05`) at the manhole `(X, Y)` coordinates and auto-normalize systematic offsets before computing sewer gradients (`SIM-06`).
-**Early test.** Audit manhole rim vs. LiDAR DEM offsets across all compiled Kāpiti tiles (`T-22`).
+**Early test.** Done for one tile (T-16, T-17, 2026-11-06): 253 MB peak, no rate limiting from KCDC or LINZ S3; two transient connection resets handled by retries. Time is network-bound (about 2 minutes per tile end to end). Still open at scale: full Kāpiti compile (T-21).
 
 ## R-3: OCR noise and non-standard formatting in scanned 1950s–1980s council PDFs
 **Why it matters.** If the `$0.00` deterministic regex/AST parser (`dredge_raw_statutory_text_zero_cost`) misses handwritten or poorly scanned imperial pipe depths or `s221` notices, historical primitives (`D53`, `D54`) will be incomplete.
@@ -23,8 +28,8 @@ Follows: risk list v1.1 (ai-working-practices)
 **What we can likely do.** Enforce Pillar 14 sensor de-biasing (`D84`): calibrate roof thermal brightness temperature using material emissivity classified from `5cm` RGBI + `1064nm` LiDAR intensity, and require a 4-of-5 multi-sensor quorum before flagging geotechnical or occupancy anomalies.
 **Early test.** Fetch one live Sentinel-2 scene over Kāpiti from Element84 STAC (`T-20`) and run the 15-pillar cross-checker across live Kāpiti parcels (`T-22`).
 
-## R-5: Cold-start gap on `$6` LINZ private covenant instrument PDFs
-**Why it matters.** While free LINZ Layer 50804 tables expose the existence and instrument number of every covenant and `s221` consent notice, the verbatim text inside a private covenant PDF costs `$6` from LINZ if no sibling lot on that Deposited Plan (`DP`) has uploaded a title or LIM yet.
+## R-5: Cold-start gap on `$8` LINZ private covenant instrument PDFs
+**Why it matters.** While free LINZ Layer 50804 tables expose the existence and instrument number of every covenant and `s221` consent notice, the verbatim text inside a private covenant PDF costs `$8` from LINZ (search fee since February 2025) if no sibling lot on that Deposited Plan (`DP`) has uploaded a title or LIM yet.
 **What we can likely do.** Flag the exact instrument number and pre-2001 sunset status (`D02/D54`) from the free memorial table so agents know an encumbrance exists, and use the Shared-DP (`1:64`) Give-to-Get Vault (`POST /v1/contribute-lim`) so a single uploaded PDF hydrates all sibling lots on that `DP` plan.
 **Early test.** Measure what percentage of Paraparaumu residential lots on `NZTM-1760-5472` share a Deposited Plan (`DP`) with at least 10 sibling lots (`T-16`).
 
@@ -32,6 +37,12 @@ Follows: risk list v1.1 (ai-working-practices)
 **Why it matters.** If a council renames WFS fields or launches a new STAC/OGC/MCP endpoint, static scrapers can break or fall behind.
 **What we can likely do.** Run the weekly GitHub Actions Watchtower (`watchtower_cron.yml`) to fingerprint `/.well-known/mcp.json`, `/llms.txt`, `/data.json` (DCAT-AP), and `FeatureServer?f=pjson` schemas across the 108 monitored agencies.
 **Early test.** Execute the live HTTP HEAD/GET Watchtower sweep script in GitHub Actions (`T-25`).
+
+## R-2: Vertical datum mismatches (`Wellington 1953` vs `NZVD2016`) in council pipe invert data
+**Why it matters.** A `0.38 m` vertical datum offset between legacy council manhole records and `NZVD2016` LiDAR can flip a gravity sewer feasibility calculation from pass to fail.
+**Update 2026-11-06.** KCDC publishes every invert, cover level and flood level in both NZVD2016 and Wellington 1953 (T-16), so for Kāpiti the risk is settled at source. It remains for councils that publish one datum only; check each council when it is added (T-24).
+**What we can likely do.** Enforce Pillar 1 of the cross-checker (`D79`): compare every council manhole rim elevation (`D07`) against the `NZVD2016` `1m` LiDAR ground elevation (`D05`) at the manhole `(X, Y)` coordinates and auto-normalize systematic offsets before computing sewer gradients (`SIM-06`).
+**Early test.** Audit manhole rim vs. LiDAR DEM offsets across all compiled Kāpiti tiles (`T-22`).
 
 ## Settled
 - R-7: Upfront `$300k` LINZ title document purchase cost: Settled by extracting instrument numbers from free LINZ Layer 50804 memorial tables and applying Shared-DP (`1:64`) instrument deduplication (`D-2`). 2026-11-05.

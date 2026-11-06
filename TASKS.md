@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 (Pacific/Auckland)
+Last updated: 2026-11-06 17:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -10,14 +10,17 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md)
 
 ## Doing (at most 3)
-- (none)
+- T-16: Single-tile live Kāpiti test: 34 public sources and three LiDAR rasters fetched live for the Paraparaumu tile (1769000–1770000 E, 5468400–5469400 N); LINZ parcels, titles and easements remain, waiting on the LINZ key (see Waiting on you). [Findings](docs/findings/2026-11-06-live-tile-test.md)
 
 ## Waiting on you
-- (none)
+- T-16: The `LINZ_API_KEY` environment variable was added but is not visible in the session that added it. Start a new Claude Code session in this environment so the key loads, then ask for the parcel fetch. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-16: Single-tile live Kāpiti WFS & LiDAR test: Run a live fetch script on your machine for one `1 km × 1 km` Paraparaumu tile (`NZTM-1760-5472`, ~462 parcels) against LINZ Data Service WFS and GWRC Open Data (early test for R-1 and R-2).
-- T-17: Gate: Single-tile compile speed and memory: Does one live `1 km × 1 km` tile compile in under 5 seconds and under 2 GB RAM on a laptop? If no: switch LiDAR raster reads to HTTP Range-request Cloud-Optimized GeoTIFF (COG) windows before running all 54 Kāpiti tiles.
+- T-33: Inverse query on live parcels: recompile the tile on LINZ parcels and run region-wide inverse queries (for example residential zone, area, slope, flood overlap, manhole invert within a distance) returning rows with provenance; compare against what Landsight and Relab can answer.
+- T-30: Replace invented benchmark fixtures: the three benchmark parcels use real addresses with invented facts (10 Tararua Street is really a 2,427 m² lot with one building). Replace with clearly fictional addresses or real fetched data before anything is published.
+- T-31: Licence and resolution register: one entry per source with licence, commercial-use terms, attribution, update frequency and spatial resolution or fit-for-parcel flag (early test for R-9 and R-10).
+- T-29: Check LiDAR change candidates: compare the 37 tile patches with more than 1 m of ground change (2021 to 2024–25, after the +0.08 m offset) against aerial imagery to tell earthworks from classification artefacts.
+- T-32: Reset proposal: a proposed decision (D-11), pruned schema based on the sourceability audit, and revised board and plan, for approval before the repo is changed.
 - T-18: Local statutory PDF parser test: Run the deterministic regex/AST parser (`dredge_raw_statutory_text_zero_cost`) on 10 real downloaded KCDC `s42A` officer reports and LIM PDFs (early test for R-3).
 - T-19: Gate: Statutory regex parser accuracy: Does the deterministic parser extract DP numbers, rule breaches, and imperial pipe depths accurately on at least 9 of 10 real KCDC PDFs? If no: add a local Ollama (`qwen2.5-coder:7b`) fallback pass for unstructured paragraphs.
 - T-20: Sentinel-1 & Sentinel-2 STAC bounding-box test: Fetch one real Sentinel-2 COG scene over Kāpiti (`60GUV`) from Element84 Earth Search STAC API (`earth-search.aws.element84.com/v1`) and verify `NDVI`/`NDWI` parcel clipping (early test for R-4).
@@ -39,6 +42,8 @@ Phase 3 — Trans-Tasman (NSW / VIC) Federation:
 - Build automated Section 32 / Section 33 Council Rating Valuation Objection letter generator from `cross_silo_contradictions_70d`.
 
 ## Done (last two weeks, newest first)
+- T-28: Competitor check on live tools: Landsight's free MCP offers address search and single-property fetch only; its own page for a Paraparaumu property says it holds no stormwater, wastewater or flood data outside Auckland, Christchurch and Hamilton. KCDC publishes all three openly. [Findings](docs/findings/2026-11-06-live-tile-test.md#competitor-comparison-landsight-verified-via-its-free-mcp-and-a-public-property-page) 2026-11-06.
+- T-17: Gate answered — single-tile speed and memory: memory passes easily (253 MB peak); time fails as written (LiDAR 62 s, vectors 2–21 s per layer, compile 19 s), but it is network-bound, not compute-bound. Decision deferred to T-32: restate the gate as a per-tile cost on GitHub Actions. [Findings](docs/findings/2026-11-06-live-tile-test.md#performance-against-the-t-17-gate) 2026-11-06.
 - T-15: Push initial commit: `main` is on GitHub at commit `b9cdd00`. [github.com/aashtonnz/land-query](https://github.com/aashtonnz/land-query) 2026-11-06.
 - T-14: Align repository with `ai-working-practices`: Added `AGENTS.md`, `CLAUDE.md`, `TASKS.md`, `DECISIONS.md`, `RISKS.md`, `PLAN.md`, `STYLE.md`; `README.md` follows Style guide v1. [`AGENTS.md`](AGENTS.md) 2026-11-06.
 - T-13: 3D strata, designations, TDRs & 12-class Crown estate (`D91–D96`): Added `advanced_mutations_zoning_and_crown_estate_96d` table and Tab 37. [`toponz_weekend1_kapiti_ingester.py`](toponz_weekend1_kapiti_ingester.py) 2026-11-06.

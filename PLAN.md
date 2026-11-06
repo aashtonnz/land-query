@@ -4,10 +4,19 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Live Kāpiti Coast Hydration & Verification)
 
-- **T-16: Single-tile live Kāpiti WFS & LiDAR test**
-  Connect `toponz_weekend1_kapiti_ingester.py` on a local internet-connected machine to the free LINZ Data Service WFS API (`Layer 50772` Primary Parcels, `Layer 50804` Property Titles, `Layer 50782` Non-Primary Easements, `Layer 101292` Building Outlines) and `Layer 123727/123728` (`1m` LiDAR DEM/DSM) for a single `1 km × 1 km` tile (`NZTM-1760-5472` in Paraparaumu Central, ~462 parcels).
-- **T-17: Gate: Single-tile compile speed and memory**
-  Verify that compiling `NZTM-1760-5472` completes in `<5 seconds` and `<2 GB` peak RAM. If full GeoTIFF loading exceeds memory, use `rasterio` / HTTP Range requests on Cloud-Optimized GeoTIFFs (COGs) to read only the `1000 × 1000` pixel window.
+- **T-16: Single-tile live Kāpiti test** (in progress)
+  Scripts in [`pipeline/tile_test/`](pipeline/tile_test/) fetch KCDC zones, overlays, flood hazards and levels, three-waters assets, building outlines, GWRC liquefaction and slope failure, and LINZ 1 m DEM/DSM (2024–25) and DEM (2021) from the public `s3://nz-elevation` COGs, for the tile 1769000–1770000 E, 5468400–5469400 N. Remaining: LINZ parcels (layer 50823), titles (50804) and non-primary parcels (50782) via WFS, which needs `LINZ_API_KEY` (`fetch_parcels.py`).
+- **T-33: Inverse query on live parcels**
+  Recompile with parcels as the unit. Run a handful of region-wide inverse queries across the tile, each returning parcel rows with the source, date and licence of every value used. Compare with what Landsight's free MCP and Relab return for the same questions.
+- **T-30: Replace invented benchmark fixtures**
+  The benchmark records for 10 Tararua St, 16 Ngahina St and 114 Otaihanga Rd describe real addresses with invented physical, legal and ownership facts. Replace with clearly fictional addresses (or real fetched data) in the compiler, schemas and `index.html` before GitHub Pages or `llms.txt` publish anything.
+- **T-31: Licence and resolution register**
+  A table (for example `SOURCES.md`) with one row per source: owner, URL, licence and commercial-use terms, attribution text, update frequency, spatial resolution, and whether values are fit for parcel-level use. Starts from the licence notes in the T-16 findings.
+- **T-29: Check LiDAR change candidates**
+  For the 37 patches of ≥100 m² changed by more than 1 m between the 2021 and 2024–25 DEMs (after the +0.08 m systematic offset), compare against LINZ aerial imagery from both periods and classify each as earthworks, construction, vegetation or artefact.
+- **T-32: Reset proposal**
+  Using the sourceability audit, propose decision D-11 (product scope: a smaller schema of sourceable, licensed, privacy-safe domains with provenance and resolution on every value), the pruned schema, a restated T-17 gate as per-tile cost on GitHub Actions, and a revised board and plan. For approval before applying.
+- **T-17: Gate: Single-tile compile speed and memory** (answered 2026-11-06; see Done)
 - **T-18: Local statutory PDF parser test**
   Download 10 real public KCDC `s42A` officer reports and sample LIM PDFs and run `dredge_raw_statutory_text_zero_cost()` to verify extraction of `DP` numbers, `RM` consent IDs, rule breaches (`m`), `s95A` notification decisions, and imperial pipe depths (`ft/in` → `m`).
 - **T-19: Gate: Statutory regex parser accuracy**

@@ -1,0 +1,400 @@
+{
+ "tile_nztm": {
+  "xmin": 1769000,
+  "ymin": 5468400,
+  "xmax": 1770000,
+  "ymax": 5469400
+ },
+ "fetched_at": "2026-11-06T03:39:38.424716+00:00",
+ "sources": {
+  "zones": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0",
+   "ok": true,
+   "features": 15,
+   "bytes": 2330334,
+   "sha256": "87252ffdec48d8a0f39c8986633776bde2df7112d419543663ee2f8952b99009",
+   "seconds": 4.62,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Zones",
+   "copyright": ""
+  },
+  "ovl_fault_avoidance": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/10",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.78,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Fault Avoidance Areas",
+   "copyright": ""
+  },
+  "ovl_flood_hazard": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11",
+   "ok": true,
+   "features": 4,
+   "bytes": 14602584,
+   "sha256": "a6481a627de68ded048b17aaf8de300a6225a508f46c66186b2afbb4e81d1189",
+   "seconds": 6.76,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Flood Hazard",
+   "copyright": ""
+  },
+  "ovl_heritage_places": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/14",
+   "ok": true,
+   "features": 3,
+   "bytes": 1703,
+   "sha256": "8ec35822ac434bcf8ba985e6b018f3fed1864e0a2d1dd6d23b58362039469194",
+   "seconds": 3.12,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Historic Heritage Places",
+   "copyright": ""
+  },
+  "ovl_notable_trees": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16",
+   "ok": true,
+   "features": 3,
+   "bytes": 1435,
+   "sha256": "684a13e3e744f4b10ea59be1f10dac968f22e61635f0a30bb7ae64f36c37c3e4",
+   "seconds": 3.18,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Notable Trees",
+   "copyright": ""
+  },
+  "ovl_ecological_sites": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/19",
+   "ok": true,
+   "features": 2,
+   "bytes": 29969,
+   "sha256": "8f57a0405955423a1406641cb487ac1cc240f1236b264735fe2bdec5ea5073d6",
+   "seconds": 3.08,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Ecological Sites",
+   "copyright": ""
+  },
+  "ovl_noise_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/28",
+   "ok": true,
+   "features": 1,
+   "bytes": 97658,
+   "sha256": "c38cbe6494044f55ffa53826a021124c3c6da5df3d71206f8be589fa734c07d4",
+   "seconds": 2.77,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Noise Corridor",
+   "copyright": ""
+  },
+  "ovl_coastal_env": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/30",
+   "ok": true,
+   "features": 1,
+   "bytes": 152578,
+   "sha256": "74889dd640d338fbce98076e2dc077d0d5a6a278e83344ae1554299ed47d86b9",
+   "seconds": 2.73,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Coastal Environment",
+   "copyright": ""
+  },
+  "flood_river_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/0",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.64,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "River Corridor",
+   "copyright": ""
+  },
+  "flood_stream_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/1",
+   "ok": true,
+   "features": 3,
+   "bytes": 45280,
+   "sha256": "591cd952a97c607c84456cbeb25ac3839003b657d887ca831c7573045c4d507d",
+   "seconds": 3.0,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Stream Corridor",
+   "copyright": ""
+  },
+  "flood_overflow_path": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/2",
+   "ok": true,
+   "features": 1,
+   "bytes": 12472,
+   "sha256": "14f193750ec99ae464d8bba5e83273ca6f4e8155e63cba3684f17d2867066688",
+   "seconds": 3.13,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Overflow Path",
+   "copyright": ""
+  },
+  "flood_residual_overflow": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/3",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.88,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Residual Overflow",
+   "copyright": ""
+  },
+  "flood_fill_control": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/4",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.57,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Fill Control",
+   "copyright": ""
+  },
+  "flood_storage": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/5",
+   "ok": true,
+   "features": 2,
+   "bytes": 9104,
+   "sha256": "c32e2e0bd681a1980e1f7e8bbc7dd776940b65bfcd3629fc7d52589c37ee0c50",
+   "seconds": 2.67,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Storage",
+   "copyright": ""
+  },
+  "flood_ponding": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/6",
+   "ok": true,
+   "features": 9,
+   "bytes": 379855,
+   "sha256": "7f74e70e84e73bd3eec1ca02c8c7f06fdaf387f178f53fbda0ab9b3cb67d2123",
+   "seconds": 3.0,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Ponding",
+   "copyright": ""
+  },
+  "flood_residual_ponding": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/7",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.42,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Residual Ponding",
+   "copyright": ""
+  },
+  "flood_shallow_surface": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/8",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.51,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Shallow Surface Flow",
+   "copyright": ""
+  },
+  "flood_rbl_nzvd2016": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/10",
+   "ok": true,
+   "features": 12284,
+   "bytes": 3122961,
+   "sha256": "1291f806de82ed72783570e244fb1fd0ca86a915aba11e35b0b1f66a6634046e",
+   "seconds": 21.37,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "RBLs (NZVD2016 vertical datum)",
+   "copyright": "created and uploaded by JamesC x521 23 January 2012; source data provided by MattA x840 matt.aitchison@kapiticoast.govt.nz"
+  },
+  "ww_node": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9",
+   "ok": true,
+   "features": 258,
+   "bytes": 179945,
+   "sha256": "f9823b3d885adf1c9e5198f5a505ff876dc224d594e9ec76d46fb6a026086591",
+   "seconds": 3.04,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "WW Point",
+   "copyright": ""
+  },
+  "ww_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/10",
+   "ok": true,
+   "features": 227,
+   "bytes": 210704,
+   "sha256": "7b3b50e032f10d7c3ad92a6d1cbb4e5ff8757d1399faee2e0f449b8818478852",
+   "seconds": 2.75,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "WW Pipe",
+   "copyright": ""
+  },
+  "ww_lateral": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/11",
+   "ok": true,
+   "features": 502,
+   "bytes": 301795,
+   "sha256": "dab4f36925901d484d267f685213084a6c3c27969e497f3671a1865006036753",
+   "seconds": 2.58,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "WW Lateral",
+   "copyright": ""
+  },
+  "sw_point": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/4",
+   "ok": true,
+   "features": 576,
+   "bytes": 399864,
+   "sha256": "92ccb4b8281dbf2f61cbc4b139040b02ca704dc55d079964f0bc8a14c94cebfb",
+   "seconds": 2.68,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "SW Point",
+   "copyright": ""
+  },
+  "sw_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/5",
+   "ok": true,
+   "features": 474,
+   "bytes": 430091,
+   "sha256": "27295634a7cb6c9a1be23607ac758a0493b6484b3d5482541e17516a9a8e933d",
+   "seconds": 2.97,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "SW Pipe",
+   "copyright": ""
+  },
+  "ws_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/2",
+   "ok": true,
+   "features": 740,
+   "bytes": 593871,
+   "sha256": "9e0496ecf41ac1cc81c3adf1e90d07ac03f177952d9fd13e9ed8e89306e20687",
+   "seconds": 2.94,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "WS Pipe",
+   "copyright": ""
+  },
+  "wind_stainless": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/1",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.33,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Stainless Zone",
+   "copyright": ""
+  },
+  "wind_very_high": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/2",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.25,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Very High Wind Zone",
+   "copyright": ""
+  },
+  "tsunami_zones": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Tsunami/MapServer/3",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.25,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Tsunami Evacuation Zones",
+   "copyright": ""
+  },
+  "buildings_2021": {
+   "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
+   "ok": true,
+   "features": 887,
+   "bytes": 573720,
+   "sha256": "f0c053d6fbf2fa4ce39befdfc1f74aed90aa4d472d569d92b19190c68fa3098f",
+   "seconds": 1.97,
+   "licence": "KCDC Building Outlines 2021 (licence to confirm)",
+   "layer_name": "Building Outlines 2021",
+   "copyright": ""
+  },
+  "dem_2025": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/BP32_10000_0203.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DEM (2024-2025)",
+   "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+   "shape": [
+    1000,
+    1000
+   ],
+   "valid_frac": 1.0,
+   "sha256": "7ac10b5b9698f8004450cc8c9481a75eb31217e0b48baa170c9ba1b737031a77",
+   "seconds": 30.5
+  },
+  "dsm_2025": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/BP32_10000_0203.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DSM (2024-2025)",
+   "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+   "shape": [
+    1000,
+    1000
+   ],
+   "valid_frac": 1.0,
+   "sha256": "df1c05e161aba9f48eeed2b91212547c0a4a3af4467803783fb0d8387ef514c6",
+   "seconds": 15.0
+  },
+  "dem_2021": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/BP32_10000_0203.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DEM (2021)",
+   "licence": "CC-BY-4.0 [\"AAM NZ\", \"K\\u0101piti Coast District Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+   "shape": [
+    1000,
+    1000
+   ],
+   "valid_frac": 1.0,
+   "sha256": "07668922bc85352eb93ec09e8d70fa5fd31ed91dbfa6c4c5582adfb8f049652d",
+   "seconds": 16.0
+  },
+  "gw_liquefaction": {
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10",
+   "ok": true,
+   "features": 1,
+   "bytes": 11208,
+   "sha256": "659460d7d1b6dbb7768400707af3129879040ee12dd0f3bc0722de547836120b",
+   "seconds": 3.58,
+   "licence": "GWRC (licence to confirm)",
+   "layer_name": "Liquefaction",
+   "copyright": "GWRC"
+  },
+  "gw_eq_slope_failure": {
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/11",
+   "ok": true,
+   "features": 9,
+   "bytes": 367660,
+   "sha256": "40cd51d87b559202deb7a25d4da6d3a5bbc997c1c5e6b8d75b7555b654e6663a",
+   "seconds": 4.89,
+   "licence": "GWRC (licence to confirm)",
+   "layer_name": "Slope failure",
+   "copyright": "GWRC"
+  },
+  "earthworks": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Earthworks/MapServer/1",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.33,
+   "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+   "layer_name": "Earthworks",
+   "copyright": ""
+  }
+ }
+}

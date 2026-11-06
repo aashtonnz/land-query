@@ -1,0 +1,3 @@
+pipeline/tile_test/data/
+__pycache__/
+*.duckdb
