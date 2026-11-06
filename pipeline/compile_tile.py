@@ -86,6 +86,50 @@ def stat(f, a, nd=2):
     return None if a.size == 0 else round(float(f(a)), nd)
 DZ = Z - z21
 
+# ---- computed measures (T-37): sun, shading, roofs, overland flow, earthworks, wind exposure, horizon ----
+import measures as M
+from scipy.ndimage import uniform_filter
+from pyproj import Transformer
+tm = time.time()
+if HAVE_LIDAR:
+    H_, W_ = Z.shape
+    cx, cy = dem.transform * (W_ / 2, H_ / 2)
+    LON, LAT = Transformer.from_crs(2193, 4326, always_xy=True).transform(cx, cy)
+    # roof and ground surface orientation from the DSM
+    dgy, dgx = np.gradient(dsm, 1.0)
+    PITCH = np.degrees(np.arctan(np.hypot(dgx, dgy))).astype(np.float32)
+    ASPECT = (np.degrees(np.arctan2(-dgx, dgy)) % 360).astype(np.float32)   # direction the surface faces, from north
+    del dgx, dgy
+    sb, cb = np.sin(np.radians(PITCH)), np.cos(np.radians(PITCH))
+    WINTER = np.zeros(Z.shape, np.uint8)        # hours of direct sun on 21 June (hourly, NZST)
+    IRR = np.zeros(Z.shape, np.float32)          # clear-sky direct irradiation on the surface, 3 representative days
+    IRR_FLAT = 0.0                               # the same for an unshaded horizontal surface
+    for (mo, dd) in ((6, 21), (3, 20), (12, 21)):
+        for hr, az, alt in M.day_positions(LAT, LON, mo, dd):
+            lit = M.sunlit(dsm, az, alt)
+            am = 1 / max(math.sin(math.radians(alt)), 0.05)
+            dni = 1353 * 0.7 ** (am ** 0.678)  # Meinel clear-sky beam
+            cosi = np.clip(math.sin(math.radians(alt)) * cb + math.cos(math.radians(alt)) * sb *
+                           np.cos(np.radians(az - ASPECT)), 0, None)
+            IRR += (dni * cosi * lit).astype(np.float32)
+            IRR_FLAT += dni * math.sin(math.radians(alt))
+            if mo == 6: WINTER += lit.astype(np.uint8)
+            del lit, cosi
+    del sb, cb
+    ACC = M.flow_accumulation(Z, dem.transform)                   # upslope area, m²
+    # earthworks: 15 m × 15 m level platform, estimated from local spread of ground levels (modelled)
+    zf = np.where(np.isfinite(Z), Z, 0).astype(np.float64); ok = np.isfinite(Z) & ~BLDMASK
+    k = 15; n_ok = uniform_filter(ok.astype(np.float32), k, mode="constant")
+    mz = uniform_filter(zf * ok, k, mode="constant"); mz2 = uniform_filter(zf * zf * ok, k, mode="constant")
+    with np.errstate(invalid="ignore", divide="ignore"):
+        PLAT = np.where(n_ok > 0.999, 225 * np.sqrt(np.clip(mz2 / n_ok - (mz / n_ok) ** 2, 0, None)) * math.sqrt(2 / math.pi), np.nan).astype(np.float32)
+    del zf, mz, mz2, n_ok
+    # wind exposure inputs: obstruction share within ±100 m, and ground relative to the surrounding ±500 m
+    OBS = uniform_filter(((dsm - Z) > 2.5).astype(np.float32), 201, mode="nearest")
+    zf = np.where(np.isfinite(Z), Z, np.nanmean(Z)).astype(np.float32)
+    RELH = (zf - uniform_filter(zf, 1001, mode="nearest")).astype(np.float32); del zf
+    print(f"measures computed in {time.time()-tm:.0f}s (lat {LAT:.3f})")
+
 def nearest(key, items, g, maxd=150):
     if key not in T: return None, None
     idx = T[key].query(g.buffer(maxd))
@@ -163,6 +207,49 @@ for uid, (g, p) in enumerate(units):
              rbl_in_parcel_max_minus_ground_mean_m=round(max(lin) - r["ground_mean_m"], 2) if lin and r["ground_mean_m"] is not None else None)
     r.update(rbl_max_nzvd2016=max(lv) if lv else None,
              ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv and r["ground_min_m"] is not None else None)
+    # computed measures (T-37); modelled or derived, see SOURCES.md
+    keys = ["winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
+            "roof_north_m2", "roof_solar_rel_pct", "upslope_area_max_m2", "flow_path_m", "level_open_cut_m3",
+            "level_open_fill_m3", "platform_15m_earthworks_min_m3", "wind_obstruction_pct", "wind_rel_height_m",
+            "wind_exposure_class", "horizon_mean_deg", "horizon_north_deg", "sky_view_pct"]
+    if not HAVE_LIDAR or r["lidar_cells"] == 0:
+        r.update({k: None for k in keys})
+    else:
+        og = open_ground & np.isfinite(Zw); roof = m & Bw
+        wh = WINTER[rs, cs][og]
+        r.update(winter_sun_hours_open_mean=round(float(wh.mean()), 1) if wh.size else None,
+                 winter_sun_open_ge3h_pct=round(100 * float((wh >= 3).mean()), 1) if wh.size else None)
+        pr, ar, ir = PITCH[rs, cs][roof], ASPECT[rs, cs][roof], IRR[rs, cs][roof]
+        north = (pr >= 5) & ((ar >= 315) | (ar < 45))
+        r.update(roof_pitch_p50_deg=stat(np.median, pr, 1),
+                 roof_flat_m2=int((pr < 5).sum()), roof_north_m2=int(north.sum()),
+                 roof_solar_rel_pct=round(100 * float(ir.mean()) / IRR_FLAT, 1) if ir.size and IRR_FLAT else None)
+        a = ACC[rs, cs][m]
+        r.update(upslope_area_max_m2=stat(np.max, a, 0), flow_path_m=int((a >= 2000).sum()))
+        zo = Zw[og]
+        if zo.size:
+            med = float(np.median(zo))
+            r.update(level_open_cut_m3=round(float(np.clip(zo - med, 0, None).sum()), 0),
+                     level_open_fill_m3=round(float(np.clip(med - zo, 0, None).sum()), 0))
+        else: r.update(level_open_cut_m3=None, level_open_fill_m3=None)
+        r.update(platform_15m_earthworks_min_m3=stat(np.min, PLAT[rs, cs][m], 0))
+        # viewpoint: the most open spot on the section, the open-ground cell farthest from buildings and the boundary
+        from scipy.ndimage import distance_transform_edt
+        if og.any():
+            dist = distance_transform_edt(og)
+            kk = np.unravel_index(int(np.argmax(dist)), dist.shape)
+            pr_, pc = int(kk[0] + rs.start), int(kk[1] + cs.start)
+        if og.any() and np.isfinite(Z[pr_, pc]):
+            ob, rh = float(OBS[pr_, pc]) * 100, float(RELH[pr_, pc])
+            cls = "exposed" if (ob < 10 or rh > 15) else "sheltered" if (ob >= 40 and rh < 5) else "partly sheltered"
+            hz = M.horizon(dsm, Z, pr_, pc)
+            r.update(wind_obstruction_pct=round(ob, 1), wind_rel_height_m=round(rh, 1), wind_exposure_class=cls,
+                     horizon_mean_deg=round(float(np.mean(hz)), 1) if hz else None,
+                     horizon_north_deg=round(max(hz[15], hz[0], hz[1]), 1) if hz else None,
+                     sky_view_pct=round(100 * (1 - float(np.mean(np.sin(np.radians(hz))))), 1) if hz else None)
+        else:
+            r.update(wind_obstruction_pct=None, wind_rel_height_m=None, wind_exposure_class=None,
+                     horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
     rows.append(r)
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"))

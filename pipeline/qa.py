@@ -6,6 +6,7 @@ Each check compares two independent sources; it reports agreement, it does not c
 3. LiDAR epoch offset: 2024-25 minus 2021 on flat, open, unbuilt ground.
 4. Parcel polygon area against LINZ calc_area.
 5. LiDAR coverage: share of parcels with no LiDAR cells.
+6. Roof surface (2024-25 DSM median inside each outline) against KCDC's 2021 photogrammetric building height (BLD_ave).
 """
 import json, os, sys
 import numpy as np, rasterio, duckdb
@@ -54,6 +55,22 @@ flat = (slope < 2) & ((dsm - Z) < 0.5) & ~bmask & np.isfinite(Z) & np.isfinite(z
 dz = (Z - z21)[flat]
 if dz.size > 200000: dz = np.random.default_rng(0).choice(dz, 200000, replace=False)
 qa["lidar_2025_minus_2021_flat_m"] = summary(dz)
+
+from shapely.geometry import box as _box
+rd = []
+for f in feats("buildings_2021")[:3000]:
+    p_ = f["properties"]
+    if p_.get("BLD_ave") is None: continue
+    g = shape(f["geometry"]).buffer(-0.5)
+    if g.is_empty or g.area < 5: continue
+    b = g.bounds; r0, c0 = dem.index(b[0], b[3]); r1, c1 = dem.index(b[2], b[1])
+    r0, c0 = max(0, r0), max(0, c0); r1, c1 = min(Z.shape[0], r1 + 1), min(Z.shape[1], c1 + 1)
+    if r1 <= r0 or c1 <= c0: continue
+    tr = rasterio.windows.transform(rasterio.windows.Window(c0, r0, c1 - c0, r1 - r0), dem.transform)
+    mm = ~geometry_mask([g], out_shape=(r1 - r0, c1 - c0), transform=tr)
+    v = dsm[r0:r1, c0:c1][mm]; v = v[np.isfinite(v)]
+    if v.size >= 5: rd.append(float(np.median(v)) - p_["BLD_ave"])
+qa["roof_dsm_minus_kcdc_bld_ave_m"] = summary(rd)
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)
 raw = {f["properties"]["id"]: f["properties"].get("calc_area") for f in feats("parcels")}

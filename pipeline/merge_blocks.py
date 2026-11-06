@@ -52,6 +52,7 @@ qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks i
           manhole_cover_minus_lidar_m=pooled("manhole_cover_minus_lidar_m"),
           building_ground_minus_lidar_m=pooled("building_ground_minus_lidar_m"),
           lidar_2025_minus_2021_flat_m=pooled("lidar_2025_minus_2021_flat_m"),
+          roof_dsm_minus_kcdc_bld_ave_m=pooled("roof_dsm_minus_kcdc_bld_ave_m"),
           parcel_area_max_abs_diff_m2=max((b["qa"].get("parcel_area_minus_linz_calc_m2", {}).get("max_abs") or 0) for b in blocks) if blocks else None)
 json.dump(qs, open(os.path.join(OUT, "qa_summary.json"), "w"), indent=1)
 print(json.dumps(qs, indent=1))
