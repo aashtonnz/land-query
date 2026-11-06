@@ -8,6 +8,7 @@ import hashlib, json, os, sys, time
 import requests
 from shapely.geometry import shape, box
 import tile_env as te
+from provenance import utc_now
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
@@ -50,9 +51,9 @@ json.dump(dict(block=list(te.BLOCK), bbox=win, parcels=len(kept)), open(os.path.
 
 prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path)) if os.path.exists(prov_path) else {"sources": {}}
-prov.update(block=list(te.BLOCK), fetch_bbox=win)
+prov.update(block=list(te.BLOCK), block_id=te.BLOCK_ID, fetch_bbox=win)
 prov["sources"]["parcels"] = dict(url=URL, ok=True, features=len(kept), sha256=hashlib.sha256(b).hexdigest(),
-                                  seconds=round(time.time() - t0, 1), fetched=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                                  seconds=round(time.time() - t0, 1), fetched=utc_now(),
                                   licence="LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)")
 json.dump(prov, open(prov_path, "w"), indent=1)
 print("parcels", len(kept), "of", len(feats), "intersecting; window", win, round(time.time() - t0, 1), "s")

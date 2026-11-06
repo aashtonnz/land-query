@@ -30,6 +30,20 @@ def test_layer_label_is_its_class_never_the_column_name():
         assert class_label(layer, {}) != layer
 
 
+def test_query_rows_carry_their_own_blocks_sha256_and_fetch_time():
+    from provenance import merge_sources, row_sources, source_summary
+    blk = lambda x, sha, t: dict(block=[x, 0, x + 5000, 5000], sources=dict(
+        zones=dict(url="u", licence="CC BY 4.0", ok=True, features=3, sha256=sha, fetched=t),
+        dem_2021=dict(ok=False, no_coverage=True)))
+    P = merge_sources([blk(0, "aa", "2026-11-06T01:00:00+00:00"), blk(5000, "bb", "2026-11-06T02:00:00+00:00")])
+    assert row_sources(P, ["zones", "dem_2021"], "5000_0_5000") == {"zones": dict(sha256="bb", fetched="2026-11-06T02:00:00+00:00")}
+    s = source_summary(P["zones"])
+    assert s["fetched_first"] < s["fetched_last"] and "features" not in s  # no sum over overlapping windows
+    assert P["dem_2021"]["failed_blocks"] == 0  # outside the survey is not a failure
+    lidar = dict(collection="https://nz-elevation.s3/x/collection.json", ok=True, sha256="cc", fetched="t", licence="CC BY 4.0")
+    assert source_summary(lidar)["url"]  # a single block: LiDAR records its STAC collection, not a url
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

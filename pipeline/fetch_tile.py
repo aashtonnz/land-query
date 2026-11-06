@@ -4,7 +4,8 @@ Every fetched source is written to data/raw/ and recorded in data/provenance.jso
 URL, fetch time, sha256, feature count and licence note. Nothing is invented: a source
 that fails is recorded as failed.
 """
-import hashlib, json, os, sys, time, datetime as dt
+import hashlib, json, os, sys, time
+from provenance import utc_now
 import requests
 import tile_env as te
 
@@ -85,7 +86,7 @@ def arcgis_query(url):
 def main():
     pp = os.path.join(OUT, "provenance.json")
     prov = json.load(open(pp)) if os.path.exists(pp) else {"sources": {}}
-    prov.update(tile_nztm=TILE, fetched_at=dt.datetime.now(dt.timezone.utc).isoformat())
+    prov.update(tile_nztm=TILE, block_id=te.BLOCK_ID, fetched_at=utc_now())
     only = set(os.environ.get("ONLY", "").split(",")) - {""}
     for name, (url, lic) in ARCGIS.items():
         if only and name not in only: continue
@@ -96,7 +97,7 @@ def main():
             open(os.path.join(RAW, name + ".geojson"), "wb").write(b)
             meta = requests.get(url, params={"f": "json"}, timeout=60).json()
             prov["sources"][name] = dict(url=url, ok=True, features=len(fc["features"]), bytes=len(b), sha256=sha(b),
-                                         seconds=round(time.time() - t0, 2), licence=lic,
+                                         seconds=round(time.time() - t0, 2), fetched=utc_now(), licence=lic,
                                          layer_name=meta.get("name"), copyright=te.scrub_copyright(meta.get("copyrightText")))
             print(f"{name:26s} {len(fc['features']):6d} features  {time.time()-t0:5.1f}s")
         except Exception as e:

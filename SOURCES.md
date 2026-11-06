@@ -57,7 +57,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 > **Known problems in the current results (T-39 review, 6 Nov 2026)**, being fixed in T-40 to T-44: until the next
 > district rebuild (T-45), zone and overlay shares in the published results can exceed 100% and some carry older zone
-> names or the layer name (fixed in the code by T-40); query provenance lacks sha256 and fetch time; `upslope_area_max_m2` and `flow_path_m` stop at the block's fetch
+> names or the layer name (fixed in the code by T-40), and query provenance lacks sha256 and fetch time (fixed by T-41); `upslope_area_max_m2` and `flow_path_m` stop at the block's fetch
 > window (`flow_path_m` is a count of 1 m cells); winter sun, horizon and sky view are measured on the tree canopy where
 > there are trees; `wind_rel_height_m` is biased low near the sea; the platform estimate is given for parcels too small
 > to hold one; terrain values are given for parcels only partly covered by LiDAR. The five newer KCDC flood layers and

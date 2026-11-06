@@ -1,5 +1,6 @@
 """Read the fetch window from LINZ elevation COGs (s3://nz-elevation, CC BY 4.0) without downloading whole files."""
 import json, os, sys, time, hashlib
+from provenance import utc_now
 import tile_env as te
 import numpy as np, requests, rasterio
 from rasterio.windows import from_bounds
@@ -52,7 +53,7 @@ def read(coll, name):
     meta = dict(collection=BASE + coll + "/collection.json", items=hrefs, title=c.get("title"),
                 licence=(c.get("license") or "") + " " + json.dumps([p.get("name") for p in c.get("providers", [])]),
                 shape=list(arr.shape), valid_frac=float(np.isfinite(arr).mean()),
-                sha256=hashlib.sha256(arr.tobytes()).hexdigest(), seconds=round(time.time() - t0, 1))
+                sha256=hashlib.sha256(arr.tobytes()).hexdigest(), seconds=round(time.time() - t0, 1), fetched=utc_now())
     print(name, meta["shape"], "valid", round(meta["valid_frac"], 3), meta["seconds"], "s", len(hrefs), "COGs")
     return meta
 

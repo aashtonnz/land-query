@@ -1,5 +1,6 @@
 """Fetch LINZ primary parcels (as linz_parcels, for comparison with the KCDC mirror), titles and non-primary parcels (incl. easements) via LDS WFS (needs LINZ_API_KEY; CC BY 4.0)."""
 import hashlib, json, os, sys, time
+from provenance import utc_now
 import requests
 import tile_env as te
 
@@ -37,7 +38,7 @@ for name, lid in LAYERS.items():
         open(os.path.join(OUT, "raw", name + ".geojson"), "wb").write(b)
         prov["sources"][name] = dict(url=f"https://data.linz.govt.nz/layer/{lid}/", ok=True, features=len(fc["features"]),
                                      sha256=hashlib.sha256(b).hexdigest(), seconds=round(time.time() - t0, 1),
-                                     licence="LINZ CC BY 4.0")
+                                     fetched=utc_now(), licence="LINZ CC BY 4.0")
         print(name, len(fc["features"]), round(time.time() - t0, 1), "s")
     except Exception as e:
         prov["sources"][name] = dict(ok=False, error=str(e).replace(KEY, "***")[:300]); print(name, "FAILED")

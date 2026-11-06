@@ -6,11 +6,12 @@ OUT_DIR/units.parquet, OUT_DIR/blocks.json and OUT_DIR/qa_summary.json.
 """
 import glob, json, os, sys
 import duckdb
+from provenance import merge_sources
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 os.makedirs(OUT, exist_ok=True)
 dirs = sorted(d for d in glob.glob(os.path.join(SRC, "*")) if os.path.exists(os.path.join(d, "units.parquet")))
-blocks, prov = [], {}
+blocks, provs = [], []
 for d in dirs:
     p = json.load(open(os.path.join(d, "provenance.json")))
     qa = json.load(open(os.path.join(d, "qa.json"))) if os.path.exists(os.path.join(d, "qa.json")) else {}
@@ -18,14 +19,8 @@ for d in dirs:
     no_cov = [k for k, v in p["sources"].items() if v.get("no_coverage")]
     blocks.append(dict(block=p.get("block"), fetch_bbox=p.get("fetch_bbox"), parcels=p["sources"].get("parcels", {}).get("features"),
                        failed_sources=failed, no_coverage=no_cov, qa=qa))
-    for k, v in p["sources"].items():
-        e = prov.setdefault(k, dict(url=v.get("url") or v.get("collection"), licence=v.get("licence"), blocks=0, failed_blocks=0,
-                                    features=0, fetched_first=None, fetched_last=None, sha256_by_block={}))
-        e["blocks"] += 1; e["failed_blocks"] += 0 if v.get("ok", True) else 1
-        e["features"] += v.get("features") or 0
-        t = p.get("fetched_at") or v.get("fetched")
-        if t: e["fetched_first"] = min(filter(None, [e["fetched_first"], t])); e["fetched_last"] = max(filter(None, [e["fetched_last"], t]))
-        if v.get("sha256"): e["sha256_by_block"]["_".join(map(str, p.get("block") or []))] = v["sha256"]
+    provs.append(p)
+prov = merge_sources(provs)
 
 db = duckdb.connect(os.path.join(OUT, "district.duckdb"))
 files = [os.path.join(d, "units.parquet") for d in dirs]

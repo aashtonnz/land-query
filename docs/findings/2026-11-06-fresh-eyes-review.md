@@ -77,3 +77,22 @@ run through GitHub Actions, which can reach those hosts.
   labelled "Noise Corridor (no name in source)". It is probably the road and rail corridor, but nothing in the source
   says so.
 - **Rebuild.** The district results change at the next rebuild (T-45).
+
+## T-41: query provenance (fixed in code, 6 Nov 2026)
+
+- **Cause.** Only the parcel fetcher recorded a fetch time. The district merge renamed the sha256 to a per-block map
+  that the queries never read, so every source in `inverse_queries.json` had `sha256: null` and `fetched: null`. In
+  the published district results, all 23 query-level source entries have both null, and none of the 3,428 rows
+  carries provenance of its own.
+- **Fix.**
+  - Every fetcher now records the fetch time (UTC) and sha256 for each source.
+  - `pipeline/provenance.py` keeps both per block through the merge.
+  - Each query row now carries `block_id` and the sha256 and fetch time of each of its sources, as fetched for its own
+    block. URL, licence and first and last fetch times are given once per query.
+  - Feature counts stay per block instead of being summed across overlapping fetch windows.
+  - Every run prints how many rows lack a source's sha256 or fetch time.
+- **Checked on live data.** The test tile was fetched again from the live sources, then compiled, merged as a
+  one-block district and queried. 0 of 568 entries are missing, in both the tile output and the merged output.
+- **Tests.** One new test in `pipeline/test_review.py` covers the per-block lookup, no summed feature counts, and the
+  LiDAR collection link. It fails on the old code, which has no `provenance` module.
+- **Size.** Per-row provenance adds about 1 KB per row, which is about 3 MB on the district's 3,428 query rows.
