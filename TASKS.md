@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 21:00 (Pacific/Auckland)
+Last updated: 2026-11-06 21:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -10,12 +10,12 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
+- T-39: Fresh-eyes review (started 2026-11-06 by a separate reviewer agent): a new session, starting from the code, `SOURCES.md` and D-12 rather than earlier summaries, reviews the pipeline and the query results for errors before T-36 is offered to anyone outside. Fixes come with a check that fails before and passes after.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-39: Fresh-eyes review: a new session, starting from the code, `SOURCES.md` and D-12 rather than earlier summaries, reviews the pipeline and the query results for errors before T-36 is offered to anyone outside. Fixes come with a check that fails before and passes after.
 - T-36: Query service: a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
