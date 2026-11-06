@@ -1,0 +1,9 @@
+pyproj
+shapely
+rasterio
+numpy
+duckdb
+pandas
+pyarrow
+requests
+scipy

@@ -1,21 +1,21 @@
-"""Region-wide inverse queries over the compiled tile (T-33).
+"""Region-wide inverse queries over a compiled block or the merged district (T-33, T-21).
 
 Each query is a plain filter over raw primitives (no scores). Every returned row carries the parcel id and
 appellation, the values it was selected on, and the provenance (URL, sha256, fetch time, licence) of each
-source those values came from. Output: data/inverse_queries.json and a markdown summary on stdout.
+source those values came from. Usage: inverse_queries.py DIR [DBFILE] (default DIR/tile.duckdb).
+Output: DIR/inverse_queries.json and a markdown summary on stdout.
 """
-import os as _os
-_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import json, os, sys
 import duckdb
 
 D = sys.argv[1] if len(sys.argv) > 1 else "data"
-db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)
+DBF = sys.argv[2] if len(sys.argv) > 2 else os.path.join(D, "tile.duckdb")
+db = duckdb.connect(DBF, read_only=True)
 PROV = {k: json.loads(v) for k, v in db.execute("SELECT source, json FROM provenance").fetchall()}
 LIDAR_OFFSET_M = 0.08  # systematic 2024-25 minus 2021 offset on flat ground (findings, 6 Nov 2026)
 
 # Only parcels wholly inside the tile, so terrain and overlay values cover the whole parcel.
-BASE = "FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20"
+BASE = "FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20"
 
 Q = [
     dict(id="Q1", name="Gravity-serviceable infill candidates",
@@ -66,7 +66,7 @@ Q = [
 def prov(keys):
     return {k: {f: PROV[k].get(f) for f in ("url", "sha256", "fetched", "licence", "features")} for k in keys if k in PROV}
 
-out = dict(tile=[_X, _Y, _X + 1000, _Y + 1000], universe=db.execute(f"SELECT count(*) {BASE}").fetchone()[0],
+out = dict(database=os.path.basename(DBF), blocks=db.execute("SELECT count(DISTINCT block_id) FROM units").fetchone()[0], universe=db.execute(f"SELECT count(*) {BASE}").fetchone()[0],
            queries=[])
 for q in Q:
     res = db.execute(q["sql"]); cols = [c[0] for c in res.description]

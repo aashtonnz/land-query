@@ -1,16 +1,16 @@
-"""Fetch one live 1 km x 1 km Paraparaumu tile from public sources, logging provenance.
+"""Fetch the block's fetch window from public KCDC and GWRC layers, logging provenance.
 
 Every fetched source is written to data/raw/ and recorded in data/provenance.json with
 URL, fetch time, sha256, feature count and licence note. Nothing is invented: a source
 that fails is recorded as failed.
 """
-import os as _os
-_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
 import hashlib, json, os, sys, time, datetime as dt
 import requests
+import tile_env as te
 
-TILE = dict(xmin=_X, ymin=_Y, xmax=_X + 1000, ymax=_Y + 1000)  # NZTM2000 (EPSG:2193)
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
+_W = te.fetch_bbox(OUT)  # block grown to cover its parcels (fetch_parcels_kcdc.py)
+TILE = dict(xmin=_W[0], ymin=_W[1], xmax=_W[2], ymax=_W[3])  # NZTM2000 (EPSG:2193)
 RAW = os.path.join(OUT, "raw"); os.makedirs(RAW, exist_ok=True)
 KC = "https://maps.kapiticoast.govt.nz/server/rest/services/Public"
 KC_LIC = "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)"
@@ -56,34 +56,37 @@ ARCGIS = {
 def sha(b): return hashlib.sha256(b).hexdigest()
 
 def arcgis_query(url):
-    """Page through an ArcGIS layer for features intersecting the tile, as GeoJSON in EPSG:2193."""
+    """Page through an ArcGIS layer for features intersecting the fetch window, as GeoJSON in EPSG:2193."""
     feats, offset = [], 0
+    try: page = int(requests.get(url, params={"f": "json"}, timeout=60).json().get("maxRecordCount") or 1000)
+    except Exception: page = 1000
+    page = max(1000, min(page, 5000))
     env = f"{TILE['xmin']},{TILE['ymin']},{TILE['xmax']},{TILE['ymax']}"
     while True:
         p = dict(where="1=1", geometry=env, geometryType="esriGeometryEnvelope", inSR=2193,
                  spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193,
-                 returnGeometry="true", f="geojson", resultOffset=offset, resultRecordCount=1000)
+                 returnGeometry="true", f="geojson", resultOffset=offset, resultRecordCount=page)
         for attempt in range(4):
             try:
                 r = requests.get(url + "/query", params=p, timeout=120)
                 r.raise_for_status()
                 break
-            except requests.exceptions.ConnectionError:
+            except requests.exceptions.RequestException:
                 if attempt == 3: raise
-                time.sleep(3 * (attempt + 1))
+                time.sleep(5 * (attempt + 1))
         j = r.json()
         if "error" in j: raise RuntimeError(j["error"])
         fs = j.get("features", [])
         feats += fs
-        if len(fs) < 1000 and not j.get("exceededTransferLimit"): break
+        if len(fs) < page and not j.get("exceededTransferLimit"): break
         offset += len(fs)
     return {"type": "FeatureCollection", "features": feats}
 
 def main():
-    prov = {"tile_nztm": TILE, "fetched_at": dt.datetime.now(dt.timezone.utc).isoformat(), "sources": {}}
+    pp = os.path.join(OUT, "provenance.json")
+    prov = json.load(open(pp)) if os.path.exists(pp) else {"sources": {}}
+    prov.update(tile_nztm=TILE, fetched_at=dt.datetime.now(dt.timezone.utc).isoformat())
     only = set(os.environ.get("ONLY", "").split(",")) - {""}
-    if only and os.path.exists(os.path.join(OUT, "provenance.json")):
-        prov = json.load(open(os.path.join(OUT, "provenance.json")))
     for name, (url, lic) in ARCGIS.items():
         if only and name not in only: continue
         t0 = time.time()

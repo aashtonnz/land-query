@@ -1,14 +1,14 @@
-"""Compile per-unit raw primitives for the live tile into DuckDB.
+"""Compile per-parcel raw primitives for one block into DuckDB and Parquet.
 
 Unit = LINZ parcel if data/raw/parcels.geojson exists, otherwise KCDC building outline (stand-in,
 labelled as such). Every column group names its source key in provenance.json. No scores,
 no opinions: overlaps, distances, elevations and the raw attributes of the nearest assets.
 """
-import os as _os
-_X, _Y = int(_os.environ.get("TILE_XMIN", 1769000)), int(_os.environ.get("TILE_YMIN", 5468400))  # 1 km NZTM2000 tile
-import json, os, sys, time, math
+import json, os, sys, time, math, warnings
 import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
+from rasterio.windows import from_bounds, Window
+import tile_env as te
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -16,7 +16,8 @@ from shapely.ops import unary_union
 D = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(D, "raw")
 t0 = time.time()
-TILE_BOX = box(_X, _Y, _X + 1000, _Y + 1000)
+TILE_BOX = box(*te.fetch_bbox(D))  # fetch window; values cover only the part of a parcel inside it
+warnings.filterwarnings("ignore", category=RuntimeWarning)  # all-NaN cells where LiDAR is missing
 
 def load(name):
     p = os.path.join(RAW, name + ".geojson")
@@ -49,7 +50,7 @@ ww_pipes = council(load("ww_pipe")); ws_pipes = council(load("ws_pipe"))
 rbl = load("flood_rbl_nzvd2016")
 T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=sw_nodes, ww_pipes=ww_pipes,
                                                     ws_pipes=ws_pipes, rbl=rbl).items() if v}
-bld_union = unary_union([g for g, _ in load("buildings_2021")])
+bld_geoms = [g for g, _ in load("buildings_2021")]
 
 dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
 dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
@@ -57,7 +58,24 @@ z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
 gy, gx = np.gradient(Z, 1.0)
 SLOPE = np.degrees(np.arctan(np.hypot(gx, gy)))
 CANOPY = (dsm - Z) > 3.0
-BLDMASK = ~geometry_mask([bld_union], out_shape=Z.shape, transform=dem.transform) if not bld_union.is_empty else np.zeros_like(Z, bool)
+BLDMASK = ~geometry_mask(bld_geoms, out_shape=Z.shape, transform=dem.transform) if bld_geoms else np.zeros_like(Z, bool)
+
+def window_mask(g):
+    """Cells of the parcel, computed in a small window around it: (row slice, col slice, mask)."""
+    T_ = dem.transform; x0, y0, x1, y1 = g.bounds
+    c0, c1 = int(math.floor((x0 - T_.c) / T_.a)) - 1, int(math.ceil((x1 - T_.c) / T_.a)) + 1
+    r0, r1 = int(math.floor((y1 - T_.f) / T_.e)) - 1, int(math.ceil((y0 - T_.f) / T_.e)) + 1
+    r0, c0, r1, c1 = max(0, r0), max(0, c0), min(Z.shape[0], r1), min(Z.shape[1], c1)
+    if r1 <= r0 or c1 <= c0: return slice(0, 0), slice(0, 0), np.zeros((0, 0), bool)
+    tr = rasterio.windows.transform(Window(c0, r0, c1 - c0, r1 - r0), dem.transform)
+    sh = (r1 - r0, c1 - c0)
+    m = ~geometry_mask([g], out_shape=sh, transform=tr, all_touched=False)
+    if m.sum() == 0: m = ~geometry_mask([g], out_shape=sh, transform=tr, all_touched=True)
+    return slice(r0, r1), slice(c0, c1), m
+
+def stat(f, a, nd=2):
+    a = a[np.isfinite(a)]
+    return None if a.size == 0 else round(float(f(a)), nd)
 DZ = Z - z21
 
 def nearest(key, items, g, maxd=150):
@@ -81,11 +99,11 @@ for uid, (g, p) in enumerate(units):
                if NONPRI[i][0].intersection(g).area > 1]
     extra = dict(title_types=", ".join(tts) or None, title_count=len(tnos),
                  easements_n=np_hits.count("Easement"), land_covenants_n=np_hits.count("Covenant - Land"))
-    r = dict(unit_id=p.get("id") or p.get("ID") or f"U{uid}", unit_source=unit_src,
+    r = dict(unit_id=p.get("id") or p.get("ID") or f"U{uid}", unit_source=unit_src, block_id=te.BLOCK_ID,
              appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
-             # share of the unit inside the tile: terrain and overlay values cover only that share
-             in_tile_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1), **extra)
+             # share of the parcel inside the fetch window: terrain and overlay values cover only that share
+             coverage_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1) if g.area else 0.0, **extra)
     # zones and polygon overlays: overlap percentage per class value
     for n in poly_layers:
         if n not in trees: r[n] = None; continue
@@ -99,24 +117,26 @@ for uid, (g, p) in enumerate(units):
                 hits[label] = round(hits.get(label, 0) + 100 * a / g.area, 1)
         r[n] = json.dumps(hits) if hits else None
     for n in point_layers:
-        r[n] = json.dumps([pp.get("SIGNIFICANCE") for pg, pp in (L.get(n) or []) if g.buffer(1).contains(pg)]) or None
+        gb = g.buffer(1)
+        r[n] = json.dumps([L[n][i][1].get("SIGNIFICANCE") for i in (trees[n].query(gb) if n in trees else [])
+                           if gb.contains(L[n][i][0])])
     # terrain (LINZ LiDAR 2024-25, 2021)
-    m = ~geometry_mask([g], out_shape=Z.shape, transform=dem.transform, all_touched=False)
-    if m.sum() == 0: m = ~geometry_mask([g], out_shape=Z.shape, transform=dem.transform, all_touched=True)
-    z = Z[m]; s = SLOPE[m]
-    open_ground = m & ~BLDMASK
-    r.update(ground_min_m=round(float(np.nanmin(z)), 2), ground_mean_m=round(float(np.nanmean(z)), 2),
-             ground_max_m=round(float(np.nanmax(z)), 2), slope_p50_deg=round(float(np.nanpercentile(s, 50)), 1),
-             slope_p90_deg=round(float(np.nanpercentile(s, 90)), 1),
-             building_2021_m2=int((m & BLDMASK).sum()), open_ground_m2=int(open_ground.sum()), open_ground_slope_lt5_m2=int((open_ground & (SLOPE < 5)).sum()),
-             canopy_gt3m_open_pct=round(100 * float((CANOPY & open_ground).sum()) / max(1, open_ground.sum()), 1),
-             dz_2021_2025_mean_m=round(float(np.nanmean(DZ[m])), 3),
-             dz_2021_2025_absmax_m=round(float(np.nanmax(np.abs(DZ[m]))), 2))
+    rs, cs, m = window_mask(g)
+    Zw, Sw, Bw, Cw, Dw = Z[rs, cs], SLOPE[rs, cs], BLDMASK[rs, cs], CANOPY[rs, cs], DZ[rs, cs]
+    z = Zw[m]; s = Sw[m]
+    open_ground = m & ~Bw
+    r.update(lidar_cells=int(np.isfinite(z).sum()), ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
+             ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
+             slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
+             building_2021_m2=int((m & Bw).sum()), open_ground_m2=int(open_ground.sum()),
+             open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()),
+             canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1),
+             dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
     d, np_ = nearest("ww_nodes", ww_nodes, g)
     r.update(ww_mh_dist_m=None if d is None else round(d, 1), ww_mh_id=np_ and np_["asset_id"],
              ww_mh_invert_nzvd2016=np_ and np_["invert_level_nzvd2016"],
-             ww_head_ground_min_minus_invert_m=None if np_ is None else round(r["ground_min_m"] - np_["invert_level_nzvd2016"], 2))
+             ww_head_ground_min_minus_invert_m=None if np_ is None or r["ground_min_m"] is None else round(r["ground_min_m"] - np_["invert_level_nzvd2016"], 2))
     d, pp_ = nearest("ww_pipes", ww_pipes, g)
     r.update(ww_pipe_dist_m=None if d is None else round(d, 1), ww_pipe_id=pp_ and pp_["asset_id"],
              ww_pipe_material=pp_ and pp_.get("pipe_material"), ww_pipe_dia_mm=pp_ and pp_.get("width"),
@@ -131,15 +151,16 @@ for uid, (g, p) in enumerate(units):
     lin = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g) if "rbl" in T else [])
            if rbl[i][1].get("VALUE_NZVD2016") is not None and g.contains(rbl[i][0])]
     r.update(rbl_in_parcel_n=len(lin), rbl_in_parcel_max_nzvd2016=max(lin) if lin else None,
-             rbl_in_parcel_max_minus_ground_mean_m=round(max(lin) - r["ground_mean_m"], 2) if lin else None)
+             rbl_in_parcel_max_minus_ground_mean_m=round(max(lin) - r["ground_mean_m"], 2) if lin and r["ground_mean_m"] is not None else None)
     r.update(rbl_max_nzvd2016=max(lv) if lv else None,
-             ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv else None)
+             ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv and r["ground_min_m"] is not None else None)
     rows.append(r)
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"))
 import pandas as pd
 df = pd.DataFrame(rows)
 db.execute("CREATE OR REPLACE TABLE units AS SELECT * FROM df")
+db.execute(f"COPY units TO '{os.path.join(D, 'units.parquet')}' (FORMAT PARQUET)")
 prov = json.load(open(os.path.join(D, "provenance.json")))
 db.execute("CREATE OR REPLACE TABLE provenance (source VARCHAR, json VARCHAR)")
 db.executemany("INSERT INTO provenance VALUES (?, ?)", [(k, json.dumps(v)) for k, v in prov["sources"].items()])
