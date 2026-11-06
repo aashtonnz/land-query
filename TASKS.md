@@ -1,7 +1,7 @@
 # Tasks
 
 Last updated: 2026-11-06 (Pacific/Auckland)
-Follows: task board v1.9 (ai-working-practices), changelog to entry 32
+Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
 - Keep out-of-pocket infrastructure and data cost at `$0.00`.
@@ -10,10 +10,10 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md)
 
 ## Doing (at most 3)
-- T-14: Align repository with `ai-working-practices`: Add `AGENTS.md`, `CLAUDE.md`, `TASKS.md`, `DECISIONS.md`, `RISKS.md`, `PLAN.md`, and `STYLE.md`, and rewrite `README.md` to follow Style guide v1.
+- (none)
 
 ## Waiting on you
-- T-15: Push initial commit to `github.com/aashtonnz/land-query`: The sandbox VM has no outbound internet access, so it cannot run `git push` directly. Suggested: unzip `land-query-v39.0-repo.zip` locally and run `cd land-query && git push -u origin main`. Raised 2026-11-06.
+- (none)
 
 ## Next (in order, at most about 10)
 - T-16: Single-tile live Kāpiti WFS & LiDAR test: Run a live fetch script on your machine for one `1 km × 1 km` Paraparaumu tile (`NZTM-1760-5472`, ~462 parcels) against LINZ Data Service WFS and GWRC Open Data (early test for R-1 and R-2).
@@ -39,6 +39,8 @@ Phase 3 — Trans-Tasman (NSW / VIC) Federation:
 - Build automated Section 32 / Section 33 Council Rating Valuation Objection letter generator from `cross_silo_contradictions_70d`.
 
 ## Done (last two weeks, newest first)
+- T-15: Push initial commit: `main` is on GitHub at commit `b9cdd00`. [github.com/aashtonnz/land-query](https://github.com/aashtonnz/land-query) 2026-11-06.
+- T-14: Align repository with `ai-working-practices`: Added `AGENTS.md`, `CLAUDE.md`, `TASKS.md`, `DECISIONS.md`, `RISKS.md`, `PLAN.md`, `STYLE.md`; `README.md` follows Style guide v1. [`AGENTS.md`](AGENTS.md) 2026-11-06.
 - T-13: 3D strata, designations, TDRs & 12-class Crown estate (`D91–D96`): Added `advanced_mutations_zoning_and_crown_estate_96d` table and Tab 37. [`toponz_weekend1_kapiti_ingester.py`](toponz_weekend1_kapiti_ingester.py) 2026-11-06.
 - T-12: Multi-generational farm-to-lot coordinate backfill (`D89–D90`): Added `ancestral_farm_to_lot_backfill_90d` table and 5-class inheritance algebra in Tab 36. [`schemas/ancestral_farm_to_lot_backfill_90d_report.json`](schemas/ancestral_farm_to_lot_backfill_90d_report.json) 2026-11-06.
 - T-11: Cadastral split/join DAG, split-zoning slicer & non-private land (`D85–D88`): Added `cadastral_lineage_dag_85d`, `parcel_split_zoning_and_epochs_86d`, and `non_private_and_special_tenure_88d` in Tab 35. [`schemas/lineage_splitzoning_and_nonprivate_land_88d_report.json`](schemas/lineage_splitzoning_and_nonprivate_land_88d_report.json) 2026-11-06.

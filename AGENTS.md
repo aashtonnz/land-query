@@ -4,10 +4,10 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
 
 ## Practices followed
 
-- **Task board**: v1.9 ([`TASKS.md`](TASKS.md), [`DECISIONS.md`](DECISIONS.md), [`PLAN.md`](PLAN.md))
+- **Task board**: v1.10 ([`TASKS.md`](TASKS.md), [`DECISIONS.md`](DECISIONS.md), [`PLAN.md`](PLAN.md))
 - **Style guide**: v1 ([`STYLE.md`](STYLE.md))
 - **Risk list**: v1.1 ([`RISKS.md`](RISKS.md))
-- **Changelog checked to**: entry 32 (20 Oct 2026)
+- **Changelog checked to**: entry 33 (6 Nov 2026)
 
 ## Project rules
 
