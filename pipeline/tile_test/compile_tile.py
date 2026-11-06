@@ -65,13 +65,23 @@ def nearest(key, items, g, maxd=150):
         if best is None or d < best[0]: best = (d, items[i][1])
     return best if best else (None, None)
 
+# LINZ titles (type and estate only; no owner names) and non-primary parcels (easements, land covenants)
+TITLES = {p["title_no"]: p for _, p in load("titles")}
+NONPRI = load("nonprimary_parcels"); T_NP = STRtree([g for g, _ in NONPRI]) if NONPRI else None
+
 rows = []
 for uid, (g, p) in enumerate(units):
+    tnos = [t.strip() for t in (p.get("titles") or "").split(",") if t.strip()]
+    tts = sorted({TITLES[t]["type"] for t in tnos if t in TITLES})
+    np_hits = [NONPRI[i][1]["parcel_intent"] for i in (T_NP.query(g) if T_NP else [])
+               if NONPRI[i][0].intersection(g).area > 1]
+    extra = dict(title_types=", ".join(tts) or None, title_count=len(tnos),
+                 easements_n=np_hits.count("Easement"), land_covenants_n=np_hits.count("Covenant - Land"))
     r = dict(unit_id=p.get("id") or p.get("ID") or f"U{uid}", unit_source=unit_src,
              appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
              # share of the unit inside the tile: terrain and overlay values cover only that share
-             in_tile_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1))
+             in_tile_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1), **extra)
     # zones and polygon overlays: overlap percentage per class value
     for n in poly_layers:
         if n not in trees: r[n] = None; continue

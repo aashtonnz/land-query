@@ -10,8 +10,8 @@
   {
    "id": "Q1",
    "name": "Gravity-serviceable infill candidates",
-   "question": "High or General Residential parcels of at least 800 m\u00b2, under 25% covered by 2021 buildings, 90th-percentile slope under 10\u00b0, no KCDC flood hazard overlay, and a wastewater manhole with a recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground.",
-   "sql": "SELECT unit_id, appellation, area_m2, building_2021_m2, slope_p90_deg, zones, ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND (json_extract(zones,'$.\"High Density Residential Zone\"')::DOUBLE >= 90 OR json_extract(zones,'$.\"General Residential Zone\"')::DOUBLE >= 90) AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10 AND ovl_flood_hazard IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1 ORDER BY area_m2 DESC",
+   "question": "High or General Residential parcels of at least 800 m\u00b2, under 25% covered by 2021 buildings, 90th-percentile slope under 10\u00b0, no KCDC flood hazard overlay, and a wastewater manhole with a recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground. Title type and easement count returned (cross-lease and unit titles complicate subdivision); freehold first.",
+   "sql": "SELECT unit_id, appellation, title_types, easements_n, area_m2, building_2021_m2, slope_p90_deg, zones, ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND (json_extract(zones,'$.\"High Density Residential Zone\"')::DOUBLE >= 90 OR json_extract(zones,'$.\"General Residential Zone\"')::DOUBLE >= 90) AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10 AND ovl_flood_hazard IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1 ORDER BY (title_types = 'Freehold') DESC, area_m2 DESC",
    "count": 16,
    "provenance": {
     "parcels": {
@@ -20,6 +20,20 @@
      "fetched": "2026-11-06T17:35:28+1300",
      "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
      "features": 582
+    },
+    "titles": {
+     "url": "https://data.linz.govt.nz/layer/50804/",
+     "sha256": "81ef964fd0f351d49c26ccea701f8f5cde92ec906521f90e170fe2c87e7200a7",
+     "fetched": null,
+     "licence": "LINZ CC BY 4.0",
+     "features": 667
+    },
+    "nonprimary_parcels": {
+     "url": "https://data.linz.govt.nz/layer/50782/",
+     "sha256": "97704191bf426aa8977481073661f36fcbe6a58831eeece89b5cd79e4cb1594e",
+     "fetched": null,
+     "licence": "LINZ CC BY 4.0",
+     "features": 328
     },
     "zones": {
      "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0",
@@ -61,6 +75,8 @@
     {
      "unit_id": 8039401,
      "appellation": "Lot 3 DP 517321",
+     "title_types": "Freehold",
+     "easements_n": 2,
      "area_m2": 2121.8,
      "building_2021_m2": 464,
      "slope_p90_deg": 6.8,
@@ -72,6 +88,8 @@
     {
      "unit_id": 3791228,
      "appellation": "Lot 1 DP 14628",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 1511.4,
      "building_2021_m2": 213,
      "slope_p90_deg": 4.9,
@@ -83,6 +101,8 @@
     {
      "unit_id": 3752856,
      "appellation": "Lot 2 DP 21486",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 1165.2,
      "building_2021_m2": 254,
      "slope_p90_deg": 6.9,
@@ -94,6 +114,8 @@
     {
      "unit_id": 3894723,
      "appellation": "Lot 8 Block III DP 462",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 1012.9,
      "building_2021_m2": 248,
      "slope_p90_deg": 8.2,
@@ -105,6 +127,8 @@
     {
      "unit_id": 3820167,
      "appellation": "Lot 6 Block III DP 462",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 1011.6,
      "building_2021_m2": 164,
      "slope_p90_deg": 5.9,
@@ -116,6 +140,8 @@
     {
      "unit_id": 3936277,
      "appellation": "Lot 1 DP 4680",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 1011.1,
      "building_2021_m2": 158,
      "slope_p90_deg": 5.6,
@@ -127,6 +153,8 @@
     {
      "unit_id": 8051359,
      "appellation": "Lot 2 DP 537796",
+     "title_types": "Freehold",
+     "easements_n": 1,
      "area_m2": 901.5,
      "building_2021_m2": 194,
      "slope_p90_deg": 4.7,
@@ -138,6 +166,8 @@
     {
      "unit_id": 3904551,
      "appellation": "Lot 41 DP 15862",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 825.6,
      "building_2021_m2": 181,
      "slope_p90_deg": 7.6,
@@ -149,6 +179,8 @@
     {
      "unit_id": 3771842,
      "appellation": "Lot 3 DP 27104",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 823.1,
      "building_2021_m2": 173,
      "slope_p90_deg": 3.2,
@@ -160,6 +192,8 @@
     {
      "unit_id": 3941431,
      "appellation": "Lot 1 DP 27104",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 821.3,
      "building_2021_m2": 135,
      "slope_p90_deg": 5.6,
@@ -171,6 +205,8 @@
     {
      "unit_id": 8575950,
      "appellation": "Lot 5 DP 573424",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 819.4,
      "building_2021_m2": 25,
      "slope_p90_deg": 4.6,
@@ -182,6 +218,8 @@
     {
      "unit_id": 3809141,
      "appellation": "Lot 1 DP 14471",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 809.6,
      "building_2021_m2": 199,
      "slope_p90_deg": 6.2,
@@ -193,6 +231,8 @@
     {
      "unit_id": 8708426,
      "appellation": "Lot 4 DP 611762",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 807.6,
      "building_2021_m2": 0,
      "slope_p90_deg": 6.0,
@@ -204,6 +244,8 @@
     {
      "unit_id": 8708424,
      "appellation": "Lot 2 DP 611762",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 803.7,
      "building_2021_m2": 0,
      "slope_p90_deg": 8.2,
@@ -215,6 +257,8 @@
     {
      "unit_id": 8708425,
      "appellation": "Lot 3 DP 611762",
+     "title_types": "Freehold",
+     "easements_n": 0,
      "area_m2": 801.3,
      "building_2021_m2": 0,
      "slope_p90_deg": 8.2,
@@ -226,6 +270,8 @@
     {
      "unit_id": 8144920,
      "appellation": "Lot 3 DP 553379",
+     "title_types": "Freehold",
+     "easements_n": 5,
      "area_m2": 800.2,
      "building_2021_m2": 0,
      "slope_p90_deg": 4.9,

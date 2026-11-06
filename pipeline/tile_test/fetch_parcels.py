@@ -1,4 +1,4 @@
-"""Fetch LINZ parcels, titles and easements for the tile via LDS WFS (needs LINZ_API_KEY; CC BY 4.0 layers)."""
+"""Fetch LINZ primary parcels (as linz_parcels, for comparison with the KCDC mirror), titles and non-primary parcels (incl. easements) via LDS WFS (needs LINZ_API_KEY; CC BY 4.0)."""
 import hashlib, json, os, sys, time
 import requests
 
@@ -6,7 +6,7 @@ KEY = os.environ.get("LINZ_API_KEY")
 if not KEY: sys.exit("LINZ_API_KEY not set")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 TILE = (1769000, 5468400, 1770000, 5469400)
-LAYERS = {"parcels": 50823, "titles": 50804, "nonprimary_parcels": 50782}
+LAYERS = {"linz_parcels": 50823, "titles": 50804, "nonprimary_parcels": 50782}
 
 def wfs(layer):
     # EPSG:2193 axis order is northing, easting for WFS 2.0

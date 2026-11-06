@@ -8,7 +8,7 @@ pip install pyproj shapely rasterio numpy duckdb pandas requests scipy
 python3 fetch_tile.py data          # KCDC and GWRC vector layers, provenance in data/provenance.json
 python3 fetch_lidar.py data         # LINZ 1 m DEM/DSM windows (2024-25, 2021)
 python3 fetch_parcels_kcdc.py data  # primary parcels from KCDC's public LINZ mirror (no key; D-11)
-LINZ_API_KEY=... python3 fetch_parcels.py data   # LINZ titles, non-primary parcels (needs a free LDS key; T-34)
+LINZ_API_KEY=... python3 fetch_parcels.py data   # LINZ parcels (for comparison), titles, easements (free LDS key)
 python3 compile_tile.py data        # per-parcel primitives into data/tile.duckdb (parcels if fetched, else buildings)
 python3 inverse_queries.py data     # five inverse queries with provenance into data/inverse_queries.json
 ```

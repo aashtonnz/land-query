@@ -4,8 +4,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Live Kāpiti Coast Hydration & Verification)
 
-- **T-34: LINZ titles, easements and non-primary parcels**
-  Run `pipeline/tile_test/fetch_parcels.py` with `LINZ_API_KEY` for layers 50804 (titles), 50782 (non-primary parcels) and the easement layer for the tile. Compare LINZ primary parcels (50823) with the KCDC mirror (D-11): count of parcels, newest DP, and any geometry differences, to measure the mirror's lag.
 - **T-30: Replace invented benchmark fixtures**
   The benchmark records for 10 Tararua St, 16 Ngahina St and 114 Otaihanga Rd describe real addresses with invented physical, legal and ownership facts. Replace with clearly fictional addresses (or real fetched data) in the compiler, schemas and `index.html` before GitHub Pages or `llms.txt` publish anything.
 - **T-31: Licence and resolution register**

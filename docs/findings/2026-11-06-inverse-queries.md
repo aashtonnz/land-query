@@ -14,12 +14,16 @@ The LINZ key still is not visible to sessions, so parcels came from KCDC's publi
 - 582 primary parcels in the tile, fetched in about 2 s; 490 lie wholly inside it.
 - **Checked against LINZ.** Lot 2 DP 7318 (10 Tararua Street) is 2,427 m² here, as in LINZ's record seen through
   Landsight. Compiled polygon areas match LINZ `calc_area` to within 0.5 m² for every parcel.
-- **Recent.** The newest plan in the tile is DP 627447, and seven plans are numbered above DP 600000. The mirror's refresh
-  date is not published, so the lag behind LINZ is unknown until the two are compared (T-34).
-- **Not included:** road and hydro parcels, non-primary parcels, easements, and title details beyond the title
-  reference. Those still need the LINZ key (T-34).
+- **Compared with LINZ directly (T-34, once the key was available).** LINZ WFS returned 637 parcels for the tile.
+  51 of the extras are not in the tile at all (the WFS filter matches bounding boxes, not shapes); the other 4 are railway
+  parcels, which the mirror leaves out. The 582 shared parcels have identical appellation, titles and intent, and their
+  shapes differ by at most 0.06 m². Both have the same newest plan (DP 627447), so the mirror shows no lag.
+- **Titles and easements from LINZ.** 667 titles (528 freehold, 106 cross lease, 16 unit title, 14 leasehold), with
+  type and estate only; owner names are not fetched (privacy rule). 328 non-primary parcels: 322 easements,
+  6 land covenants. Every title reference on the parcels resolves. Of the 490 parcels wholly inside the tile, 32 are cross lease only,
+  105 have at least one easement.
 
-Compile on parcels: 582 units × 55 columns in 13 s.
+Compile on parcels: 582 units × 59 columns in 15 s.
 
 ## Five inverse queries
 
@@ -29,7 +33,7 @@ source used.
 
 | Query | Conditions | Parcels |
 | --- | --- | --- |
-| Q1 Gravity-serviceable infill candidates | High or General Residential (≥90%), ≥800 m², <25% built (2021), p90 slope <10°, no flood overlay, manhole with invert ≤30 m and ≥1 m below lowest ground | 16 |
+| Q1 Gravity-serviceable infill candidates | High or General Residential (≥90%), ≥800 m², <25% built (2021), p90 slope <10°, no flood overlay, manhole with invert ≤30 m and ≥1 m below lowest ground; title type and easements returned | 16 (all freehold) |
 | Q2 Recommended floor level well above ground | Built on, and highest KCDC recommended building level inside the parcel >1 m above mean ground | 8 |
 | Q3 Nearest sewer old and in poor condition | Nearest wastewater pipe ≤20 m, installed before 1980, condition grade 4–5 | 18 |
 | Q4 Ground change since 2021 | Some cell changed >1 m, and parcel mean changed >0.3 m after the 0.08 m epoch offset | 30 |
@@ -73,6 +77,5 @@ invert 11.1 m NZVD2016 in both raw and compiled data.
 
 ## Not yet done
 
-- Titles, easements, road and non-primary parcels (T-34, needs the LINZ key).
 - More than one tile; plan siblings across tile edges (T-21).
 - Plain-language column definitions and fit-for-parcel flags (T-31).

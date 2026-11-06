@@ -19,15 +19,16 @@ Q = [
     dict(id="Q1", name="Gravity-serviceable infill candidates",
          question="High or General Residential parcels of at least 800 m², under 25% covered by 2021 buildings, "
                   "90th-percentile slope under 10°, no KCDC flood hazard overlay, and a wastewater manhole with a "
-                  "recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground.",
-         sql=f"""SELECT unit_id, appellation, area_m2, building_2021_m2, slope_p90_deg, zones, ww_mh_id, ww_mh_dist_m,
-                 ww_head_ground_min_minus_invert_m {BASE}
+                  "recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground. Title type and easement "
+                  "count returned (cross-lease and unit titles complicate subdivision); freehold first.",
+         sql=f"""SELECT unit_id, appellation, title_types, easements_n, area_m2, building_2021_m2, slope_p90_deg, zones,
+                 ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m {BASE}
                  AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
                       OR json_extract(zones,'$."General Residential Zone"')::DOUBLE >= 90)
                  AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10
                  AND ovl_flood_hazard IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1
-                 ORDER BY area_m2 DESC""",
-         sources=["parcels", "zones", "buildings_2021", "dem_2025", "ovl_flood_hazard", "ww_node"]),
+                 ORDER BY (title_types = 'Freehold') DESC, area_m2 DESC""",
+         sources=["parcels", "titles", "nonprimary_parcels", "zones", "buildings_2021", "dem_2025", "ovl_flood_hazard", "ww_node"]),
     dict(id="Q2", name="Recommended floor level well above ground",
          question="Built-on parcels where the highest KCDC recommended building level (a minimum floor level, "
                   "NZVD2016, including freeboard) inside the parcel is more than 1 m above the parcel's mean LiDAR "
