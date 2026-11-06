@@ -4,7 +4,7 @@ in SOURCES.md. Functions work on the block's 1 m rasters (north-up, square cells
 - Sun position: NOAA solar position equations.
 - Shadows: a cell is shaded when the DSM along the sun's direction rises above the sun ray from that cell,
   searched out to MAX_SHADOW_M (obstacles farther away, such as distant ranges, are not counted).
-- Overland flow: D8 flow accumulation on the depression-filled 2024-25 DEM (pysheds).
+- Overland flow: D8 flow accumulation on the 2024-25 DEM, every cell drained by priority-flood (flow.py).
 - Horizon and sky view: rays in 16 directions from a point at eye height, to MAX_HORIZON_M.
 - Wind exposure: surrounding obstruction share and relative elevation (an approximation of NZS 3604 site exposure
   and topographic class, not a wind zone determination).
@@ -81,21 +81,12 @@ def sunlit(dsm, az, alt, res=1.0, maxd=MAX_SHADOW_M):
     return ~shaded
 
 
+from flow import flow_routing  # noqa: E402  (D8 flow: priority-flood, every cell drains)
+
+
 def flow_accumulation(dem, transform):
-    """D8 upslope area (m², counting the cell itself) on the depression-filled DEM. NaN treated as no data."""
-    if not hasattr(np, "in1d"): np.in1d = np.isin  # pysheds 0.5 still calls np.in1d (removed in NumPy 2.4)
-    from pysheds.sview import Raster, ViewFinder
-    from pysheds.grid import Grid
-    nod = -9999.0
-    a = np.where(np.isfinite(dem), dem, nod).astype(np.float64)
-    vf = ViewFinder(affine=transform, shape=a.shape, nodata=nod, crs="EPSG:2193")
-    r = Raster(a, viewfinder=vf)
-    g = Grid.from_raster(r)
-    filled = g.resolve_flats(g.fill_depressions(g.fill_pits(r)))
-    fdir = g.flowdir(filled)
-    acc = np.asarray(g.accumulation(fdir), dtype=np.float32)
-    acc[~np.isfinite(dem)] = np.nan
-    return acc * abs(transform.a * transform.e)
+    """D8 upslope area (m², counting the cell itself). See flow_routing."""
+    return flow_routing(dem, transform)[0]
 
 
 def horizon(dsm, dem, row, col, res=1.0, n=16, maxd=MAX_HORIZON_M):

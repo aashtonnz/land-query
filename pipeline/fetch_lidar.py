@@ -5,15 +5,13 @@ import tile_env as te
 import numpy as np, requests, rasterio
 from rasterio.windows import from_bounds
 from rasterio.merge import merge
-from pyproj import Transformer
 
 BASE = "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
-TILE = te.fetch_bbox(OUT)  # fetch window (block grown to cover its parcels)
+TILE = te.lidar_bbox(OUT)  # fetch window plus LIDAR_CONTEXT_M on every side
 os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 os.environ.setdefault("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif,.tiff")
-to_ll = Transformer.from_crs(2193, 4326, always_xy=True)
-lon0, lat0 = to_ll.transform(TILE[0], TILE[1]); lon1, lat1 = to_ll.transform(TILE[2], TILE[3])
+lon0, lat0, lon1, lat1 = te.ll_envelope(TILE)
 
 def items_for(coll):
     c = requests.get(BASE + coll + "/collection.json", timeout=60).json()

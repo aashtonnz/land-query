@@ -5,12 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-42: Window edges**
-  Overland flow on a district mosaic, with an `upslope_truncated` flag where the upslope area reaches missing LiDAR or the
-  mosaic edge, and flow length in metres. Sea cells at 0 m for wind relative height, with at least 500 m of context
-  beyond each block. LiDAR sheets chosen by their real NZTM bounds. Checks: a lower Waikanae corridor parcel has upslope
-  area above 1e8 m² or is flagged; the edge test shows no point off by more than 0.1 m; the selected sheets match a
-  bounds test.
 - **T-43: Ground-level measures**
   Treat cells where DSM − DEM > 0.5 m as shaded at ground level; choose the viewpoint from clear cells. No platform
   estimate unless the open ground holds a 15 × 15 m square. Add `lidar_coverage_pct`; queries require at least 99. Checks:

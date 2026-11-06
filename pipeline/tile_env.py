@@ -11,6 +11,8 @@ X = int(os.environ.get("TILE_XMIN", 1769000))
 Y = int(os.environ.get("TILE_YMIN", 5468400))
 SIZE = int(os.environ.get("TILE_SIZE", 1000))
 MAX_BUFFER = int(os.environ.get("MAX_BUFFER", 1000))
+# LiDAR is read this far beyond the fetch window, so shadows (to 300 m) and obstruction near its edge see what is beyond
+LIDAR_CONTEXT_M = int(os.environ.get("LIDAR_CONTEXT_M", 300))
 BLOCK = (X, Y, X + SIZE, Y + SIZE)
 BLOCK_ID = f"{X}_{Y}_{SIZE}"
 
@@ -28,3 +30,17 @@ def scrub_copyright(text):
     """Layer copyright text, unless it names or contacts a person (D-12: never data about people)."""
     text = (text or "")[:200]
     return "[withheld: names a person]" if PERSON_HINTS.search(text) else text
+
+
+def ll_envelope(bbox):
+    """Lon/lat envelope of an NZTM box from all four corners (grid convergence makes two corners miss parts)."""
+    from pyproj import Transformer
+    tr = Transformer.from_crs(2193, 4326, always_xy=True)
+    x0, y0, x1, y1 = bbox
+    lons, lats = tr.transform([x0, x1, x0, x1], [y0, y0, y1, y1])
+    return min(lons), min(lats), max(lons), max(lats)
+
+
+def lidar_bbox(out="data"):
+    x0, y0, x1, y1 = fetch_bbox(out); c = LIDAR_CONTEXT_M
+    return (x0 - c, y0 - c, x1 + c, y1 + c)

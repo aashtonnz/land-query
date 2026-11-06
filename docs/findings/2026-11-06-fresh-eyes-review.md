@@ -96,3 +96,46 @@ run through GitHub Actions, which can reach those hosts.
 - **Tests.** One new test in `pipeline/test_review.py` covers the per-block lookup, no summed feature counts, and the
   LiDAR collection link. It fails on the old code, which has no `provenance` module.
 - **Size.** Per-row provenance adds about 1 KB per row, which is about 3 MB on the district's 3,428 query rows.
+
+## T-42: window edges (fixed in code, 6 Nov 2026)
+
+- **A second flow fault, found while fixing this one.** pysheds 0.5 left some valley-floor cells with no flow
+  direction after its flat-resolution step, so flow stopped there.
+  - On a 10 m district mosaic, the Ōtaki River stopped at 294 km² in its gorge and showed 60 km² near its mouth.
+  - The published 1 m values are affected wherever such a cell lies on a flow path.
+  - `pipeline/flow.py` replaces pysheds with priority-flood plus epsilon (Barnes, Lehman and Mulla 2014) and
+    steepest-descent D8, compiled with numba, so every cell drains to an outlet.
+  - A 1 km crop of the real LINZ DEM is kept as a test fixture: pysheds routes 4,636 cells to its outlet, the new code
+    6,685.
+- **Whole catchments.**
+  - `district_flow.py` builds a 10 m mosaic once per run: LINZ's national 1 m DEM read through its overviews, with gaps
+    filled from the national 8 m contour DEM. It covers the district and the Tararua catchments draining into it.
+  - From that mosaic it computes the upslope area, which gives the new column `catchment_area_max_m2` for every parcel,
+    including parcels without LiDAR.
+  - Near their mouths the Waikanae has 148 km² and the Ōtaki 374 km², in line with their published catchments of
+    about 140–150 and 350–360 km². No cell inside the district's blocks has an upslope area reaching the mosaic edge.
+  - The run takes 4–5 minutes and peaks at 3 GB of memory (pysheds needed 6 GB). It is cached on GitHub for the month,
+    and the cropped output is 112 MB.
+- **A known limit, kept visible.** On the coastal plain north of Ōtaki, the Waitohu shows about 130 km², which is too
+  large for that stream. Flow is routed in a straight line north across the plain to the mosaic edge. A DEM has no
+  culverts, so road and rail embankments act as dams, and the filled area behind them spills the wrong way. This is
+  noted in `SOURCES.md`; the mouths of the main rivers are unaffected.
+- **Block-scale flow.**
+  - `upslope_area_max_m2` is still the 1 m flow inside the block, now with `upslope_area_truncated`. The flag marks
+    parcels whose upslope area reaches the window edge or a LiDAR gap over land; a gap over the sea is an outlet.
+  - `flow_path_m` is now metres, with diagonal steps counted as √2. On the test tile it is a median 23% longer than the
+    old cell count.
+- **Wind relative height.** Ground at the parcel is now compared with the mean within ±500 m on the district mosaic,
+  with the sea at 0 m, so the result no longer depends on the block's window. At the reviewer's two beach points it
+  reads −3.5 and −3.4 m, against −11.3 and −15.7 m before.
+- **Edges of shadows and obstruction.** LiDAR is now read 300 m beyond the fetch window, the maximum shadow length.
+  On the test tile, winter sun changes by at most 0.1 h, horizon by 0.4° and obstruction by 1.6 points.
+- **LiDAR sheets.** The search box comes from all four corners of the window. The old two-corner box misses part of
+  block 1765000_5470000's window (test).
+- **Test tile** (live, 535 parcels):
+  - 86 columns, with all five queries unchanged in count.
+  - The largest 1 m upslope area is 0.80 km² (was 0.19).
+  - 41 parcels are flagged truncated.
+  - The largest catchment is 1.03 km², and none is truncated.
+- **Tests.** Five new tests in `pipeline/test_review.py`; the Ōtaki fixture, edge-only inflow, sea at 0 m and the
+  four-corner search each fail on the old code.

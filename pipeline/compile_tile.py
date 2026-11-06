@@ -88,6 +88,39 @@ def stat(f, a, nd=2):
     return None if a.size == 0 else round(float(f(a)), nd)
 DZ = Z - z21
 
+# district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
+DF_PATH = os.path.join(RAW, "district_flow.tif")
+DF = None
+if os.path.exists(DF_PATH):
+    _src = rasterio.open(DF_PATH)
+    _x0, _y0, _x1, _y1 = te.lidar_bbox(D)
+    _win = from_bounds(_x0 - 20, _y0 - 20, _x1 + 20, _y1 + 20, _src.transform).round_offsets().round_lengths()
+    DF = dict(acc=_src.read(1, window=_win, boundless=True, fill_value=np.nan),
+              trunc=_src.read(2, window=_win, boundless=True, fill_value=np.nan),
+              mean500=_src.read(3, window=_win, boundless=True, fill_value=np.nan),
+              ground=_src.read(4, window=_win, boundless=True, fill_value=np.nan),
+              transform=_src.window_transform(_win))
+else:
+    print("no district_flow.tif: catchment and wind relative height columns stay empty")
+
+
+def district_cells(g):
+    """Values of the 10 m district rasters on cells touching the parcel."""
+    T_ = DF["transform"]; x0, y0, x1, y1 = g.bounds
+    c0, c1 = int(math.floor((x0 - T_.c) / T_.a)), int(math.ceil((x1 - T_.c) / T_.a))
+    r0, r1 = int(math.floor((y1 - T_.f) / T_.e)), int(math.ceil((y0 - T_.f) / T_.e))
+    r0, c0 = max(r0, 0), max(c0, 0); r1, c1 = min(r1, DF["acc"].shape[0]), min(c1, DF["acc"].shape[1])
+    if r1 <= r0 or c1 <= c0: return None
+    m = ~geometry_mask([g], out_shape=(r1 - r0, c1 - c0), transform=rasterio.windows.transform(Window(c0, r0, c1 - c0, r1 - r0), T_), all_touched=True)
+    return {k: DF[k][r0:r1, c0:c1][m] for k in ("acc", "trunc")}
+
+
+def district_at(key, x, y):
+    T_ = DF["transform"]; c, r = int((x - T_.c) / T_.a), int((y - T_.f) / T_.e)
+    a = DF[key]
+    return float(a[r, c]) if 0 <= r < a.shape[0] and 0 <= c < a.shape[1] else float("nan")
+
+
 # ---- computed measures (T-37): sun, shading, roofs, overland flow, earthworks, wind exposure, horizon ----
 import measures as M
 from scipy.ndimage import uniform_filter
@@ -118,7 +151,19 @@ if HAVE_LIDAR:
             if mo == 6: WINTER += lit.astype(np.uint8)
             del lit, cosi
     del sb, cb
-    ACC = M.flow_accumulation(Z, dem.transform)                   # upslope area, m²
+    # flow may enter the window across its edge, or from unsurveyed land next to a LiDAR gap (not from the sea)
+    from scipy.ndimage import binary_dilation
+    INFLOW = np.zeros(Z.shape, bool); INFLOW[0, :] = INFLOW[-1, :] = INFLOW[:, 0] = INFLOW[:, -1] = True
+    GAP = ~np.isfinite(Z)
+    if DF is not None and GAP.any():
+        from rasterio.warp import reproject, Resampling
+        g10 = np.full(Z.shape, np.nan, np.float32)
+        reproject(DF["ground"], g10, src_transform=DF["transform"], src_crs="EPSG:2193", dst_transform=dem.transform,
+                  dst_crs="EPSG:2193", src_nodata=np.nan, dst_nodata=np.nan, resampling=Resampling.nearest)
+        GAP &= np.isfinite(g10); del g10  # a gap over land; gaps over the sea are outlets
+    INFLOW |= binary_dilation(GAP)
+    ACC, ACC_TRUNC, STEP = M.flow_routing(Z, dem.transform, inflow=INFLOW)  # upslope m², flow from outside, step m
+    del INFLOW, GAP
     # earthworks: 15 m × 15 m level platform, estimated from local spread of ground levels (modelled)
     zf = np.where(np.isfinite(Z), Z, 0).astype(np.float64); ok = np.isfinite(Z) & ~BLDMASK
     k = 15; n_ok = uniform_filter(ok.astype(np.float32), k, mode="constant")
@@ -128,8 +173,6 @@ if HAVE_LIDAR:
     del zf, mz, mz2, n_ok
     # wind exposure inputs: obstruction share within ±100 m, and ground relative to the surrounding ±500 m
     OBS = uniform_filter(((dsm - Z) > 2.5).astype(np.float32), 201, mode="nearest")
-    zf = np.where(np.isfinite(Z), Z, np.nanmean(Z)).astype(np.float32)
-    RELH = (zf - uniform_filter(zf, 1001, mode="nearest")).astype(np.float32); del zf
     print(f"measures computed in {time.time()-tm:.0f}s (lat {LAT:.3f})")
 
 def nearest(key, items, g, maxd=150):
@@ -204,7 +247,7 @@ for uid, (g, p) in enumerate(units):
              ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv and r["ground_min_m"] is not None else None)
     # computed measures (T-37); modelled or derived, see SOURCES.md
     keys = ["winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
-            "roof_north_m2", "roof_solar_rel_pct", "upslope_area_max_m2", "flow_path_m", "level_open_cut_m3",
+            "roof_north_m2", "roof_solar_rel_pct", "upslope_area_max_m2", "upslope_area_truncated", "flow_path_m", "level_open_cut_m3",
             "level_open_fill_m3", "platform_15m_earthworks_min_m3", "wind_obstruction_pct", "wind_rel_height_m",
             "horizon_mean_deg", "horizon_north_deg", "sky_view_pct"]
     if not HAVE_LIDAR or r["lidar_cells"] == 0:
@@ -219,8 +262,13 @@ for uid, (g, p) in enumerate(units):
         r.update(roof_pitch_p50_deg=stat(np.median, pr, 1),
                  roof_flat_m2=int((pr < 5).sum()), roof_north_m2=int(north.sum()),
                  roof_solar_rel_pct=round(100 * float(ir.mean()) / IRR_FLAT, 1) if ir.size and IRR_FLAT else None)
-        a = ACC[rs, cs][m]
-        r.update(upslope_area_max_m2=stat(np.max, a, 0), flow_path_m=int((a >= 2000).sum()))
+        a, tr_, st = ACC[rs, cs][m], ACC_TRUNC[rs, cs][m], STEP[rs, cs][m]
+        fin = np.isfinite(a)
+        if fin.any():
+            k_ = int(np.nanargmax(np.where(fin, a, -1)))
+            r.update(upslope_area_max_m2=round(float(a[k_]), 0), upslope_area_truncated=bool(tr_[k_]),
+                     flow_path_m=round(float(np.nansum(st[fin & (a >= 2000)])), 1))
+        else: r.update(upslope_area_max_m2=None, upslope_area_truncated=None, flow_path_m=None)
         zo = Zw[og]
         if zo.size:
             med = float(np.median(zo))
@@ -236,15 +284,23 @@ for uid, (g, p) in enumerate(units):
             pr_, pc = int(kk[0] + rs.start), int(kk[1] + cs.start)
         if og.any() and np.isfinite(Z[pr_, pc]):
             # wind: the inputs only. A modelled exposure class disagreed with KCDC's wind zones (T-37) and is withheld.
-            ob, rh = float(OBS[pr_, pc]) * 100, float(RELH[pr_, pc])
+            ob = float(OBS[pr_, pc]) * 100
+            vx, vy = dem.transform * (pc + 0.5, pr_ + 0.5)
+            rh = float(Z[pr_, pc]) - district_at("mean500", vx, vy) if DF is not None else float("nan")
             hz = M.horizon(dsm, Z, pr_, pc)
-            r.update(wind_obstruction_pct=round(ob, 1), wind_rel_height_m=round(rh, 1),
+            r.update(wind_obstruction_pct=round(ob, 1), wind_rel_height_m=round(rh, 1) if math.isfinite(rh) else None,
                      horizon_mean_deg=round(float(np.mean(hz)), 1) if hz else None,
                      horizon_north_deg=round(max(hz[15], hz[0], hz[1]), 1) if hz else None,
                      sky_view_pct=round(100 * (1 - float(np.mean(np.sin(np.radians(hz))))), 1) if hz else None)
         else:
             r.update(wind_obstruction_pct=None, wind_rel_height_m=None,
                      horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
+    # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
+    dc = district_cells(g) if DF is not None else None
+    if dc is not None and np.isfinite(dc["acc"]).any():
+        k_ = int(np.nanargmax(np.where(np.isfinite(dc["acc"]), dc["acc"], -1)))
+        r.update(catchment_area_max_m2=round(float(dc["acc"][k_]), 0), catchment_truncated=bool(dc["trunc"][k_] > 0))
+    else: r.update(catchment_area_max_m2=None, catchment_truncated=None)
     rows.append(r)
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"))
@@ -253,6 +309,12 @@ df = pd.DataFrame(rows)
 db.execute("CREATE OR REPLACE TABLE units AS SELECT * FROM df")
 db.execute(f"COPY units TO '{os.path.join(D, 'units.parquet')}' (FORMAT PARQUET)")
 prov = json.load(open(os.path.join(D, "provenance.json")))
+if DF is not None and os.path.exists(DF_PATH + ".json"):  # district flow raster: built once per district run
+    m_ = json.load(open(DF_PATH + ".json"))
+    prov["sources"]["district_flow"] = dict(ok=True, url=m_["sources"][0]["collection"], sha256=m_["sha256"], fetched=m_["fetched"],
+                                            licence="LINZ CC BY 4.0 (national 1 m DEM; gaps from the contour-interpolated 8 m DEM)",
+                                            res_m=m_["res_m"], bbox=m_["bbox"], inputs=m_["sources"])
+    json.dump(prov, open(os.path.join(D, "provenance.json"), "w"), indent=1)
 db.execute("CREATE OR REPLACE TABLE provenance (source VARCHAR, json VARCHAR)")
 db.executemany("INSERT INTO provenance VALUES (?, ?)", [(k, json.dumps(v)) for k, v in prov["sources"].items()])
 print(f"compiled {len(rows)} units, {df.shape[1]} columns in {time.time()-t0:.1f}s")

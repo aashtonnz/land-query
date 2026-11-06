@@ -31,6 +31,7 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 | `nonprimary_parcels` | NZ Non-Primary Parcels, layer 50782 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Easements and land covenants (existence and shape, not terms) |
 | `dem_2025`, `dsm_2025` | Kāpiti Coast LiDAR 1 m DEM/DSM 2024–25 (LINZ, KCDC, Aerial Surveys) | ✅ CC BY 4.0 | 2024–25 flight | ✅ | 1 m cells. Does not cover Kapiti Island or the foothills: 544 parcels (2%) have no terrain values |
 | `dem_2021` | Kāpiti Coast LiDAR 1 m DEM 2021 (LINZ, KCDC, AAM NZ) | ✅ CC BY 4.0 | 2021 flight | ✅ | +0.08 m offset against 2024–25 on flat ground |
+| `district_flow` | New Zealand LiDAR 1 m DEM, read at 10 m, gaps from the Contour-Interpolated 8 m DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic, surveys 2008–2026 | ⚠ | 10 m mosaic over the district and the Tararua catchments draining into it (1745000–1835000 E, 5440000–5510000 N), built once per run by `district_flow.py` |
 | `buildings_2021` | Kapiti Coast Building Outlines 2021 (KCDC, by AAM) | ◐ | catalogue 18 May 2023 | ⚠ | As at 2021; misses newer buildings |
 | `zones` | Operative District Plan 2021 – Zones (KCDC) | ◐ | 27 May 2024 | ✅ | Drawn on the cadastre |
 | `ovl_flood_hazard` | ODP 2021 – Flood Hazards (KCDC) | ◐ | 13 Jul 2021 | ⚠ | Plan overlay; newer modelling is in the `flood_*` layers |
@@ -57,9 +58,9 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 > **Known problems in the current results (T-39 review, 6 Nov 2026)**, being fixed in T-40 to T-44: until the next
 > district rebuild (T-45), zone and overlay shares in the published results can exceed 100% and some carry older zone
-> names or the layer name (fixed in the code by T-40), and query provenance lacks sha256 and fetch time (fixed by T-41); `upslope_area_max_m2` and `flow_path_m` stop at the block's fetch
-> window (`flow_path_m` is a count of 1 m cells); winter sun, horizon and sky view are measured on the tree canopy where
-> there are trees; `wind_rel_height_m` is biased low near the sea; the platform estimate is given for parcels too small
+> names or the layer name (fixed in the code by T-40), and query provenance lacks sha256 and fetch time (fixed by T-41); `upslope_area_max_m2` stops at the block's fetch
+> window and `flow_path_m` is a count of 1 m cells (fixed by T-42, which adds `catchment_area_max_m2`); winter sun, horizon and sky view are measured on the tree canopy where
+> there are trees; `wind_rel_height_m` is biased low near the sea (fixed by T-42); the platform estimate is given for parcels too small
 > to hold one; terrain values are given for parcels only partly covered by LiDAR. The five newer KCDC flood layers and
 > `earthworks` are compiled from T-40 on. See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
 
@@ -90,8 +91,9 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `winter_sun_hours_open_mean`, `winter_sun_open_ge3h_pct` | modelled | Hours of direct sun on open ground on 21 June (hourly samples, NZST), mean over the open ground and share getting 3 hours or more. Shadows from buildings, trees and terrain within 300 m in the 2024–25 DSM; farther ranges are not counted |
 | `roof_pitch_p50_deg`, `roof_flat_m2`, `roof_north_m2` | derived | From the 2024–25 DSM inside 2021 building outlines: median pitch, area under 5°, area facing north (315°–45°) at 5° or more |
 | `roof_solar_rel_pct` | modelled | Clear-sky direct sun on the roof surface (shaded as above) over three representative days (21 June, 20 March, 21 December), as % of an unshaded horizontal surface at the same place. No cloud or diffuse light; compare roofs with each other, not with kWh figures |
-| `upslope_area_max_m2`, `flow_path_m` | modelled | Overland flow on the depression-filled 2024–25 DEM (D8): largest upslope area draining through the parcel, and length of cells draining at least 2,000 m². Ignores stormwater pipes, so urban flows are overstated |
+| `upslope_area_max_m2`, `upslope_area_truncated`, `flow_path_m` | modelled | Overland flow on the 2024–25 1 m DEM (D8; depressions and flats drained by priority-flood, `flow.py`) within the block's LiDAR window: largest upslope area draining through the parcel; whether that upslope area reaches the window edge or a LiDAR gap over land, so may be larger (true for river corridors: use `catchment_area_max_m2`); and length in metres of flow paths across the parcel draining at least 2,000 m². Ignores stormwater pipes, culverts and bridges, so urban flows are overstated |
+| `catchment_area_max_m2`, `catchment_truncated` | modelled | Largest upslope area draining through the parcel on the 10 m district mosaic (`district_flow`), so whole river catchments are counted, and whether it reaches the mosaic edge. Embankments without their culverts can divert flow: on the plain north of Ōtaki the Waitohu shows about 130 km² because flow is routed north across it. Checked: Waikanae 148 km² and Ōtaki 374 km² near their mouths |
 | `level_open_cut_m3`, `level_open_fill_m3` | derived | Cut and fill to bring all open ground to its median level |
 | `platform_15m_earthworks_min_m3` | modelled | Smallest earthworks for a 15 m × 15 m level platform on open ground, estimated from the spread of ground levels |
-| `wind_obstruction_pct`, `wind_rel_height_m` | derived | Share of the surrounding ±100 m (square) with obstructions over 2.5 m in the DSM; ground at the parcel relative to the mean within ±500 m. Inputs to wind exposure, not an exposure rating: a modelled exposure class built from these two disagreed with KCDC's wind zones (T-37) and is withheld |
+| `wind_obstruction_pct`, `wind_rel_height_m` | derived | Share of the surrounding ±100 m (square) with obstructions over 2.5 m in the DSM; ground at the parcel (1 m DEM) relative to the mean ground within ±500 m on the 10 m district mosaic, with the sea at 0 m. Inputs to wind exposure, not an exposure rating: a modelled exposure class built from these two disagreed with KCDC's wind zones (T-37) and is withheld |
 | `horizon_mean_deg`, `horizon_north_deg`, `sky_view_pct` | derived | From the most open spot on the section at 1.6 m eye height: mean horizon angle in 16 directions, the highest towards north (N, NNE, NNW), and sky view (100 = open sky) |

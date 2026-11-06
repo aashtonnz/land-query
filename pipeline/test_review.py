@@ -44,6 +44,57 @@ def test_query_rows_carry_their_own_blocks_sha256_and_fetch_time():
     assert source_summary(lidar)["url"]  # a single block: LiDAR records its STAC collection, not a url
 
 
+def test_lidar_sheet_search_box_covers_all_four_corners():
+    from pyproj import Transformer
+    tr = Transformer.from_crs(2193, 4326, always_xy=True)
+    win = (1764765, 5469237, 1775355, 5480800)  # block 1765000_5470000; a sheet was missed on its east side
+    w, s, e, n = te.ll_envelope(win)
+    for x, y in ((win[0], win[1]), (win[2], win[1]), (win[0], win[3]), (win[2], win[3])):
+        lon, lat = tr.transform(x, y)
+        assert w <= lon <= e and s <= lat <= n
+    assert te.lidar_bbox("/nonexistent")[0] == te.BLOCK[0] - te.LIDAR_CONTEXT_M
+
+
+def test_every_cell_drains_to_an_outlet_across_flats_and_pits():
+    import numpy as np
+    from rasterio.transform import from_origin
+    from flow import flow_routing
+    rows, cols = 60, 41
+    x = np.abs(np.arange(cols) - 20)[None, :] * 0.5            # valley walls
+    dem = (np.arange(rows, 0, -1)[:, None] * 0.1 + x).astype(np.float32)
+    dem[20:30, :] = np.minimum(dem[20:30, :], 4.0)              # a flat valley floor across the middle
+    dem[40:43, 19:22] = 0.5                                     # a pit on the valley floor
+    inflow = np.zeros(dem.shape, bool); inflow[0, :] = True     # only the north edge brings flow from outside
+    acc, trunc, step = flow_routing(dem, from_origin(0, rows, 1, 1), inflow=inflow)
+    floor_out = float(acc[-1, 20])                              # the valley floor at the south edge
+    assert floor_out > 600, floor_out                           # the flat and the pit pass flow on, not swallow it
+    assert trunc[-1, 20] and not trunc[-1, 0]
+    assert abs(float(np.nanmax(step)) - 2 ** 0.5) < 1e-6
+
+
+def test_real_valley_floor_has_no_dead_ends():
+    """LINZ DEM crop where pysheds left a valley cell with no flow direction, cutting off the Ōtaki River."""
+    import os
+    import numpy as np
+    from affine import Affine
+    import flow
+    f = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "otaki_valley_10m.npz"))
+    z, T = f["z"], Affine(*f["transform"])
+    ok = np.isfinite(z)
+    rec, dirn = flow._receivers(flow._fill(z.astype(np.float32), ok), ok)
+    assert (dirn[1:-1, 1:-1] >= 0).all()                          # every interior cell drains somewhere
+    acc = flow.flow_routing(z, T)[0]
+    assert float(np.nanmax(acc)) / 100 > 6000, np.nanmax(acc)     # pysheds: 4,636 cells reach the outlet
+
+
+def test_wind_relative_height_counts_the_sea_at_sea_level():
+    import numpy as np
+    from district_flow import mean_ground
+    z = np.full((101, 101), np.nan, np.float32); z[:, 50:] = 20.0     # land at 20 m east of the beach, sea to the west
+    m = mean_ground(z, 10.0)
+    assert abs(float(m[50, 50]) - 10.0) < 0.5, m[50, 50]              # half sea at 0 m, half land at 20 m
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

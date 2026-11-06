@@ -27,12 +27,24 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -r pipeline/requirements.txt
+      - id: month
+        run: echo "m=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: flowcache
+        with:
+          path: pipeline/flowdata
+          key: district-flow-${{ steps.month.outputs.m }}-${{ hashFiles('pipeline/district_flow.py', 'pipeline/flow.py') }}
+      - name: District flow (T-42), unless cached
+        if: steps.flowcache.outputs.cache-hit != 'true'
+        working-directory: pipeline
+        run: mkdir -p flowdata && python3 district_flow.py flowdata/district_flow.tif
       - name: Fetch, compile, query
         working-directory: pipeline
         env:
           LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
         run: |
           python3 test_review.py
+          mkdir -p data/raw && cp flowdata/district_flow.tif* data/raw/
           python3 fetch_parcels_kcdc.py data
           /usr/bin/time -v python3 fetch_tile.py data 2> time_fetch.txt
           python3 fetch_lidar.py data
