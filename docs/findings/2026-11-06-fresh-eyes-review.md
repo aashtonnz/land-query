@@ -139,3 +139,5 @@ run through GitHub Actions, which can reach those hosts.
   - The largest catchment is 1.03 km², and none is truncated.
 - **Tests.** Five new tests in `pipeline/test_review.py`; the Ōtaki fixture, edge-only inflow, sea at 0 m and the
   four-corner search each fail on the old code.
+- **On GitHub Actions** (tile workflow run 42251507841 on this branch): district flow 2 min 18 s, whole run 5.5
+  minutes, same query counts as the local run, and an identical district flow sha256, so the mosaic is reproducible.
