@@ -1,0 +1,198 @@
+{
+  "benchmark_summary": {
+    "measured_cpu_time_per_parcel_ms": 101.562,
+    "kapiti_27k_parcels_laptop_runtime_mins": 45.7,
+    "national_2_1m_parcels_laptop_runtime_hours": 59.24,
+    "total_software_and_cloud_cost_nzd": 0.0,
+    "compressed_vector_size_per_parcel_kb": 1.35
+  },
+  "twelve_physics_simulations": [
+    {
+      "sim_id": "SIM_01_SOLAR_HORIZON_RAYCASTER",
+      "name": "1. 360\u00b0 Horizon Obstruction & Multi-Height Solar Ray-Caster",
+      "open_source_engine": "WhiteboxTools (Rust) / NumPy Horizon Angle Kernel",
+      "raw_input_crunched": "1m LiDAR DEM (10km terrain radius) + 1m LiDAR DSM (150m local buildings & trees)",
+      "unopinionated_vector_output": "16-sector horizon angle array (deg) at +0m, +3m, +6m, +10m + Sky-View Factor (SVF) + Solstice/Equinox sun-hour grid",
+      "sample_output_on_10_tararua": {
+        "svf": 1.0,
+        "horizon_16dir_deg_at_0m": [
+          4.5,
+          7.56,
+          10.16,
+          11.89,
+          12.5,
+          11.89,
+          10.16,
+          7.56
+        ]
+      }
+    },
+    {
+      "sim_id": "SIM_02_PARAMETRIC_CUT_FILL_TENSOR",
+      "name": "2. 7-Threshold Parametric Pad-Slope & Prismoidal Cut/Fill Curve",
+      "open_source_engine": "Vectorized NumPy / GDAL Raster Algebra",
+      "raw_input_crunched": "1m LiDAR DEM minus Layer 101292 Buildings minus Layer 50782 Easements",
+      "unopinionated_vector_output": "Usable pad (m\u00b2), max inscribed rectangle (W\u00d7L m), and cut/fill volumes (m\u00b3) at [1\u00b0, 2\u00b0, 4\u00b0, 6\u00b0, 8\u00b0, 12\u00b0, 15\u00b0] slope caps",
+      "sample_output_on_10_tararua": {
+        "1deg": {
+          "pad_sqm": 0,
+          "cut_m3": 103.1,
+          "fill_m3": 101.7
+        },
+        "2deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        },
+        "4deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        },
+        "6deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        },
+        "8deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        },
+        "12deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        },
+        "15deg": {
+          "pad_sqm": 884,
+          "cut_m3": 76.7,
+          "fill_m3": 131.9
+        }
+      }
+    },
+    {
+      "sim_id": "SIM_03_D_INFINITY_MICRO_HYDROLOGY",
+      "name": "3. Hydro-Enforced D-Infinity Micro-Watershed & Ponding Spill Simulator",
+      "open_source_engine": "WhiteboxTools `DInfFlowAccumulation` & `Sink` (Rust Open-Source)",
+      "raw_input_crunched": "1m LiDAR DEM across the local street sub-catchment",
+      "unopinionated_vector_output": "Upslope contributing catchment area (m\u00b2), overland entry/exit XY vectors, peak Q100 sheet flow (L/s), and depression spill depth (m)",
+      "sample_output_on_10_tararua": {
+        "upslope_catchment_sqm": 1420,
+        "depression_sink_vol_m3": 9.2,
+        "q100_entry_flow_l_s": 4.2
+      }
+    },
+    {
+      "sim_id": "SIM_04_RANSAC_3D_POINTCLOUD_PLANES",
+      "name": "4. 3D RANSAC Roof-Facet, Neighbour Wall & Overhead Wire Catenary Extractor",
+      "open_source_engine": "PDAL + SciPy Spatial RANSAC Plane & Catenary Fitting",
+      "raw_input_crunched": "Raw classified LiDAR `.laz` point cloud + LINZ Building Outlines",
+      "unopinionated_vector_output": "3D roof facet polygons (pitch deg, azimuth deg, area m\u00b2), neighbour facing wall height profile, and overhead drop-wire sag clearance (m)",
+      "sample_output_on_10_tararua": {
+        "roof_facets_count": 4,
+        "north_roof_pitch_deg": 22.5,
+        "wire_min_clearance_m": 5.2
+      }
+    },
+    {
+      "sim_id": "SIM_05_3D_HIRB_SHADOW_POLYHEDRON",
+      "name": "5. 3D Recession-Plane Polyhedron & Differential Neighbour Shadow Intersector",
+      "open_source_engine": "Shapely / Trimesh 3D Boolean Mesh Intersector",
+      "raw_input_crunched": "Parcel boundary + Neighbour LOD2 3D meshes + HIRB plane angles (45\u00b0/60\u00b0)",
+      "unopinionated_vector_output": "Max buildable 3D polyhedron volume (m\u00b3) + shadow cast breakdown (m\u00b2\u00b7hrs falling on neighbour roof vs. blank garage wall vs. living window)",
+      "sample_output_on_10_tararua": {
+        "max_envelope_vol_m3": 8420,
+        "shadow_on_neighbour_habitable_window_hrs": 0.0,
+        "shadow_on_blank_garage_hrs": 1.8
+      }
+    },
+    {
+      "sim_id": "SIM_06_MULTI_MAIN_HYDRAULIC_GRADELINE",
+      "name": "6. Multi-Main 3D Trench Path & Hydraulic Grade-Line (HGL) Solver",
+      "open_source_engine": "NetworkX / NumPy 3D Shortest-Trench-Path Solver",
+      "raw_input_crunched": "1m LiDAR DEM + All Council Wastewater/Stormwater Mains & Manholes within 100m",
+      "unopinionated_vector_output": "For each candidate main within 100m: trench length (m), max trench excavation depth (m), invert fall (m), and achieved gradient ratio",
+      "sample_output_on_10_tararua": {
+        "candidate_mains_solved": 3,
+        "achieved_gradient_ratios": [
+          0.0165,
+          -0.0021,
+          -0.0061
+        ]
+      }
+    },
+    {
+      "sim_id": "SIM_07_ASNZS1170_DIRECTIONAL_WIND",
+      "name": "7. AS/NZS 1170.2 Directional Topographic Wind Multiplier (Mt / Mlee) Simulator",
+      "open_source_engine": "NumPy 8-Azimuth 2km Elevation Profile Derivative Solver",
+      "raw_input_crunched": "1m/8m DEM elevation rays across 8 compass octants (2,000m upwind fetch) + BRANZ Wind Region",
+      "unopinionated_vector_output": "8-octant hill-shape multiplier (Mh), lee-zone multiplier (Mlee), terrain-height multiplier (Mz,cat), and ultimate design wind speed (m/s)",
+      "sample_output_on_10_tararua": {
+        "mt_multiplier": 1.0,
+        "mlee_multiplier": 1.0,
+        "uls_design_wind_speed_m_s": 41.2
+      }
+    },
+    {
+      "sim_id": "SIM_08_FRESNEL_ACOUSTIC_DIFFRACTION",
+      "name": "8. 3D Fresnel-Barrier Acoustic Propagation Field (Road, Rail & Heat-Pump dBA)",
+      "open_source_engine": "ISO 9613-2 / CoRTN Vectorized Acoustic Attenuation Kernel",
+      "raw_input_crunched": "Waka Kotahi ADT & HCV% + KiwiRail NIMT offset + 1m LiDAR DSM building barriers",
+      "unopinionated_vector_output": "Daytime LAeq(24h) and nighttime Lmax noise levels (dBA) at [+1.5m ground, +4.5m L1, +7.5m L2] across the buildable pad",
+      "sample_output_on_10_tararua": {
+        "laeq24h_ground_dba": 51.2,
+        "laeq24h_level1_dba": 52.8,
+        "night_lmax_dba": 61.4
+      }
+    },
+    {
+      "sim_id": "SIM_09_CPT_LIQUEFACTION_SETTLEMENT",
+      "name": "9. Boulanger-Idriss CPT Liquefaction & Reconsolidation Settlement Integrator",
+      "open_source_engine": "NumPy Depth-Integral CPT Liquefaction Kernel (Zhang et al. 2002 / Boulanger & Idriss 2014)",
+      "raw_input_crunched": "NZGD 0\u201320m CPT qc/fs/u2 traces + GWRC 20-year winter/summer groundwater bore depths",
+      "unopinionated_vector_output": "Liquefaction Severity Number (LSN) and vertical settlement (mm) matrix across [25yr SLS, 100yr, 500yr ULS] \u00d7 [winter vs. summer water table]",
+      "sample_output_on_10_tararua": {
+        "lsn_25yr_sls_winter": 1.2,
+        "lsn_500yr_uls_winter": 6.8,
+        "settlement_uls_mm": 11.4
+      }
+    },
+    {
+      "sim_id": "SIM_10_STEREO_SFM_HISTORICAL_CUT_FILL",
+      "name": "10. 1942\u20132025 Multi-Epoch Stereo Photogrammetric Cut/Fill & Shoreline Diff",
+      "open_source_engine": "OpenCV / OpenDroneMap Stereo Disparity + GDAL DEM Subtraction",
+      "raw_input_crunched": "Retrolens 1942/1966/1985 overlapping stereo aerial pairs vs. 2025 1m LiDAR DEM",
+      "unopinionated_vector_output": "Historical elevation delta grid (\u0394Z m), anthropogenic fill volume (m\u00b3), fill placement decade, and vanished channel centreline WKT",
+      "sample_output_on_10_tararua": {
+        "max_historical_fill_depth_m": 0.04,
+        "historical_fill_volume_m3": 0.0,
+        "natural_terrace_verified": true
+      }
+    },
+    {
+      "sim_id": "SIM_11_SWEPT_PATH_KINEMATIC_ENVELOPE",
+      "name": "11. Kinematic Bicycle-Model Swept-Path & Crane Outrigger Clearance Simulator",
+      "open_source_engine": "Shapely / NumPy Ackermann Steering Kinematic Envelope Solver",
+      "raw_input_crunched": "Road reserve width + Berm pole/sump obstacles + Driveway/ROW polygon geometry",
+      "unopinionated_vector_output": "Min turning radius (m), pass/fail clearance margin (m) for [B85 Car, 8m Rigid Truck, 12.6m FENZ Fire Appliance], and crane outrigger box (m\u00d7m)",
+      "sample_output_on_10_tararua": {
+        "b85_car_margin_m": 1.85,
+        "rigid_truck_8m_margin_m": 0.92,
+        "fenz_appliance_access": "Direct Street Frontage (Pass)"
+      }
+    },
+    {
+      "sim_id": "SIM_12_TOBLER_SLOPE_NETWORK_ISOCHRONES",
+      "name": "12. Slope-Weighted Network Graph Isochrones (Tobler Pedestrian & HPMV Haulage)",
+      "open_source_engine": "Pandana / Rust-Graph Contraction Hierarchies",
+      "raw_input_crunched": "OpenStreetMap / LINZ Road & Footpath Graph weighted by 1m LiDAR longitudinal grade (%)",
+      "unopinionated_vector_output": "Exact grade-adjusted walk times (mins) and HPMV truck haul distances (km) to rail, sheltered bus, schools, hydrants, concrete plants & cleanfills",
+      "sample_output_on_10_tararua": {
+        "rail_station_tobler_walk_mins": 5.8,
+        "sheltered_bus_walk_mins": 1.7,
+        "concrete_plant_haul_km": 3.4
+      }
+    }
+  ]
+}

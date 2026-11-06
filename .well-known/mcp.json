@@ -1,0 +1,27 @@
+{
+  "schema_version": "2026-11",
+  "name": "land-query-toponz-96d",
+  "description": "Trans-Tasman (NZ & AU) 96-Domain (2,746-Primitive) Reconciled Plot, 1:N Building, Natural Resource, Satellite EO & 12-Physics-Simulation Spine",
+  "repository": "https://github.com/aashtonnz/land-query",
+  "command": "python3",
+  "args": ["toponz_weekend1_kapiti_ingester.py", "--serve-mcp"],
+  "tools": [
+    "toponz_generate_master_84d_dossier",
+    "toponz_query_58d_spine",
+    "toponz_find_coasean_swaps",
+    "toponz_forensic_subsurface_scan",
+    "toponz_watchtower_status",
+    "toponz_dredge_raw_document",
+    "toponz_run_agent_eval",
+    "toponz_audit_plot_buildings",
+    "toponz_audit_natural_resources",
+    "toponz_detect_cross_silo_contradictions",
+    "toponz_tile_batch_status",
+    "toponz_render_satellite_and_visual_stack",
+    "toponz_run_indirect_xray_inference",
+    "toponz_run_80d_crosscheck_audit",
+    "toponz_audit_lineage_zoning_and_tenure",
+    "toponz_trace_ancestral_backfill",
+    "toponz_audit_96d_completeness"
+  ]
+}

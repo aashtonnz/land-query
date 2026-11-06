@@ -1,0 +1,90 @@
+{
+  "kit_version": "TopoNZ / TopoAU v24.0 Turnkey $0.00 Edge Production, MCP/OpenAPI & Vault Flywheel Kit",
+  "fixed_monthly_infrastructure_cost_nzd": 0.0,
+  "edge_hosting_stack": {
+    "compute_layer": "Cloudflare Workers Free Tier (100,000 requests/day = $0.00/mo; <15ms latency across NZ & Australia edge POPs in Auckland, Wellington, Sydney, Melbourne)",
+    "structured_sql_fts5_layer": "Cloudflare D1 Serverless SQLite (5 GB free storage, 5M rows read/day free = $0.00/mo) + Partitioned Regional SQLite/GeoParquet Shards on Cloudflare R2 (10 GB/mo free, $0 egress)",
+    "payments_and_metering": "Stripe Usage-Based Billing ($0.00 monthly fixed fee; pay only 2.9% + $0.30 when a customer actually buys API credits)"
+  },
+  "agent_discovery_and_protocol_endpoints": {
+    "llms_txt_manifest": "# TopoNZ / TopoAU \u2014 58-Domain Unopinionated Plot & Resource Spine (NZ & Australia)\n> Canonical parcel-level physical, legal, 4D historical (1840\u20132026), relational graph, and 12-physics-simulation primitives for AI agents.\n\n## Core MCP & REST Endpoints\n- `GET /v1/domains` \u2014 Progressive discovery of all 58 Domains (D01\u2013D58) and 1,606 raw primitive field definitions.\n- `POST /v1/query/hybrid` \u2014 Execute combined numerical SQL predicates + SQLite FTS5 BM25 search across verbatim s42A/s4.15 reports, s92 RFIs, title memorials, and drainage cards.\n- `GET /v1/plot/{parcel_id}` \u2014 Fetch the complete 58-domain raw plot JSON + 12 physics simulation vectors + SHA-256 Merkle provenance ledger.\n- `POST /v1/cdc/subscribe` \u2014 Subscribe an agent webhook to deterministic `[prev_merkle_root -> new_merkle_root]` state transitions.\n- `POST /v1/vault/contribute` \u2014 Upload a PDF LIM, Property File, or Title Instrument to auto-hydrate an entire Deposited Plan (DP) and earn +25 free API query credits.",
+    "claude_cursor_mcp_config": {
+      "mcpServers": {
+        "toponz-58domain-spine": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@toponz/mcp-server",
+            "--region",
+            "NZ-AU-ALL"
+          ],
+          "env": {
+            "TOPONZ_API_KEY": "tnz_live_free_tier_key"
+          }
+        }
+      }
+    },
+    "openapi_3_1_summary": {
+      "openapi": "3.1.0",
+      "info": {
+        "title": "TopoNZ / TopoAU 58-Domain Plot Context Spine API",
+        "version": "24.0.0",
+        "description": "Unopinionated raw plot primitives, 4D history (1840\u20132026), N/E/S/W relational graphs, and 12 vectorized physics simulations for AI agents."
+      },
+      "paths": {
+        "/v1/domains": {
+          "get": {
+            "summary": "List 58 Domain headers for progressive context loading"
+          }
+        },
+        "/v1/query/hybrid": {
+          "post": {
+            "summary": "Execute Hybrid SQL + FTS5 BM25 + Physics Vector filter"
+          }
+        },
+        "/v1/plot/{parcel_id}": {
+          "get": {
+            "summary": "Retrieve full 58-domain plot record + SHA-256 provenance"
+          }
+        },
+        "/v1/vault/contribute": {
+          "post": {
+            "summary": "Give-to-Get: Upload PDF LIM/Title to hydrate whole DP & earn +25 credits"
+          }
+        }
+      }
+    }
+  },
+  "give_to_get_vault_flywheel_simulation": {
+    "event": "User or AI Agent uploads `LIM_Report_14_Kowhai_Rd_Paraparaumu.pdf` to `/v1/vault/contribute`",
+    "autonomous_pipeline_steps": [
+      "1. SHA-256 dedup check confirms PDF is a new KCDC LIM + Title pack on Deposited Plan `DP 84910`.",
+      "2. Local deterministic parser extracts Covenant Instrument `B684120.3` (25-yr sunset clause), Consent Notice `819204.2`, and 1978 As-Built Drainage Card.",
+      "3. Shared-DP Propagator attaches the extracted covenant & subdivision geotech primitives to ALL 64 sibling lots on `DP 84910` simultaneously.",
+      "4. Recomputes 58-Domain Merkle Roots for all 64 lots and credits the uploader's API key with `+25 Free Plot Queries` ($0.00 cash cost to TopoNZ)."
+    ],
+    "plots_hydrated_from_single_upload": 64,
+    "cash_cost_to_platform_nzd": 0.0,
+    "api_credits_minted_to_contributor": 25
+  },
+  "zero_fixed_cost_pricing_tiers": [
+    {
+      "tier_name": "1. Free Agent Discovery & Give-to-Get Tier",
+      "price": "$0 / month",
+      "included": "50 plot queries/month + Unlimited schema introspection (`D01\u2013D58`) + Earn +25 free queries for every PDF LIM / Title Pack / Drainage Card contributed to the Vault",
+      "purpose": "Seeds adoption across developers, planners, engineers & AI agents while crowdsourcing Bucket-3 private documents for $0.00."
+    },
+    {
+      "tier_name": "2. Pay-As-You-Go Agent Metered API",
+      "price": "$0.15 NZD / plot query (or $0.02 / bulk SQL row)",
+      "included": "Full 58-Domain + 12-Physics-Simulation JSON payload + Verbatim FTS5 snippets + SHA-256 Provenance Ledger",
+      "purpose": "Pure usage-based monetization via Stripe (zero monthly commitment barrier; 99% gross margin)."
+    },
+    {
+      "tier_name": "3. Pro Autonomous Agent & CDC Watchtower Seat",
+      "price": "$149 NZD / month",
+      "included": "2,500 plot queries/mo + Unlimited standing SQL/FTS5 queries + Real-time CDC Merkle State-Diff Webhooks across NZ & AU",
+      "purpose": "Recurring SaaS/API revenue from active property developers, solar/BESS site selectors, valuers, and lenders."
+    }
+  ]
+}

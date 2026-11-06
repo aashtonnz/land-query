@@ -1,0 +1,8 @@
+# land-query (TopoNZ / TopoAU 96-Domain Plot Truth Engine v39.0)
+> Pre-joined, physics-compressed, 15-pillar cross-checked 96-Domain (2,746-primitive) property, building, natural-resource, and satellite EO spine for New Zealand and Australia.
+
+- Repository: https://github.com/aashtonnz/land-query
+- Interactive 37-Tab Engine: ./index.html (`nz_topological_parcel_engine.html`)
+- Standalone $0.00 SQLite + FTS5 + 12-Physics Compiler & JSON-RPC 2.0 MCP Server: `./toponz_weekend1_kapiti_ingester.py`
+- MCP Manifest: `./.well-known/mcp.json`
+- Complete JSON Schemas & Verification Benchmarks: `./schemas/`

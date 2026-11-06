@@ -1,0 +1,74 @@
+{
+  "engine_version": "TopoNZ / TopoAU v22.0 Zero-Budget ($0.00) Bootstrap Blueprint",
+  "total_out_of_pocket_cost_nzd": 0.0,
+  "workarounds_for_linz_instrument_fees": [
+    {
+      "workaround_id": "FREE_WORKAROUND_01_MEMORIAL_TEXT_TABLE",
+      "title": "1. Free LINZ Title Memorials Summary Table (Layer 50804 + Related Memorials CSV)",
+      "replaces_cost": "$19,600,000 retail / $300,000 deduplicated title search fees",
+      "actual_cost_nzd": 0.0,
+      "how_it_works": "LINZ Data Service publishes the NZ Property Titles layer (50804) and Title Memorials summary table under a 100% free CC-BY 4.0 licence. Every parcel's exact memorial strings ('Land Covenant in Transfer B684120.3', 'Consent Notice s221 RMA 819204.2', 'Subject to s72 Building Act', 'Easement Marked A DP 84910') are already in the free bulk CSV\u2014giving 100% covenant/s221/s72 detection nationwide for $0.00."
+    },
+    {
+      "workaround_id": "FREE_WORKAROUND_02_COUNCIL_LGOIMA_S221_REGISTERS",
+      "title": "2. Free Council LGOIMA s221 Consent Notice & Subdivision Condition Dumps",
+      "replaces_cost": "Paying LINZ $8/deed to read s221 geotechnical or stormwater consent notices",
+      "actual_cost_nzd": 0.0,
+      "how_it_works": "Every RMA s221 Consent Notice is authored and held by the territorial authority (KCDC, WCC, Auckland Council) as part of the subdivision resource consent decision. Requesting the council's electronic register of s221 consent notices and subdivision decisions under LGOIMA is statutory free public information ($0.00)."
+    },
+    {
+      "workaround_id": "FREE_WORKAROUND_03_PUBLIC_BUYER_PACK_HARVESTER",
+      "title": "3. Real-Estate Public 'Property Info Pack / LIM' Harvester + 1-to-64 DP Propagation",
+      "replaces_cost": "Paying for private subdivision covenant instruments & council LIM/building files",
+      "actual_cost_nzd": 0.0,
+      "how_it_works": "Whenever any single house in a 64-lot subdivision goes on the market, listing agents publicly host the 'Buyer Property Pack' (containing the full LIM, Record of Title, and Covenant Instrument PDF). Scraping that single public Buyer Pack hydrates the verbatim covenant wording and parent subdivision geotech report across ALL 64 lots on that Deposited Plan for $0.00."
+    },
+    {
+      "workaround_id": "FREE_WORKAROUND_04_PASS_THROUGH_AND_GIVE_TO_GET",
+      "title": "4. Customer Pass-Through & 'Upload-a-LIM, Get-Free-Credits' Flywheel",
+      "replaces_cost": "Any remaining uncached rare instrument or microfiche building file",
+      "actual_cost_nzd": 0.0,
+      "how_it_works": "For any rare instrument not yet in the free vault, either (a) the querying customer's agent triggers a live pass-through order where the customer pays the $8 disbursement + margin at checkout, or (b) lawyers/developers upload their existing PDF LIM/Title packs in exchange for free API credits\u2014permanently hydrating that entire street for $0.00 capital outlay."
+    }
+  ],
+  "workarounds_for_cloud_compute_and_storage": [
+    {
+      "component": "1m LiDAR DEM/DSM Processing (5 TB Raw GeoTIFFs -> 120 MB Numeric Columns)",
+      "traditional_cost": "$12,000/yr AWS RDS PostGIS + S3 storage",
+      "zero_budget_method": "Stream-and-discard tile processing on your local laptop/PC: download one 1km\u00b2 LiDAR GeoTIFF tile at a time into RAM, compute the elevation/slope/roof numbers for those 400 parcels, write the numbers into a local DuckDB / SQLite / Parquet file, and delete the raw GeoTIFF tile immediately. K\u0101piti Coast (27,000 parcels) compiles in ~40 minutes on a laptop and takes 85 MB on disk.",
+      "actual_cost_nzd": 0.0
+    },
+    {
+      "component": "PDF & Microfiche OCR / NLP Extraction (s42A Reports, s92 RFIs & Drainage Cards)",
+      "traditional_cost": "$6,000+ in commercial LLM API tokens",
+      "zero_budget_method": "Use deterministic Python `pypdf` / `pdfplumber` text extraction (95% of post-2010 council s42A PDFs are native digital text, requiring zero OCR!) + local open-weight models (PaddleOCR / Qwen-2.5-VL running locally on your own machine) for scanned 1970s drainage cards.",
+      "actual_cost_nzd": 0.0
+    },
+    {
+      "component": "Database Hosting & MCP API Distribution",
+      "traditional_cost": "$6,000/yr managed cloud database servers",
+      "zero_budget_method": "Store the compiledspine as static partitioned GeoParquet / SQLite files on Cloudflare R2 (10 GB/month free tier with zero egress fees) + Cloudflare Workers free tier (100,000 requests/day free) or local MCP server (`stdio` / `npx` CLI downloaded by the user's agent).",
+      "actual_cost_nzd": 0.0
+    }
+  ],
+  "phased_zero_dollar_launch_plan": [
+    {
+      "step": "Step 1: K\u0101piti Coast Complete 58-Domain Spine (~27,000 Parcels)",
+      "storage_size": "~85 MB DuckDB / SQLite file",
+      "build_time_on_laptop": "1 weekend on a single laptop",
+      "cash_cost_nzd": "$0.00"
+    },
+    {
+      "step": "Step 2: Greater Wellington Region (~180,000 Parcels \u2014 WCC, Hutt, Porirua, K\u0101piti)",
+      "storage_size": "~540 MB DuckDB / GeoParquet file",
+      "build_time_on_laptop": "2\u20133 nights background batch run",
+      "cash_cost_nzd": "$0.00"
+    },
+    {
+      "step": "Step 3: National NZ Spine (~2.8M Parcels) on Cloudflare R2 Free Tier",
+      "storage_size": "~5.8 GB Zstd-compressed Parquet (Fits inside Cloudflare R2 10GB Free Tier!)",
+      "build_time_on_laptop": "1 week background tile streaming",
+      "cash_cost_nzd": "$0.00"
+    }
+  ]
+}

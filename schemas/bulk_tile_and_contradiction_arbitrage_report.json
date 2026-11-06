@@ -1,0 +1,328 @@
+{
+  "status": "WEEKEND1_SPINE_COMPILED_AND_VERIFIED",
+  "compile_and_sim_time_ms": 52.11,
+  "cash_cost_nzd": 0.0,
+  "coasean_easement_swaps_discovered": [
+    {
+      "uphill_parcel_id": "LINZ-5041819-UPHILL",
+      "uphill_address": "16 Ngahina Street, Paraparaumu (Rear Uphill Neighbour)",
+      "uphill_own_street_grade": -0.0125,
+      "downhill_neighbour_id": "LINZ-5041821",
+      "downhill_neighbour_address": "10 Tararua Street, Paraparaumu",
+      "cross_boundary_easement_grade_ratio": 0.0571
+    }
+  ],
+  "predictive_subsurface_failures_flagged": [
+    {
+      "parcel_id": "LINZ-5042110",
+      "address": "114 Otaihanga Road, \u014ctaihanga",
+      "sim10_hist_fill_m": 1.15,
+      "d52_insar_vlm_mm_yr": -3.6,
+      "d56_curbside_wall_tilt_deg": 2.1,
+      "d58_sewer_blockage_callouts": 3
+    }
+  ],
+  "autonomous_watchtower_targets_verified": [
+    {
+      "target_id": "WT-NZ-LINZ-01",
+      "agency_name": "Toit\u016b Te Whenua LINZ Data Service & Elevation GitHub",
+      "active_data_protocol": "WFS 2.0 + Koordinates REST + Upcoming STAC Item Search API (#571)",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_STAC_COG_READY"
+    },
+    {
+      "target_id": "WT-NZ-KCDC-01",
+      "agency_name": "K\u0101piti Coast District Council (KCDC)",
+      "active_data_protocol": "ArcGIS REST FeatureServer + Static PDF Consent/LIM Register",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "MONITORED_NO_COUNCIL_MCP"
+    },
+    {
+      "target_id": "WT-NZ-GWRC-01",
+      "agency_name": "Greater Wellington Regional Council (GWRC)",
+      "active_data_protocol": "ArcGIS Hub DCAT-AP /data.json + OGC WFS",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_DCAT_AUTO_SYNC"
+    },
+    {
+      "target_id": "WT-NZ-MBIE-01",
+      "agency_name": "MBIE Business API Portal (Companies Office / NZBN)",
+      "active_data_protocol": "OpenAPI 3.0 REST (OAuth2 Free Tier)",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_ENTITY_GRAPH"
+    },
+    {
+      "target_id": "WT-AU-NSW-01",
+      "agency_name": "NSW Planning Portal & Spatial Services",
+      "active_data_protocol": "REST Council Trackers + OGC WFS",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_TRANS_TASMAN"
+    }
+  ],
+  "building_subspine_1_to_n_verified": [
+    {
+      "building_id": "BLD-5041821-01",
+      "parcel_id": "LINZ-5041821",
+      "structure_role": "Primary Dwelling (Relocatable 1974 Bunglaow)",
+      "d59_bedrooms_count": 3,
+      "d59_bathrooms_count": 1.5,
+      "d59_council_rid_floor_area_sqm": 132.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 132.0,
+      "d59_unconsented_floor_delta_sqm": 0.0,
+      "d60_year_built": 1974,
+      "d60_wall_cladding_and_cavity": "Bevel-back heart rimu / radiata weatherboard (Consented)",
+      "d63_ccc_status": "Pre-1992 Safe & Sanitary + BC-2019-0412 CCC Issued",
+      "d64_house_relocation_salvage_net_nzd": 18000
+    },
+    {
+      "building_id": "BLD-5041821-02",
+      "parcel_id": "LINZ-5041821",
+      "structure_role": "Detached Rear Garage + Unconsented Studio Sleepout",
+      "d59_bedrooms_count": 1,
+      "d59_bathrooms_count": 1.0,
+      "d59_council_rid_floor_area_sqm": 54.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 78.0,
+      "d59_unconsented_floor_delta_sqm": 24.0,
+      "d60_year_built": 1988,
+      "d60_wall_cladding_and_cavity": "Harditex fibre-cement sheet (pre-1987 trace chrysotile risk on soffits)",
+      "d63_ccc_status": "WARNING: 24m\u00b2 Studio + Bathroom lacks CCC / Certificate of Acceptance (s96)",
+      "d64_house_relocation_salvage_net_nzd": -6500
+    },
+    {
+      "building_id": "BLD-5041819-01",
+      "parcel_id": "LINZ-5041819-UPHILL",
+      "structure_role": "Primary Dwelling (1998 Split-Level)",
+      "d59_bedrooms_count": 4,
+      "d59_bathrooms_count": 2.5,
+      "d59_council_rid_floor_area_sqm": 215.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 215.0,
+      "d59_unconsented_floor_delta_sqm": 0.0,
+      "d60_year_built": 1998,
+      "d60_wall_cladding_and_cavity": "HIGH RISK: Direct-fixed monolithic texture-coated polystyrene (EIFS, zero cavity, zero eaves) + untreated kiln-dried framing",
+      "d63_ccc_status": "CCC Issued 1999 (High Weathertightness Re-Clad Risk: -$220,000)",
+      "d64_house_relocation_salvage_net_nzd": -32000
+    },
+    {
+      "building_id": "BLD-5042110-01",
+      "parcel_id": "LINZ-5042110",
+      "structure_role": "Primary Dwelling (1982 Timber Pole House)",
+      "d59_bedrooms_count": 3,
+      "d59_bathrooms_count": 1.0,
+      "d59_council_rid_floor_area_sqm": 148.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 176.0,
+      "d59_unconsented_floor_delta_sqm": 28.0,
+      "d60_year_built": 1982,
+      "d60_wall_cladding_and_cavity": "Rusticated cedar weatherboard + Super Six corrugated fibrolite roof (Asbestos)",
+      "d63_ccc_status": "28m\u00b2 enclosed sunroom deck lacks Building Consent; s221 geotech notice active",
+      "d64_house_relocation_salvage_net_nzd": -28000
+    }
+  ],
+  "natural_resources_70d_verified": [
+    {
+      "parcel_id": "LINZ-5041821",
+      "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M exploration/mining permits)",
+      "d65_subsurface_aggregate_resource": "Holocene dune sand over dense alluvial greywacke gravel at 2.4m (Clean fill / roading sub-base)",
+      "d65_crown_minerals_s8_reservation_flag": 1,
+      "d66_groundwater_allocation_zone": "Paraparaumu Shallow Unconfined Aquifer (Spare allocation available)",
+      "d66_water_take_consent_l_s": 0.0,
+      "d66_aquifer_specific_capacity_l_s_m": 4.8,
+      "d66_nitrogen_leaching_cap_kg_ha_yr": 18.0,
+      "d67_lris_luc_class": "LUC 3s (Urban Residential Exempt from NPS-HPL)",
+      "d67_nps_hpl_highly_productive_lock": 0,
+      "d67_profile_available_water_mm": 92.0,
+      "d67_lcdb_v6_land_cover_class": "LCDB v6.0 Class 1: Built-up Area (Settlement)",
+      "d68_ets_forest_status": "Non-forest urban land (Zero ETS liability)",
+      "d68_pre1990_deforestation_liability_nzd": 0,
+      "d68_post1989_carbon_yield_nzu_yr": 0.0,
+      "d69_solar_ghi_kwh_m2_yr": 1465.0,
+      "d69_wind_50m_mean_m_s": 6.4,
+      "d69_shallow_geothermal_w_m_k": 2.15,
+      "d70_qeii_or_doc_covenant_status": "Zero QEII / DOC covenants",
+      "d70_esplanade_20m_strip_forfeiture_flag": 0,
+      "d70_riparian_fish_passage_note": "No surface stream on parcel"
+    },
+    {
+      "parcel_id": "LINZ-5041819-UPHILL",
+      "d65_nzpam_mineral_permit_status": "Clear (Zero active NZP&M permits)",
+      "d65_subsurface_aggregate_resource": "Consolidated sand/silt dune ridge (Zero quarry aggregate)",
+      "d65_crown_minerals_s8_reservation_flag": 1,
+      "d66_groundwater_allocation_zone": "Paraparaumu Shallow Unconfined Aquifer",
+      "d66_water_take_consent_l_s": 0.0,
+      "d66_aquifer_specific_capacity_l_s_m": 4.2,
+      "d66_nitrogen_leaching_cap_kg_ha_yr": 18.0,
+      "d67_lris_luc_class": "LUC 3s (Urban Residential Exempt from NPS-HPL)",
+      "d67_nps_hpl_highly_productive_lock": 0,
+      "d67_profile_available_water_mm": 84.0,
+      "d67_lcdb_v6_land_cover_class": "LCDB v6.0 Class 1: Built-up Area (Settlement)",
+      "d68_ets_forest_status": "Non-forest urban land",
+      "d68_pre1990_deforestation_liability_nzd": 0,
+      "d68_post1989_carbon_yield_nzu_yr": 0.0,
+      "d69_solar_ghi_kwh_m2_yr": 1490.0,
+      "d69_wind_50m_mean_m_s": 7.1,
+      "d69_shallow_geothermal_w_m_k": 2.05,
+      "d70_qeii_or_doc_covenant_status": "Zero QEII / DOC covenants",
+      "d70_esplanade_20m_strip_forfeiture_flag": 0,
+      "d70_riparian_fish_passage_note": "No surface stream on parcel"
+    },
+    {
+      "parcel_id": "LINZ-5042110",
+      "d65_nzpam_mineral_permit_status": "NZP&M Historical Greywacke Alluvial Aggregate Zone (Waikanae Fan)",
+      "d65_subsurface_aggregate_resource": "High-value alluvial greywacke gravel bed at 3.2m BGL beneath 1.15m fill & peat lens",
+      "d65_crown_minerals_s8_reservation_flag": 1,
+      "d66_groundwater_allocation_zone": "Waikanae Groundwater Management Zone (OVER-ALLOCATED: New commercial takes restricted)",
+      "d66_water_take_consent_l_s": 1.8,
+      "d66_aquifer_specific_capacity_l_s_m": 11.4,
+      "d66_nitrogen_leaching_cap_kg_ha_yr": 14.5,
+      "d67_lris_luc_class": "LUC 2w (HIGHLY PRODUCTIVE LAND: NPS-HPL Class 2 Soil + Peat Drainage Constraint)",
+      "d67_nps_hpl_highly_productive_lock": 1,
+      "d67_profile_available_water_mm": 148.0,
+      "d67_lcdb_v6_land_cover_class": "LCDB v6.0 Class 40/45: High Producing Exotic Grassland + Palustrine Wetland Fringe",
+      "d68_ets_forest_status": "Post-1989 Indigenous Wetland/Riparian Regeneration Eligible (14.2 NZUs/yr); 0.18ha Pre-1990 shelterbelt (-$10,800 deforestation liability if cleared)",
+      "d68_pre1990_deforestation_liability_nzd": 10800,
+      "d68_post1989_carbon_yield_nzu_yr": 14.2,
+      "d69_solar_ghi_kwh_m2_yr": 1455.0,
+      "d69_wind_50m_mean_m_s": 6.8,
+      "d69_shallow_geothermal_w_m_k": 2.65,
+      "d70_qeii_or_doc_covenant_status": "Adjoins Waikanae River Corridor SNA (GWRC Schedule F)",
+      "d70_esplanade_20m_strip_forfeiture_flag": 1,
+      "d70_riparian_fish_passage_note": "WARNING: Mandatory 20m Esplanade Strip forfeiture triggered on any <4ha subdivision bordering tributary stream (>3m width)"
+    }
+  ],
+  "spatial_1km_tile_batch_checkpoints": [
+    {
+      "nztm_tile_id": "NZTM-1760-5472",
+      "suburb_cluster": "Paraparaumu Central & Tararua St",
+      "nztm_bbox_epsg2193": "[1760000, 5472000, 1761000, 5473000]",
+      "parcels_in_tile": 462,
+      "buildings_in_tile": 618,
+      "unique_dp_plans": 19,
+      "vectorized_tile_compile_ms": 174.2,
+      "checkpoint_status": "MERKLE_SEALED_70D",
+      "tile_merkle_root": "sha256:4f91a082c71e8831"
+    },
+    {
+      "nztm_tile_id": "NZTM-1758-5473",
+      "suburb_cluster": "Paraparaumu Beach & Marine Parade",
+      "nztm_bbox_epsg2193": "[1758000, 5473000, 1759000, 5474000]",
+      "parcels_in_tile": 518,
+      "buildings_in_tile": 690,
+      "unique_dp_plans": 22,
+      "vectorized_tile_compile_ms": 189.6,
+      "checkpoint_status": "MERKLE_SEALED_70D",
+      "tile_merkle_root": "sha256:9c20b418e55d1024"
+    },
+    {
+      "nztm_tile_id": "NZTM-1757-5469",
+      "suburb_cluster": "Raumati Beach & Raumati South",
+      "nztm_bbox_epsg2193": "[1757000, 5469000, 1758000, 5470000]",
+      "parcels_in_tile": 485,
+      "buildings_in_tile": 640,
+      "unique_dp_plans": 21,
+      "vectorized_tile_compile_ms": 181.0,
+      "checkpoint_status": "MERKLE_SEALED_70D",
+      "tile_merkle_root": "sha256:7a11d930f42c6190"
+    },
+    {
+      "nztm_tile_id": "NZTM-1762-5475",
+      "suburb_cluster": "\u014ctaihanga & Waikanae River Corridor",
+      "nztm_bbox_epsg2193": "[1762000, 5475000, 1763000, 5476000]",
+      "parcels_in_tile": 194,
+      "buildings_in_tile": 275,
+      "unique_dp_plans": 14,
+      "vectorized_tile_compile_ms": 98.4,
+      "checkpoint_status": "MERKLE_SEALED_70D",
+      "tile_merkle_root": "sha256:2e88c501a39b7742"
+    },
+    {
+      "nztm_tile_id": "NZTM-1764-5477",
+      "suburb_cluster": "Waikanae Town Centre & Rail Precinct",
+      "nztm_bbox_epsg2193": "[1764000, 5477000, 1765000, 5478000]",
+      "parcels_in_tile": 430,
+      "buildings_in_tile": 560,
+      "unique_dp_plans": 18,
+      "vectorized_tile_compile_ms": 165.8,
+      "checkpoint_status": "MERKLE_SEALED_70D",
+      "tile_merkle_root": "sha256:6b54f129d80a3315"
+    }
+  ],
+  "cross_silo_contradictions_detected": [
+    {
+      "contradiction_id": "CONTRA-01-FLOOR-DELTA",
+      "parcel_id": "LINZ-5041821",
+      "silo_a_source": "D59 Council RID Valuation Roll (KCDC)",
+      "silo_b_source": "D06 LINZ 1m LiDAR DSM + Layer 101292 Building Outlines",
+      "contradiction_type": "UNCONSENTED_FLOOR_AREA_DISCREPANCY",
+      "silo_a_claim": "Detached garage BLD-5041821-02 recorded as 54.0 m\u00b2 utility shed with 0 bedrooms/bathrooms",
+      "silo_b_physical_truth": "3D LiDAR + Orthophoto measures 78.0 m\u00b2 (+24.0 m\u00b2 enclosed studio sleepout + 2014 gully-trap bathroom)",
+      "arbitrage_or_trap_value_nzd": -18500,
+      "automated_remedy_action": "Demand vendor s96 Certificate of Acceptance (COA) or -$18,500 price reduction before unconditional."
+    },
+    {
+      "contradiction_id": "CONTRA-02-FLOOD-INSURANCE",
+      "parcel_id": "LINZ-5041821",
+      "silo_a_source": "D10 Coarse 2D Insurer Flood Risk Polygon",
+      "silo_b_source": "D06 Surveyed FFL (14.42m) + D60 H5 Pile Elevation vs 1% AEP Flood RL (13.50m)",
+      "contradiction_type": "FALSE_POSITIVE_INSURANCE_FLOOD_LOADING",
+      "silo_a_claim": "Coarse insurer postcode/street flood buffer flags parcel for +$1,850/yr flood risk surcharge",
+      "silo_b_physical_truth": "1m LiDAR + repiled subfloor proves FFL sits +0.92m above 100-year flood RL (nearly double 0.50m freeboard rule)",
+      "arbitrage_or_trap_value_nzd": 18500,
+      "automated_remedy_action": "Auto-generate Cryptographic Flood Freeboard Exemption Certificate (NPV +$18,500 over 10 yrs)."
+    },
+    {
+      "contradiction_id": "CONTRA-03-RATES-OVERVALUATION",
+      "parcel_id": "LINZ-5042110",
+      "silo_a_source": "D15 Council Mass-Appraisal Land Value ($670,000)",
+      "silo_b_source": "D67 NPS-HPL LUC 2w Lock + D70 20m Esplanade Forfeiture + SIM-10 1.15m Peat Fill",
+      "contradiction_type": "STATUTORY_LAND_VALUATION_OVERASSESSMENT",
+      "silo_a_claim": "Mass appraisal prices 4,900m\u00b2 lot as unconstrained lifestyle subdivision land",
+      "silo_b_physical_truth": "Combined NPS-HPL Class 2 soil lock + 20m stream forfeiture + 1.15m peat fill blocks standard subdivision",
+      "arbitrage_or_trap_value_nzd": 24000,
+      "automated_remedy_action": "File automated s32/s33 Rating Valuation Objection -> reduces annual council rates by ~$2,400/yr (10-yr NPV +$24k)."
+    },
+    {
+      "contradiction_id": "CONTRA-04-ETS-ZONING-CONFLICT",
+      "parcel_id": "LINZ-5042110",
+      "silo_a_source": "D11 District Plan Permitted Shelterbelt Clearance",
+      "silo_b_source": "D68 MfE LUCAS Pre-1990 Forest Polygon (0.18 ha)",
+      "contradiction_type": "HIDDEN_ETS_DEFORESTATION_SURRENDER_TRAP",
+      "silo_a_claim": "Council District Plan allows routine rural shelterbelt removal without resource consent",
+      "silo_b_physical_truth": "MPI/MfE LUCAS classifies the 0.18ha pine belt as Pre-1990 forest land triggering NZU surrender liability",
+      "arbitrage_or_trap_value_nzd": -10800,
+      "automated_remedy_action": "Retain Pre-1990 shelterbelt strip and register adjoining 1.2ha wetland fringe for +14.2 NZUs/yr Post-1989 credits."
+    }
+  ],
+  "zero_cost_statutory_dredger_sample": {
+    "dredge_latency_ms": 2.2675,
+    "llm_api_cost_nzd": 0.0,
+    "dp_plans_detected": [
+      "DP 24819"
+    ],
+    "consent_ids_detected": [
+      "RM260144"
+    ],
+    "title_refs_detected": [
+      "24819",
+      "WN42B/881"
+    ],
+    "imperial_to_metric_conversions": [
+      {
+        "verbatim": "4ft 2in",
+        "metric_m": 1.27
+      },
+      {
+        "verbatim": "18ft 6in",
+        "metric_m": 5.639
+      }
+    ],
+    "rule_breach_magnitude_m": 1.25,
+    "s95a_non_notified_waiver_granted": true,
+    "s92_rfi_or_withdrawn_flag": false,
+    "covenant_sunset_detected": "expires on 14 May 2021",
+    "s221_geotech_notice_flag": false
+  },
+  "agent_eval_benchmark_summary": {
+    "baseline_pass_rate": "0/6 (0%)",
+    "toponz_58d_pass_rate": "6/6 (100%)",
+    "cumulative_value_protected_or_unlocked_nzd": 871000
+  }
+}

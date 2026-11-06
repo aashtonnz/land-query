@@ -1,0 +1,154 @@
+{
+  "status": "WEEKEND1_SPINE_COMPILED_AND_VERIFIED",
+  "compile_and_sim_time_ms": 72.79,
+  "cash_cost_nzd": 0.0,
+  "coasean_easement_swaps_discovered": [
+    {
+      "uphill_parcel_id": "LINZ-5041819-UPHILL",
+      "uphill_address": "16 Ngahina Street, Paraparaumu (Rear Uphill Neighbour)",
+      "uphill_own_street_grade": -0.0125,
+      "downhill_neighbour_id": "LINZ-5041821",
+      "downhill_neighbour_address": "10 Tararua Street, Paraparaumu",
+      "cross_boundary_easement_grade_ratio": 0.0571
+    }
+  ],
+  "predictive_subsurface_failures_flagged": [
+    {
+      "parcel_id": "LINZ-5042110",
+      "address": "114 Otaihanga Road, \u014ctaihanga",
+      "sim10_hist_fill_m": 1.15,
+      "d52_insar_vlm_mm_yr": -3.6,
+      "d56_curbside_wall_tilt_deg": 2.1,
+      "d58_sewer_blockage_callouts": 3
+    }
+  ],
+  "autonomous_watchtower_targets_verified": [
+    {
+      "target_id": "WT-NZ-LINZ-01",
+      "agency_name": "Toit\u016b Te Whenua LINZ Data Service & Elevation GitHub",
+      "active_data_protocol": "WFS 2.0 + Koordinates REST + Upcoming STAC Item Search API (#571)",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_STAC_COG_READY"
+    },
+    {
+      "target_id": "WT-NZ-KCDC-01",
+      "agency_name": "K\u0101piti Coast District Council (KCDC)",
+      "active_data_protocol": "ArcGIS REST FeatureServer + Static PDF Consent/LIM Register",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "MONITORED_NO_COUNCIL_MCP"
+    },
+    {
+      "target_id": "WT-NZ-GWRC-01",
+      "agency_name": "Greater Wellington Regional Council (GWRC)",
+      "active_data_protocol": "ArcGIS Hub DCAT-AP /data.json + OGC WFS",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_DCAT_AUTO_SYNC"
+    },
+    {
+      "target_id": "WT-NZ-MBIE-01",
+      "agency_name": "MBIE Business API Portal (Companies Office / NZBN)",
+      "active_data_protocol": "OpenAPI 3.0 REST (OAuth2 Free Tier)",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_ENTITY_GRAPH"
+    },
+    {
+      "target_id": "WT-AU-NSW-01",
+      "agency_name": "NSW Planning Portal & Spatial Services",
+      "active_data_protocol": "REST Council Trackers + OGC WFS",
+      "mcp_or_llms_txt_detected": 0,
+      "assimilation_status": "ASSIMILATED_TRANS_TASMAN"
+    }
+  ],
+  "building_subspine_1_to_n_verified": [
+    {
+      "building_id": "BLD-5041821-01",
+      "parcel_id": "LINZ-5041821",
+      "structure_role": "Primary Dwelling (Relocatable 1974 Bunglaow)",
+      "d59_bedrooms_count": 3,
+      "d59_bathrooms_count": 1.5,
+      "d59_council_rid_floor_area_sqm": 132.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 132.0,
+      "d59_unconsented_floor_delta_sqm": 0.0,
+      "d60_year_built": 1974,
+      "d60_wall_cladding_and_cavity": "Bevel-back heart rimu / radiata weatherboard (Consented)",
+      "d63_ccc_status": "Pre-1992 Safe & Sanitary + BC-2019-0412 CCC Issued",
+      "d64_house_relocation_salvage_net_nzd": 18000
+    },
+    {
+      "building_id": "BLD-5041821-02",
+      "parcel_id": "LINZ-5041821",
+      "structure_role": "Detached Rear Garage + Unconsented Studio Sleepout",
+      "d59_bedrooms_count": 1,
+      "d59_bathrooms_count": 1.0,
+      "d59_council_rid_floor_area_sqm": 54.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 78.0,
+      "d59_unconsented_floor_delta_sqm": 24.0,
+      "d60_year_built": 1988,
+      "d60_wall_cladding_and_cavity": "Harditex fibre-cement sheet (pre-1987 trace chrysotile risk on soffits)",
+      "d63_ccc_status": "WARNING: 24m\u00b2 Studio + Bathroom lacks CCC / Certificate of Acceptance (s96)",
+      "d64_house_relocation_salvage_net_nzd": -6500
+    },
+    {
+      "building_id": "BLD-5041819-01",
+      "parcel_id": "LINZ-5041819-UPHILL",
+      "structure_role": "Primary Dwelling (1998 Split-Level)",
+      "d59_bedrooms_count": 4,
+      "d59_bathrooms_count": 2.5,
+      "d59_council_rid_floor_area_sqm": 215.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 215.0,
+      "d59_unconsented_floor_delta_sqm": 0.0,
+      "d60_year_built": 1998,
+      "d60_wall_cladding_and_cavity": "HIGH RISK: Direct-fixed monolithic texture-coated polystyrene (EIFS, zero cavity, zero eaves) + untreated kiln-dried framing",
+      "d63_ccc_status": "CCC Issued 1999 (High Weathertightness Re-Clad Risk: -$220,000)",
+      "d64_house_relocation_salvage_net_nzd": -32000
+    },
+    {
+      "building_id": "BLD-5042110-01",
+      "parcel_id": "LINZ-5042110",
+      "structure_role": "Primary Dwelling (1982 Timber Pole House)",
+      "d59_bedrooms_count": 3,
+      "d59_bathrooms_count": 1.0,
+      "d59_council_rid_floor_area_sqm": 148.0,
+      "d06_lidar_3d_gross_floor_area_sqm": 176.0,
+      "d59_unconsented_floor_delta_sqm": 28.0,
+      "d60_year_built": 1982,
+      "d60_wall_cladding_and_cavity": "Rusticated cedar weatherboard + Super Six corrugated fibrolite roof (Asbestos)",
+      "d63_ccc_status": "28m\u00b2 enclosed sunroom deck lacks Building Consent; s221 geotech notice active",
+      "d64_house_relocation_salvage_net_nzd": -28000
+    }
+  ],
+  "zero_cost_statutory_dredger_sample": {
+    "dredge_latency_ms": 1.9884,
+    "llm_api_cost_nzd": 0.0,
+    "dp_plans_detected": [
+      "DP 24819"
+    ],
+    "consent_ids_detected": [
+      "RM260144"
+    ],
+    "title_refs_detected": [
+      "24819",
+      "WN42B/881"
+    ],
+    "imperial_to_metric_conversions": [
+      {
+        "verbatim": "4ft 2in",
+        "metric_m": 1.27
+      },
+      {
+        "verbatim": "18ft 6in",
+        "metric_m": 5.639
+      }
+    ],
+    "rule_breach_magnitude_m": 1.25,
+    "s95a_non_notified_waiver_granted": true,
+    "s92_rfi_or_withdrawn_flag": false,
+    "covenant_sunset_detected": "expires on 14 May 2021",
+    "s221_geotech_notice_flag": false
+  },
+  "agent_eval_benchmark_summary": {
+    "baseline_pass_rate": "0/6 (0%)",
+    "toponz_58d_pass_rate": "6/6 (100%)",
+    "cumulative_value_protected_or_unlocked_nzd": 871000
+  }
+}
