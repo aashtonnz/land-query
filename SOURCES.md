@@ -53,26 +53,37 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 statement (◐). None are known to be closed to commercial reuse. Before anything is sold, someone should ask KCDC and GWRC to confirm, in writing, that the
 portal-wide statements cover the uncatalogued service layers (the owner makes that contact, not an agent).
 
-## Compiled columns (per parcel, `tile.duckdb` table `units`)
+## Compiled columns (per parcel, table `units`)
 
-| Columns | Meaning |
-| --- | --- |
-| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | LINZ parcel id and fields as published |
-| `block_id` | The 5 km block (or test tile) the parcel was compiled in: `xmin_ymin_size` |
-| `area_m2`, `coverage_pct` | Polygon area; share of it inside the block's fetch window (overlays and terrain cover only that share; queries use parcels at 99% or more) |
-| `lidar_cells` | Number of 1 m LiDAR cells with ground values on the parcel; 0 means outside the LiDAR surveys and terrain columns are empty |
-| `title_types`, `title_count` | Distinct LINZ title types on the parcel (for example Freehold, Cross lease) and number of title references |
-| `easements_n`, `land_covenants_n` | Count of LINZ non-primary easement and covenant parcels overlapping it by more than 1 m² |
-| `zones`, `ovl_*`, `flood_*` (polygon layers), `wind_*`, `tsunami_zones`, `gw_*` | JSON of class name → % of parcel area covered (overlaps under 0.5 m² ignored) |
-| `ovl_heritage_places`, `ovl_notable_trees` | JSON list of heritage or tree points within 1 m of the parcel |
-| `ground_min_m`, `ground_mean_m`, `ground_max_m` | 2024–25 LiDAR ground height over the parcel, metres NZVD2016 |
-| `slope_p50_deg`, `slope_p90_deg` | Median and 90th-percentile ground slope over the parcel's 1 m cells |
-| `building_2021_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | Area under 2021 building outlines; the rest; the rest that slopes under 5° |
-| `canopy_gt3m_open_pct` | Share of open ground where surface is more than 3 m above ground (trees or structures) |
-| `dz_2021_2025_mean_m`, `dz_2021_2025_absmax_m` | Ground change 2021 → 2024–25, mean and largest single cell; not offset-corrected |
-| `ww_mh_*` | Nearest in-use council wastewater manhole that has an invert: distance, id, invert (NZVD2016) |
-| `ww_head_ground_min_minus_invert_m` | Parcel's lowest ground minus that invert: a rough fall available for gravity drainage, before pipe cover and grade |
-| `ww_pipe_*` | Nearest in-use council wastewater pipe: distance, id, material code, diameter, install year, condition grade (1 very good to 5 very poor; 0 treated as not graded) |
-| `sw_mh_*`, `ws_pipe_*` | Nearest in-use council stormwater point with an invert; nearest water supply pipe and its diameter |
-| `rbl_in_parcel_n`, `rbl_in_parcel_max_nzvd2016`, `rbl_in_parcel_max_minus_ground_mean_m` | Recommended building level points inside the parcel; highest; how far it sits above mean ground (a floor-height requirement) |
-| `rbl_max_nzvd2016`, `ground_min_minus_rbl_m` | Highest recommended building level within 10 m, and lowest ground minus it. Picks up upslope values, so don't read it as flood depth |
+**Kind:** **published** = a value as the source publishes it · **derived** = calculated exactly from published data
+(an overlap, a distance, a statistic of LiDAR cells) · **modelled** = an estimate from a model with stated simplifications.
+
+| Columns | Kind | Meaning |
+| --- | --- | --- |
+| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | published | LINZ parcel id and fields as published |
+| `block_id` | derived | The block the parcel was compiled in: `xmin_ymin_size` (NZTM2000, metres) |
+| `area_m2`, `coverage_pct` | derived | Polygon area; share of it inside the block's fetch window (overlays and terrain cover only that share; queries use parcels at 99% or more) |
+| `lidar_cells` | derived | 1 m LiDAR cells with ground values on the parcel; 0 means outside the LiDAR surveys and terrain columns are empty |
+| `title_types`, `title_count` | published | Distinct LINZ title types on the parcel (for example Freehold, Cross lease) and number of title references |
+| `easements_n`, `land_covenants_n` | derived | LINZ easement and covenant parcels overlapping it by more than 1 m² |
+| `zones`, `ovl_*`, `flood_*` (polygon layers), `wind_*`, `tsunami_zones`, `gw_*` | derived | JSON of class name → % of parcel area covered (overlaps under 0.5 m² ignored) |
+| `ovl_heritage_places`, `ovl_notable_trees` | derived | JSON list of heritage or tree points within 1 m of the parcel |
+| `ground_min_m`, `ground_mean_m`, `ground_max_m` | derived | 2024–25 LiDAR ground height over the parcel, metres NZVD2016 |
+| `slope_p50_deg`, `slope_p90_deg` | derived | Median and 90th-percentile ground slope over the parcel's 1 m cells |
+| `building_2021_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | derived | Area under 2021 building outlines; the rest; the rest that slopes under 5° |
+| `canopy_gt3m_open_pct` | derived | Share of open ground where the surface is more than 3 m above ground (trees or structures) |
+| `dz_2021_2025_mean_m`, `dz_2021_2025_absmax_m` | derived | Ground change 2021 → 2024–25, mean and largest single cell; not offset-corrected (subtract about 0.07 m) |
+| `ww_mh_*` | derived | Nearest in-use council wastewater manhole that has an invert: distance, id, invert (NZVD2016) |
+| `ww_head_ground_min_minus_invert_m` | derived | Parcel's lowest ground minus that invert: a rough fall available for gravity drainage, before pipe cover and grade |
+| `ww_pipe_*` | published / derived | Nearest in-use council wastewater pipe: distance (derived), id, material code, diameter, install year, condition grade (1 very good to 5 very poor; 0 treated as not graded) |
+| `sw_mh_*`, `ws_pipe_*` | published / derived | Nearest in-use council stormwater point with an invert; nearest water supply pipe and its diameter |
+| `rbl_in_parcel_n`, `rbl_in_parcel_max_nzvd2016`, `rbl_in_parcel_max_minus_ground_mean_m` | derived | Recommended building level points inside the parcel; highest; how far it sits above mean ground (a floor-height requirement) |
+| `rbl_max_nzvd2016`, `ground_min_minus_rbl_m` | derived | Highest recommended building level within 10 m, and lowest ground minus it. Picks up upslope values; don't read it as flood depth |
+| `winter_sun_hours_open_mean`, `winter_sun_open_ge3h_pct` | modelled | Hours of direct sun on open ground on 21 June (hourly samples, NZST), mean over the open ground and share getting 3 hours or more. Shadows from buildings, trees and terrain within 300 m in the 2024–25 DSM; farther ranges are not counted |
+| `roof_pitch_p50_deg`, `roof_flat_m2`, `roof_north_m2` | derived | From the 2024–25 DSM inside 2021 building outlines: median pitch, area under 5°, area facing north (315°–45°) at 5° or more |
+| `roof_solar_rel_pct` | modelled | Clear-sky direct sun on the roof surface (shaded as above) over three representative days (21 June, 20 March, 21 December), as % of an unshaded horizontal surface at the same place. No cloud or diffuse light; compare roofs with each other, not with kWh figures |
+| `upslope_area_max_m2`, `flow_path_m` | modelled | Overland flow on the depression-filled 2024–25 DEM (D8): largest upslope area draining through the parcel, and length of cells draining at least 2,000 m². Ignores stormwater pipes, so urban flows are overstated |
+| `level_open_cut_m3`, `level_open_fill_m3` | derived | Cut and fill to bring all open ground to its median level |
+| `platform_15m_earthworks_min_m3` | modelled | Smallest earthworks for a 15 m × 15 m level platform on open ground, estimated from the spread of ground levels |
+| `wind_obstruction_pct`, `wind_rel_height_m` | derived | Share of the surrounding ±100 m (square) with obstructions over 2.5 m in the DSM; ground at the parcel relative to the mean within ±500 m. Inputs to wind exposure, not an exposure rating: a modelled exposure class built from these two disagreed with KCDC's wind zones (T-37) and is withheld |
+| `horizon_mean_deg`, `horizon_north_deg`, `sky_view_pct` | derived | From the most open spot on the section at 1.6 m eye height: mean horizon angle in 16 directions, the highest towards north (N, NNE, NNW), and sky view (100 = open sky) |

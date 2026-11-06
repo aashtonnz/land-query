@@ -21,8 +21,10 @@ flood = ("(ovl_flood_hazard IS NOT NULL OR flood_stream_corridor IS NOT NULL OR 
          "OR flood_storage IS NOT NULL OR flood_ponding IS NOT NULL)")
 out = dict(
     overland_flow_path_vs_kcdc_flood_hazard=lift("flow_path_m > 0", flood),
-    wind_exposed_vs_kcdc_very_high_wind_zone=lift("wind_exposure_class = 'exposed'", "wind_very_high IS NOT NULL"),
-    wind_exposed_vs_kcdc_coastal_stainless_zone=lift("wind_exposure_class = 'exposed'", "wind_stainless IS NOT NULL"),
+    # the modelled wind class failed this check (lift 0.58 and 0.31 on the densest block) and was withdrawn; the
+    # input is still reported so a better model can be compared later
+    low_obstruction_vs_kcdc_very_high_wind_zone=lift("wind_obstruction_pct < 10", "wind_very_high IS NOT NULL"),
+    low_obstruction_vs_kcdc_coastal_stainless_zone=lift("wind_obstruction_pct < 10", "wind_stainless IS NOT NULL"),
     high_floor_level_vs_overland_flow=lift("rbl_in_parcel_max_minus_ground_mean_m > 1", "flow_path_m > 0"),
 )
 json.dump(out, open(sys.argv[2], "w"), indent=1)

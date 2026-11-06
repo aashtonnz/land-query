@@ -211,7 +211,7 @@ for uid, (g, p) in enumerate(units):
     keys = ["winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
             "roof_north_m2", "roof_solar_rel_pct", "upslope_area_max_m2", "flow_path_m", "level_open_cut_m3",
             "level_open_fill_m3", "platform_15m_earthworks_min_m3", "wind_obstruction_pct", "wind_rel_height_m",
-            "wind_exposure_class", "horizon_mean_deg", "horizon_north_deg", "sky_view_pct"]
+            "horizon_mean_deg", "horizon_north_deg", "sky_view_pct"]
     if not HAVE_LIDAR or r["lidar_cells"] == 0:
         r.update({k: None for k in keys})
     else:
@@ -240,15 +240,15 @@ for uid, (g, p) in enumerate(units):
             kk = np.unravel_index(int(np.argmax(dist)), dist.shape)
             pr_, pc = int(kk[0] + rs.start), int(kk[1] + cs.start)
         if og.any() and np.isfinite(Z[pr_, pc]):
+            # wind: the inputs only. A modelled exposure class disagreed with KCDC's wind zones (T-37) and is withheld.
             ob, rh = float(OBS[pr_, pc]) * 100, float(RELH[pr_, pc])
-            cls = "exposed" if (ob < 10 or rh > 15) else "sheltered" if (ob >= 40 and rh < 5) else "partly sheltered"
             hz = M.horizon(dsm, Z, pr_, pc)
-            r.update(wind_obstruction_pct=round(ob, 1), wind_rel_height_m=round(rh, 1), wind_exposure_class=cls,
+            r.update(wind_obstruction_pct=round(ob, 1), wind_rel_height_m=round(rh, 1),
                      horizon_mean_deg=round(float(np.mean(hz)), 1) if hz else None,
                      horizon_north_deg=round(max(hz[15], hz[0], hz[1]), 1) if hz else None,
                      sky_view_pct=round(100 * (1 - float(np.mean(np.sin(np.radians(hz))))), 1) if hz else None)
         else:
-            r.update(wind_obstruction_pct=None, wind_rel_height_m=None, wind_exposure_class=None,
+            r.update(wind_obstruction_pct=None, wind_rel_height_m=None,
                      horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
     rows.append(r)
 
