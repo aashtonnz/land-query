@@ -6,4 +6,4 @@
 - Sources, licences and column definitions: ./SOURCES.md
 - Example results with provenance: ./docs/findings/2026-11-06-inverse-queries.json
 
-Status: tested on one Paraparaumu tile. No query service is running yet. The prototype in ./archive/ uses fictional data and is not a source of facts.
+Status: the whole Kāpiti Coast district is compiled (27,614 parcels). No query service is running yet. The prototype in ./archive/ uses fictional data and is not a source of facts.

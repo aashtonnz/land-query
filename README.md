@@ -21,15 +21,16 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   hazards), compile one row of facts per parcel into DuckDB, and run inverse queries with provenance on every row.
 - **[`.github/workflows/tile.yml`](.github/workflows/tile.yml)**: runs the pipeline for any tile on GitHub Actions, using
   the `LINZ_API_KEY` repository secret. One tile takes about 2.5 minutes; results go to the `tile-results` branch.
-- **Tested on one tile** in central Paraparaumu: 582 parcels, 59 columns, five inverse queries
-  ([findings](docs/findings/2026-11-06-inverse-queries.md)).
+- **[`.github/workflows/kapiti.yml`](.github/workflows/kapiti.yml)**: compiles the whole Kāpiti Coast district (27,614
+  parcels, 61 columns, 46 blocks) in about 20 minutes, with quality checks on every block, and pushes the merged parcel
+  table and query results to the `kapiti-results` branch ([findings](docs/findings/2026-11-06-kapiti-district.md)).
 - **[`archive/prototype-2026-11/`](archive/prototype-2026-11/)**: the original 96-domain design prototype, kept for
   reference. Its data is fictional.
 
 ## What is planned
 
-Tracked on [`TASKS.md`](TASKS.md): compile the rest of Kāpiti Coast with more computed measures (T-21), a read-only MCP
-query service on the compiled data (T-36), source-change checks (T-25), then one more council (T-24).
+Tracked on [`TASKS.md`](TASKS.md): more computed measures (T-37), a fresh-eyes review (T-39), a read-only MCP query
+service on the compiled data (T-36), source-change checks (T-25), then one more council (T-24).
 
 ## Run one tile
 

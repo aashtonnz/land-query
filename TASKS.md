@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-06 20:15 (Pacific/Auckland)
+Last updated: 2026-11-06 20:55 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -15,11 +15,10 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-21: Full Kāpiti compile (in progress: 46 blocks of 5 km, `kapiti.yml`): run `tile.yml` over every tile that overlaps the district and merge the results into one database, with QA checks on every tile (manhole lids and building ground heights against LiDAR, LiDAR epoch offset, parcel areas against LINZ).
 - T-37: Cheap computed measures: add sun hours and winter shading, horizon and view angles, overland flow and catchment, roof planes and solar potential, cut/fill for a level platform, and an approximate wind exposure category; check each once against something independent; mark every column published, derived or modelled in `SOURCES.md`.
 - T-39: Fresh-eyes review: a new session, starting from the code, `SOURCES.md` and D-12 rather than earlier summaries, reviews the pipeline and the query results for errors before T-36 is offered to anyone outside. Fixes come with a check that fails before and passes after.
 - T-36: Query service: a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
-- T-29: Check LiDAR change candidates: five changed parcels not explained by recent subdivisions (T-33), checked against LINZ 7.5 cm aerials from both periods.
+- T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
@@ -37,6 +36,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-21: Full Kāpiti compile: 27,614 parcels (the whole district) × 61 columns in one 18.5-minute Actions run (46 blocks of 5 km, 160 billable minutes), with QA checks on every block. Manholes, buildings and both LiDAR flights agree to within about 0.1 m district-wide; one inland Waikanae block's manholes are off by about 0.5 m (for T-39). District queries: 288 infill candidates, 633 high floor levels, 555 old poor sewers, 554 ground changes (54% on recent subdivisions), 1,398 heritage, tree or ecology parcels. [Findings](docs/findings/2026-11-06-kapiti-district.md) 2026-11-06.
 - T-32: Reset applied: decision D-12 (product scope), keep/defer/drop schema, corrected assumptions, prototype archived, pipeline moved to `pipeline/`, README, `llms.txt`, `AGENTS.md` and `STYLE.md` rewritten, board revised. [Proposal](docs/proposals/2026-11-06-reset.md) 2026-11-06.
 - T-31: Licence and resolution register: [`SOURCES.md`](SOURCES.md) lists every source with licence, update date, fit-for-parcel flag and notes, plus a plain definition of every compiled column. Every source is CC BY 4.0: LINZ directly, KCDC through its open data portal (11 rows with a dataset licence, 12 on the portal statement), and GWRC through its regional statement. GWRC liquefaction is flagged as not fit for parcel use. Also fixed: the compiler now uses only in-use council pipes and manholes (results unchanged). KCDC condition grade 0 has no published definition. [`SOURCES.md`](SOURCES.md) 2026-11-06.
 - T-30: Replace invented benchmark fixtures: the three benchmark parcels are now fictional (10 Example St, 16 Sample St, 114 Specimen Rd), along with 15 other real street addresses, invented companies with plausible names and one real consultancy. Parcel ids carry a `DEMO-` prefix, and plan, consent and title numbers sit in never-issued ranges (for example DP 9924819), so the parser still reads them. 1,956 replacements across the compiler, both HTML copies, 16 schemas, README and `llms.txt`; self-test output unchanged apart from the renames. A fictional-data notice is shown on the page, in `llms.txt` and in the README; `AGENTS.md` now forbids invented facts about real places, companies or people. Left as is: real town and school names (for example Paraparaumu College) used as context. 2026-11-06.

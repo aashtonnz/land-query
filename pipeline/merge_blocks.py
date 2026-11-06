@@ -14,9 +14,10 @@ blocks, prov = [], {}
 for d in dirs:
     p = json.load(open(os.path.join(d, "provenance.json")))
     qa = json.load(open(os.path.join(d, "qa.json"))) if os.path.exists(os.path.join(d, "qa.json")) else {}
-    failed = [k for k, v in p["sources"].items() if not v.get("ok", True)]
+    failed = [k for k, v in p["sources"].items() if not v.get("ok", True) and not v.get("no_coverage")]
+    no_cov = [k for k, v in p["sources"].items() if v.get("no_coverage")]
     blocks.append(dict(block=p.get("block"), fetch_bbox=p.get("fetch_bbox"), parcels=p["sources"].get("parcels", {}).get("features"),
-                       failed_sources=failed, qa=qa))
+                       failed_sources=failed, no_coverage=no_cov, qa=qa))
     for k, v in p["sources"].items():
         e = prov.setdefault(k, dict(url=v.get("url") or v.get("collection"), licence=v.get("licence"), blocks=0, failed_blocks=0,
                                     features=0, fetched_first=None, fetched_last=None, sha256_by_block={}))
@@ -45,7 +46,8 @@ def pooled(key):
     return dict(n=n, blocks=len(xs), median_of_block_medians=sorted(x["median"] for x in xs)[len(xs) // 2] if xs else None,
                 worst_block_median=max((x["median"] for x in xs), key=abs) if xs else None)
 n, nl, part = db.execute("SELECT count(*), count(*) FILTER (WHERE lidar_cells = 0), count(*) FILTER (WHERE coverage_pct < 99) FROM units").fetchone()
-qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks if b["failed_sources"]), parcels=n,
+qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks if b["failed_sources"]),
+          blocks_outside_lidar=sum(1 for b in blocks if b["no_coverage"]), parcels=n,
           duplicates_removed=dups, parcels_without_lidar=nl, parcels_partly_outside_window=part,
           manhole_cover_minus_lidar_m=pooled("manhole_cover_minus_lidar_m"),
           building_ground_minus_lidar_m=pooled("building_ground_minus_lidar_m"),

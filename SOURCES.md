@@ -1,6 +1,6 @@
 # Sources: licence and resolution register
 
-Last checked: 2026-11-06. One row per source used by the live tile pipeline ([`pipeline`](pipeline/)).
+Last checked: 2026-11-06. One row per source used by the pipeline ([`pipeline`](pipeline/)).
 This is a working record, not legal advice. Keys match `provenance.json` and the `inverse_queries.json` provenance.
 
 **Licence status:** ✅ licence stated for the dataset · ◐ covered by a portal-wide statement, but no licence on the dataset itself ·
@@ -25,11 +25,11 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 
 | Key | Dataset (owner) | Licence | Updated | Fit for parcel | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `parcels` | NZ Primary Parcels via KCDC Cadastral mirror (LINZ) | ✅ LINZ CC BY 4.0 | matches LINZ 6 Nov 2026 | ✅ | Omits railway parcels (D-11). `DCDB` parcels are legacy digitised boundaries: less accurate than surveyed ones |
+| `parcels` | NZ Primary Parcels via KCDC Cadastral mirror (LINZ) | ✅ LINZ CC BY 4.0 | matches LINZ 6 Nov 2026 | ✅ | Omits railway parcels (D-11) and clips parcels at the district boundary (97 of 27,521 differ from LINZ area by more than 1 m²). `DCDB` parcels are legacy digitised boundaries: less accurate than surveyed ones |
 | `linz_parcels` | NZ Primary Parcels, layer 50823 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Used to check the mirror |
 | `titles` | NZ Property Titles, layer 50804 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Type and estate only; owner count, no names |
 | `nonprimary_parcels` | NZ Non-Primary Parcels, layer 50782 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Easements and land covenants (existence and shape, not terms) |
-| `dem_2025`, `dsm_2025` | Kāpiti Coast LiDAR 1 m DEM/DSM 2024–25 (LINZ, KCDC, Aerial Surveys) | ✅ CC BY 4.0 | 2024–25 flight | ✅ | 1 m cells |
+| `dem_2025`, `dsm_2025` | Kāpiti Coast LiDAR 1 m DEM/DSM 2024–25 (LINZ, KCDC, Aerial Surveys) | ✅ CC BY 4.0 | 2024–25 flight | ✅ | 1 m cells. Does not cover Kapiti Island or the foothills: 544 parcels (2%) have no terrain values |
 | `dem_2021` | Kāpiti Coast LiDAR 1 m DEM 2021 (LINZ, KCDC, AAM NZ) | ✅ CC BY 4.0 | 2021 flight | ✅ | +0.08 m offset against 2024–25 on flat ground |
 | `buildings_2021` | Kapiti Coast Building Outlines 2021 (KCDC, by AAM) | ◐ | catalogue 18 May 2023 | ⚠ | As at 2021; misses newer buildings |
 | `zones` | Operative District Plan 2021 – Zones (KCDC) | ◐ | 27 May 2024 | ✅ | Drawn on the cadastre |
@@ -58,7 +58,9 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | Columns | Meaning |
 | --- | --- |
 | `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | LINZ parcel id and fields as published |
-| `area_m2`, `in_tile_pct` | Polygon area; share of it inside the tile (queries use only parcels at 99% or more) |
+| `block_id` | The 5 km block (or test tile) the parcel was compiled in: `xmin_ymin_size` |
+| `area_m2`, `coverage_pct` | Polygon area; share of it inside the block's fetch window (overlays and terrain cover only that share; queries use parcels at 99% or more) |
+| `lidar_cells` | Number of 1 m LiDAR cells with ground values on the parcel; 0 means outside the LiDAR surveys and terrain columns are empty |
 | `title_types`, `title_count` | Distinct LINZ title types on the parcel (for example Freehold, Cross lease) and number of title references |
 | `easements_n`, `land_covenants_n` | Count of LINZ non-primary easement and covenant parcels overlapping it by more than 1 m² |
 | `zones`, `ovl_*`, `flood_*` (polygon layers), `wind_*`, `tsunami_zones`, `gw_*` | JSON of class name → % of parcel area covered (overlaps under 0.5 m² ignored) |

@@ -31,6 +31,7 @@ def items_for(coll):
 def read(coll, name):
     t0 = time.time()
     c, hrefs = items_for(coll)
+    if not hrefs: raise LookupError("no LiDAR survey in this collection covers the window")
     cache = os.path.join(OUT, "cache"); os.makedirs(cache, exist_ok=True)
     local = []
     for h in hrefs:
@@ -61,6 +62,8 @@ for coll, name in [("kapiti-coast_2024-2025/dem_1m/2193", "dem_2025"),
                    ("kapiti-coast_2024-2025/dsm_1m/2193", "dsm_2025"),
                    ("kapiti-coast_2021/dem_1m/2193", "dem_2021")]:
     try: prov["sources"][name] = dict(ok=True, **read(coll, name))
+    except LookupError as e:  # outside the survey (hills, Kapiti Island): not a failure
+        prov["sources"][name] = dict(ok=False, no_coverage=True, error=str(e)); print(name, "no coverage")
     except Exception as e:
         prov["sources"][name] = dict(ok=False, error=str(e)[:300]); print(name, "FAILED", e)
 json.dump(prov, open(prov_path, "w"), indent=1)

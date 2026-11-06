@@ -5,13 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-21: Full Kāpiti compile**
-  List the 1 km NZTM2000 tiles that overlap the Kāpiti Coast district boundary, run [`tile.yml`](.github/workflows/tile.yml)
-  for each (a matrix job or a loop of dispatches, within the free Actions minutes), and merge the per-tile results into
-  one database keyed by LINZ parcel id, keeping each parcel once (taking the tile it lies mostly within). QA checks on every tile,
-  written to the results: council manhole lid levels against LiDAR ground; KCDC building ground heights against LiDAR;
-  the 2021 to 2024–25 LiDAR offset on flat ground; parcel area against LINZ `calc_area`. Also count instruments per parcel
-  for R-5.
 - **T-37: Cheap computed measures**
   From the 1 m DEM and DSM already fetched: sun hours on the open ground of each parcel at the winter solstice and
   annually, and the share in shade; horizon angle and view openness; overland flow paths and upslope catchment
@@ -29,7 +22,7 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users
   only licence-cleared data, after T-35.
 - **T-29: Check LiDAR change candidates**
-  For the five Q4 parcels not on recent survey plans, compare LINZ 7.5 cm aerials from before and after and classify each
+  For a sample of the 256 Q4 parcels not on recent survey plans (district run), compare LINZ 7.5 cm aerials from before and after and classify each
   change as earthworks, construction, vegetation or artefact.
 - **T-25: Source-change checks**
   A weekly workflow that fetches each source layer's field list and record count (and the LINZ layer revision where available),
