@@ -32,6 +32,7 @@ jobs:
         env:
           LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
         run: |
+          python3 test_review.py
           python3 fetch_parcels_kcdc.py data
           /usr/bin/time -v python3 fetch_tile.py data 2> time_fetch.txt
           python3 fetch_lidar.py data

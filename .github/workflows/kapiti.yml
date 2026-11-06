@@ -57,6 +57,7 @@ jobs:
           LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
         run: |
           python3 test_measures.py
+          python3 test_review.py
           python3 fetch_parcels_kcdc.py data
           python3 fetch_tile.py data
           python3 fetch_lidar.py data

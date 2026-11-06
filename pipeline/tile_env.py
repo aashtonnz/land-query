@@ -5,7 +5,7 @@ Each parcel belongs to the block containing its representative point. fetch_parc
 (the block grown to cover those parcels, capped at MAX_BUFFER metres beyond the block) to data/fetch_bbox.json; the
 other fetchers and the compiler read it, so every parcel is computed whole unless it is larger than the cap.
 """
-import json, os
+import json, os, re
 
 X = int(os.environ.get("TILE_XMIN", 1769000))
 Y = int(os.environ.get("TILE_YMIN", 5468400))
@@ -19,3 +19,12 @@ def fetch_bbox(out="data"):
     """The fetch window for this block: from data/fetch_bbox.json if written, otherwise the block itself."""
     p = os.path.join(out, "fetch_bbox.json")
     return tuple(json.load(open(p))["bbox"]) if os.path.exists(p) else BLOCK
+
+
+PERSON_HINTS = re.compile(r"[\w.%+-]+@[\w-]+\.[\w.-]+|\bx\d{3,4}\b|\b(?:by|from|contact)\s+[A-Z][a-z]+", re.I)
+
+
+def scrub_copyright(text):
+    """Layer copyright text, unless it names or contacts a person (D-12: never data about people)."""
+    text = (text or "")[:200]
+    return "[withheld: names a person]" if PERSON_HINTS.search(text) else text

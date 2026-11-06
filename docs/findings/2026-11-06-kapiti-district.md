@@ -17,7 +17,7 @@ Results: the [`kapiti-results`](https://github.com/aashtonnz/land-query/tree/kap
 
 | Check | Result |
 | --- | --- |
-| Council manhole cover levels minus LiDAR ground | 17,432 manholes; median of block medians −0.10 m. One block (inland Waikanae, 1775000 E 5480000 N) has a median of −0.49 m with half its 74 manholes more than 0.5 m off: unexplained, flagged for T-39 |
+| Council manhole cover levels minus LiDAR ground | 17,432 manholes; median of block medians −0.10 m. One block (Te Horo, 1775000 E 5480000 N; first described here as inland Waikanae) has a median of −0.49 m with half its 74 manholes more than 0.5 m off: the block is unsewered and the check mixes in stormwater points ([T-39](2026-11-06-fresh-eyes-review.md)) |
 | Council 2021 building ground heights minus LiDAR | 68,033 buildings; median of block medians −0.08 m; worst block −0.26 m |
 | LiDAR 2024–25 minus 2021 on flat open ground | 4.2 million cells; median of block medians +0.073 m (single tile: +0.08 m); worst block +0.16 m |
 | Parcel area against LINZ `calc_area` | 97 of 27,521 differ by more than 1 m². These are rural sections: the KCDC mirror clips parcels at the district boundary (Section 5 SO 495075 is 615 km² in LINZ, 68 km² in the mirror), and some legacy sections are split into fragments |
@@ -49,7 +49,7 @@ against 5.8% of all parcels. Most ground change is new subdivision earthworks. T
 
 ## For the fresh-eyes review (T-39)
 
-- The inland Waikanae manhole block above.
+- The Te Horo manhole block above (first described as inland Waikanae).
 - Q5 counts every heritage or tree point within 1 m; check it isn't picking up road-reserve features on boundaries.
 - `zones` and overlay percentages for parcels clipped at the district boundary are shares of the clipped area.
 

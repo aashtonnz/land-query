@@ -97,7 +97,7 @@ def main():
             meta = requests.get(url, params={"f": "json"}, timeout=60).json()
             prov["sources"][name] = dict(url=url, ok=True, features=len(fc["features"]), bytes=len(b), sha256=sha(b),
                                          seconds=round(time.time() - t0, 2), licence=lic,
-                                         layer_name=meta.get("name"), copyright=meta.get("copyrightText", "")[:200])
+                                         layer_name=meta.get("name"), copyright=te.scrub_copyright(meta.get("copyrightText")))
             print(f"{name:26s} {len(fc['features']):6d} features  {time.time()-t0:5.1f}s")
         except Exception as e:
             prov["sources"][name] = dict(url=url, ok=False, error=str(e)[:300], licence=lic)
