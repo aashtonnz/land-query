@@ -1,0 +1,1037 @@
+{
+ "tile": [
+  1769000,
+  5468400,
+  1770000,
+  5469400
+ ],
+ "universe": 472,
+ "queries": [
+  {
+   "id": "Q1",
+   "name": "Gravity-serviceable infill candidates",
+   "question": "High or General Residential parcels of at least 800 m\u00b2, under 25% covered by 2021 buildings, 90th-percentile slope under 10\u00b0, no KCDC flood hazard overlay, and a wastewater manhole with a recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground.",
+   "sql": "SELECT unit_id, appellation, area_m2, building_2021_m2, slope_p90_deg, zones, ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND (json_extract(zones,'$.\"High Density Residential Zone\"')::DOUBLE >= 90 OR json_extract(zones,'$.\"General Residential Zone\"')::DOUBLE >= 90) AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10 AND ovl_flood_hazard IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1 ORDER BY area_m2 DESC",
+   "count": 16,
+   "provenance": {
+    "parcels": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+     "sha256": "f1b74116f015113447d90ee15304ba0b403f174644d0bd84bc9a6535aefe47ba",
+     "fetched": "2026-11-06T17:35:28+1300",
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
+     "features": 582
+    },
+    "zones": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0",
+     "sha256": "87252ffdec48d8a0f39c8986633776bde2df7112d419543663ee2f8952b99009",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 15
+    },
+    "buildings_2021": {
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
+     "sha256": "f0c053d6fbf2fa4ce39befdfc1f74aed90aa4d472d569d92b19190c68fa3098f",
+     "fetched": null,
+     "licence": "KCDC Building Outlines 2021 (licence to confirm)",
+     "features": 887
+    },
+    "dem_2025": {
+     "url": null,
+     "sha256": "7ac10b5b9698f8004450cc8c9481a75eb31217e0b48baa170c9ba1b737031a77",
+     "fetched": null,
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "features": null
+    },
+    "ovl_flood_hazard": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11",
+     "sha256": "a6481a627de68ded048b17aaf8de300a6225a508f46c66186b2afbb4e81d1189",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 4
+    },
+    "ww_node": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9",
+     "sha256": "f9823b3d885adf1c9e5198f5a505ff876dc224d594e9ec76d46fb6a026086591",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 258
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 8039401,
+     "appellation": "Lot 3 DP 517321",
+     "area_m2": 2121.8,
+     "building_2021_m2": 464,
+     "slope_p90_deg": 6.8,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN008139",
+     "ww_mh_dist_m": 0.0,
+     "ww_head_ground_min_minus_invert_m": 1.15
+    },
+    {
+     "unit_id": 3791228,
+     "appellation": "Lot 1 DP 14628",
+     "area_m2": 1511.4,
+     "building_2021_m2": 213,
+     "slope_p90_deg": 4.9,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004240",
+     "ww_mh_dist_m": 9.6,
+     "ww_head_ground_min_minus_invert_m": 1.71
+    },
+    {
+     "unit_id": 3752856,
+     "appellation": "Lot 2 DP 21486",
+     "area_m2": 1165.2,
+     "building_2021_m2": 254,
+     "slope_p90_deg": 6.9,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004057",
+     "ww_mh_dist_m": 3.2,
+     "ww_head_ground_min_minus_invert_m": 1.16
+    },
+    {
+     "unit_id": 3894723,
+     "appellation": "Lot 8 Block III DP 462",
+     "area_m2": 1012.9,
+     "building_2021_m2": 248,
+     "slope_p90_deg": 8.2,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004199",
+     "ww_mh_dist_m": 4.9,
+     "ww_head_ground_min_minus_invert_m": 2.22
+    },
+    {
+     "unit_id": 3820167,
+     "appellation": "Lot 6 Block III DP 462",
+     "area_m2": 1011.6,
+     "building_2021_m2": 164,
+     "slope_p90_deg": 5.9,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004199",
+     "ww_mh_dist_m": 20.6,
+     "ww_head_ground_min_minus_invert_m": 3.45
+    },
+    {
+     "unit_id": 3936277,
+     "appellation": "Lot 1 DP 4680",
+     "area_m2": 1011.1,
+     "building_2021_m2": 158,
+     "slope_p90_deg": 5.6,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004232",
+     "ww_mh_dist_m": 18.4,
+     "ww_head_ground_min_minus_invert_m": 2.04
+    },
+    {
+     "unit_id": 8051359,
+     "appellation": "Lot 2 DP 537796",
+     "area_m2": 901.5,
+     "building_2021_m2": 194,
+     "slope_p90_deg": 4.7,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN002913",
+     "ww_mh_dist_m": 4.5,
+     "ww_head_ground_min_minus_invert_m": 1.86
+    },
+    {
+     "unit_id": 3904551,
+     "appellation": "Lot 41 DP 15862",
+     "area_m2": 825.6,
+     "building_2021_m2": 181,
+     "slope_p90_deg": 7.6,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN002951",
+     "ww_mh_dist_m": 8.9,
+     "ww_head_ground_min_minus_invert_m": 1.2
+    },
+    {
+     "unit_id": 3771842,
+     "appellation": "Lot 3 DP 27104",
+     "area_m2": 823.1,
+     "building_2021_m2": 173,
+     "slope_p90_deg": 3.2,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004235",
+     "ww_mh_dist_m": 24.4,
+     "ww_head_ground_min_minus_invert_m": 1.26
+    },
+    {
+     "unit_id": 3941431,
+     "appellation": "Lot 1 DP 27104",
+     "area_m2": 821.3,
+     "building_2021_m2": 135,
+     "slope_p90_deg": 5.6,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004234",
+     "ww_mh_dist_m": 1.2,
+     "ww_head_ground_min_minus_invert_m": 1.2
+    },
+    {
+     "unit_id": 8575950,
+     "appellation": "Lot 5 DP 573424",
+     "area_m2": 819.4,
+     "building_2021_m2": 25,
+     "slope_p90_deg": 4.6,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN011553",
+     "ww_mh_dist_m": 2.7,
+     "ww_head_ground_min_minus_invert_m": 1.1
+    },
+    {
+     "unit_id": 3809141,
+     "appellation": "Lot 1 DP 14471",
+     "area_m2": 809.6,
+     "building_2021_m2": 199,
+     "slope_p90_deg": 6.2,
+     "zones": "{\"High Density Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN002900",
+     "ww_mh_dist_m": 20.3,
+     "ww_head_ground_min_minus_invert_m": 3.92
+    },
+    {
+     "unit_id": 8708426,
+     "appellation": "Lot 4 DP 611762",
+     "area_m2": 807.6,
+     "building_2021_m2": 0,
+     "slope_p90_deg": 6.0,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN011553",
+     "ww_mh_dist_m": 11.3,
+     "ww_head_ground_min_minus_invert_m": 1.86
+    },
+    {
+     "unit_id": 8708424,
+     "appellation": "Lot 2 DP 611762",
+     "area_m2": 803.7,
+     "building_2021_m2": 0,
+     "slope_p90_deg": 8.2,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN011554",
+     "ww_mh_dist_m": 15.9,
+     "ww_head_ground_min_minus_invert_m": 3.12
+    },
+    {
+     "unit_id": 8708425,
+     "appellation": "Lot 3 DP 611762",
+     "area_m2": 801.3,
+     "building_2021_m2": 0,
+     "slope_p90_deg": 8.2,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN011553",
+     "ww_mh_dist_m": 14.6,
+     "ww_head_ground_min_minus_invert_m": 2.25
+    },
+    {
+     "unit_id": 8144920,
+     "appellation": "Lot 3 DP 553379",
+     "area_m2": 800.2,
+     "building_2021_m2": 0,
+     "slope_p90_deg": 4.9,
+     "zones": "{\"General Residential Zone\": 100.0}",
+     "ww_mh_id": "KWWN004240",
+     "ww_mh_dist_m": 0.0,
+     "ww_head_ground_min_minus_invert_m": 1.14
+    }
+   ]
+  },
+  {
+   "id": "Q2",
+   "name": "Recommended floor level well above ground",
+   "question": "Built-on parcels where the highest KCDC recommended building level (a minimum floor level, NZVD2016, including freeboard) inside the parcel is more than 1 m above the parcel's mean LiDAR ground. A floor-height requirement for rebuilding, not a flood depth.",
+   "sql": "SELECT unit_id, appellation, building_2021_m2, ground_mean_m, rbl_in_parcel_n, rbl_in_parcel_max_nzvd2016, rbl_in_parcel_max_minus_ground_mean_m, ovl_flood_hazard FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND building_2021_m2 > 0 AND rbl_in_parcel_max_minus_ground_mean_m > 1 ORDER BY rbl_in_parcel_max_minus_ground_mean_m DESC",
+   "count": 8,
+   "provenance": {
+    "parcels": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+     "sha256": "f1b74116f015113447d90ee15304ba0b403f174644d0bd84bc9a6535aefe47ba",
+     "fetched": "2026-11-06T17:35:28+1300",
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
+     "features": 582
+    },
+    "buildings_2021": {
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
+     "sha256": "f0c053d6fbf2fa4ce39befdfc1f74aed90aa4d472d569d92b19190c68fa3098f",
+     "fetched": null,
+     "licence": "KCDC Building Outlines 2021 (licence to confirm)",
+     "features": 887
+    },
+    "dem_2025": {
+     "url": null,
+     "sha256": "7ac10b5b9698f8004450cc8c9481a75eb31217e0b48baa170c9ba1b737031a77",
+     "fetched": null,
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "features": null
+    },
+    "flood_rbl_nzvd2016": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/10",
+     "sha256": "1291f806de82ed72783570e244fb1fd0ca86a915aba11e35b0b1f66a6634046e",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 12284
+    },
+    "ovl_flood_hazard": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11",
+     "sha256": "a6481a627de68ded048b17aaf8de300a6225a508f46c66186b2afbb4e81d1189",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 4
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 8642626,
+     "appellation": "Lot 16 DP 595703",
+     "building_2021_m2": 158,
+     "ground_mean_m": 14.06,
+     "rbl_in_parcel_n": 53,
+     "rbl_in_parcel_max_nzvd2016": 15.6,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.54,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 3889528,
+     "appellation": "Lot 1 DP 13159",
+     "building_2021_m2": 174,
+     "ground_mean_m": 8.43,
+     "rbl_in_parcel_n": 83,
+     "rbl_in_parcel_max_nzvd2016": 9.7,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.27,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 3980984,
+     "appellation": "Lot 6 Block VI DP 462",
+     "building_2021_m2": 154,
+     "ground_mean_m": 10.58,
+     "rbl_in_parcel_n": 63,
+     "rbl_in_parcel_max_nzvd2016": 11.8,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.22,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 3802382,
+     "appellation": "Lot 4 DP 16171",
+     "building_2021_m2": 19,
+     "ground_mean_m": 8.52,
+     "rbl_in_parcel_n": 62,
+     "rbl_in_parcel_max_nzvd2016": 9.7,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.18,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 3986710,
+     "appellation": "Lot 20 DP 86487",
+     "building_2021_m2": 219,
+     "ground_mean_m": 12.89,
+     "rbl_in_parcel_n": 56,
+     "rbl_in_parcel_max_nzvd2016": 14.0,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.11,
+     "ovl_flood_hazard": "{\"Ponding\": 82.0}"
+    },
+    {
+     "unit_id": 4024955,
+     "appellation": "Lot 5 DP 16171",
+     "building_2021_m2": 586,
+     "ground_mean_m": 8.63,
+     "rbl_in_parcel_n": 64,
+     "rbl_in_parcel_max_nzvd2016": 9.7,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.07,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 7613173,
+     "appellation": "Lot 1 DP 486670",
+     "building_2021_m2": 119,
+     "ground_mean_m": 8.64,
+     "rbl_in_parcel_n": 30,
+     "rbl_in_parcel_max_nzvd2016": 9.7,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.06,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    },
+    {
+     "unit_id": 3882932,
+     "appellation": "Lot 6 DP 16171",
+     "building_2021_m2": 576,
+     "ground_mean_m": 8.67,
+     "rbl_in_parcel_n": 63,
+     "rbl_in_parcel_max_nzvd2016": 9.7,
+     "rbl_in_parcel_max_minus_ground_mean_m": 1.03,
+     "ovl_flood_hazard": "{\"Ponding\": 100.0}"
+    }
+   ]
+  },
+  {
+   "id": "Q3",
+   "name": "Nearest sewer is old and in poor condition",
+   "question": "Parcels whose nearest wastewater pipe (within 20 m) was installed before 1980 and has KCDC condition grade 4 or 5 (grade 0 treated as not assessed).",
+   "sql": "SELECT unit_id, appellation, ww_pipe_id, ww_pipe_dist_m, ww_pipe_material, ww_pipe_year, ww_pipe_condition_grade FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND ww_pipe_dist_m <= 20 AND ww_pipe_year < 1980 AND ww_pipe_condition_grade >= 4 ORDER BY ww_pipe_condition_grade DESC, ww_pipe_year",
+   "count": 18,
+   "provenance": {
+    "parcels": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+     "sha256": "f1b74116f015113447d90ee15304ba0b403f174644d0bd84bc9a6535aefe47ba",
+     "fetched": "2026-11-06T17:35:28+1300",
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
+     "features": 582
+    },
+    "ww_pipe": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/10",
+     "sha256": "7b3b50e032f10d7c3ad92a6d1cbb4e5ff8757d1399faee2e0f449b8818478852",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 227
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 4062253,
+     "appellation": "Lot 2 DP 79022",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 3.4,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 3870802,
+     "appellation": "Lot 3 DP 69933",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 8076460,
+     "appellation": "Lot 2 DP 544109",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 4062257,
+     "appellation": "Lot 1 DP 79022",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 4040716,
+     "appellation": "Lot 4 DP 79022",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 2.4,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 3849572,
+     "appellation": "Lot 5 DP 79022",
+     "ww_pipe_id": "KWWP002225",
+     "ww_pipe_dist_m": 3.6,
+     "ww_pipe_material": "EW",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 5.0
+    },
+    {
+     "unit_id": 3898031,
+     "appellation": "Lot 24 DP 47280",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3814011,
+     "appellation": "Lot 26 DP 47280",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3802393,
+     "appellation": "Lot 25 DP 47280",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3833643,
+     "appellation": "Lot 27 DP 47280",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3749717,
+     "appellation": "Lot 28 DP 47280",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 0.0,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 4064855,
+     "appellation": "Lot 2 DP 88729",
+     "ww_pipe_id": "KWWP003972",
+     "ww_pipe_dist_m": 18.2,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3899843,
+     "appellation": "Lot 5 DP 15271",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 6.3,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 4049569,
+     "appellation": "Lot 4 DP 15271",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 6.4,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 6568943,
+     "appellation": "Lot 2 DP 310585",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 6.5,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 6568942,
+     "appellation": "Lot 1 DP 310585",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 6.5,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 3781124,
+     "appellation": "Lot 3 DP 15271",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 6.4,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    },
+    {
+     "unit_id": 8076459,
+     "appellation": "Lot 1 DP 544109",
+     "ww_pipe_id": "KWWP003979",
+     "ww_pipe_dist_m": 13.6,
+     "ww_pipe_material": "AC",
+     "ww_pipe_year": 1976.0,
+     "ww_pipe_condition_grade": 4.0
+    }
+   ]
+  },
+  {
+   "id": "Q4",
+   "name": "Ground change since 2021 not explained by buildings",
+   "question": "Parcels where some 1 m cell changed by more than 1 m between the 2021 and 2024\u201325 LiDAR and the parcel mean changed by more than 0.3 m after removing the 0.08 m epoch offset. Unverified: may be earthworks, new buildings, or vegetation classed as ground (see T-29).",
+   "sql": "SELECT unit_id, appellation, area_m2, building_2021_m2, dz_2021_2025_mean_m, round(dz_2021_2025_mean_m - 0.08, 3) AS dz_mean_corrected_m, dz_2021_2025_absmax_m FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND dz_2021_2025_absmax_m > 1 AND abs(dz_2021_2025_mean_m - 0.08) > 0.3 ORDER BY abs(dz_2021_2025_mean_m - 0.08) DESC",
+   "count": 30,
+   "provenance": {
+    "parcels": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+     "sha256": "f1b74116f015113447d90ee15304ba0b403f174644d0bd84bc9a6535aefe47ba",
+     "fetched": "2026-11-06T17:35:28+1300",
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
+     "features": 582
+    },
+    "dem_2025": {
+     "url": null,
+     "sha256": "7ac10b5b9698f8004450cc8c9481a75eb31217e0b48baa170c9ba1b737031a77",
+     "fetched": null,
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "features": null
+    },
+    "dem_2021": {
+     "url": null,
+     "sha256": "07668922bc85352eb93ec09e8d70fa5fd31ed91dbfa6c4c5582adfb8f049652d",
+     "fetched": null,
+     "licence": "CC-BY-4.0 [\"AAM NZ\", \"K\\u0101piti Coast District Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+     "features": null
+    },
+    "buildings_2021": {
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
+     "sha256": "f0c053d6fbf2fa4ce39befdfc1f74aed90aa4d472d569d92b19190c68fa3098f",
+     "fetched": null,
+     "licence": "KCDC Building Outlines 2021 (licence to confirm)",
+     "features": 887
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 8642611,
+     "appellation": "Lot 1 DP 595703",
+     "area_m2": 801.8,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 1.465,
+     "dz_mean_corrected_m": 1.385,
+     "dz_2021_2025_absmax_m": 2.28
+    },
+    {
+     "unit_id": 8642622,
+     "appellation": "Lot 12 DP 595703",
+     "area_m2": 799.9,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -1.042,
+     "dz_mean_corrected_m": -1.122,
+     "dz_2021_2025_absmax_m": 1.62
+    },
+    {
+     "unit_id": 8660774,
+     "appellation": "Lot 62 DP 575773",
+     "area_m2": 70.7,
+     "building_2021_m2": 5,
+     "dz_2021_2025_mean_m": -0.881,
+     "dz_mean_corrected_m": -0.961,
+     "dz_2021_2025_absmax_m": 1.06
+    },
+    {
+     "unit_id": 8660776,
+     "appellation": "Lot 64 DP 575773",
+     "area_m2": 67.2,
+     "building_2021_m2": 31,
+     "dz_2021_2025_mean_m": -0.873,
+     "dz_mean_corrected_m": -0.953,
+     "dz_2021_2025_absmax_m": 1.06
+    },
+    {
+     "unit_id": 8868765,
+     "appellation": "Lot 2 DP 622981",
+     "area_m2": 509.9,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 1.022,
+     "dz_mean_corrected_m": 0.942,
+     "dz_2021_2025_absmax_m": 1.96
+    },
+    {
+     "unit_id": 8660775,
+     "appellation": "Lot 63 DP 575773",
+     "area_m2": 67.2,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.854,
+     "dz_mean_corrected_m": -0.934,
+     "dz_2021_2025_absmax_m": 1.03
+    },
+    {
+     "unit_id": 8759083,
+     "appellation": "Lot 10 DP 613169",
+     "area_m2": 463.7,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.832,
+     "dz_mean_corrected_m": -0.912,
+     "dz_2021_2025_absmax_m": 1.3
+    },
+    {
+     "unit_id": 8868771,
+     "appellation": "Lot 8 DP 622981",
+     "area_m2": 446.5,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.991,
+     "dz_mean_corrected_m": 0.911,
+     "dz_2021_2025_absmax_m": 1.19
+    },
+    {
+     "unit_id": 8660790,
+     "appellation": "Lot 79 DP 575773",
+     "area_m2": 87.7,
+     "building_2021_m2": 40,
+     "dz_2021_2025_mean_m": -0.831,
+     "dz_mean_corrected_m": -0.911,
+     "dz_2021_2025_absmax_m": 1.1
+    },
+    {
+     "unit_id": 8660773,
+     "appellation": "Lot 61 DP 575773",
+     "area_m2": 68.7,
+     "building_2021_m2": 22,
+     "dz_2021_2025_mean_m": -0.831,
+     "dz_mean_corrected_m": -0.911,
+     "dz_2021_2025_absmax_m": 1.24
+    },
+    {
+     "unit_id": 8868768,
+     "appellation": "Lot 5 DP 622981",
+     "area_m2": 498.3,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.975,
+     "dz_mean_corrected_m": 0.895,
+     "dz_2021_2025_absmax_m": 1.6
+    },
+    {
+     "unit_id": 8660788,
+     "appellation": "Lot 77 DP 575773",
+     "area_m2": 84.6,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.775,
+     "dz_mean_corrected_m": -0.855,
+     "dz_2021_2025_absmax_m": 1.28
+    },
+    {
+     "unit_id": 8660772,
+     "appellation": "Lot 60 DP 575773",
+     "area_m2": 67.1,
+     "building_2021_m2": 13,
+     "dz_2021_2025_mean_m": -0.643,
+     "dz_mean_corrected_m": -0.723,
+     "dz_2021_2025_absmax_m": 1.27
+    },
+    {
+     "unit_id": 8759078,
+     "appellation": "Lot 5 DP 613169",
+     "area_m2": 392.2,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.632,
+     "dz_mean_corrected_m": -0.712,
+     "dz_2021_2025_absmax_m": 2.72
+    },
+    {
+     "unit_id": 7752535,
+     "appellation": "Lot 2 DP 502250",
+     "area_m2": 1076.6,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.514,
+     "dz_mean_corrected_m": -0.594,
+     "dz_2021_2025_absmax_m": 4.5
+    },
+    {
+     "unit_id": 8868767,
+     "appellation": "Lot 4 DP 622981",
+     "area_m2": 468.6,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.671,
+     "dz_mean_corrected_m": 0.591,
+     "dz_2021_2025_absmax_m": 1.4
+    },
+    {
+     "unit_id": 8660755,
+     "appellation": "Lot 43 DP 575773",
+     "area_m2": 71.4,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.474,
+     "dz_mean_corrected_m": -0.554,
+     "dz_2021_2025_absmax_m": 1.02
+    },
+    {
+     "unit_id": 8759084,
+     "appellation": "Lot 11 DP 613169",
+     "area_m2": 414.1,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.435,
+     "dz_mean_corrected_m": -0.515,
+     "dz_2021_2025_absmax_m": 1.02
+    },
+    {
+     "unit_id": 7752536,
+     "appellation": "Lot 3 DP 502250",
+     "area_m2": 1093.9,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.428,
+     "dz_mean_corrected_m": -0.508,
+     "dz_2021_2025_absmax_m": 3.5
+    },
+    {
+     "unit_id": 8868770,
+     "appellation": "Lot 7 DP 622981",
+     "area_m2": 374.9,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.534,
+     "dz_mean_corrected_m": 0.454,
+     "dz_2021_2025_absmax_m": 1.16
+    },
+    {
+     "unit_id": 8660762,
+     "appellation": "HL Lot 50 DP 575773",
+     "area_m2": 72.9,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.373,
+     "dz_mean_corrected_m": -0.453,
+     "dz_2021_2025_absmax_m": 1.08
+    },
+    {
+     "unit_id": 8738143,
+     "appellation": "Lot 1 DP 609615",
+     "area_m2": 414.1,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.363,
+     "dz_mean_corrected_m": -0.443,
+     "dz_2021_2025_absmax_m": 2.1
+    },
+    {
+     "unit_id": 8722819,
+     "appellation": "Lot 2 DP 609551",
+     "area_m2": 38108.4,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.522,
+     "dz_mean_corrected_m": 0.442,
+     "dz_2021_2025_absmax_m": 3.28
+    },
+    {
+     "unit_id": 8759075,
+     "appellation": "Lot 2 DP 613169",
+     "area_m2": 401.8,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.507,
+     "dz_mean_corrected_m": 0.427,
+     "dz_2021_2025_absmax_m": 1.13
+    },
+    {
+     "unit_id": 3844930,
+     "appellation": "Lot 1 DP 7406",
+     "area_m2": 2185.2,
+     "building_2021_m2": 169,
+     "dz_2021_2025_mean_m": 0.5,
+     "dz_mean_corrected_m": 0.42,
+     "dz_2021_2025_absmax_m": 2.67
+    },
+    {
+     "unit_id": 8759079,
+     "appellation": "Lot 6 DP 613169",
+     "area_m2": 472.7,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": -0.335,
+     "dz_mean_corrected_m": -0.415,
+     "dz_2021_2025_absmax_m": 1.7
+    },
+    {
+     "unit_id": 3818729,
+     "appellation": "Lot 1 DP 21960",
+     "area_m2": 8091.7,
+     "building_2021_m2": 372,
+     "dz_2021_2025_mean_m": 0.485,
+     "dz_mean_corrected_m": 0.405,
+     "dz_2021_2025_absmax_m": 2.6
+    },
+    {
+     "unit_id": 8868764,
+     "appellation": "Lot 1 DP 622981",
+     "area_m2": 326.6,
+     "building_2021_m2": 0,
+     "dz_2021_2025_mean_m": 0.482,
+     "dz_mean_corrected_m": 0.402,
+     "dz_2021_2025_absmax_m": 1.6
+    },
+    {
+     "unit_id": 8660756,
+     "appellation": "Lot 44 DP 575773",
+     "area_m2": 104.7,
+     "building_2021_m2": 10,
+     "dz_2021_2025_mean_m": -0.279,
+     "dz_mean_corrected_m": -0.359,
+     "dz_2021_2025_absmax_m": 1.01
+    },
+    {
+     "unit_id": 3899843,
+     "appellation": "Lot 5 DP 15271",
+     "area_m2": 929.9,
+     "building_2021_m2": 127,
+     "dz_2021_2025_mean_m": 0.388,
+     "dz_mean_corrected_m": 0.308,
+     "dz_2021_2025_absmax_m": 2.74
+    }
+   ]
+  },
+  {
+   "id": "Q5",
+   "name": "Heritage, notable tree or ecological site on the parcel",
+   "question": "Parcels containing a KCDC heritage place or notable tree point, or overlapping an ecological site.",
+   "sql": "SELECT unit_id, appellation, area_m2, ovl_heritage_places, ovl_notable_trees, ovl_ecological_sites FROM units WHERE in_tile_pct >= 99 AND area_m2 >= 20 AND (ovl_heritage_places <> '[]' OR ovl_notable_trees <> '[]' OR ovl_ecological_sites IS NOT NULL)",
+   "count": 17,
+   "provenance": {
+    "parcels": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+     "sha256": "f1b74116f015113447d90ee15304ba0b403f174644d0bd84bc9a6535aefe47ba",
+     "fetched": "2026-11-06T17:35:28+1300",
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)",
+     "features": 582
+    },
+    "ovl_heritage_places": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/14",
+     "sha256": "8ec35822ac434bcf8ba985e6b018f3fed1864e0a2d1dd6d23b58362039469194",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 3
+    },
+    "ovl_notable_trees": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16",
+     "sha256": "684a13e3e744f4b10ea59be1f10dac968f22e61635f0a30bb7ae64f36c37c3e4",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 3
+    },
+    "ovl_ecological_sites": {
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/19",
+     "sha256": "8f57a0405955423a1406641cb487ac1cc240f1236b264735fe2bdec5ea5073d6",
+     "fetched": null,
+     "licence": "KCDC open data (licence to confirm per layer; catalogue.data.govt.nz lists KCDC layers)",
+     "features": 2
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 4012558,
+     "appellation": "Lot 1 DP 12635",
+     "area_m2": 1361.3,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[\"Kauri Agathis australis\"]",
+     "ovl_ecological_sites": null
+    },
+    {
+     "unit_id": 3833023,
+     "appellation": "Lot 2 DP 12690",
+     "area_m2": 3573.0,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[\"Rimu Dacrydium cupressinum\", \"Evergreen Laurel Magnolia\"]",
+     "ovl_ecological_sites": null
+    },
+    {
+     "unit_id": 3804570,
+     "appellation": "Lot 31 DP 47280",
+     "area_m2": 1066.7,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 49.4}"
+    },
+    {
+     "unit_id": 3754140,
+     "appellation": "Lot 32 DP 47280",
+     "area_m2": 920.0,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 1.4}"
+    },
+    {
+     "unit_id": 7996367,
+     "appellation": "Lot 2 DP 534801",
+     "area_m2": 600.1,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 16.1}"
+    },
+    {
+     "unit_id": 3899843,
+     "appellation": "Lot 5 DP 15271",
+     "area_m2": 929.9,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 20.1}"
+    },
+    {
+     "unit_id": 4049569,
+     "appellation": "Lot 4 DP 15271",
+     "area_m2": 929.7,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 0.1}"
+    },
+    {
+     "unit_id": 6568943,
+     "appellation": "Lot 2 DP 310585",
+     "area_m2": 7134.8,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 30.4}"
+    },
+    {
+     "unit_id": 3892907,
+     "appellation": "Lot 2 DP 18562",
+     "area_m2": 3161.2,
+     "ovl_heritage_places": "[\"Statue of Our Lady,Mary on the hill above Paraparaumu1958\"]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 12.8}"
+    },
+    {
+     "unit_id": 7752535,
+     "appellation": "Lot 2 DP 502250",
+     "area_m2": 1076.6,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 2.6}"
+    },
+    {
+     "unit_id": 7752536,
+     "appellation": "Lot 3 DP 502250",
+     "area_m2": 1093.9,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 41.1}"
+    },
+    {
+     "unit_id": 3903691,
+     "appellation": "Lot 4 DP 87650",
+     "area_m2": 720.4,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 0.9}"
+    },
+    {
+     "unit_id": 7752537,
+     "appellation": "Lot 4 DP 502250",
+     "area_m2": 1093.7,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 60.4}"
+    },
+    {
+     "unit_id": 3766574,
+     "appellation": "Lot 2 DP 7406",
+     "area_m2": 1618.8,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Paraparaumu Quarry Scrub\": 14.5}"
+    },
+    {
+     "unit_id": 3844930,
+     "appellation": "Lot 1 DP 7406",
+     "area_m2": 2185.2,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Paraparaumu Quarry Scrub\": 44.4}"
+    },
+    {
+     "unit_id": 3752641,
+     "appellation": "Section 5A Block VIII TN OF Paraparaumu",
+     "area_m2": 20265.1,
+     "ovl_heritage_places": "[\"Memorial Gates in memory of soldiers who fought in previous World war - 1924\"]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": null
+    },
+    {
+     "unit_id": 4024101,
+     "appellation": "Lot 43 DP 47280",
+     "area_m2": 1865.1,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Lady of Lordes Statue Hill\": 99.9}"
+    }
+   ]
+  }
+ ]
+}

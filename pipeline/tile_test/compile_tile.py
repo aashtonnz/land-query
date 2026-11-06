@@ -7,13 +7,14 @@ no opinions: overlaps, distances, elevations and the raw attributes of the neare
 import json, os, sys, time, math
 import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
-from shapely.geometry import shape, Point
+from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
 
 D = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(D, "raw")
 t0 = time.time()
+TILE_BOX = box(1769000, 5468400, 1770000, 5469400)
 
 def load(name):
     p = os.path.join(RAW, name + ".geojson")
@@ -67,7 +68,10 @@ def nearest(key, items, g, maxd=150):
 rows = []
 for uid, (g, p) in enumerate(units):
     r = dict(unit_id=p.get("id") or p.get("ID") or f"U{uid}", unit_source=unit_src,
-             appellation=p.get("appellation"), area_m2=round(g.area, 1))
+             appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
+             survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
+             # share of the unit inside the tile: terrain and overlay values cover only that share
+             in_tile_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1))
     # zones and polygon overlays: overlap percentage per class value
     for n in poly_layers:
         if n not in trees: r[n] = None; continue
@@ -90,7 +94,7 @@ for uid, (g, p) in enumerate(units):
     r.update(ground_min_m=round(float(np.nanmin(z)), 2), ground_mean_m=round(float(np.nanmean(z)), 2),
              ground_max_m=round(float(np.nanmax(z)), 2), slope_p50_deg=round(float(np.nanpercentile(s, 50)), 1),
              slope_p90_deg=round(float(np.nanpercentile(s, 90)), 1),
-             open_ground_m2=int(open_ground.sum()), open_ground_slope_lt5_m2=int((open_ground & (SLOPE < 5)).sum()),
+             building_2021_m2=int((m & BLDMASK).sum()), open_ground_m2=int(open_ground.sum()), open_ground_slope_lt5_m2=int((open_ground & (SLOPE < 5)).sum()),
              canopy_gt3m_open_pct=round(100 * float((CANOPY & open_ground).sum()) / max(1, open_ground.sum()), 1),
              dz_2021_2025_mean_m=round(float(np.nanmean(DZ[m])), 3),
              dz_2021_2025_absmax_m=round(float(np.nanmax(np.abs(DZ[m]))), 2))
@@ -110,6 +114,10 @@ for uid, (g, p) in enumerate(units):
     # flood: highest KCDC recommended building level (NZVD2016) within 10 m
     lv = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g.buffer(10)) if "rbl" in T else [])
           if rbl[i][1].get("VALUE_NZVD2016") is not None and rbl[i][0].distance(g) <= 10]
+    lin = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g) if "rbl" in T else [])
+           if rbl[i][1].get("VALUE_NZVD2016") is not None and g.contains(rbl[i][0])]
+    r.update(rbl_in_parcel_n=len(lin), rbl_in_parcel_max_nzvd2016=max(lin) if lin else None,
+             rbl_in_parcel_max_minus_ground_mean_m=round(max(lin) - r["ground_mean_m"], 2) if lin else None)
     r.update(rbl_max_nzvd2016=max(lv) if lv else None,
              ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv else None)
     rows.append(r)

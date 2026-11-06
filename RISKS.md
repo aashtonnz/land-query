@@ -1,6 +1,6 @@
 # Risks
 
-Last updated: 2026-11-06 17:20 (Pacific/Auckland)
+Last updated: 2026-11-06 18:05 (Pacific/Auckland)
 Follows: risk list v1.1 (ai-working-practices)
 
 ## R-9: Licences that do not permit commercial reuse
@@ -31,7 +31,7 @@ Follows: risk list v1.1 (ai-working-practices)
 ## R-5: Cold-start gap on `$8` LINZ private covenant instrument PDFs
 **Why it matters.** While free LINZ Layer 50804 tables expose the existence and instrument number of every covenant and `s221` consent notice, the verbatim text inside a private covenant PDF costs `$8` from LINZ (search fee since February 2025) if no sibling lot on that Deposited Plan (`DP`) has uploaded a title or LIM yet.
 **What we can likely do.** Flag the exact instrument number and pre-2001 sunset status (`D02/D54`) from the free memorial table so agents know an encumbrance exists, and use the Shared-DP (`1:64`) Give-to-Get Vault (`POST /v1/contribute-lim`) so a single uploaded PDF hydrates all sibling lots on that `DP` plan.
-**Early test.** Measure what percentage of Paraparaumu residential lots on `NZTM-1760-5472` share a Deposited Plan (`DP`) with at least 10 sibling lots (`T-16`).
+**Early test.** Done for one tile (T-33, 2026-11-06): 457 residential parcels on 124 plans (about 3.7 lots per plan); 38% on a plan with 10 or more lots in the tile, 93% sharing a plan with at least one other lot (lower bounds; plans cut by the tile edge are undercounted). Sharing helps but is far from 1:64, so the risk stands; D-2's assumption is to be restated in T-32.
 
 ## R-6: Silent schema changes or new AI/MCP endpoints launched by councils and agencies
 **Why it matters.** If a council renames WFS fields or launches a new STAC/OGC/MCP endpoint, static scrapers can break or fall behind.

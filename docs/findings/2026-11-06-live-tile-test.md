@@ -2,7 +2,7 @@
 
 First contact between the Land Query design and real data. One 1 km × 1 km tile in central Paraparaumu
 (NZTM2000 1769000–1770000 E, 5468400–5469400 N), fetched live from public sources. Status: done except
-LINZ parcels, titles and easements, which need a LINZ API key (fetcher written, waiting on the key).
+LINZ titles and easements, which need a LINZ API key (T-34). Parcels were later fetched without a key ([inverse-query findings](2026-11-06-inverse-queries.md)).
 
 ## What was fetched
 
@@ -41,7 +41,7 @@ Wind/corrosion, tsunami, fault avoidance and earthworks layers returned no featu
    (5th–95th percentile −0.98 to +0.07 m) across 887 buildings.
 4. **LiDAR epochs have a systematic offset.** 2024–25 minus 2021 is +0.08 m on flat ground (IQR 0.06–0.10 m).
    Any change claim must correct for this first.
-5. **Real change candidates exist but are unverified.** After the offset, 37 patches of ≥100 m² changed by more
+5. **Real change candidates exist but are unverified.** Most turned out to be recent subdivisions ([inverse-query findings](2026-11-06-inverse-queries.md)). After the offset, 37 patches of ≥100 m² changed by more
    than 1 m. None lie on 2021 building footprints and none match a KCDC earthworks record. Many show a consistent
    +1.1 to +1.7 m rise, which could be platforms, stockpiles or vegetation classified as ground. Needs an imagery check.
 6. **Resolution varies wildly.** GWRC liquefaction is regional geology; KCDC flood levels are point-dense. Every
