@@ -58,7 +58,7 @@ jobs:
         with:
           name: district-flow
           path: pipeline/flowdata/
-          retention-days: 7
+          retention-days: 1  # results are published to kapiti-results; keep storage small (D-14)
 
   block:
     needs: [plan, flow]
@@ -102,7 +102,7 @@ jobs:
             pipeline/data/provenance.json
             pipeline/data/qa.json
             pipeline/data/fetch_bbox.json
-          retention-days: 7
+          retention-days: 1  # results are published to kapiti-results; keep storage small (D-14)
 
   merge:
     needs: [plan, block]

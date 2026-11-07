@@ -57,8 +57,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: tile-${{ inputs.xmin }}-${{ inputs.ymin }}
-          path: pipeline/data/
-          retention-days: 7
+          path: |
+            pipeline/data/units.parquet
+            pipeline/data/provenance.json
+            pipeline/data/qa.json
+            pipeline/data/inverse_queries.json
+          retention-days: 1  # raw downloads (LiDAR, the flow grid) are no longer kept; keep storage small (D-14)
       - name: Push results to tile-results branch
         run: |
           D=results/${TILE_XMIN}_${TILE_YMIN}

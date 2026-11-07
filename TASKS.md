@@ -1,10 +1,10 @@
 # Tasks
 
-Last updated: 2026-11-08 00:40 (Pacific/Auckland)
+Last updated: 2026-11-08 01:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
-- Keep out-of-pocket infrastructure and data cost at `$0.00`.
+- Costs: small and expected only, within the owner's monthly GitHub budget (US$10; D-14). November 2026 so far: about US$6.79 of paid Actions usage before the T-36 rebuild (about US$2).
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
