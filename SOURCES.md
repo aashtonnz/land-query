@@ -25,7 +25,7 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 
 | Key | Dataset (owner) | Licence | Updated | Fit for parcel | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `parcels` | NZ Primary Parcels via KCDC Cadastral mirror (LINZ) | ✅ LINZ CC BY 4.0 | matches LINZ 6 Nov 2026 | ✅ | Omits railway parcels (D-11) and clips parcels at the district boundary (97 of 27,521 differ from LINZ area by more than 1 m²). `DCDB` parcels are legacy digitised boundaries: less accurate than surveyed ones |
+| `parcels` | NZ Primary Parcels via KCDC Cadastral mirror (LINZ) | ✅ LINZ CC BY 4.0 | matches LINZ 6 Nov 2026 | ✅ | Omits railway parcels (D-11) and clips parcels at the district boundary. It also truncates some parcels lying wholly inside the district (39 in block 1785000_5485000 alone; for example Lot 1 DP 70514 is 7,463 m² in the mirror and 4.43 km² in LINZ), so values for those describe only a fragment (second review, T-49). `DCDB` parcels are legacy digitised boundaries: less accurate than surveyed ones |
 | `district_boundary` | Cadastral service layer 1, District Boundary (KCDC) | ◐ | not catalogued | — | QA only: identifies parcels the mirror clips at the boundary |
 | `linz_parcels` | NZ Primary Parcels, layer 50823 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Used to check the mirror |
 | `titles` | NZ Property Titles, layer 50804 (LINZ) | ✅ CC BY 4.0 | weekly | ✅ | Type and estate only; owner count, no names |

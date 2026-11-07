@@ -5,10 +5,10 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-49: Ties, overlaps and caveats**
-  Nearest manhole and pipe: report all assets tied within 5 cm (Q1 uses the deepest invert, Q3 the worst grade, both
-  stated). Flag parcels where zones of different types overlap. Count a parcel as clipped only if it lies at the
-  district boundary. Note the 1979 and 1980 install-year spikes in Q3. The smaller points in finding 9.
+- **T-51: Parcel geometry from LINZ**
+  Units come from `linz_parcels` (LINZ layer 50823, fetched with the repository key), with the KCDC mirror kept as a
+  QA cross-check. Parcels crossing the district boundary would then be whole, with `coverage_pct` showing the share
+  inside the fetch window. Supersedes D-11 for geometry.
 - **T-50: Rebuild and re-check**
   Rebuild the district with T-47 to T-49, re-run `sample_check.py` and the reviewer's checks, and record before and
   after.

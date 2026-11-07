@@ -294,3 +294,20 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
   - The truncation flag and wind height over the flattened sea were fixed by T-47.
   - The layer-description request in `fetch_tile.py` now retries, after a connection reset lost one layer in a local
     run.
+
+### Found while testing T-49: the KCDC mirror truncates parcels inside the district
+
+- **The test.** Testing the new boundary test on GitHub (tile run 42354949925, block 1785000_5485000, with LINZ
+  parcels fetched using the repository key): of 43 parcels that differ from LINZ by more than 1 m², only 4 are LINZ
+  parcels that cross the district boundary.
+- **The other 39** lie wholly inside the district, and KCDC's polygon is a fragment of the LINZ parcel. Examples:
+  - Lot 1 DP 70514: 7,463 m² in the mirror, 4,427,599 m² in LINZ, 920 m inside the boundary.
+  - Part Section 23 Block VII Waitohu SD: 2,864 m² against 598,672 m².
+  - Lot 2 DP 462660: 488,950 m² against 749,968 m².
+- **Effect.** Each is a single feature in the mirror, so the compiled values for these parcels describe only the
+  fragment.
+- **D-11 is wrong district-wide.** D-11 chose the mirror because it matched LINZ in the test tile; district-wide it
+  does not, and the `SOURCES.md` note that the differences are boundary clipping was wrong. The district-wide count
+  will come from the next run's QA, which now reports these separately.
+- **Proposed** (needs a decision): compile from LINZ primary parcel geometry, which every GitHub run already fetches
+  with the key, and keep the mirror only as a cross-check.
