@@ -7,7 +7,8 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
 - **Task board**: v1.10 ([`TASKS.md`](TASKS.md), [`DECISIONS.md`](DECISIONS.md), [`PLAN.md`](PLAN.md))
 - **Style guide**: v1 ([`STYLE.md`](STYLE.md))
 - **Risk list**: v1.1 ([`RISKS.md`](RISKS.md))
-- **Changelog checked to**: entry 33 (6 Nov 2026)
+- **Fresh-eyes review**: v1, before work is offered outside and at milestones that much else rests on (first used as T-39; findings in [`docs/findings/2026-11-06-fresh-eyes-review.md`](docs/findings/2026-11-06-fresh-eyes-review.md))
+- **Changelog checked to**: entry 34 (7 Nov 2026)
 
 ## Project rules
 

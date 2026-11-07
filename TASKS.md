@@ -1,7 +1,7 @@
 # Tasks
 
-Last updated: 2026-11-07 15:40 (Pacific/Auckland)
-Follows: task board v1.10 (ai-working-practices), changelog to entry 33
+Last updated: 2026-11-07 16:20 (Pacific/Auckland)
+Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
 - Keep out-of-pocket infrastructure and data cost at `$0.00`.
@@ -35,6 +35,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- Fresh-eyes review added to ai-working-practices as a Situational practice (v1, changelog entry 34), from this project's T-39; this project follows it. [Practice](https://github.com/aashtonnz/ai-working-practices/blob/main/practices/fresh-eyes-review.md) 2026-11-07.
 - T-45: District rebuild and raw-source sample check: rebuilt with T-40 to T-44 (39 minutes, all 46 blocks). The reviewer's faults are gone (zone shares over 100%: 1,719 → 0; empty provenance: 14,387 → 0; too-small platforms: 1,002 → 0; Te Horo manhole anomaly gone). 15 parcels across block types match the raw KCDC, GWRC and LINZ LiDAR sources on all 195 checks. Q1 is now 402 parcels (121 recovered from older zone names). Fixed for the next run: the area check now separates parcels KCDC clips at the district boundary, and nearest-pipe ties no longer depend on download order. Source issue reported: KCDC's zone layer double-zones 7 parcels. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-45-district-rebuild-and-raw-source-sample-check-7-nov-2026) 2026-11-07.
 - T-44: QA and query wording: the Te Horo "manholes" were stormwater culvert ends and sumps (no wastewater points in the block; datum levels converted once), so QA now compares true manholes only, wastewater and stormwater separately (Te Horo block: medians −0.11 and −0.06 m, none over 0.5 m); nearest-manhole columns use manholes only; area check against LINZ in every block (Te Horo: 753 parcels, max 0.1 m²); Q4 renamed and uses each block's epoch offset; Q5 counts points inside the parcel, with ids; paging with a count check; no invented ids. Private assets were already excluded. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-44-qa-and-query-wording-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-43: Ground-level measures: winter sun now counts only ground with nothing above it and is averaged over clear open ground, with a new `open_ground_clear_pct` (on wooded test-tile parcels 1.1 h between the trees, against 4.3 h measured on the canopy before); viewpoint never under trees; platform estimate only where a 15 × 15 m square fits on open ground (441 → 135 parcels on the tile); new `lidar_coverage_pct`, required at 99% by the terrain queries. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-43-ground-level-measures-fixed-in-code-7-nov-2026) 2026-11-07.
