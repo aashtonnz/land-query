@@ -220,7 +220,7 @@ for uid, (g, p) in enumerate(units):
     pid = p.get("id") or p.get("ID")
     if pid is None: raise SystemExit(f"parcel {uid} has no id: refusing to invent one")
     r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,
-             appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
+             geometry_source=p.get("geometry_source") or "KCDC mirror", appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
              # share of the parcel inside the fetch window: terrain and overlay values cover only that share
              coverage_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1) if g.area else 0.0, **extra)

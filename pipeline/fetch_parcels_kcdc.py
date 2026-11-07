@@ -1,13 +1,19 @@
-"""Fetch the block's primary parcels from KCDC's public Cadastral service (no key needed) and set the fetch window.
+"""Choose the block's parcels and set the fetch window; parcel geometry from LINZ (T-51).
 
-The layer mirrors LINZ NZ Primary Parcels (same fields: LINZ parcel id, appellation, titles, survey area), so parcel ids
-join to LINZ (D-11). A parcel belongs to this block if its representative point lies inside the block. The fetch window is
-the union of those parcels' bounds plus 30 m, capped at MAX_BUFFER beyond the block (tile_env.py). Run this first.
+Which parcels belong to the district comes from KCDC's public Cadastral service, a mirror of LINZ NZ Primary Parcels
+clipped to the district (no key needed); a parcel belongs to this block if the representative point of its mirror
+polygon lies inside the block. The mirror truncates some parcels lying inside the district (second review, T-49), so
+each parcel's geometry and fields come from LINZ layer 50823 by parcel id when LINZ_API_KEY is set (GitHub runs).
+A parcel LINZ does not return keeps the mirror polygon, marked in `geometry_source`. Without a key (a local session)
+every parcel uses the mirror, and the provenance says so. The mirror is saved as raw/kcdc_parcels.geojson for QA.
+The fetch window is the union of the parcels' bounds plus 30 m, capped at MAX_BUFFER beyond the block (tile_env.py).
+Run this first.
 """
 import hashlib, json, os, sys, time
 from shapely.geometry import shape, box
 import tile_env as te
 import arcgis
+import linz
 from provenance import utc_now
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
@@ -24,6 +30,24 @@ for f in feats:
     g = shape(f["geometry"])
     if blk.contains(g.representative_point()) or blk.touches(g.representative_point()):
         kept.append(f)
+mirror = dict(type="FeatureCollection", features=kept)
+open(os.path.join(OUT, "raw", "kcdc_parcels.geojson"), "w").write(json.dumps(mirror))
+LINZ_URL = "https://data.linz.govt.nz/layer/50823/"
+linz_err = None
+if linz.KEY:
+    try:
+        by_id = {f["properties"].get("id"): f for f in linz.wfs(50823, te.BLOCK) if f.get("geometry")}
+    except Exception as e:
+        by_id, linz_err = {}, str(e)[:300]
+else:
+    by_id, linz_err = {}, "LINZ_API_KEY not set: mirror geometry used"
+units = []
+for f in kept:
+    lf = by_id.get(f["properties"].get("id"))
+    if lf is not None: lf["properties"]["geometry_source"] = "LINZ"; units.append(lf)
+    else: f["properties"]["geometry_source"] = "KCDC mirror"; units.append(f)
+kept = units
+from_linz = sum(1 for f in kept if f["properties"]["geometry_source"] == "LINZ")
 fc = dict(type="FeatureCollection", features=kept)
 b = json.dumps(fc).encode()
 open(os.path.join(OUT, "raw", "parcels.geojson"), "wb").write(b)
@@ -41,8 +65,13 @@ json.dump(dict(block=list(te.BLOCK), bbox=win, parcels=len(kept)), open(os.path.
 prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path)) if os.path.exists(prov_path) else {"sources": {}}
 prov.update(block=list(te.BLOCK), block_id=te.BLOCK_ID, fetch_bbox=win)
-prov["sources"]["parcels"] = dict(url=URL, ok=True, features=len(kept), sha256=hashlib.sha256(b).hexdigest(),
+prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=True, features=len(kept),
+                                  from_linz=from_linz, from_mirror=len(kept) - from_linz, linz_error=linz_err,
+                                  membership=URL, sha256=hashlib.sha256(b).hexdigest(),
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
-                                  licence="LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror (attribute LINZ)")
+                                  licence="LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)")
+mb = json.dumps(mirror).encode()
+prov["sources"]["kcdc_parcels"] = dict(url=URL, ok=True, features=len(mirror["features"]), sha256=hashlib.sha256(mb).hexdigest(),
+                                       fetched=utc_now(), licence="LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror")
 json.dump(prov, open(prov_path, "w"), indent=1)
-print("parcels", len(kept), "of", len(feats), "intersecting; window", win, round(time.time() - t0, 1), "s")
+print("parcels", len(kept), "of", len(feats), "intersecting;", from_linz, "with LINZ geometry; window", win, round(time.time() - t0, 1), "s", linz_err or "")
