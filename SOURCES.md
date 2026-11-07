@@ -56,8 +56,11 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 ## Compiled columns (per parcel, table `units`)
 
-> **Fresh-eyes review (T-39 to T-45, 7 Nov 2026).** The problems the review found are fixed, and the district results were
-> rebuilt on 7 Nov 2026 (run 42324369141). See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
+> **Known problems in the current results (second review, T-46, 7 Nov 2026)**, being fixed in T-47 to T-49:
+> `catchment_area_max_m2` routes coastal streams through the sea (the Waitohu figure is wrong; 56 parcels touch the
+> sea strip) and counts any 10 m cell touching the parcel (513 parcels inflated); the LiDAR sources in query output
+> lack URL and licence; nearest-manhole and nearest-pipe choices between tied assets are arbitrary; 7 parcels carry
+> overlapping zones from the source. See [the second review](docs/findings/2026-11-07-second-review.md).
 
 **Kind:** **published** = a value as the source publishes it · **derived** = calculated exactly from published data
 (an overlap, a distance, a statistic of LiDAR cells) · **modelled** = an estimate from a model with stated simplifications.
@@ -89,7 +92,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `roof_pitch_p50_deg`, `roof_flat_m2`, `roof_north_m2` | derived | From the 2024–25 DSM inside 2021 building outlines: median pitch, area under 5°, area facing north (315°–45°) at 5° or more |
 | `roof_solar_rel_pct` | modelled | Clear-sky direct sun on the roof surface (shaded as above) over three representative days (21 June, 20 March, 21 December), as % of an unshaded horizontal surface at the same place. No cloud or diffuse light; compare roofs with each other, not with kWh figures |
 | `upslope_area_max_m2`, `upslope_area_truncated`, `flow_path_m` | modelled | Overland flow on the 2024–25 1 m DEM (D8; depressions and flats drained by priority-flood, `flow.py`) within the block's LiDAR window: largest upslope area draining through the parcel; whether that upslope area reaches the window edge or a LiDAR gap over land, so may be larger (true for river corridors: use `catchment_area_max_m2`); and length in metres of flow paths across the parcel draining at least 2,000 m². Ignores stormwater pipes, culverts and bridges, so urban flows are overstated |
-| `catchment_area_max_m2`, `catchment_truncated` | modelled | Largest upslope area draining through the parcel on the 10 m district mosaic (`district_flow`), so whole river catchments are counted, and whether it reaches the mosaic edge. Embankments without their culverts can divert flow: on the plain north of Ōtaki the Waitohu shows about 130 km² because flow is routed north across it. Checked: Waikanae 148 km² and Ōtaki 374 km² near their mouths |
+| `catchment_area_max_m2`, `catchment_truncated` | modelled | Largest upslope area draining through the parcel on the 10 m district mosaic (`district_flow`), so whole river catchments are counted, and whether it reaches the mosaic edge. Known fault (T-47): coastal streams are routed through the flattened sea in the DEM, so the Waitohu shows about 130 km². Checked: Waikanae 148 km² and Ōtaki 374 km² near their mouths |
 | `level_open_cut_m3`, `level_open_fill_m3` | derived | Cut and fill to bring all open ground to its median level |
 | `platform_15m_earthworks_min_m3` | modelled | Smallest earthworks for a 15 m × 15 m level platform lying wholly on the parcel's open ground, estimated from the spread of ground levels; empty where no such square fits |
 | `wind_obstruction_pct`, `wind_rel_height_m` | derived | Share of the surrounding ±100 m (square) with obstructions over 2.5 m in the DSM; ground at the parcel (1 m DEM) relative to the mean ground within ±500 m on the 10 m district mosaic, with the sea at 0 m. Inputs to wind exposure, not an exposure rating: a modelled exposure class built from these two disagreed with KCDC's wind zones (T-37) and is withheld |

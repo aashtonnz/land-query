@@ -274,3 +274,11 @@ Queries: Q1 288 → 402, Q2 633 → 633, Q3 555 → 559, Q4 554 → 554 (17 in, 
 - **Coastal relative heights.** 326 parcels in the coastal stainless band still read below −5 m. These are real:
   the lowest (−53 to −58 m) are Paekākāriki houses under the escarpment. Across the band, the median moved from 0.7 to
   0.8 m (correlation 0.93), so the sea bias the reviewer found affected only the beach edge.
+
+## Correction (7 Nov 2026, from T-46)
+
+The explanation given under T-42 for the Waitohu's 130 km² (embankments without culverts) was wrong, and was
+asserted without tracing. The second review traced it. LINZ's national DEM stores the sea as a flattened surface at
+about −0.6 to −1.0 m, not as no data, and `flow.py` never let a cell drain into an adjacent no-data cell. So
+streams reaching the beach were routed north through the sea strip to the edge of the mosaic. See
+[the second review](2026-11-07-second-review.md), finding 1; the fix is T-47.

@@ -5,11 +5,22 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-46: Second fresh-eyes review**
-  A new reviewer, briefed with the repository only, checks the changes since `23a5c9f` (T-40 to T-45: overlay labels,
-  provenance, flow and the district mosaic, ground-level measures, QA and queries) and the rebuilt district results,
-  including its own sample of parcels against the raw sources. Fixes as for T-39, each with a check that fails before
-  and passes after.
+- **T-47: Flow at the coast**
+  In `flow.py`, a valid cell next to no data drains into it when that is its steepest drop. Mask the flattened sea in the
+  national DEM (for example where the 8 m contour DEM has no data, or at the survey's constant sea value) in
+  `district_flow.py`, the 1 m block flow and the wind height mean. Use 10 m cells whose centre is in the parcel.
+  Checks: a slope to a sea column drains each row to its own beach cell; the Waitohu cell at 1780895, 5493975 reads
+  80 km² or less; parcel 3883291 reads under 1 km².
+- **T-48: Provenance and publishing safety**
+  `merge_sources` takes URL and licence from the first block that has them; test with a no-coverage block first.
+  `kapiti.yml` refuses to push when `only` is set or blocks are missing, and writes the commit SHA to `RUN.txt`.
+- **T-49: Ties, overlaps and caveats**
+  Nearest manhole and pipe: report all assets tied within 5 cm (Q1 uses the deepest invert, Q3 the worst grade, both
+  stated). Flag parcels where zones of different types overlap. Count a parcel as clipped only if it lies at the
+  district boundary. Note the 1979 and 1980 install-year spikes in Q3. The smaller points in finding 9.
+- **T-50: Rebuild and re-check**
+  Rebuild the district with T-47 to T-49, re-run `sample_check.py` and the reviewer's checks, and record before and
+  after.
 - **T-36: Query service**
   A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users

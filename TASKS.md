@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-07 16:40 (Pacific/Auckland)
+Last updated: 2026-11-07 17:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
@@ -10,13 +10,16 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-46: Second fresh-eyes review: a new reviewer, starting from the repository alone, checks the T-40 to T-45 fixes and the rebuilt district results before the query service is built on them (fresh-eyes review practice, rule 1). Started 2026-11-07.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-36: Query service (after T-46): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
+- T-47: Flow at the coast: cells next to no data drain into it; the flattened sea in LINZ's DEM masked (district mosaic, 1 m block flow, wind height); catchment from 10 m cells whose centre is in the parcel; `SOURCES.md` corrected (second review findings 1, 4).
+- T-48: Provenance and publishing safety: LiDAR URL and licence from the first block that has them, with a test that puts a no-coverage block first; `kapiti.yml` refuses to publish a partial run and records the commit in `RUN.txt` (findings 3, 6).
+- T-49: Ties, overlaps and caveats: tied nearest assets reported rather than picked arbitrarily (Q1 uses the deepest invert); overlapping-zone flag; boundary clipping identified by location; Q3 install-year caveat; the smaller points in finding 9 (findings 2, 5, 7, 8, 9).
+- T-50: Rebuild and re-check: district rebuild with T-47 to T-49, both sample checks re-run, before and after recorded.
+- T-36: Query service (after T-50): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels were not on recent survey plans (T-21; the T-45 rebuild swapped 17 of the 554); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
@@ -36,6 +39,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-46: Second fresh-eyes review: 9 findings on the T-40 to T-45 work. Most serious: the district flow routes coastal streams through the flattened sea in LINZ's DEM (the Waitohu 130 km²; my T-42 explanation was wrong), the published results predate the tie fix, and LiDAR sources lack URL and licence in query output. Its own 21-parcel raw-source check: 312 of 316 values agree, the 4 differences being tied manholes. Fixes are T-47 to T-50. [Findings](docs/findings/2026-11-07-second-review.md) 2026-11-07.
 - Fresh-eyes review added to ai-working-practices as a Situational practice (v1, changelog entry 34), from this project's T-39; this project follows it. [Practice](https://github.com/aashtonnz/ai-working-practices/blob/main/practices/fresh-eyes-review.md) 2026-11-07.
 - T-45: District rebuild and raw-source sample check: rebuilt with T-40 to T-44 (39 minutes, all 46 blocks). The reviewer's faults are gone (zone shares over 100%: 1,719 → 0; empty provenance: 14,387 → 0; too-small platforms: 1,002 → 0; Te Horo manhole anomaly gone). 15 parcels across block types match the raw KCDC, GWRC and LINZ LiDAR sources on all 195 checks. Q1 is now 402 parcels (121 recovered from older zone names). Fixed for the next run: the area check now separates parcels KCDC clips at the district boundary, and nearest-pipe ties no longer depend on download order. Source issue reported: KCDC's zone layer double-zones 7 parcels. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-45-district-rebuild-and-raw-source-sample-check-7-nov-2026) 2026-11-07.
 - T-44: QA and query wording: the Te Horo "manholes" were stormwater culvert ends and sumps (no wastewater points in the block; datum levels converted once), so QA now compares true manholes only, wastewater and stormwater separately (Te Horo block: medians −0.11 and −0.06 m, none over 0.5 m); nearest-manhole columns use manholes only; area check against LINZ in every block (Te Horo: 753 parcels, max 0.1 m²); Q4 renamed and uses each block's epoch offset; Q5 counts points inside the parcel, with ids; paging with a count check; no invented ids. Private assets were already excluded. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-44-qa-and-query-wording-fixed-in-code-7-nov-2026) 2026-11-07.
