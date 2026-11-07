@@ -330,3 +330,53 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
 - **Cost.** In this block the compile took 5.2 minutes and peaked at 4.9 GB (before: 2.0–2.5 minutes, 4.2 GB),
   because whole LINZ parcels widen the window to its 1 km cap. The runner has 7 GB; the T-50 rebuild will show the
   district-wide cost.
+
+## T-50: district rebuild and re-check (7 Nov 2026)
+
+The district was rebuilt with T-47 to T-49 and T-51 (`kapiti.yml` run 42358053821, commit `4b64604`, 39 minutes, all
+46 blocks). `RUN.txt` now names the commit. Before and after:
+[`2026-11-07-rebuild2-before-after.json`](2026-11-07-rebuild2-before-after.json).
+
+### The reviewer's failing checks
+
+| Check | Before | After |
+| --- | --- | --- |
+| Parcel 3864724 (Paekākāriki), catchment | 29.7 km² | 0.042 km² |
+| Parcel 3883291, catchment | 138.1 km² | 0.001 km² |
+| Parcels whose catchment fell from 10 km² or more to under 1 km² | — | 84 |
+| Largest catchments | — | Ōtaki corridor (up to 353.5 km²) and Waikanae corridor; none truncated |
+| Query sources without a URL or licence | 6 (LiDAR in Q1, Q2, Q4) | 0 |
+| Parcel 6627870, nearest manhole | KWWN003040 (arbitrary) | KWWN003040, the deeper of two tied, both listed |
+| Reserve 7260303 in Q1 | possible | excluded (stacked zones) |
+| Parcels with tied manholes, tied pipes (now listed) | — | 437, 3,978 |
+
+### Parcels from LINZ (D-13)
+
+- 27,613 of 27,614 parcels use LINZ geometry; one is not in LINZ's layer and keeps the mirror polygon.
+- QA, comparing the mirror with LINZ district-wide: 32 parcels clipped at the district boundary, and 88 truncated or
+  altered by the mirror inside the district. Exactly 120 parcels changed area.
+- Lot 1 DP 70514 is now its full 4,427,599 m² (was 7,463 m²).
+
+### Queries
+
+Q1 402 → 404, Q2 633 → 633, Q3 559 → 620, Q4 554 → 558, Q5 1,388 → 1,386.
+
+- All 61 new Q3 rows have tied pipes: the stated worst-grade rule now counts a poor pipe where the old arbitrary choice
+  could take a good one.
+- QA is unchanged in substance: wastewater manholes −0.077 m (worst block −0.108), stormwater −0.066 m, LiDAR offset
+  +0.073 m.
+
+### Sample check
+
+- `sample_check.py` was re-run on 18 parcels: the earlier 15, the two reviewer examples and Lot 1 DP 70514. 209 of 210
+  checks agree.
+- Parcels on LINZ geometry are checked against LINZ's area attribute on the KCDC record. Where the mirror polygon
+  differs from LINZ, as for Lot 1 DP 70514, the other checks are skipped, because this session has no LINZ key.
+  Results: [`2026-11-07-sample-check-2.json`](2026-11-07-sample-check-2.json).
+- **The one difference.** Parcel 3864724 runs onto the foreshore, and its compiled lowest ground was still −0.56 m,
+  the flat sea value.
+  - Cause: the sea mask came from the 10 m grid, so along the shoreline some 1 m flat-sea cells fell inside 10 m
+    cells counted as land.
+  - Fixed in code: 1 m cells at the survey's flat sea value that connect to masked sea are now sea too (test added).
+  - On a local tile the parcel's lowest ground is now −0.35 m.
+  - In the published results this affects 3 parcels, none in a query, so it waits for the next rebuild.

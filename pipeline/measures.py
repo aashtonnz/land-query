@@ -129,3 +129,16 @@ def viewpoint(open_mask, clear):
     if not ok.any(): return None
     d = distance_transform_edt(ok)
     return np.unravel_index(int(np.argmax(d)), d.shape)
+
+
+def extend_sea(sea, dem, tol=0.005):
+    """Grow a coarse sea mask over the 1 m DEM: cells at the survey's flat sea value (the most common value under the
+    mask) that connect to the masked sea are sea too, so the shoreline cells the 10 m grid counts as land are caught."""
+    from scipy.ndimage import binary_propagation
+    v = dem[sea & np.isfinite(dem)]
+    if v.size < 100: return sea
+    vals, counts = np.unique(np.round(v, 3), return_counts=True)
+    flat = vals[np.argmax(counts)]
+    with np.errstate(invalid="ignore"):
+        cand = sea | (np.abs(dem - flat) <= tol)
+    return binary_propagation(sea, structure=np.ones((3, 3), bool), mask=cand)

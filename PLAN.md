@@ -5,9 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-50: Rebuild and re-check**
-  Rebuild the district with T-47 to T-49, re-run `sample_check.py` and the reviewer's checks, and record before and
-  after.
 - **T-36: Query service**
   A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users

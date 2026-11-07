@@ -219,6 +219,16 @@ def test_inland_parcel_smaller_than_linz_is_reported_not_hidden_as_clipped():
     assert set(clipped) == {1} and set(other) == {2, 3}
 
 
+def test_flat_sea_cells_inside_a_coarse_land_cell_are_still_sea():
+    import numpy as np
+    import measures as M
+    dem = np.full((40, 40), 3.0, np.float32); dem[:, :15] = -0.56          # flattened sea west of x = 15
+    dem[20, 30] = -0.56                                                     # an isolated low cell inland: not sea
+    coarse = np.zeros_like(dem, bool); coarse[:, :10] = True                # the 10 m grid's sea stops 5 m short
+    sea = M.extend_sea(coarse, dem)
+    assert sea[:, :15].all() and not sea[:, 15:].any()                     # includes the isolated cell staying land
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

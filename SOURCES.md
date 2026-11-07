@@ -57,11 +57,9 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 ## Compiled columns (per parcel, table `units`)
 
-> **Known problems in the current results (second review, T-46, 7 Nov 2026)**, being fixed in T-47 to T-49:
-> `catchment_area_max_m2` routes coastal streams through the sea (the Waitohu figure is wrong; 56 parcels touch the
-> sea strip) and counts any 10 m cell touching the parcel (513 parcels inflated), both fixed in code by T-47; the LiDAR sources in query output
-> lack URL and licence; nearest-manhole and nearest-pipe choices between tied assets are arbitrary; 7 parcels carry
-> overlapping zones from the source. See [the second review](docs/findings/2026-11-07-second-review.md).
+> **Second review (T-46 to T-51, 7 Nov 2026).** The problems it found are fixed and the district was rebuilt on
+> 7 Nov 2026 (run 42358053821, commit `4b64604`). One small fix waits for the next rebuild: 3 coastal parcels' lowest
+> ground still reads the flat sea value (−0.56 m). See [the second review](docs/findings/2026-11-07-second-review.md).
 
 **sha256 in provenance:** the hash of the data as the pipeline stored it after download (re-serialised GeoJSON, or the LiDAR array), which identifies what each block was compiled from; it cannot be reproduced from the server's response bytes.
 

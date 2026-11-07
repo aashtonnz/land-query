@@ -91,6 +91,8 @@ if DF is not None and HAVE_LIDAR:
               dst_crs="EPSG:2193", src_nodata=-9999.0, dst_nodata=-9999.0, resampling=Resampling.nearest)
     with np.errstate(invalid="ignore"):
         SEA = np.isnan(G10) & ~(Z > 0.5)  # also sea the survey left as no data
+    import measures as _M
+    SEA = _M.extend_sea(SEA, Z)  # shoreline cells at the flat sea value the 10 m grid counts as land
     Z[SEA] = np.nan; dsm[SEA] = np.nan; z21[SEA] = np.nan
     print(f"sea cells masked: {int(SEA.sum())}")
 

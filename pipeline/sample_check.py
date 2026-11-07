@@ -5,6 +5,9 @@ the parcel polygon, the nearest manhole from a server-side distance query, and g
 read directly. Each value is compared with the compiled district results.
 
 Usage: sample_check.py UNITS_PARQUET OUT_JSON UNIT_ID [UNIT_ID ...]
+
+Parcels compiled on LINZ geometry (D-13) are checked against LINZ's calc_area on the KCDC record; where the KCDC
+polygon differs from LINZ, overlay and ground checks are skipped, because this session has no LINZ key.
 """
 import json, sys
 import duckdb, numpy as np, rasterio, requests
@@ -39,7 +42,7 @@ def esri_polygon(g):
 
 
 def parcel(uid):
-    j = get(f"{KC}/Cadastral/MapServer/0/query", where=f"id={uid}", outFields="id,appellation", outSR=2193, f="geojson")
+    j = get(f"{KC}/Cadastral/MapServer/0/query", where=f"id={uid}", outFields="id,appellation,calc_area", outSR=2193, f="geojson")
     f = j["features"][0]
     return shape(f["geometry"]), f["properties"]
 
@@ -105,7 +108,17 @@ def check(uid, row):
     g, props = parcel(uid)
     out = dict(unit_id=uid, appellation=props.get("appellation"), checks={})
     C = out["checks"]
-    C["area_m2"] = dict(raw=round(g.area, 1), compiled=row["area_m2"], ok=abs(g.area - row["area_m2"]) < 1)
+    if row.get("geometry_source") == "LINZ":
+        # units use LINZ geometry (D-13), which needs the key; check against LINZ's own calc_area on the record, and
+        # only recompute overlays from the mirror polygon where the mirror matches LINZ
+        ca = props.get("calc_area")
+        C["area_m2"] = dict(raw=ca, compiled=row["area_m2"], ok=ca is not None and abs(ca - row["area_m2"]) <= max(1, 0.001 * ca))
+        if ca is None or abs(g.area - ca) > max(1, 0.001 * ca):
+            out["note"] = f"mirror polygon ({round(g.area)} m²) differs from LINZ ({ca} m²): other checks skipped"
+            out["all_ok"] = C["area_m2"]["ok"]
+            return out
+    else:
+        C["area_m2"] = dict(raw=round(g.area, 1), compiled=row["area_m2"], ok=abs(g.area - row["area_m2"]) < 1)
     z = zones(g); zc = json.loads(row["zones"]) if row["zones"] else {}
     C["zones"] = dict(raw=z, compiled=zc, ok=set(z) == set(zc) and all(abs(z[k] - zc[k]) <= 0.2 for k in z))
     for col, (url, field) in LAYERS.items():
