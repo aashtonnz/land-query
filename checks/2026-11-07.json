@@ -1,0 +1,719 @@
+{
+ "checked": "2026-11-07T23:27:11+00:00",
+ "sources": {
+  "buildings_2021": {
+   "count": 50623,
+   "fields": [
+    "Area:Double",
+    "BLD_ave:Double",
+    "BLD_max:Double",
+    "BLD_min:Double",
+    "GlobalID:GlobalID",
+    "Ground:Double",
+    "ID:String",
+    "OBJECTID:OID",
+    "Shape__Area:Double",
+    "Shape__Length:Double",
+    "Source:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": 1684377816680,
+   "name": "Building Outlines 2021",
+   "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0"
+  },
+  "dem_2021": {
+   "items": 19,
+   "kind": "stac",
+   "sha256": "e901a476a06dd34a3ae52ae7718f7c7d68d91a079b28e9c75b5ef8902b12a7db",
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/collection.json"
+  },
+  "dem_2025": {
+   "items": 19,
+   "kind": "stac",
+   "sha256": "c6a0820c4276a9c1b562dbdef98a1d7f00b155d24552bc36412dca74dccbb926",
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json"
+  },
+  "district_boundary": {
+   "count": 2,
+   "fields": [
+    "FID_Boundary:Integer",
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "SHAPE_Length:Double",
+    "TLA_Name:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "District Boundary",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/1"
+  },
+  "dsm_2025": {
+   "items": 19,
+   "kind": "stac",
+   "sha256": "9ab30fddd196114488a5e9553ce65ff5e150bc84b73c3ee75b582b2aed3bad22",
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/collection.json"
+  },
+  "earthworks": {
+   "count": 4,
+   "fields": [
+    "Date_Added_GIS:Date",
+    "GlobalID:GlobalID",
+    "Label_Text:String",
+    "Notes:String",
+    "OBJECTID:OID",
+    "RAD_Link:String",
+    "RC_Number:String",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Earthworks",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Earthworks/MapServer/1"
+  },
+  "flood_fill_control": {
+   "count": 64,
+   "fields": [
+    "GIS_Core_GISADMIN_Fill_Control_:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Fill Control",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/4"
+  },
+  "flood_overflow_path": {
+   "count": 156,
+   "fields": [
+    "GIS_Core_GISADMIN_Overflow_Path:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Overflow Path",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/2"
+  },
+  "flood_ponding": {
+   "count": 998,
+   "fields": [
+    "GIS_Core_GISADMIN_Ponding_3_are:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Ponding",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/6"
+  },
+  "flood_rbl_nzvd2016": {
+   "count": 812507,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "VALUE_NZVD2016:Double",
+    "VALUE_WGTN1953:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "RBLs (NZVD2016 vertical datum)",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/10"
+  },
+  "flood_residual_overflow": {
+   "count": 94,
+   "fields": [
+    "GIS_Core_GISADMIN_Residual_Over:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Residual Overflow",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/3"
+  },
+  "flood_residual_ponding": {
+   "count": 557,
+   "fields": [
+    "GIS_Core_GISADMIN_Residual_Pond:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Residual Ponding",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/7"
+  },
+  "flood_river_corridor": {
+   "count": 3,
+   "fields": [
+    "GIS_Core_GISADMIN_River_Corrido:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "River Corridor",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/0"
+  },
+  "flood_shallow_surface": {
+   "count": 16,
+   "fields": [
+    "GIS_Core_GISADMIN_Shallow_Surfa:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Shallow Surface Flow",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/8"
+  },
+  "flood_storage": {
+   "count": 146,
+   "fields": [
+    "GIS_Core_GISADMIN_Storage_3_are:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Storage",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/5"
+  },
+  "flood_stream_corridor": {
+   "count": 96,
+   "fields": [
+    "GIS_Core_GISADMIN_Stream_Corrid:Double",
+    "GlobalID:GlobalID",
+    "Id:Integer",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Stream Corridor",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/1"
+  },
+  "gw_eq_slope_failure": {
+   "count": 908,
+   "fields": [
+    "LSKEY:SmallInteger",
+    "OBJECTID:OID",
+    "SEVERITY:String",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Slope failure",
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/11"
+  },
+  "gw_liquefaction": {
+   "count": 54,
+   "fields": [
+    "Liquefaction:String",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "Simplified:String",
+    "Source:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Liquefaction",
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10"
+  },
+  "linz_parcels": {
+   "count": 32537,
+   "kind": "linz",
+   "layer": 50823
+  },
+  "nonprimary_parcels": {
+   "count": 8563,
+   "kind": "linz",
+   "layer": 50782
+  },
+  "nz_dem_1m": {
+   "items": 424,
+   "kind": "stac",
+   "sha256": "e05634a054ad7cd4d66cbe00b44a98f402551fc35f1e21609d8e0a69be538695",
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json"
+  },
+  "nz_dem_8m": {
+   "items": 449,
+   "kind": "stac",
+   "sha256": "228bb47ff11ffb05d050f4ee5174cbfd967e085414e800e9fc97c2b5097bd134",
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json"
+  },
+  "ovl_coastal_env": {
+   "count": 2,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Coastal Environment",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/30"
+  },
+  "ovl_ecological_sites": {
+   "count": 176,
+   "fields": [
+    "AREA_HA:Double",
+    "GlobalID:GlobalID",
+    "ID:String",
+    "Name:String",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "TrackChan:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Ecological Sites",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/19"
+  },
+  "ovl_fault_avoidance": {
+   "count": 69,
+   "fields": [
+    "DESCRIPTIO:String",
+    "FAULT_NAME:String",
+    "FRIC:Double",
+    "FRI_DIS:String",
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONES_:Double",
+    "ZONES_ID:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Fault Avoidance Areas",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/10"
+  },
+  "ovl_flood_hazard": {
+   "count": 9,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ZONE:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Flood Hazard",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11"
+  },
+  "ovl_heritage_places": {
+   "count": 111,
+   "fields": [
+    "BUILDING_ID:String",
+    "COORD_E:Double",
+    "COORD_N:Double",
+    "GlobalID:GlobalID",
+    "LEGAL_DESCRIPTION:String",
+    "LOCATION:String",
+    "OBJECTID:OID",
+    "ORIGIN:String",
+    "OWNER:String",
+    "SHAPE:Geometry",
+    "SIGNIFICANCE:String",
+    "VALUATION_NO:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Historic Heritage Places",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/14"
+  },
+  "ovl_noise_corridor": {
+   "count": 4,
+   "fields": [
+    "GlobalID:GlobalID",
+    "Id:String",
+    "Name:String",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Noise Corridor",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/28"
+  },
+  "ovl_notable_trees": {
+   "count": 114,
+   "fields": [
+    "COORD_E:Double",
+    "COORD_N:Double",
+    "GlobalID:GlobalID",
+    "LEGAL_DESCRIPTION:String",
+    "LOCATION:String",
+    "OBJECTID:OID",
+    "ORIGIN:String",
+    "OWNER:String",
+    "SHAPE:Geometry",
+    "SIGNIFICANCE:String",
+    "TREE_ID:String",
+    "VALUATION_NO:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Notable Trees",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16"
+  },
+  "parcels_mirror": {
+   "count": 27614,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "SHAPE_Area:Double",
+    "SHAPE_Length:Double",
+    "affected_surveys:String",
+    "appellation:String",
+    "calc_area:Double",
+    "id:Integer",
+    "land_district:String",
+    "parcel_intent:String",
+    "statutory_actions:String",
+    "survey_area:Double",
+    "titles:String",
+    "topology_type:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Parcel Boundaries",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
+  },
+  "sw_pipe": {
+   "count": 14802,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Length:Double",
+    "asset_id:String",
+    "catchment:String",
+    "condition_date:Date",
+    "condition_grade:Integer",
+    "contract:String",
+    "criticality_score:Integer",
+    "criticality_year:Integer",
+    "ds_invert_level_nzvd2016:Double",
+    "ds_invert_level_wgtn1953:Double",
+    "ds_node_id:String",
+    "flow_control:String",
+    "joint_type:String",
+    "kcdc_histo_id:String",
+    "length:Double",
+    "location:String",
+    "pipe_class:String",
+    "pipe_material:String",
+    "pipe_type:String",
+    "status:String",
+    "system_type:String",
+    "us_invert_level_nzvd2016:Double",
+    "us_invert_level_wgtn1953:Double",
+    "us_node_id:String",
+    "width:Integer",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "SW Pipe",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/5"
+  },
+  "sw_point": {
+   "count": 17887,
+   "fields": [
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "address:String",
+    "asset_id:String",
+    "catchment:String",
+    "chamber_floor_depth:Double",
+    "condition_date:Date",
+    "condition_grade:Integer",
+    "contract:String",
+    "cover_level_nzvd2016:Double",
+    "cover_level_wgtn1953:Double",
+    "criticality_score:Integer",
+    "description:String",
+    "invert_level_nzvd2016:Double",
+    "invert_level_wgtn1953:Double",
+    "kcdc_histo_id:String",
+    "location:String",
+    "manhole_type:String",
+    "node_type:String",
+    "status:String",
+    "system_type:String",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "SW Point",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/4"
+  },
+  "titles": {
+   "count": 33021,
+   "kind": "linz",
+   "layer": 50804
+  },
+  "tsunami_zones": {
+   "count": 17,
+   "fields": [
+    "Col_Code:String",
+    "Evac_Zone:String",
+    "GlobalID:GlobalID",
+    "Heights:String",
+    "Info:String",
+    "LA:String",
+    "Location:String",
+    "Modelling:String",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "SHAPE_Area:Double",
+    "SHAPE_Length:Double",
+    "Shape_Leng:Double",
+    "Zone_Class:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Tsunami Evacuation Zones",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Tsunami/MapServer/3"
+  },
+  "wind_stainless": {
+   "count": 1,
+   "fields": [
+    "GlobalID:GlobalID",
+    "ID:String",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "SHAPE_Area:Double",
+    "SHAPE_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Stainless Zone",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/1"
+  },
+  "wind_very_high": {
+   "count": 1,
+   "fields": [
+    "GlobalID:GlobalID",
+    "ID:String",
+    "OBJECTID:OID",
+    "SHAPE:Geometry",
+    "SHAPE_Area:Double",
+    "SHAPE_Length:Double"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Very High Wind Zone",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/2"
+  },
+  "ws_pipe": {
+   "count": 33179,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Length:Double",
+    "area_code:String",
+    "asset_id:String",
+    "condition_date:Date",
+    "condition_grade:Integer",
+    "contract:String",
+    "criticality_score:Integer",
+    "criticality_year:SmallInteger",
+    "ds_node_id:String",
+    "kcdc_histo_id:String",
+    "length:Double",
+    "location:String",
+    "nominal_diameter:SmallInteger",
+    "pipe_class:String",
+    "pipe_material:String",
+    "pipe_type:String",
+    "status:String",
+    "system_type:String",
+    "us_node_id:String",
+    "usage:String",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "WS Pipe",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/2"
+  },
+  "ww_lateral": {
+   "count": 21177,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Length:Double",
+    "address:String",
+    "asset_id:String",
+    "catchment:String",
+    "contract:String",
+    "diameter:Integer",
+    "kcdc_histo_id:String",
+    "length:Double",
+    "location:String",
+    "pipe_class:String",
+    "pipe_material:String",
+    "status:String",
+    "system_type:String",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "WW Lateral",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/11"
+  },
+  "ww_node": {
+   "count": 10131,
+   "fields": [
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "address:String",
+    "asset_id:String",
+    "catchment:String",
+    "chamber_floor_depth:Double",
+    "condition_date:Date",
+    "condition_grade:Integer",
+    "contract:String",
+    "cover_level_nzvd2016:Double",
+    "cover_level_wgtn1953:Double",
+    "criticality_score:Integer",
+    "description:String",
+    "invert_level_nzvd2016:Double",
+    "invert_level_wgtn1953:Double",
+    "kcdc_histo_id:String",
+    "location:String",
+    "manhole_type:String",
+    "node_type:String",
+    "status:String",
+    "system_type:String",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "WW Point",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9"
+  },
+  "ww_pipe": {
+   "count": 9006,
+   "fields": [
+    "GlobalID:GlobalID",
+    "OBJECTID:OID",
+    "Shape:Geometry",
+    "Shape_Length:Double",
+    "asset_id:String",
+    "catchment:String",
+    "condition_date:Date",
+    "condition_grade:Integer",
+    "contract:String",
+    "criticality_score:Integer",
+    "criticality_year:Integer",
+    "ds_invert_level_nzvd2016:Double",
+    "ds_invert_level_wgtn1953:Double",
+    "ds_node_id:String",
+    "flow_control:String",
+    "joint_type:String",
+    "kcdc_histo_id:String",
+    "length:Double",
+    "location:String",
+    "pipe_class:String",
+    "pipe_material:String",
+    "pipe_type:String",
+    "status:String",
+    "system_type:String",
+    "us_invert_level_nzvd2016:Double",
+    "us_invert_level_wgtn1953:Double",
+    "us_node_id:String",
+    "width:Integer",
+    "year_installed:SmallInteger"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "WW Pipe",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/10"
+  },
+  "zones": {
+   "count": 412,
+   "fields": [
+    "Abbreviation:String",
+    "GlobalID:GlobalID",
+    "NPS_Zone:String",
+    "OBJECTID:OID",
+    "PDP_ZONE:String",
+    "Shape:Geometry",
+    "Shape_Area:Double",
+    "Shape_Length:Double",
+    "ePlan_Zone:String"
+   ],
+   "kind": "arcgis",
+   "last_edit": null,
+   "name": "Zones",
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0"
+  }
+ }
+}
