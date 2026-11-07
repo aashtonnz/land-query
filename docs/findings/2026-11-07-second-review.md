@@ -345,7 +345,7 @@ The district was rebuilt with T-47 to T-49 and T-51 (`kapiti.yml` run 4235805382
 | Parcel 3883291, catchment | 138.1 km² | 0.001 km² |
 | Parcels whose catchment fell from 10 km² or more to under 1 km² | — | 84 |
 | Largest catchments | — | Ōtaki corridor (up to 353.5 km²) and Waikanae corridor; none truncated |
-| Query sources without a URL or licence | 6 (LiDAR in Q1, Q2, Q4) | 0 |
+| Query sources without a URL or licence | 4 (LiDAR in Q1, Q2 and Q4, both surveys in Q4) | 0 |
 | Parcel 6627870, nearest manhole | KWWN003040 (arbitrary) | KWWN003040, the deeper of two tied, both listed |
 | Reserve 7260303 in Q1 | possible | excluded (stacked zones) |
 | Parcels with tied manholes, tied pipes (now listed) | — | 437, 3,978 |
