@@ -311,3 +311,22 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
   will come from the next run's QA, which now reports these separately.
 - **Proposed** (needs a decision): compile from LINZ primary parcel geometry, which every GitHub run already fetches
   with the key, and keep the mirror only as a cross-check.
+
+## T-51: parcel geometry from LINZ (7 Nov 2026, decision D-13)
+
+- **What changed.**
+  - `fetch_parcels_kcdc.py` still takes district and block membership from KCDC's mirror, which is clipped to
+    Kāpiti; LINZ's layer covers the country.
+  - It now fetches the block's LINZ primary parcels (layer 50823) and uses LINZ's geometry and fields for each parcel
+    by id.
+  - The mirror is saved for QA, which now compares the mirror's area with LINZ's and reports differences not explained
+    by boundary clipping.
+  - Without the key, the mirror is used and `geometry_source` says so; checked locally, all 535 parcels read
+    `KCDC mirror`.
+- **On GitHub** (tile run 42355853544, block 1785000_5485000):
+  - All 179 parcels have LINZ geometry.
+  - QA reports 4 parcels clipped at the district boundary and 39 truncated by the mirror inside the district.
+  - 177 parcels lie wholly within the fetch window.
+- **Cost.** In this block the compile took 5.2 minutes and peaked at 4.9 GB (before: 2.0–2.5 minutes, 4.2 GB),
+  because whole LINZ parcels widen the window to its 1 km cap. The runner has 7 GB; the T-50 rebuild will show the
+  district-wide cost.
