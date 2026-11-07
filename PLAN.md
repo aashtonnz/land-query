@@ -5,9 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-48: Provenance and publishing safety**
-  `merge_sources` takes URL and licence from the first block that has them; test with a no-coverage block first.
-  `kapiti.yml` refuses to push when `only` is set or blocks are missing, and writes the commit SHA to `RUN.txt`.
 - **T-49: Ties, overlaps and caveats**
   Nearest manhole and pipe: report all assets tied within 5 cm (Q1 uses the deepest invert, Q3 the worst grade, both
   stated). Flag parcels where zones of different types overlap. Count a parcel as clipped only if it lies at the

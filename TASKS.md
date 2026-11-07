@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-07 20:50 (Pacific/Auckland)
+Last updated: 2026-11-07 21:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
@@ -15,7 +15,6 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-48: Provenance and publishing safety: LiDAR URL and licence from the first block that has them, with a test that puts a no-coverage block first; `kapiti.yml` refuses to publish a partial run and records the commit in `RUN.txt` (findings 3, 6).
 - T-49: Ties, overlaps and caveats: tied nearest assets reported rather than picked arbitrarily (Q1 uses the deepest invert); overlapping-zone flag; boundary clipping identified by location; Q3 install-year caveat; the smaller points in finding 9 (findings 2, 5, 7, 8, 9).
 - T-50: Rebuild and re-check: district rebuild with T-47 to T-49, both sample checks re-run, before and after recorded.
 - T-36: Query service (after T-50): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
@@ -38,6 +37,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-48: Provenance and publishing safety: LiDAR URL and licence now come from the first block that has them (test with the no-coverage block first); the district workflow refuses to publish a run limited with `only`, planned short, or missing blocks (tried on GitHub: refused, published results untouched); `RUN.txt` records the commit. [Findings](docs/findings/2026-11-07-second-review.md#t-48-provenance-and-publishing-safety-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-47: Flow at the coast: cells drain into the sea (and onto lower unsurveyed ground) when that is their steepest drop; the flattened sea in LINZ's DEM is masked using the 8 m DEM; catchment from 10 m cells whose centre is in the parcel. The Waitohu now meets the sea at 41.7 km² (was 130); the Paekākāriki parcel reads 0.04 km² (was 29.7); Waikanae and Ōtaki unchanged. District results change at T-50. [Findings](docs/findings/2026-11-07-second-review.md#t-47-flow-at-the-coast-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-46: Second fresh-eyes review: 9 findings on the T-40 to T-45 work. Most serious: the district flow routes coastal streams through the flattened sea in LINZ's DEM (the Waitohu 130 km²; my T-42 explanation was wrong), the published results predate the tie fix, and LiDAR sources lack URL and licence in query output. Its own 21-parcel raw-source check: 312 of 316 values agree, the 4 differences being tied manholes. Fixes are T-47 to T-50. [Findings](docs/findings/2026-11-07-second-review.md) 2026-11-07.
 - Fresh-eyes review added to ai-working-practices as a Situational practice (v1, changelog entry 34), from this project's T-39; this project follows it. [Practice](https://github.com/aashtonnz/ai-working-practices/blob/main/practices/fresh-eyes-review.md) 2026-11-07.

@@ -253,3 +253,16 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
     are identical to the old code there, because the flattened sea lies seaward of the parcels, so the reviewer's
     suspected 1 m effect does not appear on that tile.
   - Inland test tile: catchment changes for 441 of 535 parcels under the cell-centre rule.
+
+## T-48: provenance and publishing safety (fixed in code, 7 Nov 2026)
+
+- **Provenance.** `merge_sources` takes URL and licence from the first block that has them. Before, it took them from
+  the first block met, which for LiDAR is Kapiti Island's block with no coverage. The new test puts that block first
+  and fails on the old code. Every query run also prints how many sources lack a URL or licence.
+- **Partial runs.** `kapiti.yml`'s merge job runs `pipeline/check_complete.py` before publishing. It refuses when
+  the run was limited with `only`, when it planned fewer than the district's 46 blocks, or when a planned block has no
+  results; the push step is then skipped.
+  - Tried on GitHub with `only` set to one block (run 42353181964): the merge job stopped with "run limited to
+    blocks" and "planned 1 blocks of the district's 46".
+  - The `kapiti-results` branch kept run 42324369141.
+- **Run record.** `RUN.txt` now records the commit the results were built from.
