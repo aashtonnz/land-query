@@ -9,11 +9,16 @@ Audience (D-12): "public" serves only columns whose every source has a licence s
 withheld, and cannot be filtered on, until the councils confirm their portal-wide statements in writing (T-35).
 "internal" serves everything, for the owner.
 """
-import json, os, re
+import json, math, os, re, threading
 import duckdb
 import catalogue as cat
 
 MAX_ROWS = 500
+MAX_ROWS_ALL_COLUMNS = 100   # without a `columns` list, fewer rows: a full row is about 2.4 KB of JSON (T-52)
+MAX_CONDITIONS = 20
+MAX_IN_VALUES = 1000         # across all `in` conditions
+MAX_OFFSET = 100_000
+QUERY_SECONDS = 10
 OPS = {"=": "=", "!=": "<>", "<": "<", "<=": "<=", ">": ">", ">=": ">="}
 SAFE_CLASS = re.compile(r"^[\w\s\-.,'():/āēīōūĀĒĪŌŪ]+$")
 
@@ -26,7 +31,7 @@ class LandQuery:
     def __init__(self, results_dir, audience="public"):
         if audience not in ("public", "internal"): raise ValueError("audience must be 'public' or 'internal'")
         self.audience, self.dir = audience, results_dir
-        self.db = duckdb.connect()
+        self.db = duckdb.connect(config=dict(memory_limit="1GB", threads=2))  # one request cannot take the host down (T-52)
         path = os.path.join(results_dir, "units.parquet").replace("'", "''")  # a view cannot take a parameter
         self.db.execute(f"CREATE VIEW units AS SELECT * FROM read_parquet('{path}')")
         self.all_columns = [r[0] for r in self.db.execute("DESCRIBE units").fetchall()]
@@ -56,8 +61,12 @@ class LandQuery:
     def describe_columns(self, contains=None):
         out = {}
         for c in self.all_columns:
+            if c in self.withheld:  # describing a withheld column can reveal its contents (T-52)
+                if contains and contains.lower() not in c.lower(): continue
+                out[c] = dict(served=False, withheld="licence not yet confirmed in writing (T-35)")
+                continue
             if contains and contains.lower() not in c.lower() and contains.lower() not in self.meta[c]["meaning"].lower(): continue
-            out[c] = dict(self.meta[c], served=c in self.columns)
+            out[c] = dict(self.meta[c], served=True)
         return out
 
     # ---- queries ----
@@ -72,34 +81,60 @@ class LandQuery:
         clauses, params = [], []
         if bbox is not None:
             if "bbox_xmin" not in self.all_columns: raise QueryError("these results predate parcel locations (T-36): area queries need the next rebuild")
-            if len(bbox) != 4: raise QueryError("bbox is [xmin, ymin, xmax, ymax] in NZTM2000 metres")
-            x0, y0, x1, y1 = map(float, bbox)
-            if x1 - x0 > 20000 or y1 - y0 > 20000: raise QueryError("bbox wider than 20 km: narrow it or add filters")
+            if not isinstance(bbox, (list, tuple)) or len(bbox) != 4: raise QueryError("bbox is [xmin, ymin, xmax, ymax] in NZTM2000 metres")
+            try: x0, y0, x1, y1 = (float(v) for v in bbox)
+            except (TypeError, ValueError): raise QueryError("bbox values must be numbers") from None
+            if not all(map(math.isfinite, (x0, y0, x1, y1))) or x1 < x0 or y1 < y0: raise QueryError("bbox must be finite, with xmin <= xmax and ymin <= ymax")
             clauses.append("bbox_xmax >= ? AND bbox_xmin <= ? AND bbox_ymax >= ? AND bbox_ymin <= ?"); params += [x0, x1, y0, y1]
-        for cond in where or []:
+        where = where or []
+        if not isinstance(where, list) or len(where) > MAX_CONDITIONS: raise QueryError(f"where is a list of at most {MAX_CONDITIONS} conditions")
+        if sum(len(c.get("value")) for c in where if isinstance(c, dict) and c.get("op") == "in" and isinstance(c.get("value"), list)) > MAX_IN_VALUES:
+            raise QueryError(f"at most {MAX_IN_VALUES} values across all 'in' conditions")
+        for cond in where:
             c, p = self._condition(cond); clauses.append(c); params += p
         sql_where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
-        limit = max(1, min(int(limit), MAX_ROWS)); offset = max(0, int(offset))
-        total = self.db.execute(f"SELECT count(*) FROM units{sql_where}", params).fetchone()[0]
-        sel = ", ".join(f'"{c}"' for c in dict.fromkeys(["unit_id", "appellation", "block_id"] + cols))
-        res = self.db.execute(f"SELECT {sel} FROM units{sql_where} ORDER BY unit_id LIMIT {limit} OFFSET {offset}", params)
-        names = [d[0] for d in res.description]
+        try: limit, offset = int(limit), int(offset)
+        except (TypeError, ValueError): raise QueryError("limit and offset must be whole numbers") from None
+        cap = MAX_ROWS if columns else MAX_ROWS_ALL_COLUMNS
+        limit = max(1, min(limit, cap))
+        if not 0 <= offset <= MAX_OFFSET: raise QueryError(f"offset must be between 0 and {MAX_OFFSET}")
+        total = self._run(f"SELECT count(*) FROM units{sql_where}", params)[0][0]
+        fixed = ["unit_id", "appellation", "block_id", "geometry_source"] if "geometry_source" in self.all_columns else ["unit_id", "appellation", "block_id"]
+        sel = ", ".join(f'"{c}"' for c in dict.fromkeys(fixed + cols))
+        res = self._run(f"SELECT {sel} FROM units{sql_where} ORDER BY unit_id LIMIT {limit} OFFSET {offset}", params, names=True)
+        names, data = res
         rows = []
-        for r in res.fetchall():
+        for r in data:
             d = dict(zip(names, r))
             rows.append(dict(unit_id=d["unit_id"], appellation=d["appellation"], block_id=d["block_id"],
-                             values={c: self._value(c, d[c]) for c in cols}))
+                             geometry_source=d.get("geometry_source"), values={c: self._value(c, d[c]) for c in cols}))
         return self._envelope(rows, cols, total=total, offset=offset)
+
+    def _run(self, sql, params, names=False):
+        """Run a query with a time limit; database errors become a plain message (the details stay in the server)."""
+        timer = threading.Timer(QUERY_SECONDS, self.db.interrupt); timer.start()
+        try:
+            res = self.db.execute(sql, params)
+            out = res.fetchall()
+            return ([d[0] for d in res.description], out) if names else out
+        except duckdb.Error as e:
+            if "INTERRUPT" in type(e).__name__.upper() or "interrupt" in str(e).lower():
+                raise QueryError(f"query took longer than {QUERY_SECONDS} s: narrow it") from None
+            raise QueryError("the query could not be run: check each condition's column, op and value type") from None
+        finally:
+            timer.cancel()
 
     def inverse_query(self, qid):
         iq = json.load(open(os.path.join(self.dir, "inverse_queries.json")))
         q = next((x for x in iq["queries"] if x["id"] == qid), None)
         if q is None: raise QueryError(f"unknown query {qid!r}; available: {[x['id'] for x in iq['queries']]}")
         used = {k for k in q["rows"][0] if k not in ("unit_id", "appellation", "block_id", "sources")} if q["rows"] else set()
-        blocked = sorted(c for c in used if c in self.withheld)
-        if blocked:
-            return dict(id=q["id"], name=q["name"], question=q["question"], withheld=True,
-                        reason=f"uses columns withheld in public mode until the council licences are confirmed (T-35): {blocked}")
+        # judged by every source the query draws on, not only the columns it returns: a query can filter on a
+        # withheld column, or rename one, without returning it (T-52)
+        blocked = sorted(k for k in q.get("provenance", {}) if not cat.SOURCES.get(k, {}).get("licence_cleared"))
+        if self.audience == "public" and (blocked or not q.get("provenance")):
+            return dict(id=q["id"], name=q["name"], withheld=True,
+                        reason="draws on sources whose licence is not yet confirmed in writing (T-35)" if blocked else "no source list recorded")
         return dict(id=q["id"], name=q["name"], question=q["question"], sql=q["sql"], count=q["count"],
                     columns={c: self.meta[c] for c in sorted(used) if c in self.meta},
                     sources=q["provenance"], rows=q["rows"], run=self.run)
@@ -114,7 +149,9 @@ class LandQuery:
         return list(columns)
 
     def _condition(self, cond):
+        if not isinstance(cond, dict): raise QueryError("each condition is an object: {column, op, value}")
         c, op, v = cond.get("column"), cond.get("op", "="), cond.get("value")
+        if isinstance(v, (dict, list)) and op not in ("in", "has_class"): raise QueryError(f"op {op!r} takes a single value")
         if c not in self.all_columns: raise QueryError(f"unknown column {c!r}")
         if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on (T-35)")
         q = f'"{c}"'
@@ -139,7 +176,9 @@ class LandQuery:
         return v
 
     def _envelope(self, rows, cols, total, offset):
-        keys = sorted({k for c in cols for k in self.meta[c]["sources"]})
+        keys = {k for c in cols for k in self.meta[c]["sources"]}
+        if any(r.get("geometry_source") == "KCDC mirror" for r in rows): keys.add("kcdc_parcels")  # computed on the mirror polygon
+        keys = sorted(keys)
         blocks = sorted({r["block_id"] for r in rows})
         sources = {}
         for k in keys:

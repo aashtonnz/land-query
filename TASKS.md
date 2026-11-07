@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 00:20 (Pacific/Auckland)
+Last updated: 2026-11-08 01:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
@@ -10,12 +10,13 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-52: Fresh-eyes review of the query service (started 2026-11-08) before anyone outside uses it (fresh-eyes review practice, rule 1): a new reviewer, from the repository only, tries to get wrong, misleading or withheld data out of it.
 
 ## Waiting on you
+- T-55: Title references in public mode: the `titles` column (licence-cleared, LINZ) holds title references, a direct key into LINZ's separately licensed records of owner names. Serve it publicly, or withhold it? Raised 2026-11-08.
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
+- T-54: Pipeline fixes from the service review, at the next rebuild (about US$2): epoch offset without the building outlines (so the ground-change correction can be served), water pipes excluding 20 mm service connections with a tie rule, integer pipe year and grade.
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels were not on recent survey plans (T-21; the T-45 rebuild swapped 17 of the 554); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
@@ -35,6 +36,8 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-53: Query service fixes from the T-52 review: request limits and a memory and time cap (one request could exhaust the host), wind inputs withheld (computed at a building-dependent viewpoint), correct meanings and one kind per column, precomputed queries judged by all their sources, public descriptions of withheld columns removed, plain error messages. 15 tests; all 10 mutations of the reviewer's kind now caught. [Findings](docs/findings/2026-11-08-service-review.md#t-53-service-fixes-8-nov-2026) 2026-11-08.
+- T-52: Fresh-eyes review of the query service: 14 findings. Most serious: one request could exhaust the server's memory; two publicly served columns depended on withheld building outlines; wrong meanings for 6 columns; some values not marked with one kind. Licence gate, injection resistance and 12 parcels end to end checked correct. [Findings](docs/findings/2026-11-08-service-review.md) 2026-11-08.
 - T-36: Query service: read-only MCP server in `service/` (tools `about`, `columns`, `parcel`, `search`, `query`), with each column's kind, meaning, sources, fit flag and licence status, and each source's URL, licence and per-block sha256 and fetch time. Public mode serves the 57 licence-cleared columns and withholds 42 until T-35; internal mode serves all 99. Filters are a validated grammar (injection tests). Rebuilt district (run 42364630209) publishes parcel locations and provenance: area queries work (584 parcels in a 1 km Paraparaumu box), and the T-50 foreshore fix is in (no parcel's lowest ground reads the flat sea value). Not offered outside until T-52 and T-35. [Service](service/README.md) 2026-11-08.
 - T-50: Rebuild and re-check: district rebuilt with T-47 to T-49 and T-51 (39 minutes, all 46 blocks, commit recorded). The reviewer's failing checks pass (Paekākāriki parcel catchment 29.7 → 0.04 km², parcel 3883291 138 → 0.001 km², LiDAR provenance complete, tied assets listed, double-zoned reserve out of Q1); 27,613 parcels on LINZ geometry, 120 changed area (32 boundary-clipped, 88 mirror truncations). Sample check: 209 of 210 agree; the one difference (flat sea value as lowest ground on a foreshore parcel) fixed in code for the next rebuild (3 parcels, none in a query). [Findings](docs/findings/2026-11-07-second-review.md#t-50-district-rebuild-and-re-check-7-nov-2026) 2026-11-07.
 - T-51: Parcel geometry from LINZ (D-13): each parcel's geometry and fields now come from LINZ by id, with KCDC's mirror deciding district membership and kept as a QA cross-check; `geometry_source` per parcel. On GitHub, block 1785000_5485000: all 179 parcels from LINZ, the mirror's 39 inside-district truncations now reported by QA. Compile in that block 5.2 min, 4.9 GB peak (was about 2 min, 4.2 GB). [Findings](docs/findings/2026-11-07-second-review.md#t-51-parcel-geometry-from-linz-7-nov-2026-decision-d-13) 2026-11-07.

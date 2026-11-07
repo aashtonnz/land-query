@@ -16,11 +16,13 @@ P = ["parcels"]
 COLUMN_SOURCES = [
     (r"(unit_id|appellation|parcel_intent|survey_area_m2|titles|geometry_source|unit_source|area_m2|coverage_pct|rep_[xy]|bbox_\w+)", P),
     (r"block_id", []),
-    (r"title_types|title_count", P + ["titles"]),
+    (r"title_count", P),  # counted from the parcel's own titles field
+    (r"title_types", P + ["titles"]),
     (r"easements_n|land_covenants_n", P + ["nonprimary_parcels"]),
     (r"zones_total_pct", P + ["zones"]),
-    (r"wind_obstruction_pct", P + ["dem_2025", "dsm_2025"]),
-    (r"wind_rel_height_m", P + ["dem_2025", "district_flow"]),
+    # read at the viewpoint, which is chosen on open ground outside the 2021 building outlines (T-52)
+    (r"wind_obstruction_pct", P + ["dem_2025", "dsm_2025", "buildings_2021"]),
+    (r"wind_rel_height_m", P + ["dem_2025", "dsm_2025", "buildings_2021", "district_flow"]),
     (r"ground_min_minus_rbl_m|rbl_in_parcel_max_minus_ground_mean_m", P + ["flood_rbl_nzvd2016", "dem_2025"]),
     (r"rbl_\w+", P + ["flood_rbl_nzvd2016"]),
     (r"ww_head_ground_min_minus_invert_m", P + ["ww_node", "dem_2025"]),
@@ -30,7 +32,9 @@ COLUMN_SOURCES = [
     (r"ws_pipe_\w+", P + ["ws_pipe"]),
     (r"catchment_\w+", P + ["district_flow"]),
     (r"(zones|ovl_\w+|flood_\w+|wind_\w+|tsunami_zones|earthworks|gw_\w+)", None),  # an overlay: its own source key
-    (r"lidar_cells|lidar_coverage_pct|ground_(min|mean|max)_m|slope_p\d+_deg|upslope_area_\w+|flow_path_m", P + ["dem_2025"]),
+    # the district grid masks the sea for coverage, and gives the flow its outlets and edge inflow (T-52)
+    (r"lidar_coverage_pct|upslope_area_\w+|flow_path_m", P + ["dem_2025", "district_flow"]),
+    (r"lidar_cells|ground_(min|mean|max)_m|slope_p\d+_deg", P + ["dem_2025"]),
     (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021"]),
     (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025", "buildings_2021"]),
     (r"building_2021_m2|open_ground_m2|open_ground_slope_lt5_m2|level_open_\w+|platform_15m_earthworks_min_m3", P + ["dem_2025", "buildings_2021"]),
@@ -64,11 +68,12 @@ def load(path=os.path.join(ROOT, "SOURCES.md")):
         for k in re.findall(r"`([^`]+)`", key_cell):
             sources[k] = dict(dataset=dataset, licence=lic, licence_status=_symbol(lic, LICENCE) or "unknown",
                               licence_cleared=lic.startswith("✅"), fit=_symbol(fit, FIT) or "unknown", updated=updated, notes=notes)
-    columns = []
+    exact, globs = [], []
     for cols, kind, meaning in (r[:3] for r in _table(text, "| Columns | Kind | Meaning |", header_in_heading=True)):
         for pat in re.findall(r"`([^`]+)`", cols):
-            columns.append((re.compile("^" + re.escape(pat).replace(r"\*", r"\w+") + "$"), kind, meaning))
-    return sources, columns
+            entry = (re.compile("^" + re.escape(pat).replace(r"\*", r"\w+") + "$"), kind, meaning)
+            (globs if "*" in pat else exact).append(entry)
+    return sources, exact + globs  # a column's own row wins over a pattern such as `wind_*` (T-52)
 
 
 SOURCES, _COLUMNS = load()
