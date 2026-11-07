@@ -7,6 +7,10 @@ name: Compile Kāpiti Coast
 on:
   workflow_dispatch:
     inputs:
+      reuse_blocks_from:
+        description: "Optional: a run id whose block results (kept 1 day) to merge again, instead of recomputing the blocks"
+        required: false
+        default: ""
       only:
         description: "Optional: comma-separated block xmin_ymin ids to run (default: all)"
         required: false
@@ -14,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: read   # to download block results from an earlier run (reuse_blocks_from)
 
 jobs:
   plan:
@@ -35,6 +40,7 @@ jobs:
 
   flow:
     # district-scale flow on a 10 m mosaic of LINZ's national DEM (T-42); cached for the month, as it changes rarely
+    if: inputs.reuse_blocks_from == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -62,6 +68,7 @@ jobs:
 
   block:
     needs: [plan, flow]
+    if: inputs.reuse_blocks_from == ''
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -114,7 +121,11 @@ jobs:
         with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
       - run: pip install -r pipeline/requirements.txt
       - uses: actions/download-artifact@v4
+        if: inputs.reuse_blocks_from == ''
         with: { pattern: "block-*", path: blocks }
+      - uses: actions/download-artifact@v4
+        if: inputs.reuse_blocks_from != ''
+        with: { pattern: "block-*", path: blocks, run-id: "${{ inputs.reuse_blocks_from }}", github-token: "${{ secrets.GITHUB_TOKEN }}" }
       - name: Merge and query
         working-directory: pipeline
         run: |
@@ -138,6 +149,6 @@ jobs:
           git fetch origin kapiti-results && git checkout kapiti-results || git checkout --orphan kapiti-results
           git rm -rq --cached . 2>/dev/null || true
           rm -rf results && mkdir -p results && cp /tmp/out/* results/
-          echo "Run ${{ github.run_id }} on $(date -u +%FT%TZ) from commit ${{ github.sha }}" > results/RUN.txt
+          echo "Run ${{ github.run_id }} on $(date -u +%FT%TZ) from commit ${{ github.sha }}${{ inputs.reuse_blocks_from != '' && format(' (blocks from run {0})', inputs.reuse_blocks_from) || '' }}" > results/RUN.txt
           git add results && git -c user.name="kapiti workflow" -c user.email="actions@github.com" \
             commit -qm "Kāpiti compile: run ${{ github.run_id }}" && git push -q origin HEAD:kapiti-results

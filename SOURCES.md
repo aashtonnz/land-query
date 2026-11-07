@@ -70,7 +70,8 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 | Columns | Kind | Meaning |
 | --- | --- | --- |
-| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | published | LINZ parcel id and fields as published. The query service does not serve `titles` (title references) in public mode (D-15) |
+| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2` | published | LINZ parcel id and fields as published |
+| `titles` | published | LINZ title references on the parcel, as published. Not served in public mode by the query service, because each is a key to owner records (D-15) |
 | `unit_source` | derived | What a unit is: `parcels` (a primary parcel); building outlines only in a run without parcels |
 | `geometry_source` | published | `LINZ` (layer 50823) or `KCDC mirror` (where LINZ was not fetched or did not return the parcel) |
 | `rep_x`, `rep_y`, `bbox_xmin`, `bbox_ymin`, `bbox_xmax`, `bbox_ymax` | derived | A point inside the parcel and the parcel's bounding box, NZTM2000 metres, for area queries |
