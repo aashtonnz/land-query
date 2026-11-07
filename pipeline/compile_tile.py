@@ -104,6 +104,8 @@ if DF is not None and HAVE_LIDAR:
 gy, gx = np.gradient(Z, 1.0)
 SLOPE = np.degrees(np.arctan(np.hypot(gx, gy)))
 CANOPY = (dsm - Z) > 3.0
+with np.errstate(invalid="ignore"):
+    CLEAR25 = (dsm - Z) <= 0.5  # nothing standing above the ground in 2025 (T-56)
 BLDMASK = ~geometry_mask(bld_geoms, out_shape=Z.shape, transform=dem.transform) if bld_geoms and HAVE_LIDAR else np.zeros_like(Z, bool)
 T_BLD = STRtree(bld_geoms) if bld_geoms else None
 
@@ -261,6 +263,10 @@ for uid, (g, p) in enumerate(units):
              open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()) if HAVE_LIDAR else None,
              canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1) if HAVE_LIDAR else None,
              dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), lidar_epoch_offset_block_m=EPOCH_OFFSET, dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
+    # the same change on clear ground only (T-56): drops many vegetation hits, but also new-house sites (see T-29)
+    _c = m & CLEAR25[rs, cs] & np.isfinite(Dw)
+    r.update(dz_2021_2025_clear_pct=round(100 * float(_c.sum()) / max(1, int((m & np.isfinite(Dw)).sum())), 1) if HAVE_LIDAR else None,
+             dz_2021_2025_clear_mean_m=stat(np.mean, Dw[_c], 3) if _c.sum() >= 50 else None)
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
     # ties (within 5 cm): the deepest invert for manholes, the worst condition grade for pipes; all tied ids reported
     d, np_, tied = nearest("ww_nodes", ww_nodes, g, prefer=deepest_invert)

@@ -5,10 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-56: Ground change on clear ground**
-  Compute `dz_2021_2025_*` on cells where the 2025 DSM is within 0.5 m of the DEM, add the parcel's vegetated share
-  (DSM − DEM over 0.5 m, outside 2021 building outlines), and re-run the T-29 sample: the 8 vegetation hits should
-  drop out of Q4 and the 13 real changes stay. Takes effect at the next rebuild.
 - **T-25: Source-change checks**
   A weekly workflow that fetches each source layer's field list and record count (and the LINZ layer revision where available),
   commits a snapshot, and flags any difference.

@@ -38,6 +38,7 @@ COLUMN_SOURCES = [
     # the district grid masks the sea for coverage, and gives the flow its outlets and edge inflow (T-52)
     (r"lidar_coverage_pct|upslope_area_\w+|flow_path_m", P + ["dem_2025", "district_flow"]),
     (r"lidar_cells|ground_(min|mean|max)_m|slope_p\d+_deg", P + ["dem_2025"]),
+    (r"dz_2021_2025_clear_\w+", P + ["dem_2025", "dem_2021", "dsm_2025"]),
     (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021"]),
     (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025"]),  # LiDAR only since T-54
     (r"building_2021_m2|open_ground_m2|open_ground_slope_lt5_m2|level_open_\w+|platform_15m_earthworks_min_m3", P + ["dem_2025", "buildings_2021"]),

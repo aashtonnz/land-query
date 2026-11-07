@@ -68,3 +68,21 @@ DP 550000 onward, which are mostly new subdivisions. This check looks at the oth
 | 3938633 | Lot 5 DP 29663 | -0.31 | 2.7 | artefact | existing house, minor yard change |
 | 3794457 | Topaatekaahu 5 Block | +0.36 | 2.1 | vegetation | forestry slash in 2021, young trees in 2025 |
 | 4006358 | Lot 1 DP 7224 | -0.39 | 2.0 | construction | old house demolished and a new one built |
+## T-56: the clear-ground rule, tested before changing anything (8 Nov 2026)
+
+The proposed rule: measure ground change only on clear ground (2025 DSM within 0.5 m of the DEM, at least 50
+cells), and apply Q4's thresholds to that. It was tested on the same 23 parcels, reading the 2021 and 2024–25 LiDAR
+directly from LINZ (`scratchpad` script; the old rule reproduced Q4 for all 23).
+
+| Photo class | Flagged by Q4 now | Flagged under the clear-ground rule |
+| --- | --- | --- |
+| Real change (construction, earthworks, beach, river) | 13 | 10 |
+| Vegetation | 8 | 4 |
+| No visible change | 2 | 0 |
+
+- **More precise, but it loses real changes.** The share of real changes among flagged parcels rises from 57% to 71%,
+  but 3 real new-house sites drop out: excluding the new house as "not clear ground" leaves too little of the site to
+  pass the thresholds.
+- **Decision.** Q4 is unchanged. The compiler adds `dz_2021_2025_clear_pct` and `dz_2021_2025_clear_mean_m` beside
+  the existing columns, so a user can compare the two. They take effect at the next rebuild; on the test tile the
+  two means correlate at 0.97, and 44% of cells are clear on average.
