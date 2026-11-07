@@ -176,6 +176,24 @@ def test_cell_beside_a_higher_survey_gap_is_not_an_outlet():
     assert float(np.nansum(acc[-1, :])) == np.isfinite(z).sum()           # all of it reaches the south edge
 
 
+def test_lidar_url_and_licence_survive_a_no_coverage_block_first():
+    from provenance import merge_sources, source_summary
+    island = dict(block=[1755000, 5470000, 1760000, 5475000], sources=dict(dem_2025=dict(ok=False, no_coverage=True, error="none")))
+    town = dict(block=[1765000, 5465000, 1770000, 5470000], sources=dict(dem_2025=dict(
+        ok=True, collection="https://example/collection.json", licence="CC-BY-4.0", sha256="aa", fetched="t")))
+    s = source_summary(merge_sources([island, town])["dem_2025"])   # Kapiti Island's block comes first
+    assert s["url"] and s["licence"], s
+
+
+def test_partial_district_run_is_not_published():
+    from check_complete import problems
+    planned = [dict(xmin=1, ymin=2), dict(xmin=3, ymin=4)]
+    assert problems(planned, {"1_2", "3_4"}, "", 2) == []
+    assert problems(planned, {"1_2"}, "", 2)                      # a block failed
+    assert problems(planned, {"1_2", "3_4"}, "1_2,3_4", 2)        # run limited with `only`
+    assert problems(planned[:1], {"1_2"}, "", 2)                  # planned fewer than the district
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

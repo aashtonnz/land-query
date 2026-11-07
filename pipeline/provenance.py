@@ -31,6 +31,9 @@ def merge_sources(block_provs):
             e = out.setdefault(k, dict(url=v.get("url") or v.get("collection"), licence=v.get("licence"),
                                        blocks=0, failed_blocks=0, fetched_first=None, fetched_last=None, by_block={}))
             e["blocks"] += 1
+            # take URL and licence from the first block that has them: a block outside the LiDAR surveys has neither
+            if not e["url"]: e["url"] = v.get("url") or v.get("collection")
+            if not e["licence"]: e["licence"] = v.get("licence")
             if not v.get("ok", True):
                 e["failed_blocks"] += 0 if v.get("no_coverage") else 1
                 continue

@@ -94,4 +94,6 @@ for q in Q:
 json.dump(out, open(os.path.join(D, "inverse_queries.json"), "w"), indent=1, default=str)
 missing = sum(1 for q, qq in zip(Q, out["queries"]) for r in qq["rows"] for k in q["sources"] if k in PROV and k not in r["sources"])
 print("rows missing a source's sha256 or fetch time:", missing)
+no_url = sum(1 for qq in out["queries"] for k, v in qq["provenance"].items() if not v.get("url") or not v.get("licence"))
+print("sources without a URL or licence:", no_url)
 print("universe:", out["universe"], "parcels wholly in tile")
