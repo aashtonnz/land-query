@@ -229,6 +229,16 @@ def test_flat_sea_cells_inside_a_coarse_land_cell_are_still_sea():
     assert sea[:, :15].all() and not sea[:, 15:].any()                     # includes the isolated cell staying land
 
 
+def test_water_main_ties_go_to_the_largest_and_whole_numbers_are_integers():
+    from shapely.geometry import LineString, box
+    from overlays import nearest_item, largest_diameter, as_int
+    parcel = box(0, 0, 20, 20)
+    pipes = [(LineString([(5, -5), (5, 30)]), {"asset_id": "A", "nominal_diameter": 100}),
+             (LineString([(15, -5), (15, 30)]), {"asset_id": "B", "nominal_diameter": 560})]
+    assert nearest_item(pipes, [0, 1], parcel, prefer=largest_diameter)[1]["asset_id"] == "B"
+    assert as_int(1964.0) == 1964 and isinstance(as_int(5.0), int) and as_int(None) is None and as_int(2.5) == 2.5
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

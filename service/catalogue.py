@@ -11,6 +11,9 @@ LICENCE = {"✅": "dataset licence", "◐": "portal-wide statement, to be confir
 FIT = {"✅": "fit", "⚠": "use with caution", "❌": "not fit for parcel use", "—": "not applicable"}
 FIT_RANK = {"fit": 0, "not applicable": 0, "use with caution": 1, "not fit for parcel use": 2, "unknown": 3}
 
+# Columns never served in public mode whatever their licence (D-12: facts about land, never people)
+PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records; title type and count are served instead (T-55)"}
+
 # Which sources each column is computed from, first match wins. Every derived value also depends on the parcel.
 P = ["parcels"]
 COLUMN_SOURCES = [
@@ -36,7 +39,7 @@ COLUMN_SOURCES = [
     (r"lidar_coverage_pct|upslope_area_\w+|flow_path_m", P + ["dem_2025", "district_flow"]),
     (r"lidar_cells|ground_(min|mean|max)_m|slope_p\d+_deg", P + ["dem_2025"]),
     (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021"]),
-    (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025", "buildings_2021"]),
+    (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025"]),  # LiDAR only since T-54
     (r"building_2021_m2|open_ground_m2|open_ground_slope_lt5_m2|level_open_\w+|platform_15m_earthworks_min_m3", P + ["dem_2025", "buildings_2021"]),
     (r"canopy_gt3m_open_pct|open_ground_clear_pct|winter_sun_\w+|horizon_\w+|sky_view_pct", P + ["dem_2025", "dsm_2025", "buildings_2021"]),
     (r"roof_\w+", P + ["dsm_2025", "buildings_2021"]),

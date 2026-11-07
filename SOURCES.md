@@ -70,7 +70,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 | Columns | Kind | Meaning |
 | --- | --- | --- |
-| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | published | LINZ parcel id and fields as published |
+| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2`, `titles` | published | LINZ parcel id and fields as published. The query service does not serve `titles` (title references) in public mode (D-15) |
 | `unit_source` | derived | What a unit is: `parcels` (a primary parcel); building outlines only in a run without parcels |
 | `geometry_source` | published | `LINZ` (layer 50823) or `KCDC mirror` (where LINZ was not fetched or did not return the parcel) |
 | `rep_x`, `rep_y`, `bbox_xmin`, `bbox_ymin`, `bbox_xmax`, `bbox_ymax` | derived | A point inside the parcel and the parcel's bounding box, NZTM2000 metres, for area queries |
@@ -88,7 +88,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `canopy_gt3m_open_pct` | derived | Share of open ground where the surface is more than 3 m above ground (trees or structures) |
 | `open_ground_clear_pct` | derived | Share of open ground with nothing standing more than 0.5 m above it in the 2024–25 DSM (no tree, shrub, hedge, fence, vehicle or building newer than the 2021 outlines) |
 | `dz_2021_2025_mean_m`, `dz_2021_2025_absmax_m` | derived | Ground change 2021 → 2024–25, mean and largest single cell; not offset-corrected: subtract `lidar_epoch_offset_block_m` |
-| `lidar_epoch_offset_block_m` | derived | The block's LiDAR epoch offset: median 2024–25 minus 2021 ground on flat (slope under 2°), open, unbuilt ground, from at least 1,000 cells; district blocks range from about +0.03 to +0.16 m |
+| `lidar_epoch_offset_block_m` | derived | The block's LiDAR epoch offset: median 2024–25 minus 2021 ground on flat (slope under 2°), clear ground (DSM within 0.5 m of the DEM, which excludes roofs and trees), from at least 1,000 cells; LiDAR only since T-54 (before, the 2021 building outlines were also excluded); district blocks range from about +0.03 to +0.16 m |
 | `ww_mh_dist_m`, `ww_mh_tied_ids` | derived | Nearest in-use council wastewater manhole (node type WWMH) that has an invert, within 150 m: distance, id, invert (NZVD2016). Where several are equally near (within 5 cm, for example two inside the parcel), the deepest invert is reported and all their ids are listed in `ww_mh_tied_ids`. Before T-44 any wastewater node with an invert counted, including cleaning eyes and valves |
 | `ww_mh_id`, `ww_mh_invert_nzvd2016` | published | The id and invert level of that manhole, as KCDC publishes them |
 | `ww_head_ground_min_minus_invert_m` | derived | Parcel's lowest ground minus that invert: a rough fall available for gravity drainage, before pipe cover and grade |
@@ -96,8 +96,8 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `ww_pipe_id`, `ww_pipe_material`, `ww_pipe_dia_mm`, `ww_pipe_year`, `ww_pipe_condition_grade` | published | That pipe's id, material code, diameter (mm), install year and condition grade, as KCDC publishes them (see `ww_pipe_dist_m` for caveats) |
 | `sw_mh_dist_m` | derived | Distance to the nearest in-use council stormwater manhole (node type SWMH) with an invert, within 150 m; not culvert ends, sumps or soakage |
 | `sw_mh_invert_nzvd2016` | published | That manhole's invert level (NZVD2016), as KCDC publishes it |
-| `ws_pipe_dist_m` | derived | Distance to the nearest in-use council water supply pipe within 150 m. Caution: this is usually a 20 mm service connection, not a main (second fix pending, T-54) |
-| `ws_pipe_dia_mm` | published | That water pipe's nominal diameter (mm), as KCDC publishes it; usually 20 mm, a service connection (T-54) |
+| `ws_pipe_dist_m`, `ws_pipe_tied_ids` | derived | Distance to the nearest in-use council water main within 150 m: reticulation, rider or trunk main carrying treated water (not 20 mm service connections, scour or plant pipework, or raw-water pipes). Where several tie within 5 cm, the largest is reported and all ids are listed in `ws_pipe_tied_ids`. Before T-54 (8 Nov 2026) the nearest pipe was usually a service connection |
+| `ws_pipe_dia_mm`, `ws_pipe_type` | published | That main's nominal diameter (mm) and KCDC pipe type (`RETI` reticulation, `RIDE` rider, `TRNK` trunk), as KCDC publishes them |
 | `rbl_in_parcel_n`, `rbl_in_parcel_max_nzvd2016`, `rbl_in_parcel_max_minus_ground_mean_m` | derived | Recommended building level points inside the parcel; highest; how far it sits above mean ground (a floor-height requirement) |
 | `rbl_max_nzvd2016`, `ground_min_minus_rbl_m` | derived | Highest recommended building level within 10 m, and lowest ground minus it. Picks up upslope values; don't read it as flood depth |
 | `winter_sun_hours_open_mean`, `winter_sun_open_ge3h_pct` | modelled | Hours of direct sun on the ground on 21 June (hourly samples, NZST) over the clear open ground (`open_ground_clear_pct`): the mean, and the share getting 3 hours or more. Ground under trees is not counted; empty if no open ground is clear. Before T-43 (7 Nov 2026) this measured sun on the surface, which on wooded ground is the canopy. Shadows from buildings, trees and terrain within 300 m in the 2024–25 DSM; farther ranges are not counted |

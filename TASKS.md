@@ -1,22 +1,21 @@
 # Tasks
 
-Last updated: 2026-11-08 01:30 (Pacific/Auckland)
+Last updated: 2026-11-08 02:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (US$10; D-14). November 2026 so far: about US$6.79 of paid Actions usage before the T-36 rebuild, plus about US$2 for it: an estimated US$8.80 of the US$10 budget.
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$8.80, plus about US$2 for the T-54 rebuild: about US$10.80.
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
+- T-54: Pipeline fixes from the service review (code done 2026-11-08; rebuild running, about US$2): epoch offset from LiDAR only, so the ground-change correction can be served; nearest water main (reticulation, rider or trunk) instead of service connections, with a tie rule and tied ids; integer pipe year and grade.
 
 ## Waiting on you
-- T-55: Title references in public mode: the `titles` column (licence-cleared, LINZ) holds title references, a direct key into LINZ's separately licensed records of owner names. Serve it publicly, or withhold it? Raised 2026-11-08.
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-54: Pipeline fixes from the service review, at the next rebuild (about US$2): epoch offset without the building outlines (so the ground-change correction can be served), water pipes excluding 20 mm service connections with a tie rule, integer pipe year and grade.
 - T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels were not on recent survey plans (T-21; the T-45 rebuild swapped 17 of the 554); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
@@ -36,6 +35,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-55: Title references withheld in public mode (D-15): each is a key to owner records; title type and count still served. 2026-11-08.
 - T-53: Query service fixes from the T-52 review: request limits and a memory and time cap (one request could exhaust the host), wind inputs withheld (computed at a building-dependent viewpoint), correct meanings and one kind per column, precomputed queries judged by all their sources, public descriptions of withheld columns removed, plain error messages. 15 tests; all 10 mutations of the reviewer's kind now caught. [Findings](docs/findings/2026-11-08-service-review.md#t-53-service-fixes-8-nov-2026) 2026-11-08.
 - T-52: Fresh-eyes review of the query service: 14 findings. Most serious: one request could exhaust the server's memory; two publicly served columns depended on withheld building outlines; wrong meanings for 6 columns; some values not marked with one kind. Licence gate, injection resistance and 12 parcels end to end checked correct. [Findings](docs/findings/2026-11-08-service-review.md) 2026-11-08.
 - T-36: Query service: read-only MCP server in `service/` (tools `about`, `columns`, `parcel`, `search`, `query`), with each column's kind, meaning, sources, fit flag and licence status, and each source's URL, licence and per-block sha256 and fetch time. Public mode serves the 57 licence-cleared columns and withholds 42 until T-35; internal mode serves all 99. Filters are a validated grammar (injection tests). Rebuilt district (run 42364630209) publishes parcel locations and provenance: area queries work (584 parcels in a 1 km Paraparaumu box), and the T-50 foreshore fix is in (no parcel's lowest ground reads the flat sea value). Not offered outside until T-52 and T-35. [Service](service/README.md) 2026-11-08.

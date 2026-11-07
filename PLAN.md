@@ -5,10 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-54: Pipeline fixes from the service review**
-  Compute the block epoch offset on flat, clear ground without the building outlines (DSM − DEM under 0.5 m already
-  excludes roofs), so it and the `dz_*` correction are licence-cleared; nearest water pipe excluding `SERV` service
-  connections, with a tie rule and tied ids; pipe year and grade as integers. Takes effect at the next rebuild.
 - **T-29: Check LiDAR change candidates**
   For a sample of the 256 Q4 parcels not on recent survey plans (district run), compare LINZ 7.5 cm aerials from before and after and classify each
   change as earthworks, construction, vegetation or artefact.

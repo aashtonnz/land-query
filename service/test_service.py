@@ -155,6 +155,7 @@ def test_column_metadata_matches_the_pipeline():
     assert m("ww_pipe_condition_grade")["fit"] == "use with caution"     # the weakest source counts, not the strongest
     assert m("gw_liquefaction")["fit"] == "not fit for parcel use"
     assert m("ww_mh_id")["kind"] == "published" and m("ww_mh_dist_m")["kind"] == "derived"
+    assert m("lidar_epoch_offset_block_m")["licence_cleared"]          # LiDAR only, so the dz correction can be served (T-54)
 
 
 def test_every_column_has_one_kind_and_public_mode_serves_only_cleared_sources():
@@ -164,12 +165,20 @@ def test_every_column_has_one_kind_and_public_mode_serves_only_cleared_sources()
     assert {cat.column_meta(c)["kind"] for c in lq.all_columns} <= {"published", "derived", "modelled"}
     for c in lq.columns:
         assert all(cat.SOURCES[k]["licence_cleared"] for k in cat.column_meta(c)["sources"]), c
-    # a served column's meaning should not name or describe a withheld column. Known exception until T-54 computes the
-    # epoch offset without the building outlines: the dz columns tell users to subtract it.
-    pending = {"dz_2021_2025_mean_m", "dz_2021_2025_absmax_m"}
-    for c in lq.columns:
+    for c in lq.columns:  # a served column's meaning should not name or describe a withheld column
         named = set(re.findall(r"`([a-z0-9_]+)`", cat.column_meta(c)["meaning"])) & set(lq.withheld)
-        assert not named or (c in pending and named == {"lidar_epoch_offset_block_m"}), (c, named)
+        assert not named, (c, named)
+
+
+def test_title_references_are_not_served_publicly():
+    import catalogue
+    assert "titles" in catalogue.PUBLIC_EXCLUDE
+    p = os.environ.get("LANDQ_RESULTS")
+    if not p: print("SKIPPED: set LANDQ_RESULTS to check titles on the published columns"); return
+    lq = LandQuery(p, "public")
+    assert "titles" in lq.withheld and "title_types" in lq.columns and "title_count" in lq.columns
+    try: lq.search(where=[dict(column="titles", op="contains", value="WN")]); assert False
+    except QueryError as e: assert "T-55" in str(e)
 
 
 if __name__ == "__main__":

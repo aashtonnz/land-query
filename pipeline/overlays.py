@@ -69,3 +69,13 @@ def split_clipped(diffs, linz_geoms, edge, tol_m=1.0):
     at_edge = lambda i: edge is not None and not edge.is_empty and i in linz_geoms and linz_geoms[i].buffer(tol_m).intersects(edge)
     clipped = {i: d for i, d in diffs.items() if d < -1 and at_edge(i)}
     return clipped, {i: d for i, d in diffs.items() if i not in clipped}
+
+
+def largest_diameter(p):
+    d = p.get("nominal_diameter")
+    return -d if isinstance(d, (int, float)) else 0
+
+
+def as_int(v):
+    """A whole number stored as a float (1964.0) as an integer; anything else unchanged."""
+    return int(v) if isinstance(v, float) and v.is_integer() else v

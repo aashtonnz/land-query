@@ -9,7 +9,7 @@ import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
-from overlays import class_shares, points_on, nearest_item, deepest_invert, worst_grade
+from overlays import class_shares, points_on, nearest_item, deepest_invert, worst_grade, largest_diameter, as_int
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -49,7 +49,11 @@ council = lambda items: [(g, p) for g, p in items if p.get("status") == "INUS"]
 # manholes only (node types WWMH, SWMH): not cleaning eyes, valves, culvert ends, sumps or soakage (T-44)
 ww_nodes = [(g, p) for g, p in council(load("ww_node")) if p.get("node_type") == "WWMH" and p.get("invert_level_nzvd2016") is not None]
 sw_nodes = [(g, p) for g, p in council(load("sw_point")) if p.get("node_type") == "SWMH" and p.get("invert_level_nzvd2016") is not None]
-ww_pipes = council(load("ww_pipe")); ws_pipes = council(load("ws_pipe"))
+# water mains only: reticulation, rider and trunk mains carrying treated water; not 20 mm service connections, scour
+# or plant pipework, or raw untreated-water pipes (T-54)
+WATER_MAINS = {"RETI", "RIDE", "TRNK"}
+ww_pipes = council(load("ww_pipe"))
+ws_pipes = [(g, p) for g, p in council(load("ws_pipe")) if p.get("pipe_type") in WATER_MAINS and p.get("usage") != "RAW"]
 rbl = load("flood_rbl_nzvd2016")
 T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=sw_nodes, ww_pipes=ww_pipes,
                                                     ws_pipes=ws_pipes, rbl=rbl).items() if v}
@@ -122,7 +126,9 @@ def stat(f, a, nd=2):
     return None if a.size == 0 else round(float(f(a)), nd)
 DZ = Z - z21
 # the block's own LiDAR epoch offset: median 2024-25 minus 2021 on flat, open, unbuilt ground (as QA check 3)
-_flat = (SLOPE < 2) & ((dsm - Z) < 0.5) & ~BLDMASK & np.isfinite(DZ)
+# flat (slope under 2°) and clear (DSM within 0.5 m of the DEM, which excludes roofs and trees); the 2021 building
+# outlines are not used, so the offset depends only on LiDAR (T-54)
+_flat = (SLOPE < 2) & ((dsm - Z) < 0.5) & np.isfinite(DZ)
 EPOCH_OFFSET = round(float(np.median(DZ[_flat])), 3) if _flat.sum() >= 1000 else None
 del _flat
 
@@ -266,11 +272,12 @@ for uid, (g, p) in enumerate(units):
     r.update(ww_pipe_tied_ids=json.dumps(tied) if len(tied) > 1 else None)
     r.update(ww_pipe_dist_m=None if d is None else round(d, 1), ww_pipe_id=pp_ and pp_["asset_id"],
              ww_pipe_material=pp_ and pp_.get("pipe_material"), ww_pipe_dia_mm=pp_ and pp_.get("width"),
-             ww_pipe_year=pp_ and pp_.get("year_installed"), ww_pipe_condition_grade=pp_ and pp_.get("condition_grade"))
+             ww_pipe_year=as_int(pp_ and pp_.get("year_installed")), ww_pipe_condition_grade=as_int(pp_ and pp_.get("condition_grade")))
     d, sp_, _ = nearest("sw_nodes", sw_nodes, g, prefer=deepest_invert)
     r.update(sw_mh_dist_m=None if d is None else round(d, 1), sw_mh_invert_nzvd2016=sp_ and sp_["invert_level_nzvd2016"])
-    d, wp_, _ = nearest("ws_pipes", ws_pipes, g)
-    r.update(ws_pipe_dist_m=None if d is None else round(d, 1), ws_pipe_dia_mm=wp_ and wp_.get("nominal_diameter"))
+    d, wp_, tied = nearest("ws_pipes", ws_pipes, g, prefer=largest_diameter)  # a tie goes to the largest main
+    r.update(ws_pipe_dist_m=None if d is None else round(d, 1), ws_pipe_dia_mm=as_int(wp_ and wp_.get("nominal_diameter")),
+             ws_pipe_type=wp_ and wp_.get("pipe_type"), ws_pipe_tied_ids=json.dumps(tied) if len(tied) > 1 else None)
     # flood: highest KCDC recommended building level (NZVD2016) within 10 m
     lv = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g.buffer(10)) if "rbl" in T else [])
           if rbl[i][1].get("VALUE_NZVD2016") is not None and rbl[i][0].distance(g) <= 10]

@@ -38,7 +38,8 @@ class LandQuery:
         self.meta = {c: cat.column_meta(c) for c in self.all_columns}
         missing = [c for c, m in self.meta.items() if m is None]
         if missing: raise RuntimeError(f"columns missing from SOURCES.md or the catalogue: {missing}")
-        self.columns = [c for c in self.all_columns if audience == "internal" or self.meta[c]["licence_cleared"]]
+        self.columns = [c for c in self.all_columns
+                        if audience == "internal" or (self.meta[c]["licence_cleared"] and c not in cat.PUBLIC_EXCLUDE)]
         self.withheld = [c for c in self.all_columns if c not in self.columns]
         p = os.path.join(results_dir, "provenance.json")
         self.prov = json.load(open(p)) if os.path.exists(p) else {}
@@ -63,7 +64,7 @@ class LandQuery:
         for c in self.all_columns:
             if c in self.withheld:  # describing a withheld column can reveal its contents (T-52)
                 if contains and contains.lower() not in c.lower(): continue
-                out[c] = dict(served=False, withheld="licence not yet confirmed in writing (T-35)")
+                out[c] = dict(served=False, withheld=cat.PUBLIC_EXCLUDE.get(c, "licence not yet confirmed in writing (T-35)"))
                 continue
             if contains and contains.lower() not in c.lower() and contains.lower() not in self.meta[c]["meaning"].lower(): continue
             out[c] = dict(self.meta[c], served=True)
@@ -132,6 +133,7 @@ class LandQuery:
         # judged by every source the query draws on, not only the columns it returns: a query can filter on a
         # withheld column, or rename one, without returning it (T-52)
         blocked = sorted(k for k in q.get("provenance", {}) if not cat.SOURCES.get(k, {}).get("licence_cleared"))
+        blocked += sorted(c for c in used if c in cat.PUBLIC_EXCLUDE)
         if self.audience == "public" and (blocked or not q.get("provenance")):
             return dict(id=q["id"], name=q["name"], withheld=True,
                         reason="draws on sources whose licence is not yet confirmed in writing (T-35)" if blocked else "no source list recorded")
@@ -145,7 +147,7 @@ class LandQuery:
         bad = [c for c in columns if c not in self.all_columns]
         if bad: raise QueryError(f"unknown columns: {bad}")
         held = [c for c in columns if c in self.withheld]
-        if held: raise QueryError(f"withheld in public mode until the council licences are confirmed (T-35): {held}")
+        if held: raise QueryError(f"withheld in public mode: {[(c, cat.PUBLIC_EXCLUDE.get(c, 'licence not yet confirmed (T-35)')) for c in held]}")
         return list(columns)
 
     def _condition(self, cond):
@@ -153,7 +155,7 @@ class LandQuery:
         c, op, v = cond.get("column"), cond.get("op", "="), cond.get("value")
         if isinstance(v, (dict, list)) and op not in ("in", "has_class"): raise QueryError(f"op {op!r} takes a single value")
         if c not in self.all_columns: raise QueryError(f"unknown column {c!r}")
-        if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on (T-35)")
+        if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on ({cat.PUBLIC_EXCLUDE.get(c, 'T-35')})")
         q = f'"{c}"'
         if op in OPS: return f"{q} {OPS[op]} ?", [v]
         if op == "in":
