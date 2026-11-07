@@ -9,10 +9,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
   A new reviewer, briefed with the repository only, checks `service/` against D-12 and `SOURCES.md`: whether withheld
   columns can leak (through filters, queries, errors or descriptions), whether provenance and kinds are right for each
   column, whether the filter grammar can be abused, and whether responses could mislead a user. Fixes as for T-39.
-- **T-36: Query service**
-  A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
-  source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users
-  only licence-cleared data, after T-35.
 - **T-29: Check LiDAR change candidates**
   For a sample of the 256 Q4 parcels not on recent survey plans (district run), compare LINZ 7.5 cm aerials from before and after and classify each
   change as earthworks, construction, vegetation or artefact.
