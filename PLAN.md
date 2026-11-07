@@ -5,6 +5,11 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
+- **T-46: Second fresh-eyes review**
+  A new reviewer, briefed with the repository only, checks the changes since `23a5c9f` (T-40 to T-45: overlay labels,
+  provenance, flow and the district mosaic, ground-level measures, QA and queries) and the rebuilt district results,
+  including its own sample of parcels against the raw sources. Fixes as for T-39, each with a check that fails before
+  and passes after.
 - **T-36: Query service**
   A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users
