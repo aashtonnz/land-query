@@ -26,6 +26,9 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   quality checks on every block, and pushes the merged parcel table, provenance and query results to the
   `kapiti-results` branch. Two fresh-eyes reviews checked it
   ([first](docs/findings/2026-11-06-fresh-eyes-review.md), [second](docs/findings/2026-11-07-second-review.md)).
+- **[`.github/workflows/sources.yml`](.github/workflows/sources.yml)**: a weekly check of every source's fields,
+  record count and last-edit date. Snapshots go to the `source-checks` branch, and the run is flagged when anything
+  changed, so a rebuild can be planned.
 - **[`service/`](service/)**: a read-only MCP server over those results, run locally. Each value comes with its kind,
   sources, licence and fit-for-parcel flag. In public mode it serves only licence-cleared columns (D-12). It is not yet
   offered to outside users.

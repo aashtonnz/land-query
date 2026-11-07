@@ -1,0 +1,50 @@
+name: Check sources for changes
+
+# Weekly (T-25): records each source's fields, record count within the district and last-edit date, compares with the
+# previous week, and pushes the snapshot to the `source-checks` branch. The run is marked failed when anything changed,
+# so GitHub notifies the owner; the summary says what changed. About 1–2 runner minutes a week (D-14).
+
+on:
+  schedule:
+    - cron: "37 18 * * 0"   # Sundays 18:37 UTC (Monday morning in New Zealand)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q requests
+      - name: Previous snapshot
+        run: |
+          mkdir -p prev
+          git fetch -q origin source-checks && git show origin/source-checks:checks/latest.json > prev/latest.json || echo "no previous snapshot"
+      - name: Check sources
+        id: check
+        working-directory: pipeline
+        env:
+          LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
+        run: |
+          mkdir -p ../out
+          set +e; python3 source_check.py ../out/latest.json ../prev/latest.json; code=$?; set -e
+          cat ../out/changes.md >> "$GITHUB_STEP_SUMMARY"
+          echo "changed=$([ $code -eq 3 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          [ $code -eq 0 ] || [ $code -eq 3 ]
+      - name: Push snapshot to source-checks branch
+        run: |
+          git fetch -q origin source-checks && git checkout -q source-checks || git checkout -q --orphan source-checks
+          git rm -rq --cached . 2>/dev/null || true
+          mkdir -p checks && cp out/latest.json checks/latest.json && cp out/latest.json "checks/$(date -u +%F).json" && cp out/changes.md checks/changes.md
+          git add checks && git -c user.name="source check" -c user.email="actions@github.com" \
+            commit -qm "Source check $(date -u +%F)" && git push -q origin HEAD:source-checks
+      - name: Flag changes
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          echo "::warning::Sources changed since last week: see the summary. A rebuild may be due."
+          exit 1

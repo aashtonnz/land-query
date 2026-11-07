@@ -239,6 +239,18 @@ def test_water_main_ties_go_to_the_largest_and_whole_numbers_are_integers():
     assert as_int(1964.0) == 1964 and isinstance(as_int(5.0), int) and as_int(None) is None and as_int(2.5) == 2.5
 
 
+def test_source_check_reports_field_count_and_edit_changes():
+    from source_check import compare
+    old = {"zones": dict(fields=["A:String", "B:Double"], count=412, last_edit=1),
+           "dem_2025": dict(items=19, sha256="x"), "gone": dict(count=1)}
+    new = {"zones": dict(fields=["A:String", "C:String"], count=420, last_edit=2),
+           "dem_2025": dict(items=19, sha256="y"), "fresh": dict(count=1)}
+    out = "\n".join(compare(old, new))
+    for s in ("fields changed", "count 412 → 420", "data edited", "catalogue changed", "`gone`: no longer checked", "`fresh`: new"):
+        assert s in out, (s, out)
+    assert compare(old, old) == []
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
