@@ -181,6 +181,13 @@ def test_title_references_are_not_served_publicly():
     except QueryError as e: assert "T-55" in str(e)
 
 
+def test_whole_number_columns_are_served_as_integers():
+    p = os.environ.get("LANDQ_RESULTS")
+    if not p: print("SKIPPED: set LANDQ_RESULTS to check whole-number columns"); return
+    r = LandQuery(p, "public").search(where=[dict(column="ww_pipe_year", op="not_null")], columns=["ww_pipe_year", "ww_pipe_condition_grade"], limit=5)
+    assert all(isinstance(x["values"]["ww_pipe_year"], int) for x in r["rows"]), r["rows"][0]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

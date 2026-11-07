@@ -171,7 +171,11 @@ class LandQuery:
             return f"coalesce(json_extract({q}, ?)::DOUBLE, -1) >= ?", ['$."' + cls + '"', max(float(mn), 0.000001)]
         raise QueryError(f"unknown op {op!r}; use one of {sorted(OPS) + ['in', 'is_null', 'not_null', 'contains', 'has_class']}")
 
+    WHOLE = {"ww_pipe_year", "ww_pipe_condition_grade", "ww_pipe_dia_mm", "ws_pipe_dia_mm", "title_count", "easements_n",
+             "land_covenants_n", "lidar_cells", "rbl_in_parcel_n"}
+
     def _value(self, c, v):
+        if c in self.WHOLE and isinstance(v, float) and v.is_integer(): return int(v)  # stored as decimals where a column has gaps
         if isinstance(v, str) and v[:1] in "[{":
             try: return json.loads(v)
             except ValueError: return v

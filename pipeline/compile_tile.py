@@ -349,6 +349,8 @@ for uid, (g, p) in enumerate(units):
 db = duckdb.connect(os.path.join(D, "tile.duckdb"))
 import pandas as pd
 df = pd.DataFrame(rows)
+for c_ in ("ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dia_mm", "ww_pipe_dia_mm"):  # whole numbers, kept whole
+    if c_ in df: df[c_] = pd.to_numeric(df[c_], errors="coerce").round().astype("Int64")
 db.execute("CREATE OR REPLACE TABLE units AS SELECT * FROM df")
 db.execute(f"COPY units TO '{os.path.join(D, 'units.parquet')}' (FORMAT PARQUET)")
 prov = json.load(open(os.path.join(D, "provenance.json")))

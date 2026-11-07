@@ -90,3 +90,25 @@ re-checked findings 1 to 4 before recording them.
     names this as its one known exception);
   - water pipes excluding 20 mm service connections, with a tie rule and tied ids;
   - integer pipe year and grade.
+
+## T-54 and T-55: pipeline fixes and title references (8 Nov 2026)
+
+- **Epoch offset** (finding 5). `lidar_epoch_offset_block_m` now uses flat, clear ground from LiDAR alone (DSM within
+  0.5 m of the DEM already excludes roofs), without the 2021 building outlines. So it is licence-cleared, and public
+  users can correct `dz_*`. Block offsets now run from +0.03 to +0.11 m across 20 blocks.
+- **Water mains** (finding 6).
+  - The nearest water pipe is now the nearest main: KCDC types `RETI`, `RIDE` or `TRNK`, carrying treated water.
+    Before, it was usually a 20 mm service connection: 18,793 parcels read 20 mm; now 47 do.
+  - Ties go to the largest main, with all ids in the new `ws_pipe_tied_ids`, and the new `ws_pipe_type` gives the type.
+  - Parcel 3745534 now reads the 560 mm trunk main, with its four tied pipes listed.
+  - 3,152 parcels, mostly rural, have no main within 150 m.
+- **Whole numbers.** Pipe year and grade are integers in the compiler (checked on a tile). In the published results
+  they were still stored as decimals, because merging blocks with empty values turns the column decimal again, so the
+  compiler now stores them as nullable integers and the service presents them as whole numbers meanwhile (test added).
+- **Titles** (T-55, D-15). Public mode withholds `titles`; title type and count are still served.
+- **The run.**
+  - The rebuild (run 42371100493) built all 46 blocks, then the service check stopped the merge before publishing: a
+    `SOURCES.md` note I had added after running the tests locally named the withheld `titles` column in the served
+    `unit_id` description. The guard worked as intended.
+  - After the fix, `kapiti.yml` merged those blocks again without recomputing them (new `reuse_blocks_from` input,
+    run 42374135961, about 3 minutes), so the fix cost a few cents instead of a second rebuild.

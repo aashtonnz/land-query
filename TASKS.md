@@ -1,16 +1,15 @@
 # Tasks
 
-Last updated: 2026-11-08 02:10 (Pacific/Auckland)
+Last updated: 2026-11-08 02:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 34
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$8.80, plus about US$2 for the T-54 rebuild: about US$10.80.
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$10.85 of US$20 (T-54 rebuild about US$2, merge-only rerun a few cents).
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-54: Pipeline fixes from the service review (code done 2026-11-08; rebuild running, about US$2): epoch offset from LiDAR only, so the ground-change correction can be served; nearest water main (reticulation, rider or trunk) instead of service connections, with a tie rule and tied ids; integer pipe year and grade.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
@@ -35,6 +34,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-54: Pipeline fixes from the service review: epoch offset from LiDAR only (now served publicly, so ground change can be corrected), nearest water main instead of service connections (20 mm readings 18,793 → 47; ties to the largest main, tied ids and pipe type listed), whole-number pipe fields. Published by a merge-only run reusing the rebuild's blocks, after the new service check stopped one publish over a `SOURCES.md` wording slip. [Findings](docs/findings/2026-11-08-service-review.md#t-54-and-t-55-pipeline-fixes-and-title-references-8-nov-2026) 2026-11-08.
 - T-55: Title references withheld in public mode (D-15): each is a key to owner records; title type and count still served. 2026-11-08.
 - T-53: Query service fixes from the T-52 review: request limits and a memory and time cap (one request could exhaust the host), wind inputs withheld (computed at a building-dependent viewpoint), correct meanings and one kind per column, precomputed queries judged by all their sources, public descriptions of withheld columns removed, plain error messages. 15 tests; all 10 mutations of the reviewer's kind now caught. [Findings](docs/findings/2026-11-08-service-review.md#t-53-service-fixes-8-nov-2026) 2026-11-08.
 - T-52: Fresh-eyes review of the query service: 14 findings. Most serious: one request could exhaust the server's memory; two publicly served columns depended on withheld building outlines; wrong meanings for 6 columns; some values not marked with one kind. Licence gate, injection resistance and 12 parcels end to end checked correct. [Findings](docs/findings/2026-11-08-service-review.md) 2026-11-08.
