@@ -15,6 +15,8 @@ import json, os, sys
 import numpy as np, rasterio, duckdb
 from rasterio.features import geometry_mask
 from shapely.geometry import shape
+from shapely.ops import unary_union
+from overlays import split_clipped
 
 D = sys.argv[1] if len(sys.argv) > 1 else "data"
 RAW = os.path.join(D, "raw")
@@ -36,12 +38,15 @@ def area_check(db):
     if not linz: return dict(n=0, note="LINZ parcels not fetched (needs LINZ_API_KEY)")
     rows = db.execute("SELECT unit_id, area_m2, coverage_pct FROM units").fetchall()
     diffs = {i: a - linz[i] for i, a, _ in rows if i in linz}
-    # KCDC's mirror clips parcels that cross the district boundary, so those are smaller than LINZ by design
-    clipped = {i: d for i, d in diffs.items() if d < -1}
-    other = {i: d for i, d in diffs.items() if d >= -1}
+    # KCDC's mirror clips parcels that cross the district boundary: a parcel counts as clipped only if it is smaller
+    # than LINZ's and reaches the boundary (T-49); any other difference is reported
+    lines = [shape(f["geometry"]) for f in feats("district_boundary")]
+    edge = unary_union([g.boundary if g.geom_type.endswith("Polygon") else g for g in lines])
+    geom = {f["properties"].get("id"): shape(f["geometry"]) for f in feats("parcels")}
+    clipped, other = split_clipped(diffs, geom, edge)
     worst = sorted(other.items(), key=lambda t: -abs(t[1]))[:5]
     return dict(n=len(diffs), not_in_linz=sum(1 for i, _, _ in rows if i not in linz),
-                smaller_than_linz_gt_1=len(clipped), n_abs_gt_1=int(sum(abs(d) > 1 for d in other.values())),
+                clipped_at_district_boundary=len(clipped), n_abs_gt_1=int(sum(abs(d) > 1 for d in other.values())),
                 max_abs=round(max(map(abs, other.values())), 2) if other else None,
                 worst=[[i, round(d, 2)] for i, d in worst if abs(d) > 1],
                 smaller_examples=[[i, round(d, 2)] for i, d in sorted(clipped.items(), key=lambda t: t[1])[-5:]])

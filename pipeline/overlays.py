@@ -36,12 +36,35 @@ def points_on(parcel, features, id_field):
     return [dict(id=p.get(id_field), significance=p.get("SIGNIFICANCE") or None) for g, p in features if parcel.covers(g)]
 
 
-def nearest_item(items, candidates, g, tie_m=0.05):
-    """(distance, properties) of the nearest item to g, or (None, None).
+def nearest_item(items, candidates, g, prefer=None, maxd=None, tie_m=0.05):
+    """(distance, properties, tied ids) of the nearest item to g within maxd, or (None, None, []).
 
-    Items within tie_m of the nearest distance count as equally near (a parcel lying on two pipe segments that meet),
-    and the lowest asset id among them is chosen, so the result never depends on the order the source sent them."""
+    Items within tie_m of the nearest distance count as equally near (two manholes inside one parcel, or a parcel lying
+    on two pipe segments that meet). Among them, prefer(properties) picks the one with the smallest key (callers state
+    the rule, for example the deepest invert); the lowest asset id settles any remaining tie, so the result never
+    depends on the order the source sent them. All tied ids are returned so the choice can be reported (T-49)."""
     ds = [(items[i][0].distance(g), items[i][1]) for i in candidates]
-    if not ds: return None, None
+    if maxd is not None: ds = [t for t in ds if t[0] <= maxd]
+    if not ds: return None, None, []
     dmin = min(d for d, _ in ds)
-    return min(((d, p) for d, p in ds if d <= dmin + tie_m), key=lambda t: str(t[1].get("asset_id") or ""))
+    tied = [(d, p) for d, p in ds if d <= dmin + tie_m]
+    key = lambda t: ((prefer(t[1]) if prefer else 0), str(t[1].get("asset_id") or ""))
+    d, p = min(tied, key=key)
+    return d, p, sorted(str(q.get("asset_id")) for _, q in tied)
+
+
+def deepest_invert(p):
+    return p.get("invert_level_nzvd2016") if p.get("invert_level_nzvd2016") is not None else float("inf")
+
+
+def worst_grade(p):
+    g = p.get("condition_grade")
+    return -g if g in (1, 2, 3, 4, 5) else 0   # grade 0 has no published definition: treated as not graded
+
+
+def split_clipped(diffs, geoms, edge, tol_m=1.0):
+    """Split parcel area differences (compiled minus LINZ, m²) into parcels clipped at the district boundary (smaller
+    than LINZ by over 1 m² and within tol_m of the boundary line) and all others, which are reported (T-49)."""
+    at_edge = lambda i: edge is not None and not edge.is_empty and i in geoms and geoms[i].distance(edge) <= tol_m
+    clipped = {i: d for i, d in diffs.items() if d < -1 and at_edge(i)}
+    return clipped, {i: d for i, d in diffs.items() if i not in clipped}

@@ -9,7 +9,7 @@ import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
-from overlays import class_shares, points_on, nearest_item
+from overlays import class_shares, points_on, nearest_item, deepest_invert, worst_grade
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -83,13 +83,14 @@ else:
 # the sea: the 1 m DEM stores it as a flat surface near -0.6 m, not as no data. Cells the district grid marks as sea
 # (no value there, inside the grid) and no higher than 0.5 m are set to no data, so flow can leave into the sea (T-47).
 SEA = np.zeros(Z.shape, bool); G10 = None
+LIDAR_BOX = box(*rasterio.transform.array_bounds(Z.shape[0], Z.shape[1], dem.transform)) if HAVE_LIDAR else box(0, 0, 0, 0)
 if DF is not None and HAVE_LIDAR:
     from rasterio.warp import reproject, Resampling
     G10 = np.full(Z.shape, -9999.0, np.float32)
     reproject(DF["ground"], G10, src_transform=DF["transform"], src_crs="EPSG:2193", dst_transform=dem.transform,
               dst_crs="EPSG:2193", src_nodata=-9999.0, dst_nodata=-9999.0, resampling=Resampling.nearest)
     with np.errstate(invalid="ignore"):
-        SEA = np.isnan(G10) & (Z <= 0.5)
+        SEA = np.isnan(G10) & ~(Z > 0.5)  # also sea the survey left as no data
     Z[SEA] = np.nan; dsm[SEA] = np.nan; z21[SEA] = np.nan
     print(f"sea cells masked: {int(SEA.sum())}")
 
@@ -199,9 +200,10 @@ if HAVE_LIDAR:
     OBS = uniform_filter(((dsm - Z) > 2.5).astype(np.float32), 201, mode="nearest")
     print(f"measures computed in {time.time()-tm:.0f}s (lat {LAT:.3f})")
 
-def nearest(key, items, g, maxd=150):
-    if key not in T: return None, None
-    return nearest_item(items, T[key].query(g.buffer(maxd)), g)
+def nearest(key, items, g, maxd=150, prefer=None):
+    """(distance, properties, tied ids) of the nearest asset within maxd metres; see overlays.nearest_item."""
+    if key not in T: return None, None, []
+    return nearest_item(items, T[key].query(g.buffer(maxd)), g, prefer=prefer, maxd=maxd)
 
 # LINZ titles (type and estate only; no owner names) and non-primary parcels (easements, land covenants)
 TITLES = {p["title_no"]: p for _, p in load("titles")}
@@ -227,6 +229,8 @@ for uid, (g, p) in enumerate(units):
         if n not in trees: r[n] = None; continue
         hits = class_shares(n, g, [L[n][i] for i in trees[n].query(g)])
         r[n] = json.dumps(hits) if hits else None
+        if n == "zones":  # above 100: the source stacks zones of different types on the parcel (T-49)
+            r["zones_total_pct"] = round(sum(hits.values()), 1) if hits else None
     for n in point_layers:
         idk = "BUILDING_ID" if n == "ovl_heritage_places" else "TREE_ID"
         r[n] = json.dumps(points_on(g, [L[n][i] for i in (trees[n].query(g) if n in trees else [])], idk))
@@ -236,7 +240,9 @@ for uid, (g, p) in enumerate(units):
     z = Zw[m]; s = Sw[m]
     open_ground = m & ~Bw
     r.update(lidar_cells=int(np.isfinite(z).sum()),
-             lidar_coverage_pct=round(100 * float((np.isfinite(z) | SEA[rs, cs][m]).sum()) / z.size, 1) if z.size else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
+             # share of the parcel's cells with LiDAR (masked sea counts as covered), scaled by the share of the parcel
+             # inside the LiDAR window, so a parcel running beyond the window is not shown as fully covered (T-49)
+             lidar_coverage_pct=round(100 * float((np.isfinite(z) | SEA[rs, cs][m]).sum()) / z.size * (g.intersection(LIDAR_BOX).area / g.area), 1) if z.size and g.area else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
              building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),
@@ -245,17 +251,20 @@ for uid, (g, p) in enumerate(units):
              canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1) if HAVE_LIDAR else None,
              dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), lidar_epoch_offset_block_m=EPOCH_OFFSET, dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
-    d, np_ = nearest("ww_nodes", ww_nodes, g)
+    # ties (within 5 cm): the deepest invert for manholes, the worst condition grade for pipes; all tied ids reported
+    d, np_, tied = nearest("ww_nodes", ww_nodes, g, prefer=deepest_invert)
+    r.update(ww_mh_tied_ids=json.dumps(tied) if len(tied) > 1 else None)
     r.update(ww_mh_dist_m=None if d is None else round(d, 1), ww_mh_id=np_ and np_["asset_id"],
              ww_mh_invert_nzvd2016=np_ and np_["invert_level_nzvd2016"],
              ww_head_ground_min_minus_invert_m=None if np_ is None or r["ground_min_m"] is None else round(r["ground_min_m"] - np_["invert_level_nzvd2016"], 2))
-    d, pp_ = nearest("ww_pipes", ww_pipes, g)
+    d, pp_, tied = nearest("ww_pipes", ww_pipes, g, prefer=worst_grade)
+    r.update(ww_pipe_tied_ids=json.dumps(tied) if len(tied) > 1 else None)
     r.update(ww_pipe_dist_m=None if d is None else round(d, 1), ww_pipe_id=pp_ and pp_["asset_id"],
              ww_pipe_material=pp_ and pp_.get("pipe_material"), ww_pipe_dia_mm=pp_ and pp_.get("width"),
              ww_pipe_year=pp_ and pp_.get("year_installed"), ww_pipe_condition_grade=pp_ and pp_.get("condition_grade"))
-    d, sp_ = nearest("sw_nodes", sw_nodes, g)
+    d, sp_, _ = nearest("sw_nodes", sw_nodes, g, prefer=deepest_invert)
     r.update(sw_mh_dist_m=None if d is None else round(d, 1), sw_mh_invert_nzvd2016=sp_ and sp_["invert_level_nzvd2016"])
-    d, wp_ = nearest("ws_pipes", ws_pipes, g)
+    d, wp_, _ = nearest("ws_pipes", ws_pipes, g)
     r.update(ws_pipe_dist_m=None if d is None else round(d, 1), ws_pipe_dia_mm=wp_ and wp_.get("nominal_diameter"))
     # flood: highest KCDC recommended building level (NZVD2016) within 10 m
     lv = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g.buffer(10)) if "rbl" in T else [])

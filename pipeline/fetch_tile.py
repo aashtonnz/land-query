@@ -20,6 +20,7 @@ KC_LIC = "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURC
 ARCGIS = {
     # name: (layer URL, licence note)
     "zones": (f"{KC}/District_Plan_Zones/MapServer/0", KC_LIC),
+    "district_boundary": (f"{KC}/Cadastral/MapServer/1", KC_LIC),  # QA: which parcels KCDC clips at the boundary
     "ovl_fault_avoidance": (f"{KC}/District_Plan_Overlays/MapServer/10", KC_LIC),
     "ovl_flood_hazard": (f"{KC}/District_Plan_Overlays/MapServer/11", KC_LIC),
     "ovl_heritage_places": (f"{KC}/District_Plan_Overlays/MapServer/14", KC_LIC),
@@ -76,7 +77,7 @@ def main():
             fc = arcgis_query(url)
             b = json.dumps(fc).encode()
             open(os.path.join(RAW, name + ".geojson"), "wb").write(b)
-            meta = requests.get(url, params={"f": "json"}, timeout=60).json()
+            meta = arcgis._get(url, {"f": "json"}, 60)
             prov["sources"][name] = dict(url=url, ok=True, features=len(fc["features"]), bytes=len(b), sha256=sha(b),
                                          seconds=round(time.time() - t0, 2), fetched=utc_now(), licence=lic,
                                          layer_name=meta.get("name"), copyright=te.scrub_copyright(meta.get("copyrightText")))

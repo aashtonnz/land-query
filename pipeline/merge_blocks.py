@@ -52,7 +52,7 @@ qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks i
           parcel_area_vs_linz=dict(
               n=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("n", 0) for b in blocks),
               not_in_linz=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("not_in_linz", 0) for b in blocks),
-              smaller_than_linz_gt_1=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("smaller_than_linz_gt_1", 0) for b in blocks),
+              clipped_at_district_boundary=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("clipped_at_district_boundary", 0) for b in blocks),
               n_abs_gt_1=sum(b["qa"].get("parcel_area_minus_linz_m2", {}).get("n_abs_gt_1", 0) for b in blocks),
               max_abs=max((b["qa"].get("parcel_area_minus_linz_m2", {}).get("max_abs") or 0) for b in blocks) if blocks else None))
 json.dump(qs, open(os.path.join(OUT, "qa_summary.json"), "w"), indent=1)

@@ -145,11 +145,26 @@ def test_heritage_point_just_outside_the_parcel_is_not_counted():
 
 def test_nearest_pipe_does_not_depend_on_source_order():
     from shapely.geometry import LineString, box
-    from overlays import nearest_item
+    from overlays import nearest_item, worst_grade
     parcel = box(0, 0, 20, 20)
     a = (LineString([(10, -5), (10, 10)]), {"asset_id": "KWWP001431", "condition_grade": 4})
     b = (LineString([(10, 10), (10, 30)]), {"asset_id": "KWWP001430", "condition_grade": 2})
-    assert nearest_item([a, b], [0, 1], parcel)[1]["asset_id"] == nearest_item([b, a], [0, 1], parcel)[1]["asset_id"] == "KWWP001430"
+    for order in ([a, b], [b, a]):
+        d, p, tied = nearest_item(order, [0, 1], parcel, prefer=worst_grade)
+        assert p["asset_id"] == "KWWP001431" and tied == ["KWWP001430", "KWWP001431"]
+
+
+def test_tied_manholes_inside_a_parcel_choose_the_deepest_invert_and_respect_the_distance_limit():
+    from shapely.geometry import Point, box
+    from overlays import nearest_item, deepest_invert
+    parcel = box(0, 0, 20, 20)
+    mh = [(Point(5, 5), {"asset_id": "KWWN003040", "invert_level_nzvd2016": 2.40}),
+          (Point(15, 15), {"asset_id": "KWWN003039", "invert_level_nzvd2016": 2.71}),
+          (Point(15, 5), {"asset_id": "KWWN003041", "invert_level_nzvd2016": None})]
+    d, p, tied = nearest_item(mh, [0, 1, 2], parcel, prefer=deepest_invert)
+    assert p["asset_id"] == "KWWN003040" and len(tied) == 3
+    far = [(Point(200, 10), {"asset_id": "X"})]
+    assert nearest_item(far, [0], parcel, maxd=150) == (None, None, [])   # 180 m away: beyond the 150 m limit
 
 
 def test_beach_cells_drain_into_the_sea_not_along_the_beach():
@@ -192,6 +207,15 @@ def test_partial_district_run_is_not_published():
     assert problems(planned, {"1_2"}, "", 2)                      # a block failed
     assert problems(planned, {"1_2", "3_4"}, "1_2,3_4", 2)        # run limited with `only`
     assert problems(planned[:1], {"1_2"}, "", 2)                  # planned fewer than the district
+
+
+def test_inland_parcel_smaller_than_linz_is_reported_not_hidden_as_clipped():
+    from shapely.geometry import LineString, box
+    from overlays import split_clipped
+    edge = LineString([(0, 0), (0, 1000)])                          # the district boundary
+    geoms = {1: box(0, 0, 50, 50), 2: box(500, 500, 550, 550)}      # 1 touches the boundary, 2 is inland
+    clipped, other = split_clipped({1: -400.0, 2: -5.0}, geoms, edge)
+    assert set(clipped) == {1} and other == {2: -5.0}
 
 
 if __name__ == "__main__":

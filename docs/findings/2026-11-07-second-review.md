@@ -266,3 +266,31 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
     blocks" and "planned 1 blocks of the district's 46".
   - The `kapiti-results` branch kept run 42324369141.
 - **Run record.** `RUN.txt` now records the commit the results were built from.
+
+## T-49: ties, overlaps and caveats (fixed in code, 7 Nov 2026)
+
+- **Ties** (finding 2).
+  - Where assets are equally near (within 5 cm), the nearest-manhole columns now report the deepest invert and the
+    nearest-pipe columns the worst condition grade. The rule is stated in `SOURCES.md` and in the queries.
+  - All tied ids are listed in the new `ww_mh_tied_ids` and `ww_pipe_tied_ids`. The reviewer's example (KWWN003040,
+    invert 2.40, and KWWN003039, 2.71, both inside parcel 6627870) is a test.
+  - The search is now limited to 150 m (it reached about 212 m).
+  - On the Paraparaumu Beach tile, 9 of 355 parcels have tied manholes and 72 have tied pipes.
+- **Stacked zones** (finding 5). The new `zones_total_pct` exceeds 100 where KCDC stacks zones of different types.
+  Q1 now needs the residential zone to be at least 90% and any other zone under 10%, so a reserve also zoned High
+  Density Residential no longer passes.
+- **Boundary clipping** (finding 7).
+  - QA fetches KCDC's district boundary line and counts a parcel as clipped only if it is smaller than LINZ's and
+    within 1 m of the boundary. Every other difference is reported.
+  - The test covers an inland parcel 5 m² smaller than LINZ's.
+- **Install years** (finding 8). Q3's question and the `ww_pipe_*` definition now carry a caveat that 1979 and 1980
+  dates may be placeholders.
+- **Smaller points** (finding 9).
+  - `lidar_coverage_pct` is now scaled by the share of the parcel inside the LiDAR window. Masked sea, including sea
+    the survey left as no data, counts as covered.
+  - My first version divided by the polygon area, which showed small parcels as partly uncovered: a 5.9 m² parcel holds
+    one cell centre. Corrected.
+  - The noise-corridor label and the meaning of the sha256 values are now explained in `SOURCES.md`.
+  - The truncation flag and wind height over the flattened sea were fixed by T-47.
+  - The layer-description request in `fetch_tile.py` now retries, after a connection reset lost one layer in a local
+    run.
