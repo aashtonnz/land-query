@@ -1,0 +1,153 @@
+"""Read-only queries over the compiled Kāpiti Coast results, with provenance on every value (T-36).
+
+The results directory holds what `kapiti.yml` publishes on the `kapiti-results` branch: `units.parquet`,
+`provenance.json`, `inverse_queries.json` and `RUN.txt`. Every response carries, for each column returned, its kind
+(published, derived or modelled), meaning, sources, fit-for-parcel flag and licence status, and for each source its
+dataset, URL, licence and the sha256 and fetch time of the data each row's block was compiled from.
+
+Audience (D-12): "public" serves only columns whose every source has a licence stated on the dataset; the others are
+withheld, and cannot be filtered on, until the councils confirm their portal-wide statements in writing (T-35).
+"internal" serves everything, for the owner.
+"""
+import json, os, re
+import duckdb
+import catalogue as cat
+
+MAX_ROWS = 500
+OPS = {"=": "=", "!=": "<>", "<": "<", "<=": "<=", ">": ">", ">=": ">="}
+SAFE_CLASS = re.compile(r"^[\w\s\-.,'():/āēīōūĀĒĪŌŪ]+$")
+
+
+class QueryError(ValueError):
+    pass
+
+
+class LandQuery:
+    def __init__(self, results_dir, audience="public"):
+        if audience not in ("public", "internal"): raise ValueError("audience must be 'public' or 'internal'")
+        self.audience, self.dir = audience, results_dir
+        self.db = duckdb.connect()
+        path = os.path.join(results_dir, "units.parquet").replace("'", "''")  # a view cannot take a parameter
+        self.db.execute(f"CREATE VIEW units AS SELECT * FROM read_parquet('{path}')")
+        self.all_columns = [r[0] for r in self.db.execute("DESCRIBE units").fetchall()]
+        self.meta = {c: cat.column_meta(c) for c in self.all_columns}
+        missing = [c for c, m in self.meta.items() if m is None]
+        if missing: raise RuntimeError(f"columns missing from SOURCES.md or the catalogue: {missing}")
+        self.columns = [c for c in self.all_columns if audience == "internal" or self.meta[c]["licence_cleared"]]
+        self.withheld = [c for c in self.all_columns if c not in self.columns]
+        p = os.path.join(results_dir, "provenance.json")
+        self.prov = json.load(open(p)) if os.path.exists(p) else {}
+        r = os.path.join(results_dir, "RUN.txt")
+        self.run = open(r).read().strip() if os.path.exists(r) else None
+
+    # ---- descriptions ----
+    def about(self):
+        n = self.db.execute("SELECT count(*) FROM units").fetchone()[0]
+        return dict(
+            dataset="Kāpiti Coast District parcels, compiled from public LINZ, KCDC and GWRC sources",
+            run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),
+            coordinates="NZTM2000 (EPSG:2193), metres; heights NZVD2016",
+            licence_note=("Values come from CC BY 4.0 sources; attribute LINZ, Kāpiti Coast District Council and Greater "
+                          "Wellington Regional Council as listed per source. In public mode, columns relying on a "
+                          "portal-wide licence statement are withheld until confirmed in writing."),
+            caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
+            provenance_available=bool(self.prov))
+
+    def describe_columns(self, contains=None):
+        out = {}
+        for c in self.all_columns:
+            if contains and contains.lower() not in c.lower() and contains.lower() not in self.meta[c]["meaning"].lower(): continue
+            out[c] = dict(self.meta[c], served=c in self.columns)
+        return out
+
+    # ---- queries ----
+    def parcel(self, unit_id=None, appellation=None, columns=None):
+        if unit_id is None and not appellation: raise QueryError("give unit_id or appellation")
+        where = [dict(column="unit_id", op="=", value=int(unit_id))] if unit_id is not None else \
+                [dict(column="appellation", op="=", value=str(appellation))]
+        return self.search(where=where, columns=columns, limit=20)
+
+    def search(self, bbox=None, where=None, columns=None, limit=100, offset=0):
+        cols = self._columns(columns)
+        clauses, params = [], []
+        if bbox is not None:
+            if "bbox_xmin" not in self.all_columns: raise QueryError("these results predate parcel locations (T-36): area queries need the next rebuild")
+            if len(bbox) != 4: raise QueryError("bbox is [xmin, ymin, xmax, ymax] in NZTM2000 metres")
+            x0, y0, x1, y1 = map(float, bbox)
+            if x1 - x0 > 20000 or y1 - y0 > 20000: raise QueryError("bbox wider than 20 km: narrow it or add filters")
+            clauses.append("bbox_xmax >= ? AND bbox_xmin <= ? AND bbox_ymax >= ? AND bbox_ymin <= ?"); params += [x0, x1, y0, y1]
+        for cond in where or []:
+            c, p = self._condition(cond); clauses.append(c); params += p
+        sql_where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
+        limit = max(1, min(int(limit), MAX_ROWS)); offset = max(0, int(offset))
+        total = self.db.execute(f"SELECT count(*) FROM units{sql_where}", params).fetchone()[0]
+        sel = ", ".join(f'"{c}"' for c in dict.fromkeys(["unit_id", "appellation", "block_id"] + cols))
+        res = self.db.execute(f"SELECT {sel} FROM units{sql_where} ORDER BY unit_id LIMIT {limit} OFFSET {offset}", params)
+        names = [d[0] for d in res.description]
+        rows = []
+        for r in res.fetchall():
+            d = dict(zip(names, r))
+            rows.append(dict(unit_id=d["unit_id"], appellation=d["appellation"], block_id=d["block_id"],
+                             values={c: self._value(c, d[c]) for c in cols}))
+        return self._envelope(rows, cols, total=total, offset=offset)
+
+    def inverse_query(self, qid):
+        iq = json.load(open(os.path.join(self.dir, "inverse_queries.json")))
+        q = next((x for x in iq["queries"] if x["id"] == qid), None)
+        if q is None: raise QueryError(f"unknown query {qid!r}; available: {[x['id'] for x in iq['queries']]}")
+        used = {k for k in q["rows"][0] if k not in ("unit_id", "appellation", "block_id", "sources")} if q["rows"] else set()
+        blocked = sorted(c for c in used if c in self.withheld)
+        if blocked:
+            return dict(id=q["id"], name=q["name"], question=q["question"], withheld=True,
+                        reason=f"uses columns withheld in public mode until the council licences are confirmed (T-35): {blocked}")
+        return dict(id=q["id"], name=q["name"], question=q["question"], sql=q["sql"], count=q["count"],
+                    columns={c: self.meta[c] for c in sorted(used) if c in self.meta},
+                    sources=q["provenance"], rows=q["rows"], run=self.run)
+
+    # ---- helpers ----
+    def _columns(self, columns):
+        if not columns: return list(self.columns)
+        bad = [c for c in columns if c not in self.all_columns]
+        if bad: raise QueryError(f"unknown columns: {bad}")
+        held = [c for c in columns if c in self.withheld]
+        if held: raise QueryError(f"withheld in public mode until the council licences are confirmed (T-35): {held}")
+        return list(columns)
+
+    def _condition(self, cond):
+        c, op, v = cond.get("column"), cond.get("op", "="), cond.get("value")
+        if c not in self.all_columns: raise QueryError(f"unknown column {c!r}")
+        if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on (T-35)")
+        q = f'"{c}"'
+        if op in OPS: return f"{q} {OPS[op]} ?", [v]
+        if op == "in":
+            if not isinstance(v, list) or not v or len(v) > 1000: raise QueryError("'in' takes a list of 1 to 1000 values")
+            return f"{q} IN ({', '.join('?' * len(v))})", list(v)
+        if op == "is_null": return f"{q} IS NULL", []
+        if op == "not_null": return f"{q} IS NOT NULL", []
+        if op == "contains": return f"CAST({q} AS VARCHAR) ILIKE ?", ["%" + str(v).replace("%", "").replace("_", "") + "%"]
+        if op == "has_class":
+            # an overlay column: class name, optionally with a minimum share of the parcel ({"class": ..., "min_pct": ...})
+            cls, mn = (v.get("class"), v.get("min_pct", 0)) if isinstance(v, dict) else (v, 0)
+            if not isinstance(cls, str) or not SAFE_CLASS.match(cls) or '"' in cls: raise QueryError("class name has unexpected characters")
+            return f"coalesce(json_extract({q}, ?)::DOUBLE, -1) >= ?", ['$."' + cls + '"', max(float(mn), 0.000001)]
+        raise QueryError(f"unknown op {op!r}; use one of {sorted(OPS) + ['in', 'is_null', 'not_null', 'contains', 'has_class']}")
+
+    def _value(self, c, v):
+        if isinstance(v, str) and v[:1] in "[{":
+            try: return json.loads(v)
+            except ValueError: return v
+        return v
+
+    def _envelope(self, rows, cols, total, offset):
+        keys = sorted({k for c in cols for k in self.meta[c]["sources"]})
+        blocks = sorted({r["block_id"] for r in rows})
+        sources = {}
+        for k in keys:
+            s = cat.SOURCES.get(k, {})
+            p = self.prov.get(k, {})
+            sources[k] = dict(dataset=s.get("dataset"), url=p.get("url"), licence=s.get("licence"),
+                              licence_status=s.get("licence_status"), fit=s.get("fit"),
+                              by_block={b: p.get("by_block", {}).get(b) for b in blocks} if p else None)
+        return dict(run=self.run, audience=self.audience, total=total, offset=offset, count=len(rows), rows=rows,
+                    columns={c: self.meta[c] for c in cols}, sources=sources,
+                    withheld=self.withheld if self.audience == "public" else [])

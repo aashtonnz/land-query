@@ -30,6 +30,7 @@ db.execute("""CREATE OR REPLACE TABLE units AS SELECT * EXCLUDE (rn) FROM (
               SELECT *, row_number() OVER (PARTITION BY unit_id ORDER BY coverage_pct DESC, block_id) AS rn FROM all_units) WHERE rn = 1""")
 dups = db.execute("SELECT count(*) - count(DISTINCT unit_id) FROM all_units").fetchone()[0]
 db.execute("DROP TABLE all_units")
+json.dump(prov, open(os.path.join(OUT, "provenance.json"), "w"), indent=1)  # published with the results (T-36)
 db.execute("CREATE OR REPLACE TABLE provenance (source VARCHAR, json VARCHAR)")
 db.executemany("INSERT INTO provenance VALUES (?, ?)", [(k, json.dumps(v)) for k, v in prov.items()])
 db.execute(f"COPY units TO '{os.path.join(OUT, 'units.parquet')}' (FORMAT PARQUET)")

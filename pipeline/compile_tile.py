@@ -224,6 +224,9 @@ for uid, (g, p) in enumerate(units):
     r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,
              geometry_source=p.get("geometry_source") or "KCDC mirror", appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
+             # location for area queries (NZTM2000): a point inside the parcel, and its bounding box (T-36)
+             rep_x=round(g.representative_point().x, 1), rep_y=round(g.representative_point().y, 1),
+             bbox_xmin=round(g.bounds[0], 1), bbox_ymin=round(g.bounds[1], 1), bbox_xmax=round(g.bounds[2], 1), bbox_ymax=round(g.bounds[3], 1),
              # share of the parcel inside the fetch window: terrain and overlay values cover only that share
              coverage_pct=round(100 * g.intersection(TILE_BOX).area / g.area, 1) if g.area else 0.0, **extra)
     # zones and polygon overlays: overlap percentage per class value

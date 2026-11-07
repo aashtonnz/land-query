@@ -22,15 +22,20 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
 - **[`.github/workflows/tile.yml`](.github/workflows/tile.yml)**: runs the pipeline for any tile on GitHub Actions, using
   the `LINZ_API_KEY` repository secret. One tile takes about 2.5 minutes; results go to the `tile-results` branch.
 - **[`.github/workflows/kapiti.yml`](.github/workflows/kapiti.yml)**: compiles the whole Kāpiti Coast district (27,614
-  parcels, 77 columns including computed sun, roof, flow and earthworks measures, 46 blocks) in about 40 minutes, with quality checks on every block, and pushes the merged parcel
-  table and query results to the `kapiti-results` branch ([findings](docs/findings/2026-11-06-kapiti-district.md)).
+  parcels, 93 columns including computed sun, roof, flow and earthworks measures, 46 blocks) in about 40 minutes, with
+  quality checks on every block, and pushes the merged parcel table, provenance and query results to the
+  `kapiti-results` branch. Two fresh-eyes reviews checked it
+  ([first](docs/findings/2026-11-06-fresh-eyes-review.md), [second](docs/findings/2026-11-07-second-review.md)).
+- **[`service/`](service/)**: a read-only MCP server over those results, run locally. Each value comes with its kind,
+  sources, licence and fit-for-parcel flag. In public mode it serves only licence-cleared columns (D-12). It is not yet
+  offered to outside users.
 - **[`archive/prototype-2026-11/`](archive/prototype-2026-11/)**: the original 96-domain design prototype, kept for
   reference. Its data is fictional.
 
 ## What is planned
 
-Tracked on [`TASKS.md`](TASKS.md): a fresh-eyes review (T-39), a read-only MCP query
-service on the compiled data (T-36), source-change checks (T-25), then one more council (T-24).
+Tracked on [`TASKS.md`](TASKS.md): a fresh-eyes review of the query service before anyone outside uses it,
+confirmation of the council licences (T-35), source-change checks (T-25), then one more council (T-24).
 
 ## Run one tile
 

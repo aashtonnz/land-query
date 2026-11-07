@@ -1,3 +1,4 @@
 pipeline/data/
 __pycache__/
 *.duckdb
+service/results/

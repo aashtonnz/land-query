@@ -5,5 +5,6 @@
 - Pipeline (fetch, compile and query one 1 km tile): ./pipeline/
 - Sources, licences and column definitions: ./SOURCES.md
 - Example results with provenance: ./docs/findings/2026-11-06-inverse-queries.json
+- Query service (read-only MCP server, run locally): ./service/
 
-Status: the whole Kāpiti Coast district is compiled (27,614 parcels). No query service is running yet. The prototype in ./archive/ uses fictional data and is not a source of facts.
+Status: the whole Kāpiti Coast district is compiled (27,614 parcels). A read-only MCP query service exists (./service/) but is not offered publicly yet. The prototype in ./archive/ uses fictional data and is not a source of facts.

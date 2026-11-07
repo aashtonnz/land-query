@@ -121,6 +121,10 @@ jobs:
           mkdir -p ../district && python3 merge_blocks.py ../blocks ../district | tee ../district/merge_log.txt
           python3 inverse_queries.py ../district ../district/district.duckdb | tee ../district/summary.md
           python3 check_measures.py ../district/district.duckdb ../district/measures_checks.json | tee -a ../district/summary.md
+      - name: Check the query service covers every column (T-36)
+        run: |
+          pip install -q -r service/requirements.txt
+          LANDQ_RESULTS=district python3 service/test_service.py
       - name: Check the run is complete before publishing it as the district (T-48)
         env:
           ONLY: ${{ inputs.only }}
@@ -130,7 +134,7 @@ jobs:
             "$(python3 pipeline/kapiti_block_count.py)"
       - name: Push results to kapiti-results branch
         run: |
-          mkdir -p /tmp/out && cp district/{units.parquet,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json} /tmp/out/
+          mkdir -p /tmp/out && cp district/{units.parquet,provenance.json,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json} /tmp/out/
           git fetch origin kapiti-results && git checkout kapiti-results || git checkout --orphan kapiti-results
           git rm -rq --cached . 2>/dev/null || true
           rm -rf results && mkdir -p results && cp /tmp/out/* results/
