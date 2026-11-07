@@ -201,3 +201,76 @@ run through GitHub Actions, which can reach those hosts.
 - **Tests.** Two new tests (paging against a server limited to 500 records, and a point 0.5 m outside a parcel). Both
   fail on the old code. The manhole split and the area check were checked on the Te Horo block on GitHub. The per-block
   offset in Q4 will be checked against each block's QA offset at the T-45 rebuild.
+
+## T-45: district rebuild and raw-source sample check (7 Nov 2026)
+
+The district was rebuilt with T-40 to T-44 in one GitHub Actions run (`kapiti.yml` run 42324369141, 39 minutes, all
+46 blocks succeeded; the API did not report billable minutes for the run). Results are on the `kapiti-results`
+branch. Before-and-after counts are in
+[`2026-11-07-rebuild-before-after.json`](2026-11-07-rebuild-before-after.json).
+
+### The reviewer's checks, before and after
+
+| Check | Before | After |
+| --- | --- | --- |
+| Parcels, distinct ids | 27,614 | 27,614 |
+| Columns | 77 | 89 |
+| Parcels with a zone class above 100% | 1,719 | 0 |
+| Overlay classes above 100% | 1 | 0 |
+| Parcels carrying older zone names | 8,218 | 0 |
+| Tsunami rows labelled with the layer name | 9,428 | 0 |
+| Platform estimate with under 225 m² of open ground | 1,002 | 0 |
+| Query rows without their sources' sha256 and fetch time | 14,387 | 0 |
+| Query-level sources with a null sha256 | 23 | 0 |
+| Largest 1 m upslope area | 6.3 km² | 26.4 km² (1,069 parcels flagged as reaching the window edge) |
+| Largest whole-catchment area (new) | — | 353.5 km², none truncated |
+| Wooded parcels (≥80% canopy): winter sun, sky view | 3.9 h, 5.7% | 1.2 h, 45.2% |
+| Q4 epoch offset | 0.08 m everywhere | one per block, 0.03 to 0.13 m, each within 0.001 m of the block's QA median |
+| Worst block, wastewater manholes against LiDAR | −0.49 m (Te Horo, stormwater points) | −0.11 m |
+
+Queries: Q1 288 → 402, Q2 633 → 633, Q3 555 → 559, Q4 554 → 554 (17 in, 17 out), Q5 1,398 → 1,388.
+
+- **Q1** gains 124 and loses 10.
+  - 121 of the 124 carried only an older zone name before, as the reviewer predicted. I did not trace the other 3.
+  - Of the 10 lost, 3 are now in a newer flood layer and 7 have a different nearest manhole, now that cleaning eyes and
+    valves no longer count.
+- **Q5** loses 10: points within 1 m but outside the parcel.
+
+### Sample check against the raw sources
+
+- **Method.** `pipeline/sample_check.py` does not use the pipeline's code.
+  - It reads each parcel from KCDC.
+  - It recomputes zone shares from the raw zone polygons.
+  - It asks the KCDC and GWRC servers which flood, tsunami, coastal and liquefaction features overlap the parcel.
+  - It finds the nearest wastewater manhole with its own query, and lists heritage and tree points inside the parcel.
+  - It reads ground levels straight from the LINZ 2024–25 LiDAR files.
+- **Parcels.** 15, chosen across block types:
+  - urban Ōtaki and Paraparaumu, and the reviewer's three 200% zone examples;
+  - coastal Waikanae Beach and Paekākāriki;
+  - Waikanae hills, rural Te Horo and Ōtaki dunes;
+  - a 2.4 km² hill block, an 11.6 m² sliver, a parcel without LiDAR and a block-edge parcel with partial LiDAR;
+  - a heritage parcel and a notable-tree parcel.
+- **Result.** All 15 match on all 195 checks: area, zones, seven overlay layers, nearest manhole, heritage, trees,
+  and LiDAR ground mean and minimum, identical to the centimetre with the same cell counts. Run against the old
+  results, the same script flags the known zone and label faults.
+- **Saved.** [`2026-11-07-sample-check.json`](2026-11-07-sample-check.json).
+- **Not checked.** LINZ titles and easements: the LINZ key is held only on GitHub.
+
+### Found by the rebuild, fixed in code for the next run
+
+- **The new area check against LINZ** reports 120 parcels more than 1 m² off, up to 547 km². These are in blocks on
+  the district's edge, where KCDC's mirror clips parcels at the district boundary, already noted in `SOURCES.md`.
+  QA now reports parcels smaller than LINZ separately, with examples, so a genuine mismatch is not hidden among them.
+- **Q3 (4 net, 8 rows changed)** changed because of ties. These parcels lie on two pipe segments that meet, so both
+  are 0.0–0.1 m away and can have different condition grades. Which one counted as nearest depended on the order the
+  server sent them, which changed when paging began sorting by object id. Ties within 5 cm now go to the lowest asset
+  id (test added).
+
+### Source issues, reported rather than changed
+
+- **Overlapping zones.** Seven parcels have zone shares summing to more than 100% because KCDC's zone layer overlaps
+  zones of different types: Lot 103 DP 413488 is zoned both Open Space and High Density Residential over its whole
+  area, and five lots in DP 356329 overlap Rural Lifestyle by about 1%.
+- **Coastal relative heights.** 326 parcels in the coastal stainless band still read below −5 m. These are real:
+  the lowest (−53 to −58 m) are Paekākāriki houses under the escarpment. Across the band, the median moved from 0.7 to
+  0.8 m (correlation 0.93), so the sea bias the reviewer found affected only the beach edge.

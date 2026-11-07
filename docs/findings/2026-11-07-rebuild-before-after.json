@@ -1,0 +1,158 @@
+{
+ "b": {
+  "parcels": [
+   27614,
+   27614
+  ],
+  "columns": 77,
+  "zone_class_over_100": 1719,
+  "zone_sum_over_100": 2178,
+  "any_overlay_class_over_100": 1,
+  "legacy_zone_labels": 8218,
+  "key_equals_column_name": 9428,
+  "platform_open_lt_225": 1002,
+  "max_upslope_km2": 6.33,
+  "coastal_relh_lt_minus5": 366,
+  "canopy80_winter_sun_mean": [
+   3.93,
+   5.7
+  ],
+  "queries": {
+   "Q1": 288,
+   "Q2": 633,
+   "Q3": 555,
+   "Q4": 554,
+   "Q5": 1398
+  },
+  "provenance_rows_missing": 14387,
+  "query_level_null_sha": 23,
+  "qa": {
+   "blocks": 46,
+   "blocks_with_failed_sources": 0,
+   "blocks_outside_lidar": 13,
+   "parcels": 27614,
+   "duplicates_removed": 0,
+   "parcels_without_lidar": 544,
+   "parcels_partly_outside_window": 39,
+   "manhole_cover_minus_lidar_m": {
+    "n": 17432,
+    "blocks": 14,
+    "median_of_block_medians": -0.097,
+    "worst_block_median": -0.489
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 68033,
+    "blocks": 21,
+    "median_of_block_medians": -0.081,
+    "worst_block_median": -0.26
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 4215542,
+    "blocks": 24,
+    "median_of_block_medians": 0.073,
+    "worst_block_median": 0.157
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 27375,
+    "blocks": 21,
+    "median_of_block_medians": -0.536,
+    "worst_block_median": 4.306
+   },
+   "parcel_area_max_abs_diff_m2": 27628169.5
+  },
+  "measures_checks": {
+   "overland_flow_path_vs_kcdc_flood_hazard": 1.14,
+   "low_obstruction_vs_kcdc_very_high_wind_zone": 0.5,
+   "low_obstruction_vs_kcdc_coastal_stainless_zone": 0.46,
+   "high_floor_level_vs_overland_flow": 1.66
+  }
+ },
+ "a": {
+  "parcels": [
+   27614,
+   27614
+  ],
+  "columns": 89,
+  "zone_class_over_100": 0,
+  "zone_sum_over_100": 7,
+  "any_overlay_class_over_100": 0,
+  "legacy_zone_labels": 0,
+  "key_equals_column_name": 0,
+  "platform_open_lt_225": 0,
+  "max_upslope_km2": 26.36,
+  "max_catchment_km2": 353.5,
+  "catchment_truncated": 0,
+  "upslope_truncated": 1069,
+  "coastal_relh_lt_minus5": 326,
+  "canopy80_winter_sun_mean": [
+   1.16,
+   45.2
+  ],
+  "partial_lidar_gt100m2": 117,
+  "epoch_offsets": [
+   0.03,
+   0.13,
+   22
+  ],
+  "queries": {
+   "Q1": 402,
+   "Q2": 633,
+   "Q3": 559,
+   "Q4": 554,
+   "Q5": 1388
+  },
+  "provenance_rows_missing": 0,
+  "query_level_null_sha": 0,
+  "qa": {
+   "blocks": 46,
+   "blocks_with_failed_sources": 0,
+   "blocks_outside_lidar": 10,
+   "parcels": 27614,
+   "duplicates_removed": 0,
+   "parcels_without_lidar": 544,
+   "parcels_partly_outside_window": 39,
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 8049,
+    "blocks": 11,
+    "median_of_block_medians": -0.077,
+    "worst_block_median": -0.108
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 5382,
+    "blocks": 14,
+    "median_of_block_medians": -0.066,
+    "worst_block_median": -0.134
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 68341,
+    "blocks": 21,
+    "median_of_block_medians": -0.08,
+    "worst_block_median": -0.26
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 4452155,
+    "blocks": 24,
+    "median_of_block_medians": 0.073,
+    "worst_block_median": 0.13
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 27458,
+    "blocks": 21,
+    "median_of_block_medians": -0.536,
+    "worst_block_median": 4.306
+   },
+   "parcel_area_vs_linz": {
+    "n": 27613,
+    "not_in_linz": 1,
+    "n_abs_gt_1": 120,
+    "max_abs": 546979601.71
+   }
+  },
+  "measures_checks": {
+   "overland_flow_path_vs_kcdc_flood_hazard": 1.16,
+   "low_obstruction_vs_kcdc_very_high_wind_zone": 0.5,
+   "low_obstruction_vs_kcdc_coastal_stainless_zone": 0.47,
+   "high_floor_level_vs_overland_flow": 1.65
+  }
+ }
+}

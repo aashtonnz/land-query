@@ -1,5 +1,8 @@
 # Kāpiti Coast district compile: findings (6 Nov 2026)
 
+> Superseded in part: the fresh-eyes review (T-39) found faults in these results, and the district was rebuilt on
+> 7 Nov 2026. Current counts are in [the review](2026-11-06-fresh-eyes-review.md#t-45-district-rebuild-and-raw-source-sample-check-7-nov-2026); for example, Q1 is now 402 parcels, not 288.
+
 T-21. The whole district compiled from live public sources in one GitHub Actions run (`kapiti.yml`, run 42174240520).
 Results: the [`kapiti-results`](https://github.com/aashtonnz/land-query/tree/kapiti-results/results) branch (`units.parquet`,
 `inverse_queries.json`, `qa_summary.json`, `blocks.json`, `summary.md`).

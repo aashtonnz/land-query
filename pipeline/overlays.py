@@ -34,3 +34,14 @@ def class_shares(layer, parcel, features):
 def points_on(parcel, features, id_field):
     """Point features inside or on the boundary of the parcel, as [{id, significance}] (T-44: not within 1 m)."""
     return [dict(id=p.get(id_field), significance=p.get("SIGNIFICANCE") or None) for g, p in features if parcel.covers(g)]
+
+
+def nearest_item(items, candidates, g, tie_m=0.05):
+    """(distance, properties) of the nearest item to g, or (None, None).
+
+    Items within tie_m of the nearest distance count as equally near (a parcel lying on two pipe segments that meet),
+    and the lowest asset id among them is chosen, so the result never depends on the order the source sent them."""
+    ds = [(items[i][0].distance(g), items[i][1]) for i in candidates]
+    if not ds: return None, None
+    dmin = min(d for d, _ in ds)
+    return min(((d, p) for d, p in ds if d <= dmin + tie_m), key=lambda t: str(t[1].get("asset_id") or ""))

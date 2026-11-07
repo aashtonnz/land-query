@@ -9,7 +9,7 @@ import numpy as np, duckdb, rasterio
 from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
-from overlays import class_shares, points_on
+from overlays import class_shares, points_on, nearest_item
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -183,12 +183,7 @@ if HAVE_LIDAR:
 
 def nearest(key, items, g, maxd=150):
     if key not in T: return None, None
-    idx = T[key].query(g.buffer(maxd))
-    best = None
-    for i in idx:
-        d = items[i][0].distance(g)
-        if best is None or d < best[0]: best = (d, items[i][1])
-    return best if best else (None, None)
+    return nearest_item(items, T[key].query(g.buffer(maxd)), g)
 
 # LINZ titles (type and estate only; no owner names) and non-primary parcels (easements, land covenants)
 TITLES = {p["title_no"]: p for _, p in load("titles")}

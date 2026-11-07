@@ -5,9 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-45: Raw-source sample check**
-  Through GitHub Actions, fetch the raw features for 10 or more named parcels (urban, rural, coastal, block edge) and
-  compare their compiled values; then rebuild the district once with T-40 to T-44 and record the before and after counts.
 - **T-36: Query service**
   A read-only MCP server over the compiled Kāpiti database: area or filter queries return parcel rows, each value with its
   source, fetch time, licence, value kind and fit-for-parcel flag. Run locally or from GitHub first; serve outside users

@@ -142,6 +142,15 @@ def test_heritage_point_just_outside_the_parcel_is_not_counted():
     assert points_on(parcel, pts, "TREE_ID") == [dict(id="T2", significance=None), dict(id="T3", significance="Group A")]
 
 
+def test_nearest_pipe_does_not_depend_on_source_order():
+    from shapely.geometry import LineString, box
+    from overlays import nearest_item
+    parcel = box(0, 0, 20, 20)
+    a = (LineString([(10, -5), (10, 10)]), {"asset_id": "KWWP001431", "condition_grade": 4})
+    b = (LineString([(10, 10), (10, 30)]), {"asset_id": "KWWP001430", "condition_grade": 2})
+    assert nearest_item([a, b], [0, 1], parcel)[1]["asset_id"] == nearest_item([b, a], [0, 1], parcel)[1]["asset_id"] == "KWWP001430"
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

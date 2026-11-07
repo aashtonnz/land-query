@@ -56,13 +56,8 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 ## Compiled columns (per parcel, table `units`)
 
-> **Known problems in the current results (T-39 review, 6 Nov 2026)**, being fixed in T-40 to T-44: until the next
-> district rebuild (T-45), zone and overlay shares in the published results can exceed 100% and some carry older zone
-> names or the layer name (fixed in the code by T-40), and query provenance lacks sha256 and fetch time (fixed by T-41); `upslope_area_max_m2` stops at the block's fetch
-> window and `flow_path_m` is a count of 1 m cells (fixed by T-42, which adds `catchment_area_max_m2`); winter sun, horizon and sky view are measured on the tree canopy where
-> there are trees (fixed by T-43); `wind_rel_height_m` is biased low near the sea (fixed by T-42); the platform estimate is given for parcels too small
-> to hold one, and terrain values are given for parcels only partly covered by LiDAR (both fixed by T-43). The five newer KCDC flood layers and
-> `earthworks` are compiled from T-40 on. See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
+> **Fresh-eyes review (T-39 to T-45, 7 Nov 2026).** The problems the review found are fixed, and the district results were
+> rebuilt on 7 Nov 2026 (run 42324369141). See [the review](docs/findings/2026-11-06-fresh-eyes-review.md).
 
 **Kind:** **published** = a value as the source publishes it · **derived** = calculated exactly from published data
 (an overlap, a distance, a statistic of LiDAR cells) · **modelled** = an estimate from a model with stated simplifications.

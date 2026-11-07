@@ -35,9 +35,16 @@ def area_check(db):
     linz = {f["properties"].get("id"): shape(f["geometry"]).area for f in feats("linz_parcels")}
     if not linz: return dict(n=0, note="LINZ parcels not fetched (needs LINZ_API_KEY)")
     rows = db.execute("SELECT unit_id, area_m2, coverage_pct FROM units").fetchall()
-    diffs = [a - linz[i] for i, a, _ in rows if i in linz]
+    diffs = {i: a - linz[i] for i, a, _ in rows if i in linz}
+    # KCDC's mirror clips parcels that cross the district boundary, so those are smaller than LINZ by design
+    clipped = {i: d for i, d in diffs.items() if d < -1}
+    other = {i: d for i, d in diffs.items() if d >= -1}
+    worst = sorted(other.items(), key=lambda t: -abs(t[1]))[:5]
     return dict(n=len(diffs), not_in_linz=sum(1 for i, _, _ in rows if i not in linz),
-                max_abs=round(max(map(abs, diffs)), 2) if diffs else None, n_abs_gt_1=int(sum(abs(x) > 1 for x in diffs)))
+                smaller_than_linz_gt_1=len(clipped), n_abs_gt_1=int(sum(abs(d) > 1 for d in other.values())),
+                max_abs=round(max(map(abs, other.values())), 2) if other else None,
+                worst=[[i, round(d, 2)] for i, d in worst if abs(d) > 1],
+                smaller_examples=[[i, round(d, 2)] for i, d in sorted(clipped.items(), key=lambda t: t[1])[-5:]])
 
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)

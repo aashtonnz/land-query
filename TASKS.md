@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-07 10:45 (Pacific/Auckland)
+Last updated: 2026-11-07 15:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 33
 
 Standing priorities:
@@ -15,9 +15,8 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-45: Raw-source sample check: compare 10 or more parcels across block types with the raw KCDC, GWRC and LINZ layers, run through GitHub Actions (the review session could not reach those hosts), then one district rebuild with T-40 to T-44.
-- T-36: Query service (after T-45): a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
-- T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels are not on recent survey plans (T-21); check a sample against LINZ 7.5 cm aerials from both periods.
+- T-36: Query service: a read-only MCP server on the compiled Kāpiti database that answers area queries with provenance, licence, value kind and fit-for-parcel flag on each row. Serve only licence-cleared data to outside users (T-35).
+- T-29: Check LiDAR change candidates: district-wide, 256 of 554 changed parcels were not on recent survey plans (T-21; the T-45 rebuild swapped 17 of the 554); check a sample against LINZ 7.5 cm aerials from both periods.
 - T-25: Source-change checks: weekly workflow that records each source layer's fields and record count and flags changes.
 - T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
@@ -36,6 +35,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-45: District rebuild and raw-source sample check: rebuilt with T-40 to T-44 (39 minutes, all 46 blocks). The reviewer's faults are gone (zone shares over 100%: 1,719 → 0; empty provenance: 14,387 → 0; too-small platforms: 1,002 → 0; Te Horo manhole anomaly gone). 15 parcels across block types match the raw KCDC, GWRC and LINZ LiDAR sources on all 195 checks. Q1 is now 402 parcels (121 recovered from older zone names). Fixed for the next run: the area check now separates parcels KCDC clips at the district boundary, and nearest-pipe ties no longer depend on download order. Source issue reported: KCDC's zone layer double-zones 7 parcels. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-45-district-rebuild-and-raw-source-sample-check-7-nov-2026) 2026-11-07.
 - T-44: QA and query wording: the Te Horo "manholes" were stormwater culvert ends and sumps (no wastewater points in the block; datum levels converted once), so QA now compares true manholes only, wastewater and stormwater separately (Te Horo block: medians −0.11 and −0.06 m, none over 0.5 m); nearest-manhole columns use manholes only; area check against LINZ in every block (Te Horo: 753 parcels, max 0.1 m²); Q4 renamed and uses each block's epoch offset; Q5 counts points inside the parcel, with ids; paging with a count check; no invented ids. Private assets were already excluded. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-44-qa-and-query-wording-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-43: Ground-level measures: winter sun now counts only ground with nothing above it and is averaged over clear open ground, with a new `open_ground_clear_pct` (on wooded test-tile parcels 1.1 h between the trees, against 4.3 h measured on the canopy before); viewpoint never under trees; platform estimate only where a 15 × 15 m square fits on open ground (441 → 135 parcels on the tile); new `lidar_coverage_pct`, required at 99% by the terrain queries. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-43-ground-level-measures-fixed-in-code-7-nov-2026) 2026-11-07.
 - T-42: Window edges: whole-catchment flow on a 10 m district mosaic of LINZ's national DEM (new `catchment_area_max_m2`; Waikanae 148 km², Ōtaki 374 km² near their mouths), built once per run and cached; pysheds replaced by priority-flood D8 after it was found stopping rivers on flat valley floors; 1 m upslope area flagged where it reaches the window edge; flow path in metres; wind relative height with the sea at 0 m; LiDAR read 300 m beyond each window, with sheets chosen from all four corners. Known limit: embankments without culverts divert flow on the plain north of Ōtaki. [Findings](docs/findings/2026-11-06-fresh-eyes-review.md#t-42-window-edges-fixed-in-code-6-nov-2026) 2026-11-07.
