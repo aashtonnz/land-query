@@ -5,12 +5,6 @@ Full descriptions for open tasks in `Next` and `Planned` on [`TASKS.md`](TASKS.m
 
 ## Next (Phase 1 — Kāpiti Coast)
 
-- **T-47: Flow at the coast**
-  In `flow.py`, a valid cell next to no data drains into it when that is its steepest drop. Mask the flattened sea in the
-  national DEM (for example where the 8 m contour DEM has no data, or at the survey's constant sea value) in
-  `district_flow.py`, the 1 m block flow and the wind height mean. Use 10 m cells whose centre is in the parcel.
-  Checks: a slope to a sea column drains each row to its own beach cell; the Waitohu cell at 1780895, 5493975 reads
-  80 km² or less; parcel 3883291 reads under 1 km².
 - **T-48: Provenance and publishing safety**
   `merge_sources` takes URL and licence from the first block that has them; test with a no-coverage block first.
   `kapiti.yml` refuses to push when `only` is set or blocks are missing, and writes the commit SHA to `RUN.txt`.
