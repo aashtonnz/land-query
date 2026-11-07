@@ -42,8 +42,8 @@ def area_check(db):
     # than LINZ's and reaches the boundary (T-49); any other difference is reported
     lines = [shape(f["geometry"]) for f in feats("district_boundary")]
     edge = unary_union([g.boundary if g.geom_type.endswith("Polygon") else g for g in lines])
-    geom = {f["properties"].get("id"): shape(f["geometry"]) for f in feats("parcels")}
-    clipped, other = split_clipped(diffs, geom, edge)
+    linz_geom = {f["properties"].get("id"): shape(f["geometry"]) for f in feats("linz_parcels")}
+    clipped, other = split_clipped(diffs, linz_geom, edge)
     worst = sorted(other.items(), key=lambda t: -abs(t[1]))[:5]
     return dict(n=len(diffs), not_in_linz=sum(1 for i, _, _ in rows if i not in linz),
                 clipped_at_district_boundary=len(clipped), n_abs_gt_1=int(sum(abs(d) > 1 for d in other.values())),

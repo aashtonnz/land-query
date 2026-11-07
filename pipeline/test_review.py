@@ -213,9 +213,10 @@ def test_inland_parcel_smaller_than_linz_is_reported_not_hidden_as_clipped():
     from shapely.geometry import LineString, box
     from overlays import split_clipped
     edge = LineString([(0, 0), (0, 1000)])                          # the district boundary
-    geoms = {1: box(0, 0, 50, 50), 2: box(500, 500, 550, 550)}      # 1 touches the boundary, 2 is inland
-    clipped, other = split_clipped({1: -400.0, 2: -5.0}, geoms, edge)
-    assert set(clipped) == {1} and other == {2: -5.0}
+    linz = {1: box(-30, 0, 50, 50), 2: box(500, 500, 550, 550),     # LINZ parcel 1 crosses the boundary
+            3: box(40, 600, 3000, 2000)}                            # 3 is large but lies wholly inside the district
+    clipped, other = split_clipped({1: -400.0, 2: -5.0, 3: -4e6}, linz, edge)
+    assert set(clipped) == {1} and set(other) == {2, 3}
 
 
 if __name__ == "__main__":

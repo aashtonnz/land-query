@@ -62,9 +62,10 @@ def worst_grade(p):
     return -g if g in (1, 2, 3, 4, 5) else 0   # grade 0 has no published definition: treated as not graded
 
 
-def split_clipped(diffs, geoms, edge, tol_m=1.0):
+def split_clipped(diffs, linz_geoms, edge, tol_m=1.0):
     """Split parcel area differences (compiled minus LINZ, m²) into parcels clipped at the district boundary (smaller
-    than LINZ by over 1 m² and within tol_m of the boundary line) and all others, which are reported (T-49)."""
-    at_edge = lambda i: edge is not None and not edge.is_empty and i in geoms and geoms[i].distance(edge) <= tol_m
+    than LINZ by over 1 m², where the LINZ parcel itself crosses the boundary line) and all others, which are reported:
+    a mirror polygon cut short anywhere else is an error in the mirror (T-49)."""
+    at_edge = lambda i: edge is not None and not edge.is_empty and i in linz_geoms and linz_geoms[i].buffer(tol_m).intersects(edge)
     clipped = {i: d for i, d in diffs.items() if d < -1 and at_edge(i)}
     return clipped, {i: d for i, d in diffs.items() if i not in clipped}

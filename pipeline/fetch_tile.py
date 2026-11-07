@@ -58,11 +58,14 @@ ARCGIS = {
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 
-def arcgis_query(url):
-    """Every feature of an ArcGIS layer intersecting the fetch window, as GeoJSON in EPSG:2193."""
+WHOLE = {"district_boundary"}  # small layers fetched whole: a large parcel can cross the boundary outside the window
+
+
+def arcgis_query(url, whole=False):
+    """Every feature of an ArcGIS layer intersecting the fetch window (or all of it), as GeoJSON in EPSG:2193."""
     env = f"{TILE['xmin']},{TILE['ymin']},{TILE['xmax']},{TILE['ymax']}"
-    q = dict(where="1=1", geometry=env, geometryType="esriGeometryEnvelope", inSR=2193,
-             spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193, returnGeometry="true")
+    q = dict(where="1=1", outFields="*", outSR=2193, returnGeometry="true")
+    if not whole: q.update(geometry=env, geometryType="esriGeometryEnvelope", inSR=2193, spatialRel="esriSpatialRelIntersects")
     return {"type": "FeatureCollection", "features": arcgis.query_all(url, q)}
 
 def main():
@@ -74,7 +77,7 @@ def main():
         if only and name not in only: continue
         t0 = time.time()
         try:
-            fc = arcgis_query(url)
+            fc = arcgis_query(url, whole=name in WHOLE)
             b = json.dumps(fc).encode()
             open(os.path.join(RAW, name + ".geojson"), "wb").write(b)
             meta = arcgis._get(url, {"f": "json"}, 60)
