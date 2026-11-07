@@ -64,6 +64,36 @@ else:
     dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
     dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
     z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
+# district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
+DF_PATH = os.path.join(RAW, "district_flow.tif")
+DF = None
+if os.path.exists(DF_PATH):
+    _src = rasterio.open(DF_PATH)
+    _x0, _y0, _x1, _y1 = te.lidar_bbox(D)
+    _win = from_bounds(_x0 - 20, _y0 - 20, _x1 + 20, _y1 + 20, _src.transform).round_offsets().round_lengths()
+    DF = dict(acc=_src.read(1, window=_win, boundless=True, fill_value=np.nan),
+              trunc=_src.read(2, window=_win, boundless=True, fill_value=np.nan),
+              mean500=_src.read(3, window=_win, boundless=True, fill_value=np.nan),
+              ground=_src.read(4, window=_win, boundless=True, fill_value=-9999.0),  # -9999: outside the grid
+              transform=_src.window_transform(_win))
+else:
+    print("no district_flow.tif: catchment and wind relative height columns stay empty")
+
+
+# the sea: the 1 m DEM stores it as a flat surface near -0.6 m, not as no data. Cells the district grid marks as sea
+# (no value there, inside the grid) and no higher than 0.5 m are set to no data, so flow can leave into the sea (T-47).
+SEA = np.zeros(Z.shape, bool); G10 = None
+if DF is not None and HAVE_LIDAR:
+    from rasterio.warp import reproject, Resampling
+    G10 = np.full(Z.shape, -9999.0, np.float32)
+    reproject(DF["ground"], G10, src_transform=DF["transform"], src_crs="EPSG:2193", dst_transform=dem.transform,
+              dst_crs="EPSG:2193", src_nodata=-9999.0, dst_nodata=-9999.0, resampling=Resampling.nearest)
+    with np.errstate(invalid="ignore"):
+        SEA = np.isnan(G10) & (Z <= 0.5)
+    Z[SEA] = np.nan; dsm[SEA] = np.nan; z21[SEA] = np.nan
+    print(f"sea cells masked: {int(SEA.sum())}")
+
+
 gy, gx = np.gradient(Z, 1.0)
 SLOPE = np.degrees(np.arctan(np.hypot(gx, gy)))
 CANOPY = (dsm - Z) > 3.0
@@ -93,30 +123,19 @@ _flat = (SLOPE < 2) & ((dsm - Z) < 0.5) & ~BLDMASK & np.isfinite(DZ)
 EPOCH_OFFSET = round(float(np.median(DZ[_flat])), 3) if _flat.sum() >= 1000 else None
 del _flat
 
-# district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
-DF_PATH = os.path.join(RAW, "district_flow.tif")
-DF = None
-if os.path.exists(DF_PATH):
-    _src = rasterio.open(DF_PATH)
-    _x0, _y0, _x1, _y1 = te.lidar_bbox(D)
-    _win = from_bounds(_x0 - 20, _y0 - 20, _x1 + 20, _y1 + 20, _src.transform).round_offsets().round_lengths()
-    DF = dict(acc=_src.read(1, window=_win, boundless=True, fill_value=np.nan),
-              trunc=_src.read(2, window=_win, boundless=True, fill_value=np.nan),
-              mean500=_src.read(3, window=_win, boundless=True, fill_value=np.nan),
-              ground=_src.read(4, window=_win, boundless=True, fill_value=np.nan),
-              transform=_src.window_transform(_win))
-else:
-    print("no district_flow.tif: catchment and wind relative height columns stay empty")
-
-
 def district_cells(g):
-    """Values of the 10 m district rasters on cells touching the parcel."""
+    """Values of the 10 m district rasters on cells whose centre is in the parcel (or the cell holding its
+    representative point, for a parcel too small to contain a centre)."""
     T_ = DF["transform"]; x0, y0, x1, y1 = g.bounds
     c0, c1 = int(math.floor((x0 - T_.c) / T_.a)), int(math.ceil((x1 - T_.c) / T_.a))
     r0, r1 = int(math.floor((y1 - T_.f) / T_.e)), int(math.ceil((y0 - T_.f) / T_.e))
     r0, c0 = max(r0, 0), max(c0, 0); r1, c1 = min(r1, DF["acc"].shape[0]), min(c1, DF["acc"].shape[1])
     if r1 <= r0 or c1 <= c0: return None
-    m = ~geometry_mask([g], out_shape=(r1 - r0, c1 - c0), transform=rasterio.windows.transform(Window(c0, r0, c1 - c0, r1 - r0), T_), all_touched=True)
+    m = ~geometry_mask([g], out_shape=(r1 - r0, c1 - c0), transform=rasterio.windows.transform(Window(c0, r0, c1 - c0, r1 - r0), T_), all_touched=False)
+    if not m.any():
+        p_ = g.representative_point(); c, r = int((p_.x - T_.c) / T_.a), int((p_.y - T_.f) / T_.e)
+        if not (0 <= r < DF["acc"].shape[0] and 0 <= c < DF["acc"].shape[1]): return None
+        return {k: DF[k][r:r + 1, c] for k in ("acc", "trunc")}
     return {k: DF[k][r0:r1, c0:c1][m] for k in ("acc", "trunc")}
 
 
@@ -160,16 +179,15 @@ if HAVE_LIDAR:
     # flow may enter the window across its edge, or from unsurveyed land next to a LiDAR gap (not from the sea)
     from scipy.ndimage import binary_dilation
     INFLOW = np.zeros(Z.shape, bool); INFLOW[0, :] = INFLOW[-1, :] = INFLOW[:, 0] = INFLOW[:, -1] = True
-    GAP = ~np.isfinite(Z)
-    if DF is not None and GAP.any():
-        from rasterio.warp import reproject, Resampling
-        g10 = np.full(Z.shape, np.nan, np.float32)
-        reproject(DF["ground"], g10, src_transform=DF["transform"], src_crs="EPSG:2193", dst_transform=dem.transform,
-                  dst_crs="EPSG:2193", src_nodata=np.nan, dst_nodata=np.nan, resampling=Resampling.nearest)
-        GAP &= np.isfinite(g10); del g10  # a gap over land; gaps over the sea are outlets
+    GAP = ~np.isfinite(Z) & ~SEA
+    OUTSIDE = np.zeros(Z.shape, np.float32)  # what lies in no-data cells: the sea at 0 m, or the 10 m ground in a survey gap
+    if G10 is not None:
+        land = GAP & np.isfinite(G10) & (G10 > -9000)
+        OUTSIDE[land] = G10[land]
+        GAP = land  # a gap over land where flow may come from; without the grid, every gap counts
     INFLOW |= binary_dilation(GAP)
-    ACC, ACC_TRUNC, STEP = M.flow_routing(Z, dem.transform, inflow=INFLOW)  # upslope m², flow from outside, step m
-    del INFLOW, GAP
+    ACC, ACC_TRUNC, STEP = M.flow_routing(Z, dem.transform, inflow=INFLOW, outside=OUTSIDE)  # upslope m², flow from outside, step m
+    del INFLOW, GAP, OUTSIDE
     # earthworks: 15 m × 15 m level platform, estimated from local spread of ground levels (modelled)
     zf = np.where(np.isfinite(Z), Z, 0).astype(np.float64); ok = np.isfinite(Z) & ~BLDMASK
     k = 15; n_ok = uniform_filter(ok.astype(np.float32), k, mode="constant")
@@ -218,7 +236,7 @@ for uid, (g, p) in enumerate(units):
     z = Zw[m]; s = Sw[m]
     open_ground = m & ~Bw
     r.update(lidar_cells=int(np.isfinite(z).sum()),
-             lidar_coverage_pct=round(100 * float(np.isfinite(z).sum()) / z.size, 1) if z.size else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
+             lidar_coverage_pct=round(100 * float((np.isfinite(z) | SEA[rs, cs][m]).sum()) / z.size, 1) if z.size else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
              building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),

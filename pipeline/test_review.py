@@ -81,7 +81,8 @@ def test_real_valley_floor_has_no_dead_ends():
     f = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "otaki_valley_10m.npz"))
     z, T = f["z"], Affine(*f["transform"])
     ok = np.isfinite(z)
-    rec, dirn = flow._receivers(flow._fill(z.astype(np.float32), ok), ok)
+    out = np.zeros(z.shape)
+    rec, dirn = flow._receivers(flow._fill(z.astype(np.float32), ok, out), ok, out)
     assert (dirn[1:-1, 1:-1] >= 0).all()                          # every interior cell drains somewhere
     acc = flow.flow_routing(z, T)[0]
     assert float(np.nanmax(acc)) / 100 > 6000, np.nanmax(acc)     # pysheds: 4,636 cells reach the outlet
@@ -149,6 +150,30 @@ def test_nearest_pipe_does_not_depend_on_source_order():
     a = (LineString([(10, -5), (10, 10)]), {"asset_id": "KWWP001431", "condition_grade": 4})
     b = (LineString([(10, 10), (10, 30)]), {"asset_id": "KWWP001430", "condition_grade": 2})
     assert nearest_item([a, b], [0, 1], parcel)[1]["asset_id"] == nearest_item([b, a], [0, 1], parcel)[1]["asset_id"] == "KWWP001430"
+
+
+def test_beach_cells_drain_into_the_sea_not_along_the_beach():
+    """Second review finding 1: a coast sloping gently south made every beach cell drain sideways, so one collected
+    the whole coast. Each row should reach the sea at its own beach cell."""
+    import numpy as np
+    from rasterio.transform import from_origin
+    from flow import flow_routing
+    rows, cols = 50, 10
+    z = (np.arange(cols)[None, :] * 1.0 + np.arange(rows, 0, -1)[:, None] * 0.05).astype(np.float32)
+    z[:, 0] = np.nan                                                    # the sea, west of the beach
+    acc = flow_routing(z, from_origin(0, rows, 1, 1))[0]
+    assert float(np.nanmax(acc)) <= 3 * (cols - 1), np.nanmax(acc)      # pysheds-era code: 450 cells at one beach cell
+
+
+def test_cell_beside_a_higher_survey_gap_is_not_an_outlet():
+    import numpy as np
+    from rasterio.transform import from_origin
+    from flow import flow_routing
+    z = np.tile(np.arange(20, 0, -1, dtype=np.float32)[:, None], (1, 5))  # slopes down to the south
+    z[0:3, :] = np.nan                                                    # a survey gap upslope, at the north end
+    outside = np.full(z.shape, np.nan); outside[0:3, :] = 30.0           # known higher ground there
+    acc = flow_routing(z, from_origin(0, 20, 1, 1), outside=outside)[0]
+    assert float(np.nansum(acc[-1, :])) == np.isfinite(z).sum()           # all of it reaches the south edge
 
 
 if __name__ == "__main__":

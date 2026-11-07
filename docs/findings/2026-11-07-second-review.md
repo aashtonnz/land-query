@@ -226,3 +226,30 @@ Result: 316 checks, 4 mismatches. All 4 are the manhole ties in finding 2.
   current rule I find far more: 2,087 pipe and 239 manhole picks, 30 Q3 rows and 6 Q1 rows.
 - **Overlapping zones.** Recorded as a source issue ("reported"), but nothing in the code flags them.
 - **New in this review:** findings 3, 4, 6, 7 and 8.
+
+## T-47: flow at the coast (fixed in code, 7 Nov 2026)
+
+- **Drainage into no data.** `flow.py` now gives no-data cells an elevation: the sea at 0 m, or the 10 m ground
+  where the 1 m survey has a gap over land. A cell drains into them when that is its steepest drop, and the flow
+  leaves the raster there.
+  - A cell beside a higher survey gap is not an outlet (test).
+  - The reviewer's beach test (a coast sloping south, sea to the west) gives 450 cells at one beach cell on the old
+    code. On the new code each row reaches the sea at its own beach cell.
+- **The flattened sea.**
+  - `district_flow.py` masks as sea the cells with no value in the 8 m contour DEM and no higher than 0.5 m. Checked
+    at six points: the 8 m DEM has no data exactly where the 1 m DEM reads −0.56 or −1.005.
+  - The compiler masks the same sea in the block's 1 m LiDAR, using the district grid, and counts masked sea cells as
+    covered for `lidar_coverage_pct`.
+  - River beds below sea level, such as the Ōtaki mouth, have 8 m values and stay land.
+- **Catchment cells.** `catchment_area_max_m2` now uses 10 m cells whose centre is in the parcel, or the cell
+  holding a parcel too small to contain a centre.
+- **Checked on a local rebuild of the district grid:**
+  - The Waitohu stream ends at the coast at 1779215, 5489105 with 41.7 km², the reviewer's traced figure. The cell
+    that read 130 km² is masked sea.
+  - Waikanae 145.8 km² and Ōtaki 373.1 km² near their mouths, as before.
+  - Parcel 3864724 (Paekākāriki): 0.042 km², was 29.7. Parcel 3883291: 0.001 km², was 138.1.
+- **Test tiles.**
+  - Paraparaumu Beach (1766000, 5469000; 355 parcels): 753,130 sea cells masked in the LiDAR window. Parcel values
+    are identical to the old code there, because the flattened sea lies seaward of the parcels, so the reviewer's
+    suspected 1 m effect does not appear on that tile.
+  - Inland test tile: catchment changes for 441 of 535 parcels under the cell-centre rule.

@@ -1,8 +1,9 @@
 """D8 overland flow that drains every cell (T-42).
 
 Priority-flood with epsilon (Barnes, Lehman and Mulla 2014) raises each depression and flat just enough that every
-valid cell has a strictly lower neighbour on a path to an outlet (a valid cell on the raster edge or next to no
-data). Each cell then drains to its steepest-descent neighbour on the raised surface. This replaces pysheds, whose
+valid cell has a strictly lower neighbour on a path to an outlet (a valid cell on the raster edge, or next to no data
+that lies no higher than it, such as the sea). A cell next to the sea drains into it when that is its steepest drop
+(T-47: before, such cells only drained sideways along the beach). Each cell then drains to its steepest-descent neighbour on the raised surface. This replaces pysheds, whose
 resolve_flats left some valley-floor cells with no flow direction, stopping rivers mid-valley.
 """
 import heapq, math
@@ -15,7 +16,7 @@ DIST = np.array([1, math.sqrt(2), 1, math.sqrt(2), 1, math.sqrt(2), 1, math.sqrt
 
 
 @njit(cache=True)
-def _fill(z, ok):
+def _fill(z, ok, outside):
     H, W = z.shape
     zf = np.where(ok, z.astype(np.float64), np.nan)
     done = ~ok
@@ -23,10 +24,12 @@ def _fill(z, ok):
     for r in range(H):
         for c in range(W):
             if not ok[r, c]: continue
+            # an outlet: on the raster edge, or next to no data that lies no higher than the cell (the sea, say)
             seed = r == 0 or c == 0 or r == H - 1 or c == W - 1
             if not seed:
                 for k in range(8):
-                    if not ok[r + DR[k], c + DC[k]]: seed = True; break
+                    rn, cn = r + DR[k], c + DC[k]
+                    if not ok[rn, cn] and outside[rn, cn] <= zf[r, c]: seed = True; break
             if seed:
                 heapq.heappush(heap, (zf[r, c], np.int64(r * W + c))); done[r, c] = True
     while heap:
@@ -42,21 +45,24 @@ def _fill(z, ok):
 
 
 @njit(cache=True)
-def _receivers(zf, ok):
-    """Index of the steepest-descent neighbour, or -1 for an outlet; and the direction code 0-7 (-1 for none)."""
+def _receivers(zf, ok, outside):
+    """Index of the steepest-descent neighbour, or -1 where the cell drains out of the raster (into no data, or off
+    an edge with no lower neighbour); and the direction code 0-7 of that step (-1 for none)."""
     H, W = zf.shape
     rec = np.full(H * W, -1, np.int64); dirn = np.full((H, W), -1, np.int8)
     for r in range(H):
         for c in range(W):
             if not ok[r, c]: continue
-            best, bk = 0.0, -1
+            best, bk, out = 0.0, -1, False
             for k in range(8):
                 rn, cn = r + DR[k], c + DC[k]
-                if rn < 0 or cn < 0 or rn >= H or cn >= W or not ok[rn, cn]: continue
-                s = (zf[r, c] - zf[rn, cn]) / DIST[k]
-                if s > best: best, bk = s, k
+                if rn < 0 or cn < 0 or rn >= H or cn >= W: continue
+                if ok[rn, cn]: s = (zf[r, c] - zf[rn, cn]) / DIST[k]
+                else: s = (zf[r, c] - outside[rn, cn]) / DIST[k]   # into the sea, or onto unsurveyed lower ground
+                if s > best: best, bk, out = s, k, not ok[rn, cn]
             if bk >= 0:
-                rec[r * W + c] = (r + DR[bk]) * W + c + DC[bk]; dirn[r, c] = bk
+                dirn[r, c] = bk
+                if not out: rec[r * W + c] = (r + DR[bk]) * W + c + DC[bk]
     return rec, dirn
 
 
@@ -69,14 +75,18 @@ def _accumulate(order, rec, w):
     return acc
 
 
-def flow_routing(dem, transform, inflow=None):
+def flow_routing(dem, transform, inflow=None, outside=None):
     """Upslope area (m², counting the cell itself), truncated flag, and step length (m) for each cell.
 
-    truncated is True where the cell's upslope area includes an inflow cell, where flow from beyond the raster may
-    enter (default: cells on the raster edge or next to no data). NaN cells are no data and act as outlets."""
+    NaN cells are no data. outside gives their elevation (the sea at 0 m, or known ground where the survey has a gap);
+    by default they count as sea at 0 m. A cell drains into no data when that is its steepest drop, and the flow
+    leaves the raster there. truncated is True where the cell's upslope area includes an inflow cell, where flow from
+    beyond the raster may enter (default: cells on the raster edge or next to no data)."""
     ok = np.isfinite(dem)
-    zf = _fill(np.ascontiguousarray(dem, dtype=np.float32), ok)
-    rec, dirn = _receivers(zf, ok)
+    out = np.zeros(dem.shape, np.float64) if outside is None else np.where(np.isfinite(outside), outside, 0.0).astype(np.float64)
+    zf = _fill(np.ascontiguousarray(dem, dtype=np.float32), ok, out)
+    rec, dirn = _receivers(zf, ok, out)
+    del out
     order = np.argsort(-np.nan_to_num(zf, nan=-np.inf).ravel(), kind="stable")
     del zf
     order = order[ok.ravel()[order]]

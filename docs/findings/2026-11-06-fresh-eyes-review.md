@@ -282,3 +282,7 @@ asserted without tracing. The second review traced it. LINZ's national DEM store
 about −0.6 to −1.0 m, not as no data, and `flow.py` never let a cell drain into an adjacent no-data cell. So
 streams reaching the beach were routed north through the sea strip to the edge of the mosaic. See
 [the second review](2026-11-07-second-review.md), finding 1; the fix is T-47.
+
+A second correction: the two "beach points" quoted under T-42 (−3.5 and −3.4 m, against −11.3 and −15.7 m) were not
+beach. Their ground of −0.6 m is the flattened sea surface in the national DEM, so those cells were sea; the
+comparison showed the fill value changing, not a beach parcel.

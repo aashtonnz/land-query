@@ -70,6 +70,7 @@ def mosaic():
     W, H = int((BBOX[2] - BBOX[0]) / RES), int((BBOX[3] - BBOX[1]) / RES)
     T = from_origin(BBOX[0], BBOX[3], RES, RES)
     Z = np.full((H, W), np.nan, np.float32)
+    Z8 = np.full((H, W), np.nan, np.float32)  # the 8 m contour DEM alone: it has no data over the sea
     prov = []
     for coll, title in COLLS:
         c, hrefs = sheets(coll)
@@ -85,10 +86,18 @@ def mosaic():
                                 resampling=Resampling.average, masked=True).filled(np.nan).astype(np.float32)
             dst = Z[r0:r0 + hgt, c0:c0 + w]
             fill = np.isnan(dst) & np.isfinite(part); dst[fill] = part[fill]
+            if "contour" in coll: Z8[r0:r0 + hgt, c0:c0 + w] = np.where(np.isfinite(part), part, Z8[r0:r0 + hgt, c0:c0 + w])
         prov.append(dict(collection=BASE + coll + "/collection.json", title=c.get("title"), items=hrefs,
                          licence=c.get("license"), fetched=utc_now()))
     Z[Z <= -100] = np.nan
+    Z[sea_mask(Z, Z8)] = np.nan
     return Z, T, prov
+
+
+def sea_mask(Z, Z8, max_m=0.5):
+    """The sea: the national 1 m DEM stores it as a flat surface (-0.56 m off Kāpiti, -1.005 m further north) rather
+    than as no data, so it is taken as cells with no 8 m contour DEM value and no higher than max_m (T-47)."""
+    return np.isnan(Z8) & np.isfinite(Z) & (Z <= max_m)
 
 
 def mean_ground(Z, res, half_m=500):
