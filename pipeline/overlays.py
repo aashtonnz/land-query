@@ -198,6 +198,6 @@ def withhold_uncovered_buildings(row, g, cover):
     """Sets buildings_coverage_pct and empties the building columns unless the outlines cover the parcel."""
     share = g.intersection(cover).area / g.area if cover is not None and g.area else 0.0
     row["buildings_coverage_pct"] = round(100 * share, 1)
-    if share < BUILDING_MIN_COVER:
+    if row["buildings_coverage_pct"] < 100 * BUILDING_MIN_COVER:  # the published figure decides: 98.96% shows as 99.0 (T-77)
         for k in BUILDING_COLUMNS: row[k] = None
     return row

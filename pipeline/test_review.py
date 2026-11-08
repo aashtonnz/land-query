@@ -492,6 +492,8 @@ def test_building_values_are_empty_not_0_where_the_outlines_do_not_reach():
     assert all(r[k] is None for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 50.0
     r = ov.withhold_uncovered_buildings(dict(full), box(701, 0, 801, 100), cover)   # 99% covered: kept
     assert r["buildings_coverage_pct"] == 99.0 and r["open_ground_m2"] == 7
+    r = ov.withhold_uncovered_buildings(dict(full), box(701.04, 0, 801.04, 100), cover)   # 98.96% shows as 99.0: kept
+    assert r["buildings_coverage_pct"] == 99.0 and r["open_ground_m2"] == 7
     r = ov.withhold_uncovered_buildings(dict(full), box(702, 0, 802, 100), cover)   # 98%: empty
     assert r["open_ground_m2"] is None
     assert ov.withhold_uncovered_buildings({}, box(700, 0, 830, 100), cover)["buildings_coverage_pct"] == 76.9

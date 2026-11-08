@@ -58,3 +58,19 @@ Checked and correct:
   - `about` gains an `empty_values` note, including that some flood layers are withheld publicly.
   - The liquefaction row is corrected.
 - **Not yet in the weekly source check:** the capture area.
+
+## T-77: rebuild (8 Nov 2026)
+
+- **Run.** Run 42459146212 compiled all 44 blocks at `0b921c2` and published. The new publishing check (no building
+  value under 99% coverage, no RBL count of 0) passed.
+- **Checked on the published results:**
+  - 27,284 parcels. One capture-area sha in all 44 blocks.
+  - 818 parcels are under 99% building coverage, including 3830470, 3972863 and 3795250, which are now empty. 586
+    were covered under T-73's bounding box; 24 of those had shown buildings, for part of the parcel only.
+  - Covered parcels are unchanged apart from three. Two are newly covered, because the photo footprint reaches past
+    the outlines' bounding box: 7203031 (58 m² of buildings) and 3797241. The third, 3818065, shows 99.0% but its
+    values are empty: the rule compared the unrounded 98.98%. The rule now uses the published, rounded figure (with a
+    test). The one parcel corrects at the next rebuild.
+  - `rbl_in_parcel_n` is never 0 (10,504 parcels have points). `linz_not_in_mirror` 72; no failed source.
+
+A ninth fresh-eyes review follows, under fresh-eyes review 1.1.
