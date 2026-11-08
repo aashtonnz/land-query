@@ -527,6 +527,44 @@ def test_membership_floor_point_and_share_precision():
     assert ov.district_share(box(66.7, 0, 166.7, 100), box(0, 0, 100, 10000)) == 33.3  # one decimal place
 
 
+def test_unmapped_houses_on_the_lidar_empty_the_building_values():
+    # KCDC's outlines miss some houses inside the area they cover (ninth review): the LiDAR finds them
+    import numpy as np
+    import measures as M, overlays as ov
+    dem = np.zeros((60, 60)); dsm = dem.copy()
+    dsm[5:15, 5:17] = 5.0                                   # an unoutlined roof, 10 x 12 m, flat
+    dsm[30:40, 5:17] = 5.0; out = np.zeros((60, 60), bool); out[30:40, 5:17] = True   # an outlined one
+    dsm[30:40, 17:22] = 5.0                                 # a 5 m wide overhang or lean-to touching the outline
+    rng = np.random.default_rng(1); dsm[45:58, 30:50] = 6 + rng.uniform(-1.5, 1.5, (13, 20))  # a tree crown, rough
+    dsm[5:9, 40:58] = 4.0                                   # a 4 m wide, flat-topped hedge: 2 m wide once its rough edges go
+    dsm[20:25, 40:45] = 20.0                                # a 20 m mast or tower (over 15 m)
+    u = M.unmapped_structures(dsm, dem, out)
+    assert u[6:14, 6:16].all() and not u[25:, :].any() and not u[:20, 30:].any() and not u[18:27, 38:47].any()
+    assert M.largest_structure_m2(u) == 80  # the roof's interior: its edge cells are rough (the step to the ground)
+    d = np.zeros((6, 6), bool); d[0:2, 0:2] = True; d[2:4, 2:4] = True   # two patches touching at a corner
+    assert M.largest_structure_m2(d) == 8 and M.largest_structure_m2(np.zeros((3, 3), bool)) == 0
+    full = {k: 7 for k in ov.BUILDING_COLUMNS}
+    from shapely.geometry import box
+    cover = box(0, 0, 1000, 1000); g = box(10, 10, 20, 20)
+    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=39, coverage_pct=100.0), g, cover)["open_ground_m2"] == 7
+    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=40, coverage_pct=100.0), g, cover)["open_ground_m2"] is None
+    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=None, coverage_pct=98.9), g, cover)["building_2021_m2"] is None
+    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=None, coverage_pct=99.0), g, cover)["building_2021_m2"] == 7
+
+
+def test_capture_area_from_several_features_and_share_on_the_parcel_itself():
+    import overlays as ov
+    from shapely.geometry import box, Polygon
+    fc = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "geometry": box(174.9, -41.0, 174.91, -40.99).__geo_interface__},
+        {"type": "Feature", "geometry": box(175.0, -40.9, 175.01, -40.89).__geo_interface__}]}
+    cap = ov.capture_area_nztm(fc)
+    assert cap.geom_type == "MultiPolygon" and 1.5e6 < cap.area < 2.5e6
+    tri = Polygon([(0, 0), (100, 0), (0, 100)])            # its envelope is twice its area
+    r = ov.withhold_uncovered_buildings({}, tri, box(0, 0, 50, 100))
+    assert r["buildings_coverage_pct"] == 75.0
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

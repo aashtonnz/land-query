@@ -116,6 +116,29 @@ def ground_clear(dsm, dem, clear_m=CLEAR_M):
         return (dsm - dem) <= clear_m
 
 
+def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.35):
+    """Cells of building-like structures that no 2021 outline covers (T-79): 2.5-15 m above the ground, with a smooth
+    surface (3 x 3 standard deviation of the DSM under 0.35 m, which tree crowns exceed), at least 3 m wide (an opening
+    removes the strips where a roof overhangs its outline), and more than 2 m from any outline. KCDC's outlines miss
+    some houses, even inside the area they cover (ninth review)."""
+    from scipy.ndimage import uniform_filter, binary_opening, binary_dilation
+    with np.errstate(invalid="ignore"):
+        nd = dsm - dem
+        d = np.where(np.isfinite(dsm), dsm, 0).astype(np.float64)
+        m1 = uniform_filter(d, 3, mode="nearest"); m2 = uniform_filter(d * d, 3, mode="nearest")
+        sd = np.sqrt(np.clip(m2 - m1 * m1, 0, None))
+        cand = (nd > low) & (nd < high) & (sd < rough) & np.isfinite(nd)
+    cand &= ~binary_dilation(outlines, iterations=2)
+    return binary_opening(cand, structure=np.ones((3, 3), bool))
+
+
+def largest_structure_m2(mask, cell_m2=1.0):
+    """Area of the largest 8-connected patch of mask (0 if none)."""
+    from scipy.ndimage import label
+    lab, n = label(mask, structure=np.ones((3, 3), bool))
+    return 0 if n == 0 else int(np.bincount(lab.ravel())[1:].max() * cell_m2)
+
+
 def platform_centres(open_mask, k=15):
     """Cells at the centre of a k × k square lying wholly on open_mask (the parcel's open ground)."""
     from scipy.ndimage import binary_erosion

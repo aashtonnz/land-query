@@ -113,6 +113,8 @@ CANOPY = (dsm - Z) > 3.0
 with np.errstate(invalid="ignore"):
     CLEAR25 = (dsm - Z) <= 0.5  # nothing standing above the ground in 2025 (T-56)
 BLDMASK = ~geometry_mask(bld_geoms, out_shape=Z.shape, transform=dem.transform) if bld_geoms and HAVE_LIDAR else np.zeros_like(Z, bool)
+import measures as _M
+UNMAPPED = _M.unmapped_structures(dsm, Z, BLDMASK) if HAVE_LIDAR else np.zeros_like(Z, bool)  # T-79
 T_BLD = STRtree(bld_geoms) if bld_geoms else None
 
 def window_mask(g):
@@ -280,7 +282,7 @@ for uid, (g, p) in enumerate(units):
     r.update(ww_pipe_tied_ids=json.dumps(tied) if len(tied) > 1 else None)
     r.update(ww_pipe_dist_m=None if d is None else round(d, 1), ww_pipe_id=pp_ and pp_["asset_id"],
              ww_pipe_material=pp_ and pp_.get("pipe_material"), ww_pipe_dia_mm=pp_ and pp_.get("width"),
-             ww_pipe_year=as_int(pp_ and pp_.get("year_installed")), ww_pipe_condition_grade=as_int(pp_ and pp_.get("condition_grade")))
+             ww_pipe_year=as_int(pp_ and pp_.get("year_installed")), ww_pipe_condition_grade=as_int(pp_ and pp_.get("condition_grade")) or None)  # KCDC's 0 is "not graded" (T-79)
     d, sp_, _ = nearest("sw_nodes", sw_nodes, g, prefer=deepest_invert)
     r.update(sw_mh_dist_m=None if d is None else round(d, 1), sw_mh_invert_nzvd2016=sp_ and sp_["invert_level_nzvd2016"])
     d, wp_, tied = nearest("ws_pipes", ws_pipes, g, prefer=largest_diameter)  # a tie goes to the largest main
@@ -319,7 +321,8 @@ for uid, (g, p) in enumerate(units):
         fin = np.isfinite(a)
         if fin.any():
             k_ = int(np.nanargmax(np.where(fin, a, -1)))
-            r.update(upslope_area_max_m2=round(float(a[k_]), 0), upslope_area_truncated=bool(tr_[k_]),
+            r.update(upslope_area_max_m2=round(float(a[k_]), 0),  # unknown, not "complete", on a parcel only partly in LiDAR (T-79)
+                     upslope_area_truncated=bool(tr_[k_]) or (None if r.get("lidar_coverage_pct", 0) < 99 else False),
                      flow_path_m=round(float(np.nansum(st[fin & (a >= 2000)])), 1))
         else: r.update(upslope_area_max_m2=None, upslope_area_truncated=None, flow_path_m=None)
         zo = Zw[og]
@@ -349,7 +352,8 @@ for uid, (g, p) in enumerate(units):
                      horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
     if not HAVE_LIDAR and r["building_2021_m2"] is not None:  # the same definition as with LiDAR (seventh review)
         r["open_ground_m2"] = max(0, int(round(g.intersection(TILE_BOX).area)) - r["building_2021_m2"])
-    OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73)
+    r["unmapped_structure_m2"] = _M.largest_structure_m2(UNMAPPED[rs, cs] & m) if HAVE_LIDAR and r["lidar_cells"] else None
+    OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73, T-79)
     # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
     dc = district_cells(g) if DF is not None else None
     if dc is not None and np.isfinite(dc["acc"]).any():

@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 21:20 (Pacific/Auckland)
+Last updated: 2026-11-08 22:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,13 +10,13 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-78: Ninth fresh-eyes review (fresh-eyes review 1.1), before the second council. Started 2026-11-08.
+- T-80: Rebuild with the T-79 fixes (about US$2.20), then a tenth fresh-eyes review (fresh-eyes review 1.1). Started 2026-11-08.
 
 ## Waiting on you
-- T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
+- T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-78; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-80; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +33,8 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-79: Ninth-review fixes: LiDAR check for buildings KCDC's outlines miss (`unmapped_structure_m2`), building values also need the fetch window, empty-value meanings corrected (flood models, liquefaction, condition grade 0, easements, truncation), tally updated, publishing check extended. [Findings](docs/findings/2026-11-08-ninth-review.md#t-79-fixes-8-nov-2026) 2026-11-08.
+- T-78: Ninth fresh-eyes review: four serious findings (houses missing from KCDC's outlines read 0 m²; building values ignored the fetch window; a false statement about empty flood values; condition grade 0), six minor. [Findings](docs/findings/2026-11-08-ninth-review.md) 2026-11-08.
 - T-77: District rebuilt with the T-76 fixes: 818 parcels outside the building outlines' coverage now empty, not 0; publishing check passed; a rounding edge fixed in code. [Findings](docs/findings/2026-11-08-eighth-review.md#t-77-rebuild-8-nov-2026) 2026-11-08.
 - T-76: Eighth-review fixes: building coverage from the 2017 urban photos' capture area, not the layer's bounding box; a publishing check for it; RBL count empty, not 0; what empty overlay values mean, in `SOURCES.md` and `about`. [Findings](docs/findings/2026-11-08-eighth-review.md#t-76-fixes-8-nov-2026) 2026-11-08.
 - T-75: Eighth fresh-eyes review: two serious findings (586 parcels outside the building outlines' real coverage still read 0 m²; slope-failure empty where unmapped), six minor. [Findings](docs/findings/2026-11-08-eighth-review.md) 2026-11-08.
