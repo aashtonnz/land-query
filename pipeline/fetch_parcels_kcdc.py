@@ -14,11 +14,13 @@ from shapely.geometry import shape, box
 import tile_env as te
 import arcgis
 import linz
-from layers import KC_LIC
+
 from provenance import utc_now
 
+from councils import COUNCIL as C   # the council's parcel copy and outline sources (T-86)
+
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
-URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
+URL = C.PARCELS_URL
 os.makedirs(os.path.join(OUT, "raw"), exist_ok=True)
 
 t0 = time.time()
@@ -28,15 +30,12 @@ feats = arcgis.query_all(URL, dict(geometry=",".join(map(str, te.BLOCK)), geomet
 # the district: the mirror holds hundreds of parcels in Porirua and Horowhenua (fourth review, T-62), so membership is
 # tested here on every run, against three boundaries: KCDC's line and ward, and Stats NZ's polygon (T-65, T-70)
 import overlays as ov
-EDGE_URL = URL.rsplit("/", 1)[0] + "/1"
-WARD_URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Comm_Board_Ward_Boundaries_2025/MapServer/1"
-edge = arcgis.query_all(EDGE_URL, dict(where="1=1", outFields="OBJECTID", outSR=2193))
-STATS_URL = "https://mapping.gw.govt.nz/arcgis/rest/services/Region_basemap_P/MapServer/1"  # Stats NZ, served by GWRC
-wards = arcgis.query_all(WARD_URL, dict(where="Type='Māori Ward'", outFields="Ward,Type", outSR=2193))
-stats = arcgis.query_all(STATS_URL, dict(where="NAME='Kapiti Coast District'", outFields="NAME", outSR=2193))
+Q = lambda s: arcgis.query_all(s[0], dict(where=s[1], outFields=s[2], outSR=2193))
+EDGE_URL, WARD_URL, STATS_URL = (C.OUTLINE[k][0] for k in ("line", "ward", "stats"))
+edge, wards, stats = Q(C.OUTLINE["line"]), Q(C.OUTLINE["ward"]), Q(C.OUTLINE["stats"])
 G = lambda fs: [shape(f["geometry"]) for f in fs if f.get("geometry")]
-district = ov.district_outline(G(edge), G(wards), G(stats))
-if district.is_empty: raise SystemExit("could not build the district outline from KCDC's line and ward and Stats NZ's polygon")
+district = ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"])
+if district.is_empty: raise SystemExit("could not build the district outline from the council's line and ward and Stats NZ's polygon")
 outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards + stats), sort_keys=True).encode()
 from shapely.geometry import mapping
 json.dump(mapping(district), open(os.path.join(OUT, "raw", "district_outline.geojson"), "w"))  # for building cover (T-73)
@@ -49,7 +48,7 @@ for f in feats:
     if blk.contains(g.representative_point()) or blk.touches(g.representative_point()):
         kept.append(f)
 mirror = dict(type="FeatureCollection", features=kept)
-open(os.path.join(OUT, "raw", "kcdc_parcels.geojson"), "w").write(json.dumps(mirror))
+open(os.path.join(OUT, "raw", C.PARCELS_KEY + ".geojson"), "w").write(json.dumps(mirror))
 LINZ_URL = "https://data.linz.govt.nz/layer/50823/"
 linz_err = None
 if linz.KEY:
@@ -63,7 +62,7 @@ units = []
 for f in kept:
     lf = by_id.get(f["properties"].get("id"))
     if lf is not None: lf["properties"]["geometry_source"] = "LINZ"; units.append(lf)
-    else: f["properties"]["geometry_source"] = "KCDC mirror"; units.append(f)
+    else: f["properties"]["geometry_source"] = C.PARCELS_COPY; units.append(f)
 kept = units
 # LINZ parcels in this block (representative point inside it and inside the district) that the mirror lacks: new
 # parcels, railway parcels, or the mirror lagging. Counted and listed for QA, not compiled (T-59).
@@ -96,12 +95,12 @@ prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=linz_er
                                   outside_district=len(outside), outside_district_examples=outside[:20],
                                   membership=URL, sha256=hashlib.sha256(b).hexdigest(),
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
-                                  licence="LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)")
+                                  licence=f"LINZ NZ Primary Parcels, CC BY 4.0 (district membership from {C.PARCELS_FROM})")
 mb = json.dumps(mirror).encode()
 prov["sources"]["district_outline"] = dict(url=[EDGE_URL, WARD_URL, STATS_URL], ok=True, features=len(edge) + len(wards) + len(stats),
                                            area_km2=round(district.area / 1e6, 1), sha256=hashlib.sha256(outline_b).hexdigest(),
-                                           fetched=utc_now(), licence=KC_LIC + "; Stats NZ district polygon, CC BY 4.0, via GWRC")
-prov["sources"]["kcdc_parcels"] = dict(url=URL, ok=True, features=len(mirror["features"]), sha256=hashlib.sha256(mb).hexdigest(),
-                                       fetched=utc_now(), licence="LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror")
+                                           fetched=utc_now(), licence=C.OUTLINE_LICENCE)
+prov["sources"][C.PARCELS_KEY] = dict(url=URL, ok=True, features=len(mirror["features"]), sha256=hashlib.sha256(mb).hexdigest(),
+                                       fetched=utc_now(), licence=f"LINZ NZ Primary Parcels, CC BY 4.0, via {C.PARCELS_VIA}")
 json.dump(prov, open(prov_path, "w"), indent=1)
 print("parcels", len(kept), "of", len(feats), "intersecting;", from_linz, "with LINZ geometry; window", win, round(time.time() - t0, 1), "s", linz_err or "")

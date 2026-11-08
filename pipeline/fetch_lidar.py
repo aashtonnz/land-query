@@ -66,9 +66,8 @@ def read(coll, name):
 
 prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path))
-for coll, name in [("kapiti-coast_2024-2025/dem_1m/2193", "dem_2025"),
-                   ("kapiti-coast_2024-2025/dsm_1m/2193", "dsm_2025"),
-                   ("kapiti-coast_2021/dem_1m/2193", "dem_2021")]:
+from councils import COUNCIL as C
+for coll, name in C.LIDAR:  # the council's surveys (T-86)
     prov["sources"][name] = e = source_entry(read, coll, name)  # no coverage (hills, Kapiti Island) is not a failure
     if not e["ok"]: print(name, "no coverage" if e.get("no_coverage") else "FAILED " + e["error"])
 json.dump(prov, open(prov_path, "w"), indent=1)

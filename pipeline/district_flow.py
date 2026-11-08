@@ -20,9 +20,10 @@ from provenance import utc_now
 
 # district blocks span 1755000-1805000 E, 5455000-5495000 N; the mosaic extends east and south-east to the
 # Tararua divide so the Ōtaki, Waikanae and smaller catchments are whole (checked by the truncation flag)
-BBOX = tuple(int(v) for v in (sys.argv[2].split(",") if len(sys.argv) > 2 else (1745000, 5440000, 1835000, 5510000)))
+from councils import COUNCIL as C
+BBOX = tuple(int(v) for v in (sys.argv[2].split(",") if len(sys.argv) > 2 else C.FLOW_BBOX))
 RES = 10.0
-OUT_BBOX = (1752000, 5452000, 1808000, 5498000)  # district blocks plus 3 km: every block's LiDAR window
+OUT_BBOX = C.FLOW_OUT_BBOX  # district blocks plus 3 km: every block's LiDAR window
 BASE = "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/"
 COLLS = [("new-zealand/dem_1m/2193", "LINZ national 1 m DEM"), ("new-zealand-contour/dem_8m/2193", "LINZ contour-interpolated 8 m DEM")]
 

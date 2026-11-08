@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 03:40 (Pacific/Auckland)
+Last updated: 2026-11-09 04:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,6 +10,11 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
+- T-24: Second council, Porirua without three waters (D-16), to measure what a council adapter costs before the rest of the region (T-38). Steps:
+  - T-86: Council settings: move what is specific to Kāpiti (layers, parcel copy, boundary sources, LiDAR surveys, building coverage, blocks, flow area) into `pipeline/councils/`, chosen by `COUNCIL`; Kāpiti's output unchanged on a test tile.
+  - T-87: Porirua settings: District Plan 2025 layers (operative since 1 Nov 2025), PCC's parcel copy of LINZ (24,128), district outline from PCC's wards and Stats NZ, LiDAR `porirua_2023` (second survey `wellington_2013-2014` for ground change), building coverage; columns per council in `SOURCES.md`.
+  - T-88: Porirua on local test tiles, then a district run (`porirua.yml`, about US$1–1.50) to `porirua-results`.
+  - T-89: Fresh-eyes review of the adapter and the Porirua results; record the adapter's cost.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
@@ -17,7 +22,6 @@ Standing priorities:
 
 ## Next (in order, at most about 10)
 - T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
-- T-24: Second council, Porirua without three waters (D-16; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:

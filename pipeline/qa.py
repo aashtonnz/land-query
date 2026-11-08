@@ -39,7 +39,8 @@ def area_check(db):
     truncates or alters the parcel, which is reported with examples. Units without LINZ geometry are counted."""
     units = {f["properties"].get("id"): f for f in feats("parcels")}
     linz_geom = {i: shape(f["geometry"]) for i, f in units.items() if f["properties"].get("geometry_source") == "LINZ"}
-    mirror = {f["properties"].get("id"): shape(f["geometry"]).area for f in feats("kcdc_parcels")}
+    from councils import COUNCIL
+    mirror = {f["properties"].get("id"): shape(f["geometry"]).area for f in feats(COUNCIL.PARCELS_KEY)}
     if not linz_geom: return dict(n=0, units_without_linz_geometry=len(units), note="LINZ parcels not fetched (needs LINZ_API_KEY)")
     diffs = {i: mirror[i] - g.area for i, g in linz_geom.items() if i in mirror}
     lines = [shape(f["geometry"]) for f in feats("district_boundary")]

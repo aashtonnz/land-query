@@ -11,6 +11,7 @@ from rasterio.windows import from_bounds, Window
 import tile_env as te
 from overlays import class_shares, points_on, nearest_item, deepest_invert, worst_grade, largest_diameter, as_int
 import overlays as OV
+from councils import COUNCIL
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -238,7 +239,7 @@ for uid, (g, p) in enumerate(units):
     pid = p.get("id") or p.get("ID")
     if pid is None: raise SystemExit(f"parcel {uid} has no id: refusing to invent one")
     r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,
-             geometry_source=p.get("geometry_source") or "KCDC mirror", district_share_pct=p.get("district_share_pct"),
+             geometry_source=p.get("geometry_source") or COUNCIL.PARCELS_COPY, district_share_pct=p.get("district_share_pct"),
              appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
              # location for area queries (NZTM2000): a point inside the parcel, and its bounding box (T-36)
