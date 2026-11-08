@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 09:40 (Pacific/Auckland)
+Last updated: 2026-11-09 09:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -19,7 +19,8 @@ Standing priorities:
   - T-91 (done 2026-11-09): Thirteenth fresh-eyes review: data matches live layers city-wide; two suspected serious findings (flood mapping beyond the Horokiri valley and on Mana Island), one confirmed (P2's top row in Plimmerton Farm), eight minor. [Findings](docs/findings/2026-11-09-porirua-review.md#thirteenth-fresh-eyes-review-t-91-9-nov-2026)
   - T-92 (done 2026-11-09): Thirteenth-review fixes, rebuilt (run 42512213482: 94 columns; 163 parcels outside every flood model).
   - T-93 (done 2026-11-09): Fourteenth fresh-eyes review: two serious findings (overlays inflated by `buffer(0)` on PCC's invalid shapes; the flood model column over-read), six minor. [Findings](docs/findings/2026-11-09-porirua-review.md#fourteenth-fresh-eyes-review-t-93-9-nov-2026)
-  - T-94: Fourteenth-review fixes (in code 2026-11-09): `make_valid` repair, flood model column reworded, P2 thresholds, query tests on a table. Rebuild Porirua (about US$1), then a fifteenth review.
+  - T-94 (done 2026-11-09): Fourteenth-review fixes, rebuilt (run 42517549416; gas corridor 385 → 179 parcels, overland flow −115, inundation −67).
+  - T-96: Fifteenth fresh-eyes review. Started 2026-11-09.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.

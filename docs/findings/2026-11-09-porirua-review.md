@@ -187,3 +187,18 @@ Checked and correct:
 - **Wording** (4, 5). Stale text fixed; one row per column.
 - **Tests** (7). P1–P3 now run on a small table of made-up parcels, one for each condition, so a test checks what the
   SQL selects. All 9 mutants of this round are caught, including putting `buffer(0)` back.
+
+## T-94: rebuilt (9 Nov 2026)
+
+- **Run.** Run 42517549416 compiled all 17 blocks at `11dfb3d` and published. No source failed; the service checks
+  passed.
+- **The counts fell by exactly what the review predicted:**
+  - gas pipeline corridor 385 → 179 parcels (206 fewer);
+  - overland flow 1,257 → 1,142 (115);
+  - inundation 5,432 → 5,365 (67);
+  - tsunami 1-in-1,000-year 928 → 927;
+  - designations 1,267 → 1,086 (the gas network designation was inflated too).
+- **Spot checks.** Lot 3 DP 337497 is no longer in the corridor. Catchment labels carry their report years.
+- **Queries.** P1 310, P2 385, P3 1,803; the flow check's lift is 1.91.
+
+A fifteenth fresh-eyes review follows.
