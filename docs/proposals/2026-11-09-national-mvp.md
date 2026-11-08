@@ -1,6 +1,6 @@
 # National MVP proposal (T-99)
 
-Status: **proposed 9 Nov 2026, for the owner's decision.** Nothing here is built yet.
+Status: **approved 9 Nov 2026** (D-21). The owner will work out the buyer conversations (Part 6, "Owner") later.
 
 ## Why
 
