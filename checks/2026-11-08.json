@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-08T01:44:15+00:00",
+ "checked": "2026-11-08T22:26:37+00:00",
  "sources": {
   "buildings_2021": {
    "count": 50623,
@@ -273,10 +273,9 @@
   },
   "linz_not_in_mirror": {
    "by_intent": {
-    "Fee Simple Title": 2,
     "Railway": 70
    },
-   "count": 72,
+   "count": 70,
    "examples": [
     {
      "appellation": "Part Paekakariki 1E Block",
@@ -430,7 +429,7 @@
     }
    ],
    "kind": "gap",
-   "mirror": 27614
+   "mirror": 27615
   },
   "linz_parcels": {
    "count": 32537,
@@ -580,7 +579,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16"
   },
   "parcels_mirror": {
-   "count": 27614,
+   "count": 27615,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
