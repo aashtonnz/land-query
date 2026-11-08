@@ -21,11 +21,14 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   hazards), compile one row of facts per parcel into DuckDB, and run inverse queries with provenance on every row.
 - **[`.github/workflows/tile.yml`](.github/workflows/tile.yml)**: runs the pipeline for any tile on GitHub Actions, using
   the `LINZ_API_KEY` repository secret. One tile takes about 2.5 minutes; results go to the `tile-results` branch.
-- **[`.github/workflows/kapiti.yml`](.github/workflows/kapiti.yml)**: compiles the whole Kāpiti Coast district (27,614
-  parcels, 93 columns including computed sun, roof, flow and earthworks measures, 46 blocks) in about 40 minutes, with
-  quality checks on every block, and pushes the merged parcel table, provenance and query results to the
-  `kapiti-results` branch. Two fresh-eyes reviews checked it
-  ([first](docs/findings/2026-11-06-fresh-eyes-review.md), [second](docs/findings/2026-11-07-second-review.md)).
+- **[`.github/workflows/kapiti.yml`](.github/workflows/kapiti.yml)**: compiles the whole Kāpiti Coast district (27,284
+  parcels, about 105 columns including computed sun, roof, flow and earthworks measures, 44 blocks) in about 40
+  minutes (about US$2.20), with quality checks on every block. It pushes the merged parcel table, provenance and query
+  results to the `kapiti-results` branch. Ten fresh-eyes reviews have checked it (`docs/findings/`).
+- **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
+  `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the
+  same service checks. Use it for fixes that only change how a parcel's own values are published; anything that needs
+  new source data needs `kapiti.yml` (T-82).
 - **[`.github/workflows/sources.yml`](.github/workflows/sources.yml)**: a weekly check of every source's fields,
   record count and last-edit date. Snapshots go to the `source-checks` branch, and the run is flagged when anything
   changed, so a rebuild can be planned.

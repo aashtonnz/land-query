@@ -273,7 +273,7 @@ def test_every_column_defined_in_sources_md_is_published():
     if not p: print("SKIPPED: set LANDQ_RESULTS to check that no defined column has gone missing"); return
     have = set(LandQuery(p, "internal").all_columns)
     defined = {pat.pattern[1:-1] for pat, _, _ in cat._COLUMNS if "\\w" not in pat.pattern}
-    missing = sorted(c for c in defined if c not in have)
+    missing = sorted(c for c in defined if c not in have and c not in cat.PENDING_COLUMNS)
     assert not missing, f"defined in SOURCES.md but not in the results: {missing}"
 
 

@@ -486,18 +486,18 @@ def test_building_values_are_empty_not_0_where_the_outlines_do_not_reach():
     assert ov.building_cover(None, box(0, 0, 1, 1)) is None and ov.building_cover(box(0, 0, 1, 1), None) is None
     assert ov.withhold_uncovered_buildings({}, box(0, 0, 50, 50), cover)["buildings_coverage_pct"] == 0.0  # a hole in it
     full = {k: 7 for k in ov.BUILDING_COLUMNS}
-    r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), cover)
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(100, 100, 200, 200), cover)
     assert all(r[k] == 7 for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 100.0
-    r = ov.withhold_uncovered_buildings(dict(full), box(790, 0, 810, 100), cover)   # half outside the district
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(790, 0, 810, 100), cover)   # half outside the district
     assert all(r[k] is None for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 50.0
-    r = ov.withhold_uncovered_buildings(dict(full), box(701, 0, 801, 100), cover)   # 99% covered: kept
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(701, 0, 801, 100), cover)   # 99% covered: kept
     assert r["buildings_coverage_pct"] == 99.0 and r["open_ground_m2"] == 7
-    r = ov.withhold_uncovered_buildings(dict(full), box(701.04, 0, 801.04, 100), cover)   # 98.96% shows as 99.0: kept
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(701.04, 0, 801.04, 100), cover)   # 98.96% shows as 99.0: kept
     assert r["buildings_coverage_pct"] == 99.0 and r["open_ground_m2"] == 7
-    r = ov.withhold_uncovered_buildings(dict(full), box(702, 0, 802, 100), cover)   # 98%: empty
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(702, 0, 802, 100), cover)   # 98%: empty
     assert r["open_ground_m2"] is None
     assert ov.withhold_uncovered_buildings({}, box(700, 0, 830, 100), cover)["buildings_coverage_pct"] == 76.9
-    r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), None)   # extent unknown
+    r = ov.withhold_uncovered_buildings(dict(full, coverage_pct=100.0), box(100, 100, 200, 200), None)   # extent unknown
     assert r["building_2021_m2"] is None and r["buildings_coverage_pct"] == 0.0
     assert set(ov.BUILDING_COLUMNS) == {"building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct",
         "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
@@ -576,6 +576,26 @@ def test_capture_area_from_several_features_and_share_on_the_parcel_itself():
     tri = Polygon([(0, 0), (100, 0), (0, 100)])            # its envelope is twice its area
     r = ov.withhold_uncovered_buildings({}, tri, box(0, 0, 50, 100))
     assert r["buildings_coverage_pct"] == 75.0
+
+
+def test_finish_rules_apply_to_published_rows_and_are_idempotent():
+    # the rules finish.py applies to published results without a rebuild (T-82)
+    import overlays as ov
+    base = dict(buildings_coverage_pct=100.0, coverage_pct=100.0, lidar_coverage_pct=100.0, ww_pipe_condition_grade=3,
+                rbl_in_parcel_n=2, upslope_area_max_m2=500.0, upslope_area_truncated=False, flow_path_m=12.0,
+                unmapped_structure_m2=0, **{k: 5 for k in ov.BUILDING_COLUMNS})
+    r = ov.finish_row(dict(base)); assert r == base                                   # nothing to change
+    r = ov.finish_row(dict(base, coverage_pct=98.9)); assert all(r[k] is None for k in ov.BUILDING_COLUMNS)
+    r = ov.finish_row(dict(base, buildings_coverage_pct=None)); assert r["open_ground_m2"] is None
+    r = ov.finish_row(dict(base, lidar_coverage_pct=98.9))
+    assert all(r[k] is None for k in ov.LIDAR_FLOW_COLUMNS) and r["open_ground_m2"] == 5
+    r = ov.finish_row(dict(base, lidar_coverage_pct=float("nan"))); assert r["flow_path_m"] is None
+    r = ov.finish_row(dict(base, ww_pipe_condition_grade=0, rbl_in_parcel_n=0))
+    assert r["ww_pipe_condition_grade"] is None and r["rbl_in_parcel_n"] is None
+    once = ov.finish_row(dict(base, coverage_pct=50.0, lidar_coverage_pct=50.0, ww_pipe_condition_grade=0))
+    assert ov.finish_row(dict(once)) == once
+    r = ov.finish_row({k: v for k, v in base.items() if k != "unmapped_structure_m2"} | dict(lidar_coverage_pct=10.0))
+    assert "unmapped_structure_m2" not in r                                            # an absent column stays absent
 
 
 if __name__ == "__main__":

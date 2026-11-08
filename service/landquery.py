@@ -65,7 +65,7 @@ class LandQuery:
                       "so a few parcels reach far outside it (one forest section is 615 km2, about 40 km2 of it in the "
                       "district). Their area covers the whole parcel; terrain covers the part with LiDAR "
                       "(lidar_coverage_pct); building and open-ground values come from KCDC's 2021 building outlines, which "
-                      "miss some houses (unmapped_structure_m2 warns of most), and are empty unless the outlines and the "
+                      "miss some houses (unmapped_structure_m2 warns of most; it arrives with the next full rebuild where absent), and are empty unless the outlines and the "
                       "fetch window cover the parcel (buildings_coverage_pct, coverage_pct); council layers cover what "
                       "the council maps. "
                       "district_share_pct gives the share inside; it is withheld in public mode until the council licence "

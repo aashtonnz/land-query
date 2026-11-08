@@ -15,6 +15,10 @@ FIT_RANK = {"fit": 0, "not applicable": 0, "use with caution": 1, "not fit for p
 PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records; the title count is served instead (T-55)",
                   "title_types": "a title type such as Life Estate can describe a living person's interest (T-67, D-17)"}
 
+# Defined in SOURCES.md but only computed by a full rebuild, so absent from results published by finish.py until one
+# runs (T-82). The schema check allows these to be missing; nothing else does.
+PENDING_COLUMNS = {"unmapped_structure_m2": "added at the next full rebuild (T-82)"}
+
 # Which sources each column is computed from, first match wins. Every derived value also depends on the parcel.
 P = ["parcels"]
 COLUMN_SOURCES = [

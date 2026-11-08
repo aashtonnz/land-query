@@ -203,7 +203,29 @@ def withhold_uncovered_buildings(row, g, cover):
     miss some houses; `unmapped_structure_m2` warns of those, without emptying anything (D-19, T-81)."""
     share = g.intersection(cover).area / g.area if cover is not None and g.area else 0.0
     row["buildings_coverage_pct"] = round(100 * share, 1)
-    if (row["buildings_coverage_pct"] < 100 * BUILDING_MIN_COVER  # the published figure decides: 98.96% shows as 99.0 (T-77)
-            or (row.get("coverage_pct") is not None and row["coverage_pct"] < 100 * BUILDING_MIN_COVER)):
+    return finish_row(row)
+
+
+LIDAR_FLOW_COLUMNS = ("upslope_area_max_m2", "upslope_area_truncated", "flow_path_m", "unmapped_structure_m2")
+
+
+def finish_row(row):
+    """Rules that need only a parcel's own published values, applied by the compiler to every row and by finish.py to
+    published results, so a change to them republishes in minutes without a rebuild (T-82). Each is idempotent.
+
+    - Building and open-ground columns empty unless the outlines and the fetch window cover 99% of the parcel (T-73,
+      T-79); the published, rounded figure decides (T-77).
+    - Flow and structure columns empty under 99% LiDAR coverage: a part's values are not the parcel's (T-81).
+    - KCDC's condition grade 0 means "not graded": empty (T-79). A count of 0 recommended building levels: empty (T-76).
+    """
+    def below(k):
+        v = row.get(k)
+        return v is None or v != v or v < 100 * BUILDING_MIN_COVER   # missing or NaN counts as not covered
+    if below("buildings_coverage_pct") or below("coverage_pct"):
         for k in BUILDING_COLUMNS: row[k] = None
+    if below("lidar_coverage_pct"):
+        for k in LIDAR_FLOW_COLUMNS:
+            if k in row: row[k] = None
+    if row.get("ww_pipe_condition_grade") == 0: row["ww_pipe_condition_grade"] = None
+    if row.get("rbl_in_parcel_n") == 0: row["rbl_in_parcel_n"] = None
     return row

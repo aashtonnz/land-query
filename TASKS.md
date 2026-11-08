@@ -1,18 +1,18 @@
 # Tasks
 
-Last updated: 2026-11-09 00:40 (Pacific/Auckland)
+Last updated: 2026-11-09 01:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (D-14). November: the US$20 budget was reached during T-63 although my running total said about US$15, so the total undercounts (likely storage, or minutes rounded up per job); the owner raised the budget on 8 Nov. Since then: five full rebuilds (T-63 merge, T-66, T-71, T-74, T-77), about US$11; the budget was reached again at T-80. Check GitHub's billing page, not the estimate, before the next paid run.
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14). November: the US$20 budget was reached during T-63 although my running total said about US$15, so the total undercounts (likely storage, or minutes rounded up per job); the owner raised the budget on 8 Nov. Since then: five full rebuilds (T-63 merge, T-66, T-71, T-74, T-77), about US$11; the budget was reached again at T-80; the owner added US$5 on 9 Nov. Rebuilds are now batched, and rule-only fixes go through `finish.yml` (T-82). Check GitHub's billing page, not the estimate, before the next paid run.
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
+- T-82: Cheaper republishing: `finish.yml` applies the row rules to published results (minutes, about US$0.02) instead of a rebuild. First use: the T-79 and T-81 rule fixes. The new LiDAR warning column waits for the next full rebuild, batched with other changes that need one. Started 2026-11-09.
 
 ## Waiting on you
-- T-82: Rebuild with the T-79 and T-81 fixes (about US$2.20), then an eleventh fresh-eyes review. The Actions budget is used up: raise it by US$10, or it resumes in December. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
