@@ -1,5 +1,11 @@
-# Source check 2026-11-07T23:27:11+00:00
+# Source check 2026-11-08T01:40:52+00:00
 
-41 sources checked; 0 unreadable.
+42 sources checked; 1 unreadable.
 
-First snapshot.
+Changes since the previous check:
+
+- `linz_not_in_mirror`: new in the check
+
+Unreadable this week (flagged every week until fixed):
+
+- `linz_not_in_mirror`: No module named 'shapely'

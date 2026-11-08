@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-07T23:27:11+00:00",
+ "checked": "2026-11-08T01:40:52+00:00",
  "sources": {
   "buildings_2021": {
    "count": 50623,
@@ -270,6 +270,10 @@
    "last_edit": null,
    "name": "Liquefaction",
    "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10"
+  },
+  "linz_not_in_mirror": {
+   "error": "No module named 'shapely'",
+   "kind": "gap"
   },
   "linz_parcels": {
    "count": 32537,
