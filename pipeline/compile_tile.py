@@ -191,7 +191,7 @@ if HAVE_LIDAR:
     from scipy.ndimage import binary_dilation
     INFLOW = np.zeros(Z.shape, bool); INFLOW[0, :] = INFLOW[-1, :] = INFLOW[:, 0] = INFLOW[:, -1] = True
     GAP = ~np.isfinite(Z) & ~SEA
-    OUTSIDE = np.zeros(Z.shape, np.float32)  # what lies in no-data cells: the sea at 0 m, or the 10 m ground in a survey gap
+    OUTSIDE = np.full(Z.shape, np.nan, np.float32)  # what lies in no-data cells: the 10 m ground in a survey gap; NaN is sea
     if G10 is not None:
         land = GAP & np.isfinite(G10) & (G10 > -9000)
         OUTSIDE[land] = G10[land]
@@ -252,21 +252,16 @@ for uid, (g, p) in enumerate(units):
     Zw, Sw, Bw, Cw, Dw = Z[rs, cs], SLOPE[rs, cs], BLDMASK[rs, cs], CANOPY[rs, cs], DZ[rs, cs]
     z = Zw[m]; s = Sw[m]
     open_ground = m & ~Bw
-    r.update(lidar_cells=int(np.isfinite(z).sum()),
-             # share of the parcel's cells with LiDAR (masked sea counts as covered), scaled by the share of the parcel
-             # inside the LiDAR window, so a parcel running beyond the window is not shown as fully covered (T-49)
-             lidar_coverage_pct=round(100 * float((np.isfinite(z) | SEA[rs, cs][m]).sum()) / z.size * (g.intersection(LIDAR_BOX).area / g.area), 1) if z.size and g.area else 0.0, ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
+    r.update(lidar_cells=int(np.isfinite(z).sum()),  # coverage share: M.lidar_parcel_stats below (T-49, T-59)
+             ground_min_m=stat(np.min, z), ground_mean_m=stat(np.mean, z),
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
              building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),
              open_ground_m2=int(open_ground.sum()) if HAVE_LIDAR else None,
-             open_ground_slope_lt5_m2=int((open_ground & (Sw < 5)).sum()) if HAVE_LIDAR else None,
-             canopy_gt3m_open_pct=round(100 * float((Cw & open_ground).sum()) / max(1, open_ground.sum()), 1) if HAVE_LIDAR else None,
              dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), lidar_epoch_offset_block_m=EPOCH_OFFSET, dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
-    # the same change on clear ground only (T-56): drops many vegetation hits, but also new-house sites (see T-29)
-    _c = m & CLEAR25[rs, cs] & np.isfinite(Dw)
-    r.update(dz_2021_2025_clear_pct=round(100 * float(_c.sum()) / max(1, int((m & np.isfinite(Dw)).sum())), 1) if HAVE_LIDAR else None,
-             dz_2021_2025_clear_mean_m=stat(np.mean, Dw[_c], 3) if _c.sum() >= 50 else None)
+    # figures that need LiDAR on the parcel: empty, not 0, where it has none (T-59); clear-ground change (T-56)
+    r.update(M.lidar_parcel_stats(z, SEA[rs, cs][m], (g.intersection(LIDAR_BOX).area / g.area) if g.area else 0.0,
+                                  open_ground[m], s, Cw[m], Dw[m], CLEAR25[rs, cs][m]))
     # wastewater: nearest manhole with an invert, and nearest pipe's raw attributes
     # ties (within 5 cm): the deepest invert for manholes, the worst condition grade for pipes; all tied ids reported
     d, np_, tied = nearest("ww_nodes", ww_nodes, g, prefer=deepest_invert)

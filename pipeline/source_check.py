@@ -17,6 +17,7 @@ STAC = {
     "dem_2025": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json",
     "dsm_2025": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/collection.json",
     "dem_2021": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/collection.json",
+    # national catalogues change whenever any survey in New Zealand is added: recorded, never flagged (T-59)
     "nz_dem_1m": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
     "nz_dem_8m": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
 }
@@ -74,10 +75,13 @@ def snapshot():
     return out
 
 
+INFO_ONLY = {"nz_dem_1m", "nz_dem_8m"}
+
+
 def compare(old, new):
-    """Plain-language list of differences between two snapshots."""
+    """Plain-language list of differences between two snapshots (sources in INFO_ONLY are not compared)."""
     out = []
-    for k in sorted(set(old) | set(new)):
+    for k in sorted((set(old) | set(new)) - INFO_ONLY):
         a, b = old.get(k), new.get(k)
         if a is None: out.append(f"- `{k}`: new in the check"); continue
         if b is None: out.append(f"- `{k}`: no longer checked"); continue
@@ -105,6 +109,7 @@ if __name__ == "__main__":
     changes = compare(json.load(open(prev))["sources"], snap["sources"]) if prev else []
     md = [f"# Source check {snap['checked']}", "", f"{len(snap['sources'])} sources checked; {len(errors)} unreadable.", ""]
     md += (["Changes since the previous check:", ""] + changes) if changes else (["No changes since the previous check."] if prev else ["First snapshot."])
+    if errors: md += ["", "Unreadable this week (flagged every week until fixed):", ""] + [f"- `{k}`: {snap['sources'][k]['error']}" for k in errors]
     open(os.path.join(os.path.dirname(os.path.abspath(out)), "changes.md"), "w").write("\n".join(md) + "\n")
     print("\n".join(md))
-    sys.exit(3 if changes else 0)
+    sys.exit(3 if changes or errors else 0)

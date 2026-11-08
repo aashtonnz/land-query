@@ -12,6 +12,7 @@ from numba import njit
 
 DR = np.array([-1, -1, 0, 1, 1, 1, 0, -1], np.int64)   # N, NE, E, SE, S, SW, W, NW
 DC = np.array([0, 1, 1, 1, 0, -1, -1, -1], np.int64)
+SEA_M = -1000.0  # the elevation given to sea cells: below any land
 DIST = np.array([1, math.sqrt(2), 1, math.sqrt(2), 1, math.sqrt(2), 1, math.sqrt(2)])
 
 
@@ -78,12 +79,12 @@ def _accumulate(order, rec, w):
 def flow_routing(dem, transform, inflow=None, outside=None):
     """Upslope area (m², counting the cell itself), truncated flag, and step length (m) for each cell.
 
-    NaN cells are no data. outside gives their elevation (the sea at 0 m, or known ground where the survey has a gap);
-    by default they count as sea at 0 m. A cell drains into no data when that is its steepest drop, and the flow
+    NaN cells are no data. outside gives their elevation (known ground where the survey has a gap); where it is NaN or
+    not given, the cell is sea, below any land (SEA_M), so coastal land below 0 m still drains into it (T-59). A cell drains into no data when that is its steepest drop, and the flow
     leaves the raster there. truncated is True where the cell's upslope area includes an inflow cell, where flow from
     beyond the raster may enter (default: cells on the raster edge or next to no data)."""
     ok = np.isfinite(dem)
-    out = np.zeros(dem.shape, np.float64) if outside is None else np.where(np.isfinite(outside), outside, 0.0).astype(np.float64)
+    out = np.full(dem.shape, SEA_M) if outside is None else np.where(np.isfinite(outside), outside, SEA_M).astype(np.float64)
     zf = _fill(np.ascontiguousarray(dem, dtype=np.float32), ok, out)
     rec, dirn = _receivers(zf, ok, out)
     del out

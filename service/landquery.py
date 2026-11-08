@@ -18,6 +18,8 @@ MAX_ROWS_ALL_COLUMNS = 100   # without a `columns` list, fewer rows: a full row 
 MAX_CONDITIONS = 20
 MAX_IN_VALUES = 1000         # across all `in` conditions
 MAX_OFFSET = 100_000
+MAX_BBOX_M = 20_000          # a box at most 20 km across (T-59: promised, now enforced)
+WIDE_COLUMNS = 20            # asking for more columns than this counts as asking for all of them
 QUERY_SECONDS = 10
 OPS = {"=": "=", "!=": "<>", "<": "<", "<=": "<=", ">": ">", ">=": ">="}
 SAFE_CLASS = re.compile(r"^[\w\s\-.,'():/āēīōūĀĒĪŌŪ]+$")
@@ -31,6 +33,7 @@ class LandQuery:
     def __init__(self, results_dir, audience="public"):
         if audience not in ("public", "internal"): raise ValueError("audience must be 'public' or 'internal'")
         self.audience, self.dir = audience, results_dir
+        self._lock = threading.Lock()
         self.db = duckdb.connect(config=dict(memory_limit="1GB", threads=2))  # one request cannot take the host down (T-52)
         path = os.path.join(results_dir, "units.parquet").replace("'", "''")  # a view cannot take a parameter
         self.db.execute(f"CREATE VIEW units AS SELECT * FROM read_parquet('{path}')")
@@ -86,6 +89,7 @@ class LandQuery:
             try: x0, y0, x1, y1 = (float(v) for v in bbox)
             except (TypeError, ValueError): raise QueryError("bbox values must be numbers") from None
             if not all(map(math.isfinite, (x0, y0, x1, y1))) or x1 < x0 or y1 < y0: raise QueryError("bbox must be finite, with xmin <= xmax and ymin <= ymax")
+            if x1 - x0 > MAX_BBOX_M or y1 - y0 > MAX_BBOX_M: raise QueryError(f"bbox at most {MAX_BBOX_M // 1000} km across")
             clauses.append("bbox_xmax >= ? AND bbox_xmin <= ? AND bbox_ymax >= ? AND bbox_ymin <= ?"); params += [x0, x1, y0, y1]
         where = where or []
         if not isinstance(where, list) or len(where) > MAX_CONDITIONS: raise QueryError(f"where is a list of at most {MAX_CONDITIONS} conditions")
@@ -96,7 +100,7 @@ class LandQuery:
         sql_where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
         try: limit, offset = int(limit), int(offset)
         except (TypeError, ValueError): raise QueryError("limit and offset must be whole numbers") from None
-        cap = MAX_ROWS if columns else MAX_ROWS_ALL_COLUMNS
+        cap = MAX_ROWS if columns and len(cols) <= WIDE_COLUMNS else MAX_ROWS_ALL_COLUMNS
         limit = max(1, min(limit, cap))
         if not 0 <= offset <= MAX_OFFSET: raise QueryError(f"offset must be between 0 and {MAX_OFFSET}")
         total = self._run(f"SELECT count(*) FROM units{sql_where}", params)[0][0]
@@ -113,6 +117,10 @@ class LandQuery:
 
     def _run(self, sql, params, names=False):
         """Run a query with a time limit; database errors become a plain message (the details stay in the server)."""
+        with self._lock:  # one query at a time: a request's timer must never interrupt another request's query (T-59)
+            return self._run_locked(sql, params, names)
+
+    def _run_locked(self, sql, params, names):
         timer = threading.Timer(QUERY_SECONDS, self.db.interrupt); timer.start()
         try:
             res = self.db.execute(sql, params)
@@ -167,6 +175,8 @@ class LandQuery:
         if op == "has_class":
             # an overlay column: class name, optionally with a minimum share of the parcel ({"class": ..., "min_pct": ...})
             cls, mn = (v.get("class"), v.get("min_pct", 0)) if isinstance(v, dict) else (v, 0)
+            try: mn = float(mn)
+            except (TypeError, ValueError): raise QueryError("min_pct must be a number") from None
             if not isinstance(cls, str) or not SAFE_CLASS.match(cls) or '"' in cls: raise QueryError("class name has unexpected characters")
             return f"coalesce(json_extract({q}, ?)::DOUBLE, -1) >= ?", ['$."' + cls + '"', max(float(mn), 0.000001)]
         raise QueryError(f"unknown op {op!r}; use one of {sorted(OPS) + ['in', 'is_null', 'not_null', 'contains', 'has_class']}")
@@ -189,7 +199,7 @@ class LandQuery:
         sources = {}
         for k in keys:
             s = cat.SOURCES.get(k, {})
-            p = self.prov.get(k, {})
+            p = self.prov.get("district_flow" if k == "sea_mask" else k, {})
             sources[k] = dict(dataset=s.get("dataset"), url=p.get("url"), licence=s.get("licence"),
                               licence_status=s.get("licence_status"), fit=s.get("fit"),
                               by_block={b: p.get("by_block", {}).get(b) for b in blocks} if p else None)

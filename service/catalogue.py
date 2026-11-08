@@ -28,7 +28,7 @@ COLUMN_SOURCES = [
     (r"wind_rel_height_m", P + ["dem_2025", "dsm_2025", "buildings_2021", "district_flow"]),
     (r"ground_min_minus_rbl_m|rbl_in_parcel_max_minus_ground_mean_m", P + ["flood_rbl_nzvd2016", "dem_2025"]),
     (r"rbl_\w+", P + ["flood_rbl_nzvd2016"]),
-    (r"ww_head_ground_min_minus_invert_m", P + ["ww_node", "dem_2025"]),
+    (r"ww_head_ground_min_minus_invert_m", P + ["ww_node", "dem_2025", "sea_mask"]),
     (r"ww_mh_\w+", P + ["ww_node"]),
     (r"ww_pipe_\w+", P + ["ww_pipe"]),
     (r"sw_mh_\w+", P + ["sw_point"]),
@@ -37,9 +37,9 @@ COLUMN_SOURCES = [
     (r"(zones|ovl_\w+|flood_\w+|wind_\w+|tsunami_zones|earthworks|gw_\w+)", None),  # an overlay: its own source key
     # the district grid masks the sea for coverage, and gives the flow its outlets and edge inflow (T-52)
     (r"lidar_coverage_pct|upslope_area_\w+|flow_path_m", P + ["dem_2025", "district_flow"]),
-    (r"lidar_cells|ground_(min|mean|max)_m|slope_p\d+_deg", P + ["dem_2025"]),
-    (r"dz_2021_2025_clear_\w+", P + ["dem_2025", "dem_2021", "dsm_2025"]),
-    (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021"]),
+    (r"lidar_cells|ground_(min|mean|max)_m|slope_p\d+_deg", P + ["dem_2025", "sea_mask"]),  # sea cells removed (T-59)
+    (r"dz_2021_2025_clear_\w+", P + ["dem_2025", "dem_2021", "dsm_2025", "sea_mask"]),
+    (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021", "sea_mask"]),
     (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025"]),  # LiDAR only since T-54
     (r"building_2021_m2|open_ground_m2|open_ground_slope_lt5_m2|level_open_\w+|platform_15m_earthworks_min_m3", P + ["dem_2025", "buildings_2021"]),
     (r"canopy_gt3m_open_pct|open_ground_clear_pct|winter_sun_\w+|horizon_\w+|sky_view_pct", P + ["dem_2025", "dsm_2025", "buildings_2021"]),

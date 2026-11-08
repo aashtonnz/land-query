@@ -1,22 +1,22 @@
 # Tasks
 
-Last updated: 2026-11-08 13:55 (Pacific/Auckland)
+Last updated: 2026-11-08 15:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$10.85 of US$20 (T-54 rebuild about US$2, merge-only rerun a few cents).
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$10.85 of US$20, plus about US$2 for the T-60 rebuild: about US$12.85.
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-57: Third fresh-eyes review (fresh-eyes review 1.1: review again after serious findings are fixed): a new reviewer checks everything changed since the second review was recorded (T-47 to T-56: coastal flow, LINZ geometry, service fixes, water mains, clear-ground columns, source check) before the second council builds on it. Started 2026-11-08.
+- T-60: Rebuild with the T-59 fixes (about US$2), then a fourth fresh-eyes review (fresh-eyes review 1.1, after a serious finding) before the second council. Started 2026-11-08.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-57; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-60; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +33,8 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-59: Third-review fixes: no-LiDAR parcels now empty instead of 0, LINZ parcels missing from the mirror counted, runs with failed sources refused, block commits recorded, sea-mask source, service limits and locking, sea below land for flow, weekly-check fixes; 6 new pipeline tests, 3 service tests, and a schema check that caught a dropped column before commit. [Findings](docs/findings/2026-11-08-third-review.md#t-59-fixes-8-nov-2026) 2026-11-08.
+- T-57: Third fresh-eyes review: one serious finding (470 no-LiDAR parcels read 0 instead of empty), one suspected (LINZ parcels the mirror lacks are dropped uncounted), eight minor. A coastal block rebuilt from raw sources matched the published results on all 101 columns. [Findings](docs/findings/2026-11-08-third-review.md) 2026-11-08.
 - T-58: Wellington Water licence decision: Porirua goes ahead without three waters (D-16); asking Wellington Water for commercial terms stays open to the owner. 2026-11-08.
 - T-25: Source-change checks: weekly workflow (`sources.yml`, Sundays 18:37 UTC) records each of 41 sources' fields, record count in the district and last-edit date (LINZ counts with the key; elevation catalogues by fingerprint), pushes the snapshot to `source-checks`, and flags the run when anything changed. About 1–2 runner minutes a week. 2026-11-08.
 - T-56: Ground change on clear ground: tested on the T-29 sample before changing anything. A clear-ground Q4 would keep 10 of 13 real changes and drop 4 of 8 vegetation hits, so Q4 is unchanged; two clear-ground columns are added for users to compare (from the next rebuild). [Findings](docs/findings/2026-11-08-lidar-change-check.md#t-56-the-clear-ground-rule-tested-before-changing-anything-8-nov-2026) 2026-11-08.

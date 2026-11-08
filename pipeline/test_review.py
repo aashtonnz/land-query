@@ -181,14 +181,18 @@ def test_beach_cells_drain_into_the_sea_not_along_the_beach():
 
 
 def test_cell_beside_a_higher_survey_gap_is_not_an_outlet():
+    """A pit next to higher unsurveyed ground must fill and overflow downhill, not drain into the gap (T-59 finding 7)."""
     import numpy as np
-    from rasterio.transform import from_origin
-    from flow import flow_routing
-    z = np.tile(np.arange(20, 0, -1, dtype=np.float32)[:, None], (1, 5))  # slopes down to the south
-    z[0:3, :] = np.nan                                                    # a survey gap upslope, at the north end
-    outside = np.full(z.shape, np.nan); outside[0:3, :] = 30.0           # known higher ground there
-    acc = flow_routing(z, from_origin(0, 20, 1, 1), outside=outside)[0]
-    assert float(np.nansum(acc[-1, :])) == np.isfinite(z).sum()           # all of it reaches the south edge
+    import flow
+    z = np.tile(np.arange(20, 0, -1, dtype=np.float32)[:, None], (1, 5)).copy()
+    z[0:3, :] = np.nan                                   # a survey gap at the top
+    z[3, 2] = 5.0                                        # a pit right beside it, far below its neighbours
+    outside = np.full(z.shape, np.nan); outside[0:3, :] = 30.0
+    ok = np.isfinite(z)
+    zf = flow._fill(z, ok, np.where(np.isfinite(outside), outside, flow.SEA_M))
+    rec, dirn = flow._receivers(zf, ok, np.where(np.isfinite(outside), outside, flow.SEA_M))
+    assert rec[3 * 5 + 2] >= 0                           # it drains to a land neighbour, not out through the gap
+    assert zf[3, 2] > 16                                 # filled to its spill level (the 16 m cell below)
 
 
 def test_lidar_url_and_licence_survive_a_no_coverage_block_first():
@@ -224,6 +228,7 @@ def test_flat_sea_cells_inside_a_coarse_land_cell_are_still_sea():
     import measures as M
     dem = np.full((40, 40), 3.0, np.float32); dem[:, :15] = -0.56          # flattened sea west of x = 15
     dem[20, 30] = -0.56                                                     # an isolated low cell inland: not sea
+    dem[:, 15] = 0.2                                                        # a low beach beside the sea: still land
     coarse = np.zeros_like(dem, bool); coarse[:, :10] = True                # the 10 m grid's sea stops 5 m short
     sea = M.extend_sea(coarse, dem)
     assert sea[:, :15].all() and not sea[:, 15:].any()                     # includes the isolated cell staying land
@@ -249,6 +254,43 @@ def test_source_check_reports_field_count_and_edit_changes():
     for s in ("fields changed", "count 412 → 420", "data edited", "catalogue changed", "`gone`: no longer checked", "`fresh`: new"):
         assert s in out, (s, out)
     assert compare(old, old) == []
+    assert compare({"nz_dem_1m": dict(items=1, sha256="a")}, {"nz_dem_1m": dict(items=2, sha256="b")}) == []  # national: never flagged
+
+
+def test_no_lidar_on_a_parcel_gives_empty_values_not_zero():
+    import numpy as np
+    import measures as M
+    nan = np.full(10, np.nan)
+    st = M.lidar_parcel_stats(nan, np.zeros(10, bool), 1.0, np.ones(10, bool), nan, np.zeros(10, bool), nan, np.zeros(10, bool))
+    assert st["lidar_coverage_pct"] == 0.0 and all(st[k] is None for k in st if k != "lidar_coverage_pct"), st
+    sea = np.ones(10, bool)                               # an island: no land cells, all sea
+    assert M.lidar_parcel_stats(nan, sea, 1.0, np.ones(10, bool), nan, np.zeros(10, bool), nan, np.zeros(10, bool))["lidar_coverage_pct"] == 0.0
+    z = np.arange(10.0); dz = np.full(10, np.nan)          # 2025 LiDAR but no 2021
+    st = M.lidar_parcel_stats(z, np.zeros(10, bool), 1.0, np.ones(10, bool), np.zeros(10), np.zeros(10, bool), dz, np.ones(10, bool))
+    assert st["dz_2021_2025_clear_pct"] is None and st["open_ground_slope_lt5_m2"] == 10
+
+
+def test_ties_use_a_5_cm_tolerance():
+    from shapely.geometry import Point, box
+    from overlays import nearest_item
+    parcel = box(0, 0, 1, 1)
+    items = [(Point(11, 0.5), {"asset_id": "C"}), (Point(11.03, 0.5), {"asset_id": "A"}), (Point(13, 0.5), {"asset_id": "B"})]
+    d, p, tied = nearest_item(items, [0, 1, 2], parcel)
+    assert tied == ["A", "C"] and p["asset_id"] == "A"
+
+
+def test_district_sea_mask():
+    import numpy as np
+    from district_flow import sea_mask
+    z = np.array([[-0.56, 2.0, -0.4], [5.0, -1.005, 0.3]]); z8 = np.array([[np.nan, 2.1, -0.3], [5.1, np.nan, np.nan]])
+    assert sea_mask(z, z8).tolist() == [[True, False, False], [False, True, True]]
+
+
+def test_partial_runs_with_failed_sources_are_refused():
+    from check_complete import problems
+    planned = [dict(xmin=1, ymin=2)]
+    assert problems(planned, {"1_2"}, "", 1, {"1_2": []}) == []
+    assert problems(planned, {"1_2"}, "", 1, {"1_2": ["nonprimary_parcels"]})
 
 
 if __name__ == "__main__":

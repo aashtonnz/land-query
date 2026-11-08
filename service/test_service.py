@@ -42,7 +42,7 @@ def test_catalogue_reads_licence_and_fit_from_sources_md():
     assert cat.SOURCES["dem_2025"]["licence_cleared"] is True
     assert cat.SOURCES["gw_liquefaction"]["fit"] == "not fit for parcel use"
     m = cat.column_meta("ww_head_ground_min_minus_invert_m")
-    assert m["kind"] == "derived" and set(m["sources"]) == {"parcels", "ww_node", "dem_2025"}
+    assert m["kind"] == "derived" and set(m["sources"]) == {"parcels", "ww_node", "dem_2025", "sea_mask"}
 
 
 def test_every_published_column_is_catalogued():
@@ -186,6 +186,44 @@ def test_whole_number_columns_are_served_as_integers():
     if not p: print("SKIPPED: set LANDQ_RESULTS to check whole-number columns"); return
     r = LandQuery(p, "public").search(where=[dict(column="ww_pipe_year", op="not_null")], columns=["ww_pipe_year", "ww_pipe_condition_grade"], limit=5)
     assert all(isinstance(x["values"]["ww_pipe_year"], int) for x in r["rows"]), r["rows"][0]
+
+
+def test_t59_service_limits_and_sources():
+    lq = LandQuery(fixture(extra_rows=600), "internal")
+    for bad in (dict(bbox=[0, 0, 1e9, 1e9]), dict(where=[dict(column="zones", op="has_class", value={"class": "A", "min_pct": "x"})])):
+        try: lq.search(**bad); assert False, bad
+        except QueryError: pass
+    many = ["area_m2", "ground_mean_m", "zones", "bbox_xmin", "bbox_ymin", "bbox_xmax", "bbox_ymax", "geometry_source"] * 3
+    assert lq.search(columns=many, limit=10_000)["count"] == 100      # listing many columns does not lift the cap
+    import threading
+    out = []
+    ts = [threading.Thread(target=lambda: out.append(lq.search(columns=["area_m2"], limit=50)["count"])) for _ in range(8)]
+    [t.start() for t in ts]; [t.join() for t in ts]
+    assert out == [50] * 8                                            # concurrent requests do not interrupt each other
+    m = cat.column_meta
+    for col in ("ground_min_m", "slope_p90_deg", "dz_2021_2025_mean_m", "lidar_cells"):
+        assert "sea_mask" in m(col)["sources"] and m(col)["fit"] == "fit", col
+    for col in ("winter_sun_hours_open_mean", "horizon_mean_deg", "sky_view_pct"):
+        assert "buildings_2021" in m(col)["sources"] and not m(col)["licence_cleared"], col
+    assert "ws_pipe" in m("ws_pipe_dia_mm")["sources"]
+
+
+def test_title_references_in_a_precomputed_query_withhold_it():
+    d = fixture()
+    iq = json.load(open(os.path.join(d, "inverse_queries.json")))
+    iq["queries"].append(dict(id="T1", name="n", question="q", sql="s", count=1, provenance={"parcels": dict(url="u")},
+                              rows=[dict(unit_id=1, titles="WN1/1", sources={})]))
+    json.dump(iq, open(os.path.join(d, "inverse_queries.json"), "w"))
+    assert LandQuery(d, "public").inverse_query("T1")["withheld"] is True
+
+
+def test_every_column_defined_in_sources_md_is_published():
+    p = os.environ.get("LANDQ_RESULTS")
+    if not p: print("SKIPPED: set LANDQ_RESULTS to check that no defined column has gone missing"); return
+    have = set(LandQuery(p, "internal").all_columns)
+    defined = {pat.pattern[1:-1] for pat, _, _ in cat._COLUMNS if "\\w" not in pat.pattern}
+    missing = sorted(c for c in defined if c not in have)
+    assert not missing, f"defined in SOURCES.md but not in the results: {missing}"
 
 
 if __name__ == "__main__":

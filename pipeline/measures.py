@@ -142,3 +142,23 @@ def extend_sea(sea, dem, tol=0.005):
     with np.errstate(invalid="ignore"):
         cand = sea | (np.abs(dem - flat) <= tol)
     return binary_propagation(sea, structure=np.ones((3, 3), bool), mask=cand)
+
+
+def lidar_parcel_stats(z, sea, inside_frac, open_ground, slope, canopy, dz, clear):
+    """Parcel figures that need LiDAR, all None when the parcel has no LiDAR cells (D-12: never 0 for "no data").
+
+    z, sea, slope, canopy, dz and clear are the parcel's cells (1-D); open_ground marks open cells among them;
+    inside_frac is the share of the parcel inside the LiDAR window (T-49, T-59)."""
+    n = int(np.isfinite(z).sum())
+    if n == 0:
+        return dict(lidar_coverage_pct=0.0 if z.size else 0.0, open_ground_slope_lt5_m2=None, canopy_gt3m_open_pct=None,
+                    dz_2021_2025_clear_pct=None, dz_2021_2025_clear_mean_m=None)
+    og = open_ground & np.isfinite(z)
+    both = np.isfinite(dz)                       # cells with 2021 and 2025 ground
+    c = both & clear
+    return dict(
+        lidar_coverage_pct=round(100 * float((np.isfinite(z) | sea).sum()) / z.size * inside_frac, 1),
+        open_ground_slope_lt5_m2=int((og & (slope < 5)).sum()),
+        canopy_gt3m_open_pct=round(100 * float((canopy & og).sum()) / og.sum(), 1) if og.any() else None,
+        dz_2021_2025_clear_pct=round(100 * float(c.sum()) / both.sum(), 1) if both.any() else None,
+        dz_2021_2025_clear_mean_m=round(float(dz[c].mean()), 3) if c.sum() >= 50 else None)

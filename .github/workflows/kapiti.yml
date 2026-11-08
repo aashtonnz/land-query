@@ -149,6 +149,6 @@ jobs:
           git fetch origin kapiti-results && git checkout kapiti-results || git checkout --orphan kapiti-results
           git rm -rq --cached . 2>/dev/null || true
           rm -rf results && mkdir -p results && cp /tmp/out/* results/
-          echo "Run ${{ github.run_id }} on $(date -u +%FT%TZ) from commit ${{ github.sha }}${{ inputs.reuse_blocks_from != '' && format(' (blocks from run {0})', inputs.reuse_blocks_from) || '' }}" > results/RUN.txt
+          echo "Run ${{ github.run_id }} on $(date -u +%FT%TZ) merged at commit ${{ github.sha }}; blocks compiled at commit $(cat district/commits.txt)${{ inputs.reuse_blocks_from != '' && format(' (blocks from run {0})', inputs.reuse_blocks_from) || '' }}" > results/RUN.txt
           git add results && git -c user.name="kapiti workflow" -c user.email="actions@github.com" \
             commit -qm "Kāpiti compile: run ${{ github.run_id }}" && git push -q origin HEAD:kapiti-results

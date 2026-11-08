@@ -47,6 +47,19 @@ for f in kept:
     if lf is not None: lf["properties"]["geometry_source"] = "LINZ"; units.append(lf)
     else: f["properties"]["geometry_source"] = "KCDC mirror"; units.append(f)
 kept = units
+# LINZ parcels in this block (representative point inside it and inside the district) that the mirror lacks: new
+# parcels, railway parcels, or the mirror lagging. Counted and listed for QA, not compiled (T-59).
+missing = []
+if by_id:
+    from shapely.ops import polygonize, unary_union
+    edge = arcgis.query_all(URL.rsplit("/", 1)[0] + "/1", dict(where="1=1", outFields="OBJECTID", outSR=2193))
+    district = unary_union(list(polygonize(unary_union([shape(f["geometry"]) for f in edge if f.get("geometry")]))))
+    have = {f["properties"].get("id") for f in kept}
+    for i, f in by_id.items():
+        if i in have: continue
+        p = shape(f["geometry"]).representative_point()
+        if (blk.contains(p) or blk.touches(p)) and (district.is_empty or district.contains(p)):
+            missing.append(dict(id=i, appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
 from_linz = sum(1 for f in kept if f["properties"]["geometry_source"] == "LINZ")
 fc = dict(type="FeatureCollection", features=kept)
 b = json.dumps(fc).encode()
@@ -65,8 +78,10 @@ json.dump(dict(block=list(te.BLOCK), bbox=win, parcels=len(kept)), open(os.path.
 prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path)) if os.path.exists(prov_path) else {"sources": {}}
 prov.update(block=list(te.BLOCK), block_id=te.BLOCK_ID, fetch_bbox=win)
-prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=True, features=len(kept),
+prov.update(commit=os.environ.get("GITHUB_SHA"))  # the commit this block was compiled at (T-59)
+prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=linz_err is None, features=len(kept),
                                   from_linz=from_linz, from_mirror=len(kept) - from_linz, linz_error=linz_err,
+                                  linz_not_in_mirror=len(missing), linz_not_in_mirror_examples=missing[:20],
                                   membership=URL, sha256=hashlib.sha256(b).hexdigest(),
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
                                   licence="LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)")
