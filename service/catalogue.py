@@ -12,7 +12,8 @@ FIT = {"✅": "fit", "⚠": "use with caution", "❌": "not fit for parcel use",
 FIT_RANK = {"fit": 0, "not applicable": 0, "use with caution": 1, "not fit for parcel use": 2, "unknown": 3}
 
 # Columns never served in public mode whatever their licence (D-12: facts about land, never people)
-PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records; title type and count are served instead (T-55)"}
+PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records; the title count is served instead (T-55)",
+                  "title_types": "a title type such as Life Estate can describe a living person's interest (T-67, D-17)"}
 
 # Which sources each column is computed from, first match wins. Every derived value also depends on the parcel.
 P = ["parcels"]

@@ -176,9 +176,12 @@ def test_title_references_are_not_served_publicly():
     p = os.environ.get("LANDQ_RESULTS")
     if not p: print("SKIPPED: set LANDQ_RESULTS to check titles on the published columns"); return
     lq = LandQuery(p, "public")
-    assert "titles" in lq.withheld and "title_types" in lq.columns and "title_count" in lq.columns
+    assert "titles" in lq.withheld and "title_types" in lq.withheld and "title_count" in lq.columns
     try: lq.search(where=[dict(column="titles", op="contains", value="WN")]); assert False
     except QueryError as e: assert "T-55" in str(e)
+    try: lq.search(where=[dict(column="title_types", op="contains", value="Life Estate")]); assert False
+    except QueryError as e: assert "T-67" in str(e)
+    assert "title_types" in LandQuery(p, "internal").columns
 
 
 def test_whole_number_columns_are_served_as_integers():

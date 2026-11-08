@@ -13,7 +13,6 @@ Standing priorities:
 - T-66: Rebuild with the T-65 fixes (about US$2.20), then a sixth fresh-eyes review (fresh-eyes review 1.1). Started 2026-11-08.
 
 ## Waiting on you
-- T-67: Should public mode serve the "Life Estate" title type? It is on 4 parcels and signals that a living person holds a life interest; no names or title references are served. Recommendation: withhold `title_types` in public mode, as D-15 did for title references. Raised 2026-11-08.
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
@@ -34,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-67: Title types withheld in public mode (D-17); the title count is still served. 2026-11-08.
 - T-65: Fifth-review fixes: district outline joins KCDC's boundary line and whole-district ward; parcels kept if their point or at least 1% and 1,000 m² lies inside (27,288 parcels, 44 blocks); tested functions for membership, mirror gap, LiDAR catalogue and publishing checks (20 of 20 mutants caught). [Findings](docs/findings/2026-11-08-fifth-review.md#t-65-fixes-8-nov-2026) 2026-11-08.
 - T-64: Fifth fresh-eyes review: one serious finding (T-62's rule dropped 17 parcels with district land, one wholly inside), seven minor, one for the owner (Life Estate title type). [Findings](docs/findings/2026-11-08-fifth-review.md) 2026-11-08.
 - T-63: District rebuilt with the T-62 fixes: 27,265 parcels, 337 outside parcels dropped, LINZ-not-in-mirror 72, one flow grid. The merge first failed on the Actions budget; published by a merge-only run after the owner raised it. [Findings](docs/findings/2026-11-08-fourth-review.md#t-63-rebuild-8-nov-2026) 2026-11-08.
