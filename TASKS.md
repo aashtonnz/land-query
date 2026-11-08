@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 04:10 (Pacific/Auckland)
+Last updated: 2026-11-09 05:00 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -11,8 +11,8 @@ Standing priorities:
 
 ## Doing (at most 3)
 - T-24: Second council, Porirua without three waters (D-16), to measure what a council adapter costs before the rest of the region (T-38). Steps:
-  - T-86: Council settings: move what is specific to Kāpiti (layers, parcel copy, boundary sources, LiDAR surveys, building coverage, blocks, flow area) into `pipeline/councils/`, chosen by `COUNCIL`; Kāpiti's output unchanged on a test tile.
-  - T-87: Porirua settings: District Plan 2025 layers (operative since 1 Nov 2025), PCC's parcel copy of LINZ (24,128), district outline from PCC's wards and Stats NZ, LiDAR `porirua_2023` (second survey `wellington_2013-2014` for ground change), building coverage; columns per council in `SOURCES.md`.
+  - T-86 (done 2026-11-09): Council settings in `pipeline/councils/`, chosen by `COUNCIL`: layers, parcel copy, boundary sources, LiDAR surveys, flow area. A Kāpiti test tile compiles identically, provenance included.
+  - T-87: Porirua settings. Found: District Plan 2025 layers on PCC's ArcGIS Online (operative since 1 Nov 2025; zones, 3 flood, 4 coastal, 3 tsunami, fault rupture, heritage, notable trees, SNAs, noise, coastal environment); PCC's parcel copy of LINZ (24,128, same fields as KCDC's); three boundary polygons (PCC city boundary and wards 182.5 km², Stats NZ 174.5 km²); PCC building footprints (30,409); LiDAR `porirua_2023` only. Still to do: per-council layer lists, class fields and columns in the compiler; Kāpiti-only columns (three waters, RBL, wind, earthworks, ground change) absent for Porirua, not empty; a Porirua section in `SOURCES.md` and the service catalogue; per-council queries.
   - T-88: Porirua on local test tiles, then a district run (`porirua.yml`, about US$1–1.50) to `porirua-results`.
   - T-89: Fresh-eyes review of the adapter and the Porirua results; record the adapter's cost.
 
