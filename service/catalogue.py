@@ -19,6 +19,14 @@ PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records;
 # runs (T-82). The schema check allows these to be missing; nothing else does.
 PENDING_COLUMNS = {"unmapped_structure_m2": "added at the next full rebuild (T-82)"}
 
+
+def missing_columns(have, run_text):
+    """Columns defined in SOURCES.md but absent from results. Pending columns may be absent only from results
+    published by finish.py (RUN.txt says so): a full rebuild must have every column (eleventh review)."""
+    defined = {pat.pattern[1:-1] for pat, _, _ in _COLUMNS if "\\w" not in pat.pattern}
+    finished = "finish.py" in (run_text or "")
+    return sorted(c for c in defined if c not in set(have) and not (finished and c in PENDING_COLUMNS))
+
 # Which sources each column is computed from, first match wins. Every derived value also depends on the parcel.
 P = ["parcels"]
 COLUMN_SOURCES = [

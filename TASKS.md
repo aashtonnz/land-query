@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 01:55 (Pacific/Auckland)
+Last updated: 2026-11-09 03:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -33,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-84: Eleventh fresh-eyes review: no serious finding, which ends the run of reviews begun at T-61 (fresh-eyes review 1.1). Six minor findings fixed: finishing now says what it could not do, the publishing check covers the flow rule, `finish.py` has tests, pending columns are allowed only in finished results, warning rates given by building size. [Findings](docs/findings/2026-11-09-eleventh-review.md) 2026-11-09.
 - T-82: Cheaper republishing: `finish.yml` applies the row rules to published results. First run (42477497763, about 2 minutes) published the T-79 and T-81 rule fixes: 163 condition grades of 0, 113 flow values on partly-LiDAR parcels and 2 partly fetched parcels' building values now empty; query counts unchanged. The LiDAR warning column and 3818065's restored values wait for the next full rebuild. 2026-11-09.
 - T-81: Tenth-review fixes: building columns are KCDC's outlines, said plainly, with `unmapped_structure_m2` as a warning (D-19; a plane-fit test finds 90% of hidden-outline buildings); flow and structure columns empty under 99% LiDAR; wording; tests (8 of 8 mutants caught). Not yet rebuilt. [Findings](docs/findings/2026-11-08-tenth-review.md#t-81-fixes-89-nov-2026) 2026-11-09.
 - T-80 (review part): Tenth fresh-eyes review, on local tiles (no budget for a rebuild): four serious findings about the T-79 building check and partial-LiDAR flow values, three minor. [Findings](docs/findings/2026-11-08-tenth-review.md) 2026-11-09.

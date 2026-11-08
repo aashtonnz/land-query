@@ -266,14 +266,24 @@ def test_published_building_values_are_empty_where_the_outlines_do_not_cover_the
                      + " AND ".join(f"{c} IS NULL" for c in ov.BUILDING_COLUMNS) + "))").fetchall()[0][0]
     assert bad == 0, f"{bad} parcels have building values where the outlines do not cover them"
     assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE rbl_in_parcel_n = 0 OR ww_pipe_condition_grade = 0").fetchall()[0][0] == 0
+    flow = [c for c in ov.LIDAR_FLOW_COLUMNS if c in set(duckdb.sql(f"DESCRIBE SELECT * FROM '{f}'").df()["column_name"])]
+    assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE (lidar_coverage_pct IS NULL OR lidar_coverage_pct < 99) AND NOT ("
+                      + " AND ".join(f"{c} IS NULL" for c in flow) + ")").fetchall()[0][0] == 0, "flow values under 99% LiDAR (T-81)"
+
+
+def test_pending_columns_may_be_missing_only_from_finished_results():
+    have = [pat.pattern[1:-1] for pat, _, _ in cat._COLUMNS if "\\w" not in pat.pattern and pat.pattern[1:-1] not in cat.PENDING_COLUMNS]
+    assert cat.missing_columns(have, "Run 1 ... (row rules only, finish.py)") == []
+    assert cat.missing_columns(have, "Run 1 merged at commit x") == sorted(cat.PENDING_COLUMNS)
+    assert cat.missing_columns([c for c in have if c != "flow_path_m"], "finish.py") == ["flow_path_m"]
 
 
 def test_every_column_defined_in_sources_md_is_published():
     p = os.environ.get("LANDQ_RESULTS")
     if not p: print("SKIPPED: set LANDQ_RESULTS to check that no defined column has gone missing"); return
-    have = set(LandQuery(p, "internal").all_columns)
-    defined = {pat.pattern[1:-1] for pat, _, _ in cat._COLUMNS if "\\w" not in pat.pattern}
-    missing = sorted(c for c in defined if c not in have and c not in cat.PENDING_COLUMNS)
+    have = LandQuery(p, "internal").all_columns
+    run = open(os.path.join(p, "RUN.txt")).read() if os.path.exists(os.path.join(p, "RUN.txt")) else ""
+    missing = cat.missing_columns(have, run)
     assert not missing, f"defined in SOURCES.md but not in the results: {missing}"
 
 

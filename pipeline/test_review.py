@@ -548,6 +548,14 @@ def test_lidar_warns_of_houses_the_outlines_miss():
         assert M.largest_structure_m2(M.unmapped_structures(g, np.zeros((40, 40)), np.zeros((40, 40), bool))) >= 100, pitch
     d = np.zeros((6, 6), bool); d[0:2, 0:2] = True; d[2:4, 2:4] = True   # two patches touching at a corner
     assert M.largest_structure_m2(d) == 8 and M.largest_structure_m2(np.zeros((3, 3), bool)) == 0
+    g = np.zeros((40, 60)); o = np.zeros((40, 60), bool); g[10:20, 5:15] = 5.0; o[10:20, 5:15] = True   # an outlined house
+    g[10:20, 16:27] = 5.0                                     # an unoutlined one, starting 1 m from it: found outside the 2 m gap
+    g[10:20, 27] = 20.0                                       # a 20 m mast on its far wall: not grown into
+    uu = M.unmapped_structures(g, np.zeros((40, 60)), o)
+    assert M.largest_structure_m2(uu) == 100 and not uu[:, 27].any() and not uu[:, 15:17].any() and uu[10:20, 17].all()
+    g[14:16, 26] = 20.0                                       # and a chimney stack at its edge: over 15 m, never counted
+    uu = M.unmapped_structures(g, np.zeros((40, 60)), o)
+    assert not uu[14:16, 26].any() and M.largest_structure_m2(uu) == 90
     two = np.zeros((20, 20), bool); two[0:5, 0:5] = True; two[10:16, 10:16] = True    # two separate patches
     assert M.largest_structure_m2(two) == 36
     low = np.zeros((30, 30)); low[5:15, 5:15] = 2.0          # a 2 m flat object (a car, a fence line): too low

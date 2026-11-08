@@ -25,13 +25,15 @@ jobs:
           mkdir -p in && git archive origin/kapiti-results results | tar -x -C in
           mkdir -p district && cd pipeline && python3 finish.py ../in/results ../district | tee ../district/finish_log.txt
       - name: Check the query service and the publishing rules (T-36, T-76)
-        run: LANDQ_RESULTS=district python3 service/test_service.py
+        run: |
+          python3 pipeline/test_finish.py
+          LANDQ_RESULTS=district python3 service/test_service.py
       - name: Push results to kapiti-results branch
         run: |
-          mkdir -p /tmp/out && cp district/{units.parquet,provenance.json,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json,finish.json,finish_log.txt} /tmp/out/
+          mkdir -p /tmp/out && cp district/{units.parquet,provenance.json,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json,finish.json,finish_log.txt,finish_note.txt} /tmp/out/
           git checkout -q kapiti-results
           git rm -rq --cached . 2>/dev/null || true
           rm -rf results && mkdir -p results && cp /tmp/out/* results/
-          echo "$(cat in/results/RUN.txt | head -1); finished by run ${{ github.run_id }} on $(date -u +%FT%TZ) at commit ${{ github.sha }} (row rules only, finish.py)" > results/RUN.txt
+          echo "$(cat in/results/RUN.txt | head -1); finished by run ${{ github.run_id }} on $(date -u +%FT%TZ) at commit ${{ github.sha }} (row rules only, finish.py). $(cat district/finish_note.txt)" > results/RUN.txt
           git add results && git -c user.name="kapiti workflow" -c user.email="actions@github.com" \
             commit -qm "Kāpiti finish: run ${{ github.run_id }}" && git push -q origin HEAD:kapiti-results
