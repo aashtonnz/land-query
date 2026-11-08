@@ -66,3 +66,20 @@ Finding 9 is for the owner. Everything else served publicly is about land.
   - `SOURCES.md` says 438.
   - The outline's sources and sha are in each block's provenance.
   - A block without a district-flow record stops publishing.
+
+## T-66: rebuild (8 Nov 2026)
+
+- **Run.** Run 42443382855 compiled all 44 blocks at `525ca6e` and published. An earlier attempt was cancelled within a
+  minute: a test had failed on my machine only, from stale bytecode left by the mutation run (see T-65).
+- **Checked on the published results:**
+  - 27,286 parcels (27,288 by KCDC's shapes; LINZ's shapes differ slightly), all with `district_share_pct`, which is
+    as low as 1.0%; 51 parcels are below 100%.
+  - All the parcels the review named are back, including 4024201 (100% inside), 7344506, 3868849, and the two large
+    lots the reviewer measured with GWRC's shapes: 7267649 (28.8%) and 7694974 (6.5% of 615 km², about 40 km²).
+  - Counts reconcile with the mirror: 27,614 = 27,286 + 317 dropped by the blocks + 11 in the two blocks still
+    removed (Horowhenua and Upper Hutt).
+  - `linz_not_in_mirror` is 72. All 44 blocks used one district-flow grid and one district outline, and none had a
+    failed source.
+  - 449 parcels have no terrain values; `SOURCES.md` now says so.
+
+A sixth fresh-eyes review follows, under fresh-eyes review 1.1.
