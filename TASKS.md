@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 13:40 (Pacific/Auckland)
+Last updated: 2026-11-08 13:55 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -13,11 +13,10 @@ Standing priorities:
 - T-57: Third fresh-eyes review (fresh-eyes review 1.1: review again after serious findings are fixed): a new reviewer checks everything changed since the second review was recorded (T-47 to T-56: coastal flow, LINZ geometry, service fixes, water mains, clear-ground columns, source check) before the second council builds on it. Started 2026-11-08.
 
 ## Waiting on you
-- T-58: Wellington Water's licence: its three-waters data for Porirua, Wellington City, Hutt, Upper Hutt and South Wairarapa says "not to be used for commercial purposes including … reselling". Decide whether to (a) build Porirua without three waters, (b) ask Wellington Water for commercial terms (your contact), or (c) pause the second council. Raised 2026-11-08. [Discovery](docs/findings/2026-11-08-porirua-discovery.md)
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council (after T-57; blocked on T-58; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-57; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -34,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-58: Wellington Water licence decision: Porirua goes ahead without three waters (D-16); asking Wellington Water for commercial terms stays open to the owner. 2026-11-08.
 - T-25: Source-change checks: weekly workflow (`sources.yml`, Sundays 18:37 UTC) records each of 41 sources' fields, record count in the district and last-edit date (LINZ counts with the key; elevation catalogues by fingerprint), pushes the snapshot to `source-checks`, and flags the run when anything changed. About 1–2 runner minutes a week. 2026-11-08.
 - T-56: Ground change on clear ground: tested on the T-29 sample before changing anything. A clear-ground Q4 would keep 10 of 13 real changes and drop 4 of 8 vegetation hits, so Q4 is unchanged; two clear-ground columns are added for users to compare (from the next rebuild). [Findings](docs/findings/2026-11-08-lidar-change-check.md#t-56-the-clear-ground-rule-tested-before-changing-anything-8-nov-2026) 2026-11-08.
 - T-29: LiDAR change candidates against 2021 and 2025 aerials: of 23 random Q4 parcels not on DP 550000+ plans, 13 show real ground change (6 construction, 5 earthworks, 2 beach or river), 8 vegetation and 2 no visible change; one had no imagery. Q4 is a pointer, not proof. Tool: `pipeline/aerial_pairs.py`. [Findings](docs/findings/2026-11-08-lidar-change-check.md) 2026-11-08.
