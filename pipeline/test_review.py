@@ -625,7 +625,7 @@ def test_porirua_settings_are_consistent():
                  "flood_ponding", "tsunami_zones", "earthworks", "wind_very_high"]:
         assert absent(gone), gone
     blocks = json.load(open(os.path.join(os.path.dirname(__file__), P.BLOCKS_FILE)))
-    assert len(blocks) == 17 and sum(b["parcels"] for b in blocks) == 24110
+    assert len(blocks) == 17 and sum(b["parcels"] for b in blocks) == 21954   # roads and water left out (T-88)
     fb = P.FLOW_OUT_BBOX
     assert all(fb[0] <= b["xmin"] - 1300 and b["xmin"] + 6300 <= fb[2] and fb[1] <= b["ymin"] - 1300 and b["ymin"] + 6300 <= fb[3]
                for b in blocks)   # every block's LiDAR window (block, 1 km fetch margin, 300 m context) is in the flow grid

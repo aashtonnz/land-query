@@ -12,12 +12,12 @@
  {
   "xmin": 1750000,
   "ymin": 5440000,
-  "parcels": 1528
+  "parcels": 1337
  },
  {
   "xmin": 1750000,
   "ymin": 5445000,
-  "parcels": 3573
+  "parcels": 3215
  },
  {
   "xmin": 1750000,
@@ -27,57 +27,57 @@
  {
   "xmin": 1755000,
   "ymin": 5440000,
-  "parcels": 4235
+  "parcels": 3860
  },
  {
   "xmin": 1755000,
   "ymin": 5445000,
-  "parcels": 10760
+  "parcels": 9913
  },
  {
   "xmin": 1755000,
   "ymin": 5450000,
-  "parcels": 1457
+  "parcels": 1319
  },
  {
   "xmin": 1755000,
   "ymin": 5455000,
-  "parcels": 867
+  "parcels": 808
  },
  {
   "xmin": 1760000,
   "ymin": 5440000,
-  "parcels": 92
+  "parcels": 60
  },
  {
   "xmin": 1760000,
   "ymin": 5445000,
-  "parcels": 1286
+  "parcels": 1165
  },
  {
   "xmin": 1760000,
   "ymin": 5450000,
-  "parcels": 162
+  "parcels": 155
  },
  {
   "xmin": 1760000,
   "ymin": 5455000,
-  "parcels": 78
+  "parcels": 65
  },
  {
   "xmin": 1765000,
   "ymin": 5440000,
-  "parcels": 10
+  "parcels": 6
  },
  {
   "xmin": 1765000,
   "ymin": 5445000,
-  "parcels": 45
+  "parcels": 37
  },
  {
   "xmin": 1765000,
   "ymin": 5450000,
-  "parcels": 10
+  "parcels": 7
  },
  {
   "xmin": 1765000,

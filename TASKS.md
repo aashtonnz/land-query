@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 06:30 (Pacific/Auckland)
+Last updated: 2026-11-09 06:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -13,8 +13,8 @@ Standing priorities:
 - T-24: Second council, Porirua without three waters (D-16), to measure what a council adapter costs before the rest of the region (T-38). Steps:
   - T-86 (done 2026-11-09): Council settings in `pipeline/councils/`, chosen by `COUNCIL`: layers, parcel copy, boundary sources, LiDAR surveys, flow area. A Kāpiti test tile compiles identically, provenance included.
   - T-87 (done 2026-11-09): Porirua settings (`pipeline/councils/porirua.py`): District Plan 2025 layers, PCC's parcel copy, three-polygon outline (in effect PCC's boundary, 182.5 km²), LiDAR 2023, PCC footprints (2013–17 photos), 24,110 parcels in 17 blocks. The compiler, QA, queries (P1–P3), measure check, catalogue and `SOURCES.md` are per council; Porirua's absent columns are left out. A 1.5 km tile at Porirua's centre compiles (205 parcels, 76 columns) and passes the service checks; the Kāpiti tile still compiles identically. LINZ's newer national building outlines would replace PCC's dated footprints (later).
-  - T-88: Porirua district run (`porirua.yml`, about US$1) to `porirua-results`. Started 2026-11-09.
-  - T-89: Fresh-eyes review of the adapter and the Porirua results; record the adapter's cost.
+  - T-88: Porirua district run. First run 42499625052 (17 blocks, at b06e418) published 24,110 parcels to `porirua-results`, no failed source; P1 587, P2 426, P3 1,973; flow vs PCC's flood overlays lift 1.8. It included 2,137 road and 19 water parcels that LINZ's primary layer and KCDC's copy don't have; now left out in code (21,954 parcels), to be republished with the review's fixes.
+  - T-89: Fresh-eyes review of the adapter and the first Porirua results. Started 2026-11-09.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
