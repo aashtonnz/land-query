@@ -214,7 +214,7 @@ def withhold_uncovered_buildings(row, g, cover):
 LIDAR_FLOW_COLUMNS = ("upslope_area_max_m2", "upslope_area_truncated", "flow_path_m", "unmapped_structure_m2")
 
 
-def finish_row(row):
+def finish_row(row, council=None):
     """Rules that need only a parcel's own published values, applied by the compiler to every row and by finish.py to
     published results, so a change to them republishes in minutes without a rebuild (T-82). Each is idempotent.
 
@@ -228,9 +228,10 @@ def finish_row(row):
         return v is None or v != v or v < 100 * BUILDING_MIN_COVER   # missing or NaN counts as not covered
     if below("buildings_coverage_pct") or below("coverage_pct"):
         from councils import COUNCIL
+        council = council or COUNCIL
         for k in BUILDING_COLUMNS:
             row[k] = None
-            r = COUNCIL.RENAME_COLUMNS.get(k)
+            r = council.RENAME_COLUMNS.get(k)
             if r and r in row: row[r] = None   # published results carry the council's name for it (T-87)
     if below("lidar_coverage_pct"):
         for k in LIDAR_FLOW_COLUMNS:
@@ -248,3 +249,21 @@ def district_outline_polygons(a, b, c):
     if not (a and b and c): return Polygon()
     a, b, c = unary_union(a), unary_union(b), unary_union(c)
     return unary_union([a.intersection(b), a.intersection(c), b.intersection(c)])
+
+
+# Parcel intents not in LINZ's primary parcel layer (roads and water have layers of their own); KCDC's copy omits them,
+# PCC's includes them, so they are left out for every council (T-88)
+NOT_PRIMARY_INTENTS = frozenset({"Road", "Hydro"})
+
+
+def council_columns(columns, council):
+    """The council's published columns, in order: those it has no source for left out (D-12), others renamed (T-87)."""
+    import re
+    return [council.RENAME_COLUMNS.get(c, c) for c in columns
+            if not any(re.fullmatch(p, c) for p in council.ABSENT_COLUMNS)]
+
+
+def buildings_cover_for(council, capture, outline):
+    """Where the council's building outlines were captured: its capture area within the outline, or, for a council
+    whose footprints span it (BUILDINGS_CAPTURE None), the outline itself (T-76, T-87)."""
+    return building_cover(outline, outline) if council.BUILDINGS_CAPTURE is None else building_cover(capture, outline)

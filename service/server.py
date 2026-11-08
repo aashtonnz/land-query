@@ -1,18 +1,20 @@
 """MCP server for the Kāpiti Coast parcel results (T-36). Read-only.
 
 Run: LANDQ_RESULTS=/path/to/results LANDQ_AUDIENCE=public python3 server.py   (stdio transport)
-LANDQ_RESULTS holds the files published on the `kapiti-results` branch (see fetch_results.py). LANDQ_AUDIENCE is
+LANDQ_RESULTS holds the files published on the council's `<council>-results` branch (see fetch_results.py); COUNCIL
+(default kapiti) names the council, and the service refuses another council's results (T-87). LANDQ_AUDIENCE is
 "public" (default: only columns whose sources all carry a dataset licence) or "internal" (everything, for the owner).
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mcp.server.mcpserver import MCPServer
 from landquery import LandQuery, QueryError
+import catalogue as cat
 
 LQ = LandQuery(os.environ.get("LANDQ_RESULTS", "results"), os.environ.get("LANDQ_AUDIENCE", "public"))
 mcp = MCPServer(
     name="land-query",
-    instructions=("Parcel facts for the Kāpiti Coast District, New Zealand, compiled from public LINZ, KCDC and GWRC data. "
+    instructions=(f"Parcel facts for {cat.COUNCIL.LABEL}, New Zealand, compiled from {cat.COUNCIL.DATASET_SOURCES}. "
                   "Every response lists, for each column, its kind (published, derived or modelled), meaning, sources, "
                   "fit-for-parcel flag and licence status, and for each source the sha256 and fetch time of the data "
                   "each row's block was compiled from. Coordinates are NZTM2000 metres. Start with `about`, then "

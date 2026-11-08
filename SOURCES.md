@@ -65,7 +65,11 @@ layers are the Porirua District Plan 2025, operative from 1 November 2025
 ([council notice](https://poriruacity.govt.nz/your-council/news/public-notices/proposed-district-plan-operative)), from
 PCC's ArcGIS Online organisation. Three waters are left out: Wellington Water's licence bars commercial use (D-16). So
 are recommended building levels, wind and earthworks zones (PCC publishes none as layers), and ground change (one LiDAR
-survey). Absent columns are left out of Porirua's results, not published empty. `titles` and `nonprimary_parcels` are as
+survey used). Absent columns are left out of Porirua's results, not published empty. Notified Plan Changes 1–6
+(published as `*_PDP2025_PC1_6n` layers: flood remapping in the Mana, Pukerua Bay, Aotea/Paremata and Whitby catchments,
+and a heritage deletion) are not in force and are not used; on the notified flood maps about 1,000 more parcels would be
+in a flood overlay. PCC's draft geohazard layers (landslide and liquefaction, Level A and B) and flood depths are not
+used either. `titles` and `nonprimary_parcels` are as
 in the register above.
 
 | Key | Dataset (publisher) | Licence | Updated | Fit for parcel use | Notes |
@@ -82,11 +86,17 @@ in the register above.
 | `pdp_notable_trees` | District Plan 2025 notable trees (points, field `Tree_ID`) | ◐ | Oct 2025 | ✅ | |
 | `pdp_significant_natural_areas` | District Plan 2025 significant natural areas (field `SiteName`) | ◐ | Oct 2025 | ✅ | |
 | `pdp_noise_rail`, `pdp_noise_state_highway` | District Plan 2025 rail noise corridor and state highway noise control boundary | ◐ | Oct 2025 | ✅ | |
-| `pdp_coastal_environment` | District Plan 2025 landward extent of the coastal environment | ◐ | Oct 2025 | ✅ | |
+| `pdp_coastal_environment` | District Plan 2025 landward extent of the coastal environment | ◐ | Oct 2025 | ✅ | PCC's layer does not reach Mana Island, so empty there is the layer's mapping, not a finding (twelfth review) |
+| `plan_1999_plimmerton_farm` | Porirua City District Plan 1999 – Plimmerton Farm Zone (3.8 km²) | ◐ | 2025 | ✅ | "The Porirua District Plan 2025 does not apply to the area of the Plimmerton Farm Zone." On its 50 parcels `zones` and the `pdp_*` columns are empty: the 1999 plan and Plan Change 18 govern them, and are not compiled |
+| `pcc_flood_unmapped` | Flood Hazard – Unmapped Area (PCC Hazards/Flood_Hazards layer 3; 31.5 km², the Horokiri valley) | ◐ | not stated | ✅ | Where PCC has not mapped flood hazard: there an empty `pdp_flood_*` value means not mapped (about 210 parcels) |
+| `pdp_notable_tree_groups`, `pdp_heritage_settings`, `pdp_heritage_item_extents` | District Plan 2025 notable tree groups (field `ID`), heritage settings and heritage item extents (field `Name`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_precincts`, `pdp_height_controls`, `pdp_designations` | District Plan 2025 precincts (`Name`), height controls (`SpecificControl`, `HeightControl` or `HIRB`) and designations (`Title`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_special_amenity_landscapes`, `pdp_outstanding_natural_landscapes`, `pdp_coastal_high_natural_character`, `pdp_sites_significance_maori` | District Plan 2025 landscape, natural character and Māori heritage overlays (field `Name`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_gas_pipeline_corridor`, `pdp_rail_vibration`, `pdp_radio_height_control`, `pdp_eastern_porirua`, `pdp_northern_growth_area` | District Plan 2025 infrastructure and development-area overlays | ◐ | Oct 2025 | ✅ | |
 | `gw_liquefaction` | Earthquake Liquefaction Potential (GWRC, from GNS 2018) | ◐ (© GWRC, regional CC BY statement) | 2018 basis | ❌ | As for Kāpiti: GWRC maps only soils with significant potential, so empty means outside those areas |
 | `gw_eq_slope_failure` | Earthquake Slope Failure potential (GWRC, 1995 series) | ◐ (© GWRC) | 1995 basis | ⚠ | Classes all the land it maps, so empty means not mapped |
-| `pcc_buildings` | PCC building footprints (PropertyAdminExternal layer 2; 30,409) | ◐ | drawn from photos of 2013 and 2017 (field `SOURCE`) | ⚠ | Their extent matches the city, so coverage is taken as the whole city (`buildings_coverage_pct`). They miss what was built since; `unmapped_structure_m2` warns of most of it (in a 1.5 km test tile at Porirua's centre, 30 of 205 parcels) |
-| `dem_2023`, `dsm_2023` | Porirua LiDAR 1 m DEM/DSM 2023 (LINZ, nz-elevation `porirua_2023`) | ✅ CC BY 4.0 | 2023 flight | ✅ | 1 m cells. One survey only, so no ground-change columns |
+| `pcc_buildings` | PCC building footprints (PropertyAdminExternal layer 2; 30,409) | ◐ | mostly undated: 29,725 say "Collected from 7.5cm / 10cm GSD Stereo", 684 name photos of 2013 or 2017 (field `SOURCE`) | ⚠ | Their extent matches the city, so coverage is taken as the whole city (`buildings_coverage_pct`). They miss buildings newer than their capture; `unmapped_structure_m2` warns of most of them, and of many trees: in the first district run it was above 0 on 44% of parcels and 50 m² or more on 2,722 (12%) |
+| `dem_2023`, `dsm_2023` | Porirua LiDAR 1 m DEM/DSM 2023 (LINZ, nz-elevation `porirua_2023`) | ✅ CC BY 4.0 | 2023 flight | ✅ | 1 m cells. Ground change is not compiled: the earlier survey covering the city (`wellington_2013-2014`) is not used yet |
 | `district_flow` | New Zealand LiDAR 1 m DEM, read at 10 m, gaps from the Contour-Interpolated 8 m DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic | ⚠ | 10 m mosaic over 1740000–1780000 E, 5432000–5468000 N, which takes in the catchments draining into the city |
 | `sea_mask` | Sea cells from the `district_flow` grid, as for Kāpiti | ✅ CC BY 4.0 | as `district_flow` | ✅ | |
 
@@ -99,6 +109,10 @@ Rows here replace the shared rows below for Porirua; columns not listed have the
 | `pdp_*` | published | A District Plan 2025 overlay: JSON of its class (or its name, for a layer without classes) → % of parcel area covered; for `pdp_heritage_items` and `pdp_notable_trees`, the points on the parcel. Empty means the parcel is outside it |
 | `building_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | derived | Area under PCC's building footprints (drawn from 2013 and 2017 photos); the rest of the parcel, outside them; the rest that slopes under 5° (needs LiDAR). 0 m² means no footprint, not no building: check `unmapped_structure_m2`. Empty unless the fetch window covers at least 99% of the parcel; so are the other open-ground and roof columns |
 | `buildings_coverage_pct` | derived | Share of the parcel inside the city: PCC's footprints are taken to cover the whole city |
+| `pcc_flood_unmapped`, `plan_1999_plimmerton_farm` | published | JSON of the layer's name → % of parcel area covered: where PCC has not mapped flood hazard; where the 1999 plan's Plimmerton Farm Zone applies instead of the 2025 plan |
+| `winter_sun_hours_open_mean`, `winter_sun_open_ge3h_pct` | modelled | Hours of direct sun on the ground on 21 June over the clear open ground, from the 2023 DSM (as for Kāpiti otherwise) |
+| `wind_obstruction_pct`, `wind_rel_height_m` | derived | Share of the surrounding ±100 m with obstructions over 2.5 m in the 2023 DSM; ground at the parcel relative to the mean ground within ±500 m. Inputs only: no wind class |
+| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2` | published | LINZ parcel id and fields as published. `survey_area_m2` is the whole surveyed parcel's area, repeated on every part of a parcel in several pieces, so don't sum it |
 | `unmapped_structure_m2` | modelled | As for Kāpiti, against PCC's footprints and the 2023 LiDAR. Their age means more flags here: many are buildings built since 2017 |
 | `geometry_source` | published | `LINZ` (layer 50823) or `PCC mirror` (where LINZ was not fetched or did not return the parcel) |
 | `zones`, `zones_total_pct` | derived | `zones`: JSON of District Plan 2025 zone (PCC `ZONE`) → % of parcel area covered; overlapping features of the same zone count once. `zones_total_pct`: their sum |

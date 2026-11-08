@@ -92,8 +92,7 @@ _op = os.path.join(RAW, "district_outline.geojson")
 _cp = os.path.join(RAW, "buildings_capture_area.geojson")
 _outline = shape(json.load(open(_op))) if os.path.exists(_op) else None
 from councils import COUNCIL as _CC
-BLD_COVER = (OV.building_cover(_outline, _outline) if _CC.BUILDINGS_CAPTURE is None   # footprints span the council (T-87)
-             else OV.building_cover(OV.capture_area_nztm(json.load(open(_cp))) if os.path.exists(_cp) else None, _outline))
+BLD_COVER = OV.buildings_cover_for(_CC, OV.capture_area_nztm(json.load(open(_cp))) if os.path.exists(_cp) else None, _outline)
 LIDAR_BOX = box(*rasterio.transform.array_bounds(Z.shape[0], Z.shape[1], dem.transform)) if HAVE_LIDAR else box(0, 0, 0, 0)
 if DF is not None and HAVE_LIDAR:
     from rasterio.warp import reproject, Resampling
@@ -369,7 +368,8 @@ import pandas as pd, re as _re
 df = pd.DataFrame(rows)
 # columns the council has no source for are left out, not published empty (D-12, T-87); some are renamed where the
 # Kāpiti name would say something untrue of the council's source (for example a survey year)
-df = df[[c for c in df.columns if not any(_re.fullmatch(p, c) for p in _C.ABSENT_COLUMNS)]].rename(columns=_C.RENAME_COLUMNS)
+_keep = [c for c in df.columns if not any(_re.fullmatch(p, c) for p in _C.ABSENT_COLUMNS)]
+df = df[_keep].set_axis(OV.council_columns(_keep, _C), axis=1)
 for c_ in ("ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dia_mm", "ww_pipe_dia_mm"):  # whole numbers, kept whole
     if c_ in df: df[c_] = pd.to_numeric(df[c_], errors="coerce").round().astype("Int64")
 db.execute("CREATE OR REPLACE TABLE units AS SELECT * FROM df")

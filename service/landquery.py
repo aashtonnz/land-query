@@ -46,6 +46,10 @@ class LandQuery:
         self.withheld = [c for c in self.all_columns if c not in self.columns]
         p = os.path.join(results_dir, "provenance.json")
         self.prov = json.load(open(p)) if os.path.exists(p) else {}
+        # results from another council's run would be described with this council's sources (twelfth review)
+        copies = {k for k in self.prov if k.endswith("_parcels") and k not in ("nonprimary_parcels",)}
+        if copies and cat.COUNCIL.PARCELS_KEY not in copies:
+            raise RuntimeError(f"these results come from another council ({', '.join(sorted(copies))}); COUNCIL is {cat.COUNCIL.NAME}")
         r = os.path.join(results_dir, "RUN.txt")
         self.run = open(r).read().strip() if os.path.exists(r) else None
 
@@ -56,28 +60,9 @@ class LandQuery:
             dataset=f"{cat.COUNCIL.LABEL} parcels, compiled from {cat.COUNCIL.DATASET_SOURCES}",
             run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),
             coordinates="NZTM2000 (EPSG:2193), metres; heights NZVD2016",
-            licence_note=("Values come from CC BY 4.0 sources; attribute LINZ, Kāpiti Coast District Council and Greater "
-                          "Wellington Regional Council as listed per source. In public mode, columns relying on a "
-                          "portal-wide licence statement are withheld until confirmed in writing."),
+            licence_note=cat.COUNCIL.ABOUT["licence_note"],
             caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
-            boundary=("Whole parcels are published. A parcel crossing the district boundary is included if its "
-                      "representative point (a point always inside it) or at least 1,000 m2 of it lies in the district, "
-                      "so a few parcels reach far outside it (one forest section is 615 km2, about 40 km2 of it in the "
-                      "district). Their area covers the whole parcel; terrain covers the part with LiDAR "
-                      "(lidar_coverage_pct); building and open-ground values come from KCDC's 2021 building outlines, which "
-                      "miss some houses (unmapped_structure_m2 warns of most; it arrives with the next full rebuild where absent), and are empty unless the outlines and the "
-                      "fetch window cover the parcel (buildings_coverage_pct, coverage_pct); council layers cover what "
-                      "the council maps. "
-                      "district_share_pct gives the share inside; it is withheld in public mode until the council licence "
-                      "is confirmed (T-35). About 70 railway parcels are not included: the council's parcel list omits them."),
-            empty_values=("An empty value is never a measured 0 (a count of recommended building levels is empty "
-                          "where there are none). What else it means depends on the column: an empty hazard "
-                          "column means the parcel is outside that hazard where the council mapped it, and not mapped "
-                          "elsewhere. KCDC's flood layers cover only its flood models, which leave out Kapiti Island, the "
-                          "hills and much of the rural north. An empty zones or gw_eq_slope_failure value means not "
-                          "mapped; gw_liquefaction maps only soils with significant potential. In public mode some flood "
-                          "layers are withheld (see describe_columns), so empty served flood columns do not mean the "
-                          "parcel is outside every flood layer."),
+            boundary=cat.COUNCIL.ABOUT["boundary"], empty_values=cat.COUNCIL.ABOUT["empty_values"],   # per council (twelfth review)
             provenance_available=bool(self.prov))
 
     def describe_columns(self, contains=None):
@@ -213,7 +198,7 @@ class LandQuery:
 
     def _envelope(self, rows, cols, total, offset):
         keys = {k for c in cols for k in self.meta[c]["sources"]}
-        if any(r.get("geometry_source") == "KCDC mirror" for r in rows): keys.add("kcdc_parcels")  # computed on the mirror polygon
+        if any(r.get("geometry_source") == cat.COUNCIL.PARCELS_COPY for r in rows): keys.add(cat.COUNCIL.PARCELS_KEY)  # on the mirror polygon
         keys = sorted(keys)
         blocks = sorted({r["block_id"] for r in rows})
         sources = {}

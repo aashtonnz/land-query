@@ -30,10 +30,10 @@ def fixture(extra_rows=0, mirror=False):
                   area_m2 DOUBLE, bbox_xmin DOUBLE, bbox_ymin DOUBLE, bbox_xmax DOUBLE, bbox_ymax DOUBLE)""")
     db.executemany("INSERT INTO units VALUES (?,?,?,?,?,?,?,?,?,?)", rows)
     db.execute(f"ALTER TABLE units ADD COLUMN geometry_source VARCHAR DEFAULT 'LINZ'")
-    if mirror: db.execute("UPDATE units SET geometry_source = 'KCDC mirror' WHERE unit_id = 3")
+    if mirror: db.execute(f"UPDATE units SET geometry_source = '{cat.COUNCIL.PARCELS_COPY}' WHERE unit_id = 3")
     db.execute(f"COPY units TO '{os.path.join(d, 'units.parquet')}' (FORMAT PARQUET)")
     prov = {k: dict(url=f"https://example/{k}", by_block={B1: dict(sha256=k + "1", fetched="t1"), B2: dict(sha256=k + "2", fetched="t2")})
-            for k in ("parcels", "dem_2025", "zones", "kcdc_parcels")}
+            for k in ("parcels", "dem_2025", "zones", cat.COUNCIL.PARCELS_KEY)}
     json.dump(prov, open(os.path.join(d, "provenance.json"), "w"))
     open(os.path.join(d, "RUN.txt"), "w").write("Run 1 from commit abc")
     P = lambda *ks: {k: dict(url="u", licence="CC BY 4.0") for k in ks}
@@ -154,7 +154,7 @@ def test_withheld_columns_are_not_described_in_public_mode():
 
 def test_parcel_on_mirror_geometry_names_the_mirror_as_a_source():
     r = LandQuery(fixture(mirror=True), "internal").parcel(unit_id=3)
-    assert r["rows"][0]["geometry_source"] == "KCDC mirror" and "kcdc_parcels" in r["sources"]
+    assert r["rows"][0]["geometry_source"] == cat.COUNCIL.PARCELS_COPY and cat.COUNCIL.PARCELS_KEY in r["sources"]   # the council's own copy (twelfth review)
 
 
 @kapiti_only
@@ -258,10 +258,11 @@ def test_a_precomputed_query_ordered_or_filtered_on_a_withheld_column_is_withhel
     assert lq.inverse_query("T2")["withheld"] is True
     assert lq.inverse_query("T3").get("withheld") is not True
     b = lq.about()["boundary"]
-    assert "1,000 m2" in b and "representative point" in b and "buildings_coverage_pct" in b and "railway" in b
-    assert "miss some houses" in b and "unmapped_structure_m2" in b
+    assert "1,000 m2" in b and "representative point" in b and "unmapped_structure_m2" in b
+    if cat.COUNCIL.NAME == "kapiti": assert "buildings_coverage_pct" in b and "railway" in b and "miss some houses" in b
+    else: assert "Plimmerton Farm" in b and "Three waters are not included" in b and "Kāpiti" not in b + lq.about()["licence_note"]
     assert "withheld" in lq.about()["empty_values"] and "not mapped" in lq.about()["empty_values"]
-    assert "cover only its flood models" in lq.about()["empty_values"]
+    assert "cover only its flood models" in lq.about()["empty_values"] or "Horokiri" in lq.about()["empty_values"]
     iq = json.load(open(os.path.join(d, "inverse_queries.json")))
     iq["queries"].append(dict(id="T4", name="n", question="q", sql="SELECT unit_id FROM units ORDER BY titles_n",  # not a withheld name
                               count=1, provenance={"parcels": dict(url="u")}, rows=[dict(unit_id=1, sources={})]))

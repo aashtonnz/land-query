@@ -631,6 +631,34 @@ def test_porirua_settings_are_consistent():
                for b in blocks)   # every block's LiDAR window (block, 1 km fetch margin, 300 m context) is in the flow grid
 
 
+def test_porirua_outline_columns_buildings_and_queries():
+    # the per-council code the twelfth review's mutants got past (T-88)
+    from shapely.geometry import box, Point
+    import overlays as ov, inverse_queries_defs as iq
+    from councils import load
+    P, K = load("porirua"), load("kapiti")
+    # land where two of three polygons agree: not their union, not all three
+    o = ov.district_outline_polygons([box(0, 0, 10, 10)], [box(5, 0, 15, 10)], [box(0, 0, 10, 10)])
+    assert o.contains(Point(2, 5)) and o.contains(Point(7, 5)) and not o.contains(Point(12, 5))
+    o = ov.district_outline_polygons([box(0, 0, 10, 10)], [box(5, 0, 15, 10)], [box(8, 0, 20, 10)])
+    assert o.contains(Point(6, 5)) and o.contains(Point(12, 5)) and not o.contains(Point(2, 5)) and not o.contains(Point(18, 5))
+    assert ov.district_outline_polygons([box(0, 0, 1, 1)], [], [box(0, 0, 1, 1)]).is_empty
+    assert ov.NOT_PRIMARY_INTENTS == {"Road", "Hydro"}
+    cols = ["unit_id", "building_2021_m2", "ww_pipe_year", "ovl_flood_hazard", "pdp_tsunami_100yr", "wind_obstruction_pct", "dz_2021_2025_mean_m"]
+    assert ov.council_columns(cols, P) == ["unit_id", "building_m2", "pdp_tsunami_100yr", "wind_obstruction_pct"]
+    assert ov.council_columns(cols, K) == cols
+    r = ov.finish_row({"building_m2": 5, "buildings_coverage_pct": 100.0, "coverage_pct": 50.0, "lidar_coverage_pct": 100.0}, P)
+    assert r["building_m2"] is None                                    # the renamed column is emptied too
+    out = box(0, 0, 100, 100); cap = box(0, 0, 50, 100)
+    assert ov.buildings_cover_for(P, cap, out).area == 10000 and ov.buildings_cover_for(K, cap, out).area == 5000
+    assert P.POINT_IDS == {"pdp_heritage_items": "ID", "pdp_notable_trees": "Tree_ID"}
+    p1 = next(q for q in iq.Q_PORIRUA if q["id"] == "P1")["sql"]
+    for c in iq.PDP_FLOOD + iq.PDP_COAST + ["pcc_flood_unmapped"]: assert f"{c} IS NULL" in p1, c
+    p3 = next(q for q in iq.Q_PORIRUA if q["id"] == "P3")["sql"]
+    for c in ["pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"]: assert c in p3, c
+    assert P.LABEL == "Porirua City" and P.PARCELS_COPY == "PCC mirror" and P.PARCELS_KEY == "pcc_parcels"
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

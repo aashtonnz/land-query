@@ -45,9 +45,8 @@ mirror_ids = {f["properties"].get("id") for f in feats}
 blk = box(*te.BLOCK); kept = []
 # road and water parcels are not in LINZ's primary parcel layer (they have layers of their own), and KCDC's copy omits
 # them; PCC's includes them, so they are left out here for every council (T-88)
-NOT_PRIMARY = {"Road", "Hydro"}
 for f in feats:
-    if not f.get("geometry") or f["properties"].get("parcel_intent") in NOT_PRIMARY: continue
+    if not f.get("geometry") or f["properties"].get("parcel_intent") in ov.NOT_PRIMARY_INTENTS: continue
     g = shape(f["geometry"])
     if blk.contains(g.representative_point()) or blk.touches(g.representative_point()):
         kept.append(f)
