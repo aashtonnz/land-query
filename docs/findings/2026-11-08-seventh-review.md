@@ -60,3 +60,18 @@ Checked and correct:
     test.
   - All 13 mutants of this kind are caught, run with bytecode caching off.
   - `fetch_parcels_kcdc.py`'s own lines remain untested; the rebuild's counts check them.
+
+## T-74: rebuild (8 Nov 2026)
+
+- **Run.** Run 42454216635 compiled all 44 blocks at `4a8e65c` and published. The service tests, including the
+  schema check for the new column, passed before publishing.
+- **Checked on the published results:**
+  - 27,284 parcels, all with `buildings_coverage_pct`.
+  - 234 parcels are under 99% coverage, and every building and open-ground column is empty on all of them. They
+    include the Motungarara islets, Kapiti Island's parts (Section 3 Block I Kapiti SD) and Section 5 SO 495075. 12
+    of them had shown buildings, but only for part of the parcel.
+  - Covered parcels: none of 15 columns compared changed, except `open_ground_m2` on 7 parcels in blocks without
+    LiDAR, which now get it as intended (finding 2).
+  - `linz_not_in_mirror` 72; no failed source.
+
+An eighth fresh-eyes review follows, under fresh-eyes review 1.1.
