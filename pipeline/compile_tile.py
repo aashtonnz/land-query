@@ -90,8 +90,9 @@ else:
 # (no value there, inside the grid) and no higher than 0.5 m are set to no data, so flow can leave into the sea (T-47).
 SEA = np.zeros(Z.shape, bool); G10 = None
 _op = os.path.join(RAW, "district_outline.geojson")
-BLD_COVER = OV.building_cover(json.load(open(os.path.join(D, "provenance.json")))["sources"].get("buildings_2021", {}).get("extent"),
-                              shape(json.load(open(_op))) if os.path.exists(_op) else None)  # T-73
+_cp = os.path.join(RAW, "buildings_capture_area.geojson")
+BLD_COVER = OV.building_cover(OV.capture_area_nztm(json.load(open(_cp))) if os.path.exists(_cp) else None,
+                              shape(json.load(open(_op))) if os.path.exists(_op) else None)  # T-73, T-76
 LIDAR_BOX = box(*rasterio.transform.array_bounds(Z.shape[0], Z.shape[1], dem.transform)) if HAVE_LIDAR else box(0, 0, 0, 0)
 if DF is not None and HAVE_LIDAR:
     from rasterio.warp import reproject, Resampling
@@ -290,7 +291,8 @@ for uid, (g, p) in enumerate(units):
           if rbl[i][1].get("VALUE_NZVD2016") is not None and rbl[i][0].distance(g) <= 10]
     lin = [rbl[i][1]["VALUE_NZVD2016"] for i in (T["rbl"].query(g) if "rbl" in T else [])
            if rbl[i][1].get("VALUE_NZVD2016") is not None and g.contains(rbl[i][0])]
-    r.update(rbl_in_parcel_n=len(lin), rbl_in_parcel_max_nzvd2016=max(lin) if lin else None,
+    r.update(rbl_in_parcel_n=len(lin) or None,  # empty, not 0: outside KCDC's flood models none are issued (T-76)
+             rbl_in_parcel_max_nzvd2016=max(lin) if lin else None,
              rbl_in_parcel_max_minus_ground_mean_m=round(max(lin) - r["ground_mean_m"], 2) if lin and r["ground_mean_m"] is not None else None)
     r.update(rbl_max_nzvd2016=max(lv) if lv else None,
              ground_min_minus_rbl_m=round(r["ground_min_m"] - max(lv), 2) if lv and r["ground_min_m"] is not None else None)

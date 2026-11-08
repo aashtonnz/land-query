@@ -68,6 +68,10 @@ class LandQuery:
                       "cover the parcel (buildings_coverage_pct); council layers cover what the council maps. "
                       "district_share_pct gives the share inside; it is withheld in public mode until the council licence "
                       "is confirmed (T-35). About 70 railway parcels are not included: the council's parcel list omits them."),
+            empty_values=("Empty never means 0 or none. An empty hazard column means the parcel is outside that mapped "
+                          "hazard, within the area the council modelled; an empty zones or gw_eq_slope_failure value means "
+                          "not mapped. In public mode some flood layers are withheld (see describe_columns), so empty "
+                          "served flood columns do not mean the parcel is outside every flood layer."),
             provenance_available=bool(self.prov))
 
     def describe_columns(self, contains=None):

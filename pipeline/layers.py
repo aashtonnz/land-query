@@ -40,3 +40,8 @@ ARCGIS = {
     "buildings_2021": ("https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
                        "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)"),
 }
+
+# Where KCDC's 2021 building outlines were captured: the footprint of LINZ's 2017 urban aerial photos, which holds all
+# but 2 of the layer's 50,623 outlines (eighth review, T-76). The layer's extent is only this footprint's bounding box.
+BUILDINGS_CAPTURE = ("https://nz-imagery.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2017_0.1m/rgb/2193/capture-area.geojson",
+                     "LINZ Kāpiti Coast 0.1 m urban aerial photos (2017) capture area, CC BY 4.0")

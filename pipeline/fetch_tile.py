@@ -49,6 +49,18 @@ def main():
         except Exception as e:
             prov["sources"][name] = dict(url=url, ok=False, error=str(e)[:300], licence=lic)
             print(f"{name:26s} FAILED {e}")
+    if not only or "buildings_capture_area" in only:  # where the building outlines were captured (T-76)
+        from layers import BUILDINGS_CAPTURE
+        import requests
+        url, lic = BUILDINGS_CAPTURE
+        try:
+            r = requests.get(url, timeout=60); r.raise_for_status(); b = r.content; json.loads(b)
+            open(os.path.join(RAW, "buildings_capture_area.geojson"), "wb").write(b)
+            prov["sources"]["buildings_capture_area"] = dict(url=url, ok=True, features=1, bytes=len(b), sha256=sha(b),
+                                                             fetched=utc_now(), licence=lic)
+        except Exception as e:
+            prov["sources"]["buildings_capture_area"] = dict(url=url, ok=False, error=str(e)[:300], licence=lic)
+            print("buildings_capture_area FAILED", e)
     json.dump(prov, open(os.path.join(OUT, "provenance.json"), "w"), indent=1)
 
 if __name__ == "__main__":

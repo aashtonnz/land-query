@@ -465,6 +465,7 @@ def test_every_column_built_on_lidar_lists_the_sea_mask_and_the_share_lists_the_
         src = c.column_sources(col)
         assert src and "sea_mask" in src, (col, src)
     assert "district_outline" in c.column_sources("district_share_pct")
+    assert {"buildings_capture_area", "district_outline"} <= set(c.column_sources("buildings_coverage_pct"))
 
 
 def test_source_check_flags_a_missing_linz_key():
@@ -480,8 +481,10 @@ def test_building_values_are_empty_not_0_where_the_outlines_do_not_reach():
     # KCDC's 2021 outlines have none on Kapiti Island or outside the district; islands with houses read 0 (seventh review)
     from shapely.geometry import box
     import overlays as ov
-    cover = ov.building_cover(dict(xmin=0, ymin=0, xmax=1000, ymax=1000), box(-500, 0, 800, 1000))
-    assert cover.bounds == (0.0, 0.0, 800.0, 1000.0)                      # the extent, within the district
+    cover = ov.building_cover(box(0, 0, 1000, 1000).difference(box(0, 0, 100, 100)), box(-500, 0, 800, 1000))
+    assert cover.bounds == (0.0, 0.0, 800.0, 1000.0) and round(cover.area) == 790000  # the footprint, within the district
+    assert ov.building_cover(None, box(0, 0, 1, 1)) is None and ov.building_cover(box(0, 0, 1, 1), None) is None
+    assert ov.withhold_uncovered_buildings({}, box(0, 0, 50, 50), cover)["buildings_coverage_pct"] == 0.0  # a hole in it
     full = {k: 7 for k in ov.BUILDING_COLUMNS}
     r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), cover)
     assert all(r[k] == 7 for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 100.0
@@ -494,9 +497,21 @@ def test_building_values_are_empty_not_0_where_the_outlines_do_not_reach():
     assert ov.withhold_uncovered_buildings({}, box(700, 0, 830, 100), cover)["buildings_coverage_pct"] == 76.9
     r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), None)   # extent unknown
     assert r["building_2021_m2"] is None and r["buildings_coverage_pct"] == 0.0
-    for k in ["building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct", "open_ground_clear_pct",
-              "winter_sun_hours_open_mean", "roof_flat_m2", "roof_solar_rel_pct", "level_open_cut_m3", "platform_15m_earthworks_min_m3"]:
-        assert k in ov.BUILDING_COLUMNS, k
+    assert set(ov.BUILDING_COLUMNS) == {"building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct",
+        "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_pitch_p50_deg", "roof_flat_m2",
+        "roof_north_m2", "roof_solar_rel_pct", "level_open_cut_m3", "level_open_fill_m3", "platform_15m_earthworks_min_m3"}
+
+
+def test_building_outlines_were_captured_inside_the_2017_urban_photos_not_their_bounding_box():
+    # LINZ's capture area for the 2017 0.1 m urban photos holds all but 2 of KCDC's 50,623 outlines (eighth review)
+    import json
+    from shapely.geometry import Point
+    import overlays as ov
+    cap = ov.capture_area_nztm(json.load(open(os.path.join(os.path.dirname(__file__), "fixtures", "buildings_capture_area_2017.geojson"))))
+    assert 225e6 < cap.area < 240e6
+    assert cap.contains(Point(1767500, 5468500))           # central Paraparaumu
+    for x, y in [(1764055, 5478167), (1785128, 5478705), (1786256, 5477700)]:  # Waiorua Bay; Reikorangi; the east edge
+        assert not cap.contains(Point(x, y)) and cap.envelope.contains(Point(x, y)), (x, y)
 
 
 def test_membership_floor_point_and_share_precision():

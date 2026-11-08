@@ -43,7 +43,7 @@ COLUMN_SOURCES = [
     (r"dz_2021_2025_clear_\w+", P + ["dem_2025", "dem_2021", "dsm_2025", "sea_mask"]),
     (r"dz_2021_2025_\w+", P + ["dem_2025", "dem_2021", "sea_mask"]),
     (r"lidar_epoch_offset_block_m", ["dem_2025", "dem_2021", "dsm_2025"]),  # LiDAR only since T-54
-    (r"buildings_coverage_pct", P + ["buildings_2021", "district_outline"]),
+    (r"buildings_coverage_pct", P + ["buildings_capture_area", "district_outline"]),
     (r"building_2021_m2|open_ground_m2|open_ground_slope_lt5_m2|level_open_\w+|platform_15m_earthworks_min_m3", P + ["dem_2025", "buildings_2021"]),
     (r"canopy_gt3m_open_pct|open_ground_clear_pct|winter_sun_\w+|horizon_\w+|sky_view_pct", P + ["dem_2025", "dsm_2025", "buildings_2021"]),
     (r"roof_\w+", P + ["dsm_2025", "buildings_2021"]),

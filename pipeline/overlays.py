@@ -167,7 +167,8 @@ def parcels_error(key_set, kept, from_linz, err):
 
 # Columns that need the 2021 building outlines over the whole parcel: building area itself, and everything measured
 # on "open ground" (the parcel minus buildings). Where the outlines don't reach, a house would count as open ground
-# and its roof as no building, so these are empty, not 0 (seventh review, T-73; D-12).
+# and its roof as no building, so these are empty, not 0 (seventh review, T-73; D-12). The viewpoint columns (horizon,
+# sky view, wind) are kept: the viewpoint must also be clear of anything standing in the 2024-25 DSM, roofs included.
 BUILDING_COLUMNS = ("building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct",
                     "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct",
                     "roof_pitch_p50_deg", "roof_flat_m2", "roof_north_m2", "roof_solar_rel_pct",
@@ -175,13 +176,22 @@ BUILDING_COLUMNS = ("building_2021_m2", "open_ground_m2", "open_ground_slope_lt5
 BUILDING_MIN_COVER = 0.99
 
 
-def building_cover(extent, outline):
-    """Where KCDC's 2021 building outlines were captured: the layer's extent, within the district (it holds no
-    outlines outside the district, nor on Kapiti Island). None if the extent is unknown."""
-    from shapely.geometry import box
-    if not extent: return None
-    b = box(extent["xmin"], extent["ymin"], extent["xmax"], extent["ymax"])
-    return b if outline is None or outline.is_empty else b.intersection(outline)
+def building_cover(capture, outline):
+    """Where KCDC's 2021 building outlines were captured: the 2017 urban aerial photos' footprint (NZTM), within the
+    district (the layer holds no outlines outside it). None if either is unknown: then no parcel counts as covered
+    (T-73, T-76; the layer's bounding box, used at first, took in Reikorangi and Waiorua Bay, which have houses)."""
+    if capture is None or capture.is_empty or outline is None or outline.is_empty: return None
+    return capture.intersection(outline)
+
+
+def capture_area_nztm(geojson):
+    """A LINZ capture-area GeoJSON (a Feature or FeatureCollection in WGS84) as one NZTM geometry."""
+    from shapely.geometry import shape
+    from shapely.ops import transform, unary_union
+    from pyproj import Transformer
+    feats = geojson["features"] if geojson.get("type") == "FeatureCollection" else [geojson]
+    t = Transformer.from_crs(4326, 2193, always_xy=True).transform
+    return transform(t, unary_union([shape(f["geometry"]) for f in feats]))
 
 
 def withhold_uncovered_buildings(row, g, cover):
