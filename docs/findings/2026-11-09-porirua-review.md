@@ -71,3 +71,19 @@ Checked and correct:
   - The Kāpiti tile still compiles identically, and Kāpiti's queries are unchanged.
 - **Still open:** Porirua's QA height checks (no matching fields in PCC's layers), and ground change from the 2013–14
   survey.
+
+## T-90: republished (9 Nov 2026)
+
+- **Run.** Run 42506899575 compiled all 17 blocks at `357b58d` and published to `porirua-results`. No source failed,
+  and the service checks passed before publishing.
+- **Checked on the published results:**
+  - 21,954 parcels with no road or water parcels. 6 lack LINZ geometry (was 2,162); 10 LINZ parcels are not in PCC's
+    copy.
+  - 93 columns. `plan_1999_plimmerton_farm` is on 51 parcels, 46 of them with no zone (the 2025 plan does not apply).
+    `pcc_flood_unmapped` is on 246.
+  - The new layers carry values: height controls on 2,059 parcels, precincts 5,685, designations 1,267, notable tree
+    groups 18, heritage settings 43.
+  - P1 304 (was 587, now without roads and the unmapped flood area), P2 402, P3 1,803. The flow model against PCC's
+    flood overlays has a lift of 1.87.
+
+A thirteenth fresh-eyes review follows, under fresh-eyes review 1.1.

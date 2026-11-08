@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 08:30 (Pacific/Auckland)
+Last updated: 2026-11-09 07:25 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -15,7 +15,8 @@ Standing priorities:
   - T-87 (done 2026-11-09): Porirua settings (`pipeline/councils/porirua.py`): District Plan 2025 layers, PCC's parcel copy, three-polygon outline (in effect PCC's boundary, 182.5 km²), LiDAR 2023, PCC footprints (2013–17 photos), 24,110 parcels in 17 blocks. The compiler, QA, queries (P1–P3), measure check, catalogue and `SOURCES.md` are per council; Porirua's absent columns are left out. A 1.5 km tile at Porirua's centre compiles (205 parcels, 76 columns) and passes the service checks; the Kāpiti tile still compiles identically. LINZ's newer national building outlines would replace PCC's dated footprints (later).
   - T-88: Porirua district run. First run 42499625052 (17 blocks, at b06e418) published 24,110 parcels to `porirua-results`, no failed source; P1 587, P2 426, P3 1,973; flow vs PCC's flood overlays lift 1.8. It included 2,137 road and 19 water parcels that LINZ's primary layer and KCDC's copy don't have; now left out in code (21,954 parcels), to be republished with the review's fixes.
   - T-89 (done 2026-11-09): Twelfth fresh-eyes review (Porirua): five serious findings (Plimmerton Farm under the 1999 plan; flood not mapped in the Horokiri valley; Kāpiti text in Porirua's `about`; tree groups and heritage settings missing; Mana Island and the coastal environment), ten minor. [Findings](docs/findings/2026-11-09-porirua-review.md)
-  - T-90: Twelfth-review fixes (done in code 2026-11-09; see the findings). Republish Porirua (about US$1), then a thirteenth review (fresh-eyes review 1.1).
+  - T-90 (done 2026-11-09): Twelfth-review fixes, republished (run 42506899575: 21,954 parcels, 93 columns, no failed source).
+  - T-91: Thirteenth fresh-eyes review (Porirua and the per-council code). Started 2026-11-09.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
