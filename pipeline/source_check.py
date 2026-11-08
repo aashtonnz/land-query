@@ -76,6 +76,7 @@ def mirror_gap():
         if not f.get("geometry") or f["properties"].get("id") in mirror: continue
         if district.contains(shape(f["geometry"]).representative_point()):
             gap.append(dict(id=f["properties"].get("id"), appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
+    gap.sort(key=lambda g: g["intent"] == "Railway")  # the mirror omits railway parcels by design (D-11): list others first
     return dict(count=len(gap), by_intent=dict(Counter(g["intent"] for g in gap).most_common()), examples=gap[:30], mirror=len(mirror))
 
 

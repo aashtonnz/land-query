@@ -66,3 +66,26 @@ A new reviewer, briefed with the repository only, reviewed everything changed si
 
 The district rebuild (about US$2) follows. Then, under fresh-eyes review 1.1, a fourth review, because finding 1 was
 serious.
+
+## T-60: rebuild and what it showed (8 Nov 2026)
+
+- **The guard held.** The rebuild (run 42431175935) compiled all 46 blocks, then refused to publish: block
+  1795000_5480000 had failed to download its 2025 DSM, which T-59's new check stopped from publishing as empty
+  terrain.
+  - LiDAR downloads now retry, and a broken download no longer counts as cached.
+  - `kapiti.yml` gained patch runs: with `reuse_blocks_from` and `only`, the listed blocks are recomputed and merged
+    with the earlier run's others. The patch (run 42434764666, about 5 minutes) published the district.
+  - `RUN.txt` names the merge commit and the commits the blocks were compiled at.
+- **Checked on the published results:**
+  - No parcel without LiDAR reads 0 or shows coverage (was 470).
+  - The pipe columns are integers, and the clear-ground columns are present (25,811 parcels).
+  - No block has a failed source, and all 19 service tests pass, including the new schema check.
+  - The query counts are unchanged.
+- **The LINZ-not-in-mirror count was wrong at first.**
+  - The blocks reported 1,246. KCDC's boundary line is open along the coast, so my district outline was empty, and
+    every LINZ parcel in a block counted, including Porirua parcels in the southern blocks.
+  - `district_polygon` now closes the line with a loop out to sea, west of Kapiti Island (test added; checked: Kāpiti
+    points inside; Porirua, Levin and Upper Hutt points outside).
+  - The district-wide count now comes from the weekly source check, which has the LINZ key. **72 parcels**: 70
+    railway parcels, which the mirror omits by design (D-11), and 2 freehold parcels. The mirror is otherwise
+    complete for the district, so finding 2 is minor. The weekly check now lists non-railway parcels first.
