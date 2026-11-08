@@ -291,10 +291,24 @@ def test_published_building_values_are_empty_where_the_outlines_do_not_cover_the
                       + " AND ".join(f"{c} IS NULL" for c in flow) + ")").fetchall()[0][0] == 0, "flow values under 99% LiDAR (T-81)"
 
 
+def test_results_from_another_council_are_refused():
+    d = fixture()
+    other = "pcc_parcels" if cat.COUNCIL.NAME == "kapiti" else "kcdc_parcels"
+    pr = json.load(open(os.path.join(d, "provenance.json"))); pr[other] = pr.pop(cat.COUNCIL.PARCELS_KEY)
+    json.dump(pr, open(os.path.join(d, "provenance.json"), "w"))
+    try: LandQuery(d, "public"); assert False, "another council's results must be refused"
+    except RuntimeError as e: assert "another council" in str(e)
+    import subprocess   # and Porirua's catalogue gives its own sources for its own columns
+    out = subprocess.run([sys.executable, "-c", "import catalogue as c; print(c.column_sources('buildings_coverage_pct'), c.column_sources('building_m2'))"],
+                         cwd=os.path.dirname(os.path.abspath(__file__)), env=dict(os.environ, COUNCIL="porirua"), capture_output=True, text=True).stdout
+    assert "district_outline" in out and "pcc_buildings" in out and "buildings_capture_area" not in out, out
+
+
 def test_pending_columns_may_be_missing_only_from_finished_results():
     have = [pat.pattern[1:-1] for pat, _, _ in cat._COLUMNS if "\\w" not in pat.pattern and pat.pattern[1:-1] not in cat.PENDING_COLUMNS]
     assert cat.missing_columns(have, "Run 1 ... (row rules only, finish.py)") == []
-    assert cat.missing_columns(have, "Run 1 merged at commit x") == sorted(cat.PENDING_COLUMNS)
+    defined = {p.pattern[1:-1] for p, _, _ in cat._COLUMNS}
+    assert cat.missing_columns(have, "Run 1 merged at commit x") == sorted(c for c in cat.PENDING_COLUMNS if c in defined)
     assert cat.missing_columns([c for c in have if c != "flow_path_m"], "finish.py") == ["flow_path_m"]
 
 

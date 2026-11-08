@@ -11,7 +11,8 @@ def class_label(layer, props, council=None):
     from councils import COUNCIL
     council = council or COUNCIL
     if layer in council.CLASS_FIELDS:   # a council's own class fields, then a fixed name (T-87)
-        fields, default = council.CLASS_FIELDS[layer]
+        fields, default, *how = council.CLASS_FIELDS[layer]
+        if how == ["join"]: return "; ".join(str(f(k)) for k in fields if f(k)) or default   # every field, e.g. a control and its limit
         return next((f(k) for k in fields if f(k)), None) or default
     if layer == "zones": return f("ePlan_Zone") or f("NPS_Zone") or "Zone not recorded"
     if layer == "ovl_fault_avoidance":

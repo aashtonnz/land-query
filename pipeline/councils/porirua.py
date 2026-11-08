@@ -34,6 +34,9 @@ ARCGIS = {
     "plan_1999_plimmerton_farm": fs("Porirua_City_District_Plan_1999_Plimmerton_Farm_Zone"),
     # where PCC has not mapped flood hazard (the Horokiri valley): there an empty flood overlay is not "no hazard"
     "pcc_flood_unmapped": (f"{P}/Hazards/Flood_Hazards/MapServer/3", PCC_LIC),
+    # the stormwater models PCC's flood overlays come from: outside them, and outside the unmapped area, an empty flood
+    # overlay may mean the land was never studied (thirteenth review)
+    "pcc_flood_model_catchments": (f"{P}/Hazards/Flood_Hazards/MapServer/90", PCC_LIC),
     "pdp_notable_tree_groups": fs("Notable_Tree_Group_PDP2025"),
     "pdp_heritage_settings": fs("Heritage_Setting_PDP2025"),
     "pdp_heritage_item_extents": fs("Heritage_Item_Extent_PDP2025"),
@@ -79,7 +82,7 @@ POLY_LAYERS = ["zones", "pdp_flood_overland_flow", "pdp_flood_stream_corridor", 
                "pdp_coastal_inundation_1m_slr", "pdp_tsunami_100yr", "pdp_tsunami_500yr", "pdp_tsunami_1000yr",
                "pdp_fault_rupture", "pdp_heritage_sites", "pdp_significant_natural_areas", "pdp_noise_rail",
                "pdp_noise_state_highway", "pdp_coastal_environment", "gw_liquefaction", "gw_eq_slope_failure",
-               "plan_1999_plimmerton_farm", "pcc_flood_unmapped", "pdp_notable_tree_groups", "pdp_heritage_settings",
+               "plan_1999_plimmerton_farm", "pcc_flood_unmapped", "pcc_flood_model_catchments", "pdp_notable_tree_groups", "pdp_heritage_settings",
                "pdp_heritage_item_extents", "pdp_precincts", "pdp_height_controls", "pdp_designations",
                "pdp_special_amenity_landscapes", "pdp_outstanding_natural_landscapes", "pdp_coastal_high_natural_character",
                "pdp_sites_significance_maori", "pdp_gas_pipeline_corridor", "pdp_rail_vibration", "pdp_radio_height_control",
@@ -103,11 +106,12 @@ CLASS_FIELDS = {   # (fields to try, name when none is set)
     "pdp_coastal_environment": ((), "Coastal environment"),
     "plan_1999_plimmerton_farm": ((), "Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)"),
     "pcc_flood_unmapped": ((), "Flood hazard not mapped"),
+    "pcc_flood_model_catchments": (("Name",), "Stormwater model catchment"),
     "pdp_notable_tree_groups": (("ID",), "Notable tree group"),
     "pdp_heritage_settings": (("Name", "ID"), "Heritage setting"),
     "pdp_heritage_item_extents": (("Name", "ID"), "Heritage item extent"),
     "pdp_precincts": (("Name",), "Precinct"),
-    "pdp_height_controls": (("SpecificControl", "HeightControl", "HIRB"), "Height control"),
+    "pdp_height_controls": (("SpecificControl", "HeightControl", "HIRB"), "Height control", "join"),   # all three, joined
     "pdp_designations": (("Title", "ID"), "Designation"),
     "pdp_special_amenity_landscapes": (("Name",), "Special amenity landscape"),
     "pdp_outstanding_natural_landscapes": (("Name",), "Outstanding natural feature or landscape"),
@@ -131,7 +135,7 @@ DATASET_SOURCES = "public LINZ, Porirua City Council and GWRC sources"
 SOURCE_KEYS = {"dem_2025": "dem_2023", "dsm_2025": "dsm_2023", "buildings_2021": "pcc_buildings",
                "buildings_capture_area": "district_outline", "kcdc_parcels": "pcc_parcels"}
 COLUMN_SOURCES = [(r"building_m2", ["parcels", "dem_2023", "pcc_buildings"]),
-                  (r"pdp_\w+|plan_1999_\w+|pcc_flood_unmapped", None),   # an overlay: its own source key
+                  (r"pdp_\w+|plan_1999_\w+|pcc_flood_unmapped|pcc_flood_model_catchments", None),   # an overlay: its own source key
                   (r"buildings_coverage_pct", ["parcels", "district_outline"])]   # PCC's footprints span the city
 
 BLOCKS_FILE = "porirua_blocks.json"
@@ -156,7 +160,10 @@ ABOUT = dict(
     empty_values=("An empty value is never a measured 0 (a count of recommended building levels is empty where there "
                   "are none). An empty District Plan overlay means the parcel is outside it where the 2025 plan "
                   "applies; in the Plimmerton Farm Zone the plan does not apply. PCC has not mapped flood hazard in "
-                  "the Horokiri valley (pcc_flood_unmapped): there an empty pdp_flood_* value means not mapped. "
-                  "pdp_coastal_environment does not reach Mana Island in PCC's layer. An empty zones or "
+                  "the Horokiri valley (pcc_flood_unmapped): there an empty pdp_flood_* value means not mapped. About "
+                  "49 km² more lies outside every stormwater model the flood overlays come from "
+                  "(pcc_flood_model_catchments, after the next rebuild): there it may mean never studied. Mana Island "
+                  "has no flood or coastal hazard mapping, and is outside pdp_coastal_environment in PCC's layer. On "
+                  "parcels the fetch window cuts (coverage_pct under 99), overlays cover only the part inside it. An empty zones or "
                   "gw_eq_slope_failure value means not mapped; gw_liquefaction maps only soils with significant "
                   "potential. In public mode PCC's layers are withheld until its licence is confirmed."))

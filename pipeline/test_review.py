@@ -659,6 +659,35 @@ def test_porirua_outline_columns_buildings_and_queries():
     assert P.LABEL == "Porirua City" and P.PARCELS_COPY == "PCC mirror" and P.PARCELS_KEY == "pcc_parcels"
 
 
+def test_porirua_layers_labels_and_queries_say_what_they_claim():
+    # the thirteenth review's surviving mutants (T-92)
+    import overlays as ov, inverse_queries_defs as iq
+    from councils import load
+    P = load("porirua")
+    for n in ("plan_1999_plimmerton_farm", "pcc_flood_unmapped", "pcc_flood_model_catchments"): assert n in P.POLY_LAYERS, n
+    assert P.ARCGIS["pcc_flood_unmapped"][0].endswith("/Hazards/Flood_Hazards/MapServer/3")
+    assert P.ARCGIS["pcc_flood_model_catchments"][0].endswith("/Hazards/Flood_Hazards/MapServer/90")
+    assert P.ARCGIS["plan_1999_plimmerton_farm"][0].endswith("/Porirua_City_District_Plan_1999_Plimmerton_Farm_Zone/FeatureServer/0")
+    assert ov.class_label("pdp_height_controls", {"SpecificControl": "Height Control - Shading C", "HeightControl": "Height limit - 9m",
+                                                  "HIRB": "3m x 45°"}, P) == "Height Control - Shading C; Height limit - 9m; 3m x 45°"
+    assert ov.class_label("pdp_designations", {"Title": "State Highway 1", "ReqAuth": "NZTA", "ID": "D1"}, P) == "State Highway 1"
+    assert ov.class_label("pdp_sites_significance_maori", {"Name": "Taupō Pā", "ID": "S1"}, P) == "Taupō Pā"
+    assert ov.class_label("plan_1999_plimmerton_farm", {}, P) == "Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)"
+    assert ov.class_label("pcc_flood_model_catchments", {"Name": "Titahi Bay"}, P) == "Titahi Bay"
+    Q = {q["id"]: q["sql"] for q in iq.Q_PORIRUA}
+    where = lambda s: s[s.index("FROM units"):]
+    for z in ("High Density Residential Zone", "Medium Density Residential Zone"):
+        assert f"json_extract(zones,'$.\"{z}\"')::DOUBLE >= 90" in where(Q["P1"]), z
+    for c in ("pdp_coastal_erosion_current IS NULL", "pdp_coastal_inundation_current IS NULL", "plan_1999_plimmerton_farm IS NULL", ">= 1"):
+        assert c in where(Q["P2"]), c
+    for c in ("pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"): assert f"{c} IS NOT NULL" in where(Q["P3"]), c
+    root = os.path.join(os.path.dirname(__file__), "..", "service")
+    assert 'os.environ.get("COUNCIL"' in open(os.path.join(root, "fetch_results.py")).read()
+    assert "cat.COUNCIL.LABEL" in open(os.path.join(root, "server.py")).read()
+    K = load("kapiti")
+    assert "615 km2" in K.ABOUT["boundary"] and "KCDC" in K.ABOUT["boundary"] and "Kāpiti Coast District Council" in K.ABOUT["licence_note"]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

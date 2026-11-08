@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 07:25 (Pacific/Auckland)
+Last updated: 2026-11-09 09:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -16,7 +16,8 @@ Standing priorities:
   - T-88: Porirua district run. First run 42499625052 (17 blocks, at b06e418) published 24,110 parcels to `porirua-results`, no failed source; P1 587, P2 426, P3 1,973; flow vs PCC's flood overlays lift 1.8. It included 2,137 road and 19 water parcels that LINZ's primary layer and KCDC's copy don't have; now left out in code (21,954 parcels), to be republished with the review's fixes.
   - T-89 (done 2026-11-09): Twelfth fresh-eyes review (Porirua): five serious findings (Plimmerton Farm under the 1999 plan; flood not mapped in the Horokiri valley; Kāpiti text in Porirua's `about`; tree groups and heritage settings missing; Mana Island and the coastal environment), ten minor. [Findings](docs/findings/2026-11-09-porirua-review.md)
   - T-90 (done 2026-11-09): Twelfth-review fixes, republished (run 42506899575: 21,954 parcels, 93 columns, no failed source).
-  - T-91: Thirteenth fresh-eyes review (Porirua and the per-council code). Started 2026-11-09.
+  - T-91 (done 2026-11-09): Thirteenth fresh-eyes review: data matches live layers city-wide; two suspected serious findings (flood mapping beyond the Horokiri valley and on Mana Island), one confirmed (P2's top row in Plimmerton Farm), eight minor. [Findings](docs/findings/2026-11-09-porirua-review.md#thirteenth-fresh-eyes-review-t-91-9-nov-2026)
+  - T-92: Thirteenth-review fixes (in code 2026-11-09): flood model catchments column, P2 tightened, height labels joined, wording, tests. Rebuild Porirua (about US$1), then a fourteenth review.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.

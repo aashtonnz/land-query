@@ -74,7 +74,7 @@ Q_PORIRUA = [
          question="High or Medium Density Residential parcels of at least 800 m² (that zone over at least 90% of the parcel, no other "
                   "zone over 10%), under 25% covered by PCC's building footprints, 90th-percentile slope under 10°, outside every "
                   "District Plan 2025 flood and coastal hazard overlay. No sewer condition: Porirua's three waters are not used (D-16). "
-                  "Footprints date from 2013–17, so check `unmapped_structure_m2` for newer buildings.",
+                  "PCC's footprints are mostly undated and miss newer buildings, so check `unmapped_structure_m2`.",
          sql=f"""SELECT unit_id, appellation, area_m2, building_m2, unmapped_structure_m2, slope_p90_deg, zones {BASE} {TERRAIN}
                  AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
                       OR json_extract(zones,'$."Medium Density Residential Zone"')::DOUBLE >= 90)
@@ -87,11 +87,16 @@ Q_PORIRUA = [
          sources=["parcels", "zones", "pcc_buildings", "dem_2023", "dsm_2023", *PDP_FLOOD, *PDP_COAST, "pcc_flood_unmapped"]),
     dict(id="P2", name="Coastal hazard with 1 m sea-level rise",
          question="Parcels with buildings that the District Plan 2025 maps in coastal erosion or the 1-in-100-year storm surge "
-                  "with 1 m sea-level rise, but not in the current-day extents.",
+                  "with 1 m sea-level rise (at least 1% of the parcel), but not in the current-day extents; not in the Plimmerton "
+                  "Farm Zone, where the 2025 plan does not apply.",
          sql=f"""SELECT unit_id, appellation, area_m2, building_m2, pdp_coastal_erosion_1m_slr, pdp_coastal_inundation_1m_slr
-                 {BASE} AND building_m2 > 0 AND (pdp_coastal_erosion_1m_slr IS NOT NULL OR pdp_coastal_inundation_1m_slr IS NOT NULL)
-                 AND pdp_coastal_erosion_current IS NULL AND pdp_coastal_inundation_current IS NULL ORDER BY area_m2 DESC""",
-         sources=["parcels", "pcc_buildings", *PDP_COAST]),
+                 {BASE} AND building_m2 > 0
+                 AND (coalesce(json_extract(pdp_coastal_erosion_1m_slr, '$."Coastal erosion with 1 m sea-level rise"')::DOUBLE, 0) >= 1
+                      OR coalesce(json_extract(pdp_coastal_inundation_1m_slr, '$."1-in-100-year storm surge with 1 m sea-level rise"')::DOUBLE, 0) >= 1)
+                 AND pdp_coastal_erosion_current IS NULL AND pdp_coastal_inundation_current IS NULL
+                 AND plan_1999_plimmerton_farm IS NULL   -- the 2025 plan does not apply there (thirteenth review)
+                 ORDER BY area_m2 DESC""",
+         sources=["parcels", "pcc_buildings", *PDP_COAST, "plan_1999_plimmerton_farm"]),
     dict(id="P3", name="Heritage, notable tree or significant natural area on the parcel",
          question="Parcels with a District Plan 2025 heritage item or notable tree point inside or on their boundary, or "
                   "overlapping a notable tree group, heritage setting, heritage item extent, historic heritage site or "

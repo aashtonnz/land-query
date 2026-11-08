@@ -87,3 +87,45 @@ Checked and correct:
     flood overlays has a lift of 1.87.
 
 A thirteenth fresh-eyes review follows, under fresh-eyes review 1.1.
+
+# Thirteenth fresh-eyes review (T-91, 9 Nov 2026)
+
+A new reviewer reviewed `1d01a44..357b58d` (T-90) and the republished Porirua results (run 42506899575).
+
+- **Whole city.** It recomputed all 36 polygon layers for all 21,954 parcels from PCC's and GWRC's live layers. Apart
+  from 4 slivers and two parcels the fetch window cuts, all match. LiDAR values match exactly on 13 of 14 parcels.
+- **Kāpiti.** Kāpiti's service output is byte-identical before and after T-90.
+- **Tests.** It ran 22 mutants.
+
+| # | Finding | Status | Fix |
+| --- | --- | --- | --- |
+| 1 | Mana Island has no flood or coastal erosion and inundation mapping at all, yet its empty values read as "outside the hazard". | Suspected, serious | T-92 (disclosed) |
+| 2 | 48.9 km² of the city (about 300 parcels more than half, including about 115 Medium Density or Mixed Use) lies outside every stormwater model the flood overlays come from, and outside the unmapped area: an empty flood value there may mean never studied. | Suspected, serious | T-92 |
+| 3 | P2's top row was Lot 200 DP 600849, almost all in the Plimmerton Farm Zone, through a 56.5 m² sliver; 54 of its 402 rows had under 1% coverage. | Confirmed, serious | T-92 |
+| 4 | Not every Plimmerton Farm parcel has empty plan columns (edge slivers); the `pdp_*` row said empty always means outside. | Confirmed, minor | T-92 |
+| 5 | P1's question and the `building_m2` row still dated the footprints to 2013–17. | Confirmed, minor | T-92 |
+| 6 | Height controls dropped the height limit: only `SpecificControl` was used. | Confirmed, minor | T-92 |
+| 7 | National grid lines, Ngāti Toa statutory areas, active street frontages and gas stations were neither fetched nor disclosed. | Confirmed, minor | T-92 (disclosed) |
+| 8 | `pcc_flood_unmapped` is understated on two large parcels the fetch window cuts. | Confirmed, minor | T-92 (disclosed for all overlays) |
+| 9 | Counts in `SOURCES.md` had drifted (50, 210). | Confirmed, minor | T-92 |
+| 10 | 16 of 22 mutants survived; refusing another council's results had no test. | Confirmed, minor | T-92 |
+| 11 | Heritage and Māori-site names (such as "House at 4 Kenepuru Drive" and urupā names) are served in internal mode. They are plan items about land, withheld publicly with all PCC columns. | Note | None |
+
+## T-92: fixes (9 Nov 2026)
+
+- **Flood and coastal coverage** (1, 2, 8).
+  - A new Porirua column, `pcc_flood_model_catchments` (PCC's Stormwater Model Catchments, by model name), shows
+    which flood model a parcel lies in. An empty value means outside every model, where an empty flood value may mean
+    never studied. It is pending until the next Porirua rebuild.
+  - `SOURCES.md` and `about` disclose Mana Island's lack of flood and coastal mapping, and that overlays cover only
+    the part of a parcel inside its fetch window.
+- **P2** (3). Rows need at least 1% of the parcel in a sea-level-rise overlay, and none in the Plimmerton Farm Zone.
+- **Wording** (4, 5, 7, 9). The `pdp_*` row names its exceptions; the footprints are "mostly undated"; the layers not
+  used are listed; the counts are 51 and 246.
+- **Height controls** (6). Labelled with all three fields joined, for example "Height Control - Shading C; Height
+  limit - 9m; 3m x 45°".
+- **Tests** (10).
+  - New tests cover Porirua's layers, URLs, class labels and query filters, the service's refusal of another
+    council's results, and the council text in `server.py` and `fetch_results.py`.
+  - Of 12 mutants of the surviving kind, 11 are caught. The twelfth (Porirua's own sources for
+    `buildings_coverage_pct` removed) is equivalent: the mapped Kāpiti rule gives the same sources.
