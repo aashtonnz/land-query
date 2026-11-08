@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 03:20 (Pacific/Auckland)
+Last updated: 2026-11-09 03:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -16,6 +16,7 @@ Standing priorities:
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
+- T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
 - T-24: Second council, Porirua without three waters (D-16; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
