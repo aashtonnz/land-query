@@ -229,6 +229,21 @@ def test_title_references_in_a_precomputed_query_withhold_it():
     assert LandQuery(d, "public").inverse_query("T1")["withheld"] is True
 
 
+def test_a_precomputed_query_ordered_or_filtered_on_a_withheld_column_is_withheld():
+    # the rows' order could reveal title types even if the column is not returned (sixth review, T-70)
+    d = fixture()
+    iq = json.load(open(os.path.join(d, "inverse_queries.json")))
+    iq["queries"].append(dict(id="T2", name="n", question="q", sql="SELECT unit_id FROM units ORDER BY (title_types = 'Life Estate') DESC",
+                              count=1, provenance={"parcels": dict(url="u")}, rows=[dict(unit_id=1, sources={})]))
+    iq["queries"].append(dict(id="T3", name="n", question="q", sql="SELECT unit_id FROM units ORDER BY title_count",
+                              count=1, provenance={"parcels": dict(url="u")}, rows=[dict(unit_id=1, sources={})]))
+    json.dump(iq, open(os.path.join(d, "inverse_queries.json"), "w"))
+    lq = LandQuery(d, "public")
+    assert lq.inverse_query("T2")["withheld"] is True
+    assert lq.inverse_query("T3").get("withheld") is not True
+    assert "1,000 m2" in lq.about()["boundary"]
+
+
 def test_every_column_defined_in_sources_md_is_published():
     p = os.environ.get("LANDQ_RESULTS")
     if not p: print("SKIPPED: set LANDQ_RESULTS to check that no defined column has gone missing"); return

@@ -41,7 +41,33 @@ Checked and correct:
 - **Not recomputed:** flow, sun, horizon, roof, earthworks and wind values.
 - **Not run:** the workflows.
 
-## Pending: what a Kāpiti parcel is
+## What a Kāpiti parcel is (T-69)
 
-Findings 1–4 come from one open question: how to publish a parcel that crosses the district boundary. Three
-reviews have now found problems at that edge. The fix waits on the owner's choice (T-69).
+Findings 1–4 come from one question: how to publish a parcel that crosses the district boundary. The owner chose
+whole parcels (D-18) over publishing only the part inside.
+
+## T-70: fixes (8 Nov 2026)
+
+- **Membership** (1, 2, 7).
+  - Land counts as the district where at least two of three boundaries agree: KCDC's line, KCDC's ward and Stats NZ's
+    district polygon (GWRC's copy). So no single digitising decides.
+  - The sea and islands come from the line's sea loop, without the thin strips where the line alone disagrees on land.
+  - A parcel belongs if its point, or at least 1,000 m² of it, lies inside. There is no share floor any more.
+  - By KCDC's shapes: 27,284 parcels in 44 blocks. 3910395 (17 m² inside by the majority) is dropped; 3836751 and
+    3907637 are kept. Stats NZ's polygon agrees with the ward on 3784322, 4033360 and 3954251, so they are dropped.
+- **Public mode** (3). `about` now says that whole parcels are published, that a few reach far outside the district
+  (the 615 km² forest section), and what their values cover. The share itself stays withheld until T-35.
+- **Extents** (4). `SOURCES.md` now says what each kind of column covers on a parcel crossing the boundary: council
+  layers, the fetch window for terrain and buildings, and the mosaic for catchments. `open_ground_m2` comes from
+  building outlines, so it is present without LiDAR.
+- **Tests** (5).
+  - Synthetic and real-boundary tests pin the majority rule, the sea and the islets (Motungarara), the area floor,
+    and the publishing check's failed and no-coverage sources.
+  - 17 of 17 mutants of the new code are caught, run with bytecode caching off.
+  - The fetch script's own lines (which ward type it asks for) still have no test; a wrong query would fail the
+    outline build or show in the rebuild's counts.
+- **Smaller fixes** (6–10).
+  - A block with results but no `provenance.json` stops publishing.
+  - The fixture holds all three boundaries, simplified to 0.5 m, and says so.
+  - A precomputed query that names a withheld column anywhere in its SQL is withheld.
+  - `kcdc_mirror_vs_linz` counts parcels with LINZ geometry (27,285 of 27,286; one has none), as intended.

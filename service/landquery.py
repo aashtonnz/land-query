@@ -60,6 +60,12 @@ class LandQuery:
                           "Wellington Regional Council as listed per source. In public mode, columns relying on a "
                           "portal-wide licence statement are withheld until confirmed in writing."),
             caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
+            boundary=("Whole parcels are published. A parcel crossing the district boundary is included if its centre "
+                      "point or at least 1,000 m2 of it lies in the district, so a few parcels reach far outside it (one "
+                      "forest section is 615 km2, about 40 km2 of it in the district). Their area and terrain values "
+                      "cover the whole parcel or as much of it as was fetched (coverage_pct); council layers cover what "
+                      "the council maps. district_share_pct gives the share inside; it is withheld in public mode until "
+                      "the council licence is confirmed (T-35)."),
             provenance_available=bool(self.prov))
 
     def describe_columns(self, contains=None):
@@ -142,6 +148,8 @@ class LandQuery:
         # withheld column, or rename one, without returning it (T-52)
         blocked = sorted(k for k in q.get("provenance", {}) if not cat.SOURCES.get(k, {}).get("licence_cleared"))
         blocked += sorted(c for c in used if c in cat.PUBLIC_EXCLUDE)
+        # a withheld column named anywhere in the SQL (a filter or the order) can be read back from the rows (T-70)
+        blocked += sorted(c for c in cat.PUBLIC_EXCLUDE if re.search(rf"\b{c}\b", q.get("sql") or ""))
         if self.audience == "public" and (blocked or not q.get("provenance")):
             return dict(id=q["id"], name=q["name"], withheld=True,
                         reason="draws on sources whose licence is not yet confirmed in writing (T-35)" if blocked else "no source list recorded")

@@ -101,27 +101,34 @@ def district_polygon(lines, sea_x=1735000.0):
     return unary_union(polys) if polys else Polygon()
 
 
-# A parcel belongs to the district if its representative point lies inside, or if a real part of it does: at least 1%
-# and at least 1,000 m², so that slivers where two digitisings of one boundary disagree don't count (T-65). Large rural
-# parcels crossing the boundary were lost under the representative-point rule alone (fifth review).
-MIN_SHARE, MIN_INSIDE_M2 = 0.01, 1000.0
+# A parcel belongs to the district if its representative point lies inside, or if at least 1,000 m² of it does
+# (T-65, T-70). Whole parcels are published (owner, T-69); `district_share_pct` says how much lies inside. An area
+# floor alone: a share floor dropped 1.5-2 ha of district land on large parcels (sixth review).
+MIN_INSIDE_M2 = 1000.0
+SEA_SLIVER_M = 30.0
 
 
-def district_outline(lines, wards):
-    """KCDC's boundary line closed at sea (which takes in the islands and foreshore), joined with KCDC's whole-district
-    ward polygon (which follows the land boundary more closely where the two disagree). Empty if either is missing."""
+def district_outline(lines, wards, stats, sea_x=1735000.0):
+    """The district from three boundaries: KCDC's boundary line closed at sea, KCDC's whole-district ward polygon, and
+    Stats NZ's district polygon. Land counts where at least two of the three agree, so no single digitising decides
+    (T-70). The sea and islands come from the line's sea loop, where neither polygon reaches: thin strips there (up to
+    2 * SEA_SLIVER_M wide) are where the line disagrees with both polygons on land, and are left out. Empty if any of
+    the three is missing."""
     from shapely.geometry import Polygon
     from shapely.ops import unary_union
-    d = district_polygon(lines)
-    if d.is_empty or not wards: return Polygon()
-    return unary_union([d] + list(wards))
+    d = district_polygon(lines, sea_x)
+    if d.is_empty or not wards or not stats: return Polygon()
+    w, g = unary_union(list(wards)), unary_union(list(stats))
+    land = unary_union([d.intersection(w), d.intersection(g), w.intersection(g)])
+    sea = d.difference(w).difference(g).buffer(-SEA_SLIVER_M).buffer(SEA_SLIVER_M)
+    return unary_union([land, sea])
 
 
 def district_share(g, outline):
     """Percent of g inside outline if g belongs to the district, else None."""
     if g.is_empty or not g.area: return None
     inside = g.intersection(outline).area
-    if outline.contains(g.representative_point()) or (inside >= MIN_SHARE * g.area and inside >= MIN_INSIDE_M2):
+    if outline.contains(g.representative_point()) or inside >= MIN_INSIDE_M2:
         return round(100 * inside / g.area, 1)
     return None
 

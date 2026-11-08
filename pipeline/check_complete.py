@@ -30,11 +30,12 @@ def read_blocks(blocks_dir):
                if os.path.exists(os.path.join(d, "units.parquet"))}
     failed, flow_shas = {}, {}
     for d in glob.glob(os.path.join(blocks_dir, "block-*")):
-        pp = os.path.join(d, "provenance.json")
-        if os.path.exists(pp):
-            src = json.load(open(pp))["sources"]; bid = os.path.basename(d).removeprefix("block-")
-            failed[bid] = sorted(k for k, v in src.items() if not v.get("ok", True) and not v.get("no_coverage"))
-            flow_shas[bid] = src.get("district_flow", {}).get("sha256")
+        pp = os.path.join(d, "provenance.json"); bid = os.path.basename(d).removeprefix("block-")
+        if not os.path.exists(pp):  # results without provenance cannot be checked: refuse them (T-70)
+            failed[bid], flow_shas[bid] = ["provenance.json missing"], None; continue
+        src = json.load(open(pp))["sources"]
+        failed[bid] = sorted(k for k, v in src.items() if not v.get("ok", True) and not v.get("no_coverage"))
+        flow_shas[bid] = src.get("district_flow", {}).get("sha256")
     return present, failed, flow_shas
 
 

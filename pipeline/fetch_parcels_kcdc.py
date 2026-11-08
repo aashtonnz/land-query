@@ -26,16 +26,18 @@ feats = arcgis.query_all(URL, dict(geometry=",".join(map(str, te.BLOCK)), geomet
                                    spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193))
 
 # the district: the mirror holds hundreds of parcels in Porirua and Horowhenua (fourth review, T-62), so membership is
-# tested here on every run, against KCDC's boundary line closed at sea joined with its whole-district ward (T-65)
+# tested here on every run, against three boundaries: KCDC's line and ward, and Stats NZ's polygon (T-65, T-70)
 import overlays as ov
 EDGE_URL = URL.rsplit("/", 1)[0] + "/1"
 WARD_URL = "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Comm_Board_Ward_Boundaries_2025/MapServer/1"
 edge = arcgis.query_all(EDGE_URL, dict(where="1=1", outFields="OBJECTID", outSR=2193))
+STATS_URL = "https://mapping.gw.govt.nz/arcgis/rest/services/Region_basemap_P/MapServer/1"  # Stats NZ, served by GWRC
 wards = arcgis.query_all(WARD_URL, dict(where="Type='Māori Ward'", outFields="Ward,Type", outSR=2193))
-district = ov.district_outline([shape(f["geometry"]) for f in edge if f.get("geometry")],
-                               [shape(f["geometry"]) for f in wards if f.get("geometry")])
-if district.is_empty: raise SystemExit("could not build the district outline from KCDC's boundary line and ward")
-outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards), sort_keys=True).encode()
+stats = arcgis.query_all(STATS_URL, dict(where="NAME='Kapiti Coast District'", outFields="NAME", outSR=2193))
+G = lambda fs: [shape(f["geometry"]) for f in fs if f.get("geometry")]
+district = ov.district_outline(G(edge), G(wards), G(stats))
+if district.is_empty: raise SystemExit("could not build the district outline from KCDC's line and ward and Stats NZ's polygon")
+outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards + stats), sort_keys=True).encode()
 mirror_ids = {f["properties"].get("id") for f in feats}
 
 blk = box(*te.BLOCK); kept = []
@@ -94,9 +96,9 @@ prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=linz_er
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
                                   licence="LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)")
 mb = json.dumps(mirror).encode()
-prov["sources"]["district_outline"] = dict(url=[EDGE_URL, WARD_URL], ok=True, features=len(edge) + len(wards),
+prov["sources"]["district_outline"] = dict(url=[EDGE_URL, WARD_URL, STATS_URL], ok=True, features=len(edge) + len(wards) + len(stats),
                                            area_km2=round(district.area / 1e6, 1), sha256=hashlib.sha256(outline_b).hexdigest(),
-                                           fetched=utc_now(), licence=KC_LIC)
+                                           fetched=utc_now(), licence=KC_LIC + "; Stats NZ district polygon, CC BY 4.0, via GWRC")
 prov["sources"]["kcdc_parcels"] = dict(url=URL, ok=True, features=len(mirror["features"]), sha256=hashlib.sha256(mb).hexdigest(),
                                        fetched=utc_now(), licence="LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror")
 json.dump(prov, open(prov_path, "w"), indent=1)

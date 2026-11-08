@@ -332,16 +332,25 @@ def _outline():
     from shapely.geometry import shape
     from overlays import district_outline
     f = json.load(open(os.path.join(os.path.dirname(__file__), "fixtures", "district_outline.json")))
-    return district_outline([shape(g) for g in f["lines"]], [shape(g) for g in f["ward"]])
+    return district_outline([shape(g) for g in f["lines"]], [shape(g) for g in f["ward"]], [shape(g) for g in f["stats"]])
 
 
 def test_real_district_outline_takes_in_kapiti_island_and_land_the_line_misses_but_not_neighbours():
-    # fixture: KCDC's boundary line and its whole-district ward polygon, fetched 8 Nov 2026 (fifth review, T-65)
-    from shapely.geometry import Point
+    # fixture: KCDC's boundary line, its whole-district ward and Stats NZ's polygon, fetched 8 Nov 2026 (T-65, T-70)
+    from shapely.geometry import Point, box
     o = _outline()
     assert 1900e6 < o.area < 1960e6  # land 731 km2 plus the sea loop
     assert o.contains(Point(1759216, 5474823))  # Section 3 Block I Kapiti SD, on Kapiti Island
-    assert o.contains(Point(1779720, 5462958))  # Part Blk III Akatarawa SD: inside the ward, cut by the line
+    assert o.contains(Point(1760145, 5472149)) and o.contains(Point(1761935, 5478818))  # Motungarara islets; a rock off Kapiti Island (neither polygon has them)
+    assert o.contains(Point(1779720, 5462958))  # Part Blk III Akatarawa SD: inside the ward and Stats NZ, cut by the line
+    # Lot 2 DP 10208 (3910395), Upper Hutt side: only the line puts land of it inside (sixth review): under 100 m2 here
+    near = box(1790000, 5455000, 1800000, 5470000)
+    import json
+    from shapely.geometry import shape
+    f = json.load(open(os.path.join(os.path.dirname(__file__), "fixtures", "district_outline.json")))
+    w, s = shape(f["ward"][0]), shape(f["stats"][0])
+    land = o.intersection(near)
+    assert land.difference(w).difference(s).area < 2000  # no land that both polygons leave out (only sea-loop rounding)
     for p in [(1758500, 5449000), (1790000, 5500000), (1790000, 5445000)]:  # Pukerua Bay (Porirua), Levin, Upper Hutt side
         assert not o.contains(Point(*p)), p
 
@@ -353,14 +362,31 @@ def test_parcel_belongs_to_the_district_by_its_point_or_a_real_part_of_it():
     def f(i, g): return dict(properties=dict(id=i, appellation=str(i)), geometry=g.__geo_interface__)
     parcels = [f(1, box(100, 100, 200, 200)),        # inside
                f(2, box(700, 0, 1700, 1000)),        # 30% inside, point outside: kept
-               f(3, box(995, 0, 1995, 1000)),        # 0.5% (5,000 m2) inside: too small a share
-               f(4, box(999.5, 0, 1019.5, 100)),     # 2.5% but 50 m2 inside: a digitising sliver
-               f(5, box(2000, 0, 2100, 100))]        # outside
+               f(3, box(998, 0, 10998, 1000)),       # 2,000 m2 inside, 0.02% of the parcel: kept (an area floor only)
+               f(4, box(999.5, 0, 1019.5, 100)),     # 50 m2 inside: a digitising sliver
+               f(5, box(2000, 0, 2100, 100)),        # outside
+               f(6, box(999.05, 0, 1099.05, 1000))]  # 950 m2 inside: just under the floor
     inside, outside = ov.split_by_district(parcels, district)
-    assert [p["properties"]["id"] for p in inside] == [1, 2]
-    assert [p["properties"]["district_share_pct"] for p in inside] == [100.0, 30.0]
-    assert [o["id"] for o in outside] == [3, 4, 5]
-    assert ov.district_share(box(990, 0, 1090, 20), district) is None  # 10% but 200 m2
+    assert [p["properties"]["id"] for p in inside] == [1, 2, 3]
+    assert [p["properties"]["district_share_pct"] for p in inside] == [100.0, 30.0, 0.0]
+    assert [o["id"] for o in outside] == [4, 5, 6]
+    assert ov.district_share(box(990, 0, 1090, 20), district) is None  # 200 m2
+
+
+
+def test_district_land_is_where_two_of_three_boundaries_agree_and_the_sea_comes_from_the_line():
+    from shapely.geometry import LineString, Point, box
+    import overlays as ov
+    # the line runs round land x 0..1000 (open on the coast at x=0) and closes at sea (sea_x); the ward reaches
+    # 60 m further east than the line, Stats NZ 20 m further, and only the line takes in a 40 m strip in the south
+    line = [LineString([(0, 1000), (1000, 1000)]), LineString([(1000, 1000), (1000, -40), (0, -40)])]
+    ward, stats = [box(0, 0, 1060, 1000)], [box(0, 0, 1020, 1000)]
+    o = ov.district_outline(line, ward, stats, sea_x=-5000)
+    assert o.contains(Point(500, 500)) and o.contains(Point(-3000, 500))     # land all three agree on; the sea
+    assert o.contains(Point(1010, 500))                                      # ward and Stats NZ agree: land
+    assert not o.contains(Point(1040, 500))                                  # the ward alone
+    assert not o.contains(Point(500, -20))                                   # the line alone, a 40 m strip on land
+    assert ov.district_outline(line, [], stats).is_empty and ov.district_outline(line, ward, []).is_empty
 
 
 def test_linz_parcels_missing_from_the_mirror_are_counted_once_and_only_in_the_district():
@@ -417,12 +443,16 @@ def test_publishing_reads_each_blocks_flow_grid_and_refuses_a_block_without_one(
         os.makedirs(os.path.join(d, "block-" + b))
         open(os.path.join(d, "block-" + b, "units.parquet"), "w").close()
         src = {"district_flow": {"sha256": sha}} if sha else {}
+        if b == "1_1": src.update(dem_2025=dict(ok=False, no_coverage=True), zones=dict(ok=False, error="x"), ww_node=dict(ok=True))
         json.dump({"sources": src}, open(os.path.join(d, "block-" + b, "provenance.json"), "w"))
+    os.makedirs(os.path.join(d, "block-4_4")); open(os.path.join(d, "block-4_4", "units.parquet"), "w").close()  # no provenance
     present, failed, shas = cc.read_blocks(d)
-    assert present == {"1_1", "2_2", "3_3"} and shas == {"1_1": "a", "2_2": "b", "3_3": None}
-    planned = [dict(xmin=x, ymin=x) for x in (1, 2, 3)]
-    p = " ".join(cc.problems(planned, present, "", 3, failed, shas))
-    assert "1 blocks have no district-flow record" in p and "2 different district-flow grids" in p
+    assert present == {"1_1", "2_2", "3_3", "4_4"} and shas == {"1_1": "a", "2_2": "b", "3_3": None, "4_4": None}
+    assert failed == {"1_1": ["zones"], "2_2": [], "3_3": [], "4_4": ["provenance.json missing"]}  # no coverage is not a failure
+    planned = [dict(xmin=x, ymin=x) for x in (1, 2, 3, 4)]
+    p = " ".join(cc.problems(planned, present, "", 4, failed, shas))
+    assert "2 blocks have no district-flow record" in p and "2 different district-flow grids" in p
+    assert "2 blocks have failed sources" in p and "provenance.json missing" in p
 
 
 def test_every_column_built_on_lidar_lists_the_sea_mask_and_the_share_lists_the_outline():
