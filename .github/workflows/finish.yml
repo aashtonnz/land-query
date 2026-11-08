@@ -35,7 +35,7 @@ jobs:
           mkdir -p district && cd pipeline && python3 finish.py ../in/results ../district | tee ../district/finish_log.txt
       - name: Check the query service and the publishing rules (T-36, T-76)
         run: |
-          python3 pipeline/test_finish.py
+          COUNCIL=kapiti python3 pipeline/test_finish.py   # Kāpiti fixtures; it also runs a Porirua case itself
           LANDQ_RESULTS=district python3 service/test_service.py
       - name: Push results to the council's results branch
         run: |
