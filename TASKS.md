@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 22:50 (Pacific/Auckland)
+Last updated: 2026-11-09 00:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -13,6 +13,7 @@ Standing priorities:
 - T-80: Rebuild with the T-79 fixes (about US$2.20), then a tenth fresh-eyes review. Blocked 2026-11-08: GitHub refused to start any job (run 42465448647), so the Actions budget is used up again; waiting on the owner. The T-79 code is merged; the published results are still T-77's.
 
 ## Waiting on you
+- T-81: Building values where KCDC's outlines miss houses (tenth review). A LiDAR test can't tell roofs from trees well enough: 62% of buildings found with T-79's smoothness test, 90% with a plane fit that also flags many trees. Choose: (a) keep the outlines as the basis, say so plainly, and add the LiDAR check as a separate warning column (recommended); or (b) keep emptying values where the check fires. Raised 2026-11-08.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)

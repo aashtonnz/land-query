@@ -116,20 +116,27 @@ def ground_clear(dsm, dem, clear_m=CLEAR_M):
         return (dsm - dem) <= clear_m
 
 
-def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.35):
-    """Cells of building-like structures that no 2021 outline covers (T-79): 2.5-15 m above the ground, with a smooth
-    surface (3 x 3 standard deviation of the DSM under 0.35 m, which tree crowns exceed), at least 3 m wide (an opening
-    removes the strips where a roof overhangs its outline), and more than 2 m from any outline. KCDC's outlines miss
-    some houses, even inside the area they cover (ninth review)."""
-    from scipy.ndimage import uniform_filter, binary_opening, binary_dilation
+def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.2, k=3):
+    """Cells of building-like structures that no 2021 outline covers (T-79, T-81): 2.5-15 m above the ground, on a
+    surface that is locally a plane (a 3 x 3 plane fit leaves a residual under 0.2 m, so pitched roofs pass and tree
+    crowns don't), at least 3 m wide (an opening removes the strips where a roof overhangs its outline), and more
+    than 2 m from any outline. The interior found is then grown back by one cell, over cells still 2.5-15 m up, to
+    give the footprint. KCDC's outlines miss some houses, even inside the area they cover (ninth review); the
+    smoothness test used first (T-79) rejected roofs steeper than about 23 degrees (tenth review)."""
+    from scipy.ndimage import uniform_filter, correlate, binary_opening, binary_dilation
     with np.errstate(invalid="ignore"):
         nd = dsm - dem
         d = np.where(np.isfinite(dsm), dsm, 0).astype(np.float64)
-        m1 = uniform_filter(d, 3, mode="nearest"); m2 = uniform_filter(d * d, 3, mode="nearest")
-        sd = np.sqrt(np.clip(m2 - m1 * m1, 0, None))
-        cand = (nd > low) & (nd < high) & (sd < rough) & np.isfinite(nd)
-    cand &= ~binary_dilation(outlines, iterations=2)
-    return binary_opening(cand, structure=np.ones((3, 3), bool))
+        n = k * k; h = k // 2; xs = np.arange(-h, h + 1, dtype=float); sxx = k * float((xs * xs).sum())
+        m1 = uniform_filter(d, k, mode="nearest"); m2 = uniform_filter(d * d, k, mode="nearest")
+        kx = np.tile(xs, (k, 1))
+        sx = correlate(d, kx, mode="nearest"); sy = correlate(d, kx.T, mode="nearest")
+        rss = n * (m2 - m1 * m1) - (sx * sx + sy * sy) / sxx   # residual of z = a + b x + c y over the k x k cells
+        resid = np.sqrt(np.clip(rss, 0, None) / n)
+        tall = (nd > low) & (nd < high) & np.isfinite(nd)
+    near = binary_dilation(outlines, iterations=2)
+    core = binary_opening(tall & (resid < rough) & ~near, structure=np.ones((3, 3), bool))
+    return binary_dilation(core, structure=np.ones((3, 3), bool)) & tall & ~near
 
 
 def largest_structure_m2(mask, cell_m2=1.0):

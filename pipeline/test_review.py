@@ -539,8 +539,12 @@ def test_unmapped_houses_on_the_lidar_empty_the_building_values():
     dsm[5:9, 40:58] = 4.0                                   # a 4 m wide, flat-topped hedge: 2 m wide once its rough edges go
     dsm[20:25, 40:45] = 20.0                                # a 20 m mast or tower (over 15 m)
     u = M.unmapped_structures(dsm, dem, out)
-    assert u[6:14, 6:16].all() and not u[25:, :].any() and not u[:20, 30:].any() and not u[18:27, 38:47].any()
-    assert M.largest_structure_m2(u) == 80  # the roof's interior: its edge cells are rough (the step to the ground)
+    assert u[5:15, 5:17].all() and not u[25:, :].any() and not u[:20, 30:].any() and not u[18:27, 38:47].any()
+    assert M.largest_structure_m2(u) == 120  # the whole roof: the interior found, grown back by its rim (T-81)
+    for pitch in (10, 25, 35):                # a gable roof of any common pitch (the T-79 test missed those over 23 degrees)
+        g = np.zeros((40, 40)); t = np.tan(np.radians(pitch))
+        for i in range(10, 22): g[i, 10:24] = 3 + (6 - abs(i - 15.5)) * t
+        assert M.largest_structure_m2(M.unmapped_structures(g, np.zeros((40, 40)), np.zeros((40, 40), bool))) >= 100, pitch
     d = np.zeros((6, 6), bool); d[0:2, 0:2] = True; d[2:4, 2:4] = True   # two patches touching at a corner
     assert M.largest_structure_m2(d) == 8 and M.largest_structure_m2(np.zeros((3, 3), bool)) == 0
     full = {k: 7 for k in ov.BUILDING_COLUMNS}

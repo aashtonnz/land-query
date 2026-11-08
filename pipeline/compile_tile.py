@@ -319,10 +319,9 @@ for uid, (g, p) in enumerate(units):
                  roof_solar_rel_pct=round(100 * float(ir.mean()) / IRR_FLAT, 1) if ir.size and IRR_FLAT else None)
         a, tr_, st = ACC[rs, cs][m], ACC_TRUNC[rs, cs][m], STEP[rs, cs][m]
         fin = np.isfinite(a)
-        if fin.any():
-            k_ = int(np.nanargmax(np.where(fin, a, -1)))
-            r.update(upslope_area_max_m2=round(float(a[k_]), 0),  # unknown, not "complete", on a parcel only partly in LiDAR (T-79)
-                     upslope_area_truncated=bool(tr_[k_]) or (None if r.get("lidar_coverage_pct", 0) < 99 else False),
+        if fin.any() and r.get("lidar_coverage_pct", 0) >= 99:  # on a parcel only partly in LiDAR, a part's flow is not the
+            k_ = int(np.nanargmax(np.where(fin, a, -1)))      # parcel's: empty, not "2 m2" or "no flow path" (T-79, T-81)
+            r.update(upslope_area_max_m2=round(float(a[k_]), 0), upslope_area_truncated=bool(tr_[k_]),
                      flow_path_m=round(float(np.nansum(st[fin & (a >= 2000)])), 1))
         else: r.update(upslope_area_max_m2=None, upslope_area_truncated=None, flow_path_m=None)
         zo = Zw[og]
