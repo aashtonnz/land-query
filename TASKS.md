@@ -1,16 +1,16 @@
 # Tasks
 
-Last updated: 2026-11-08 22:40 (Pacific/Auckland)
+Last updated: 2026-11-08 22:50 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (D-14). November: the US$20 budget was reached during T-63 although my running total said about US$15, so the total undercounts (likely storage, or minutes rounded up per job); the owner raised the budget on 8 Nov. Check GitHub's billing page, not the estimate, before the next paid run.
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14). November: the US$20 budget was reached during T-63 although my running total said about US$15, so the total undercounts (likely storage, or minutes rounded up per job); the owner raised the budget on 8 Nov. Since then: five full rebuilds (T-63 merge, T-66, T-71, T-74, T-77), about US$11; the budget was reached again at T-80. Check GitHub's billing page, not the estimate, before the next paid run.
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-80: Rebuild with the T-79 fixes (about US$2.20), then a tenth fresh-eyes review (fresh-eyes review 1.1). Started 2026-11-08.
+- T-80: Rebuild with the T-79 fixes (about US$2.20), then a tenth fresh-eyes review. Blocked 2026-11-08: GitHub refused to start any job (run 42465448647), so the Actions budget is used up again; waiting on the owner. The T-79 code is merged; the published results are still T-77's.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
