@@ -293,6 +293,15 @@ def test_partial_runs_with_failed_sources_are_refused():
     assert problems(planned, {"1_2"}, "", 1, {"1_2": ["nonprimary_parcels"]})
 
 
+def test_district_outline_closes_an_open_coastal_boundary_at_sea():
+    from shapely.geometry import LineString, Point
+    from overlays import district_polygon
+    # an inland boundary from the coast at (100, 0) round to the coast at (100, 100), open along the coast (x = 100)
+    d = district_polygon([LineString([(100, 0), (300, 0), (300, 50)]), LineString([(300, 50), (300, 100), (100, 100)])], sea_x=-50)
+    assert d.contains(Point(200, 50)) and d.contains(Point(0, 50)) and not d.contains(Point(400, 50))
+    assert d.is_empty is False and district_polygon([LineString([(0, 0), (1, 1)]), LineString([(5, 5), (6, 6)])]).is_empty
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

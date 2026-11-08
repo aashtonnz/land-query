@@ -59,8 +59,32 @@ def stac(url):
     return dict(items=sum(1 for l in j.get("links", []) if l.get("rel") == "item"), sha256=hashlib.sha256(t.encode()).hexdigest())
 
 
+def mirror_gap():
+    """LINZ primary parcels inside the district (representative point within KCDC's boundary, closed at sea) that KCDC's
+    mirror lacks, by parcel intent, with examples (T-60). Needs LINZ_API_KEY."""
+    import linz
+    from collections import Counter
+    from shapely.geometry import shape
+    from overlays import district_polygon
+    import arcgis as ag
+    if not linz.KEY: return None
+    edge = ag.query_all(EXTRA["district_boundary"], dict(where="1=1", outFields="OBJECTID", outSR=2193))
+    district = district_polygon([shape(f["geometry"]) for f in edge if f.get("geometry")])
+    mirror = {f["properties"].get("id") for f in ag.query_all(EXTRA["parcels_mirror"], dict(where="1=1", outFields="id", outSR=2193, returnGeometry="false"))}
+    gap = []
+    for f in linz.wfs(50823, DISTRICT):
+        if not f.get("geometry") or f["properties"].get("id") in mirror: continue
+        if district.contains(shape(f["geometry"]).representative_point()):
+            gap.append(dict(id=f["properties"].get("id"), appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
+    return dict(count=len(gap), by_intent=dict(Counter(g["intent"] for g in gap).most_common()), examples=gap[:30], mirror=len(mirror))
+
+
 def snapshot():
     out = {}
+    try:
+        g = mirror_gap()
+        if g is not None: out["linz_not_in_mirror"] = dict(kind="gap", **g)
+    except Exception as e: out["linz_not_in_mirror"] = dict(kind="gap", error=str(e)[:200])
     for name, (url, _) in list(ARCGIS.items()) + [(k, (v, None)) for k, v in EXTRA.items()]:
         try: out[name] = dict(kind="arcgis", url=url, **arcgis(url))
         except Exception as e: out[name] = dict(kind="arcgis", url=url, error=str(e)[:200])

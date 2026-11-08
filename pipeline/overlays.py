@@ -79,3 +79,23 @@ def largest_diameter(p):
 def as_int(v):
     """A whole number stored as a float (1964.0) as an integer; anything else unchanged."""
     return int(v) if isinstance(v, float) and v.is_integer() else v
+
+
+def district_polygon(lines, sea_x=1735000.0):
+    """The district's area from KCDC's boundary line, which is open along the coast: its two loose ends are joined by a
+    loop out to sea (west of Kapiti Island), and the closed ring becomes a polygon (T-60). Returns an empty polygon if
+    the line does not have exactly two loose ends."""
+    from collections import Counter
+    from shapely.geometry import LineString, Polygon
+    from shapely.ops import linemerge, polygonize, unary_union
+    merged = linemerge(unary_union(lines))
+    parts = list(merged.geoms) if merged.geom_type == "MultiLineString" else [merged]
+    ends = Counter()
+    for l in parts:
+        ends[l.coords[0]] += 1; ends[l.coords[-1]] += 1
+    loose = [pt for pt, n in ends.items() if n == 1]
+    if len(loose) != 2: return Polygon()
+    (x0, y0), (x1, y1) = loose
+    sea = LineString([(x0, y0), (sea_x, y0), (sea_x, y1), (x1, y1)])
+    polys = list(polygonize(unary_union(parts + [sea])))
+    return unary_union(polys) if polys else Polygon()

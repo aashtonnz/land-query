@@ -51,14 +51,15 @@ kept = units
 # parcels, railway parcels, or the mirror lagging. Counted and listed for QA, not compiled (T-59).
 missing = []
 if by_id:
-    from shapely.ops import polygonize, unary_union
+    from overlays import district_polygon
     edge = arcgis.query_all(URL.rsplit("/", 1)[0] + "/1", dict(where="1=1", outFields="OBJECTID", outSR=2193))
-    district = unary_union(list(polygonize(unary_union([shape(f["geometry"]) for f in edge if f.get("geometry")]))))
+    district = district_polygon([shape(f["geometry"]) for f in edge if f.get("geometry")])
+    if district.is_empty: raise SystemExit("could not build the district outline from KCDC's boundary line")
     have = {f["properties"].get("id") for f in kept}
     for i, f in by_id.items():
         if i in have: continue
         p = shape(f["geometry"]).representative_point()
-        if (blk.contains(p) or blk.touches(p)) and (district.is_empty or district.contains(p)):
+        if (blk.contains(p) or blk.touches(p)) and district.contains(p):
             missing.append(dict(id=i, appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
 from_linz = sum(1 for f in kept if f["properties"]["geometry_source"] == "LINZ")
 fc = dict(type="FeatureCollection", features=kept)
