@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-08T01:40:52+00:00",
+ "checked": "2026-11-08T01:44:15+00:00",
  "sources": {
   "buildings_2021": {
    "count": 50623,
@@ -272,8 +272,165 @@
    "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10"
   },
   "linz_not_in_mirror": {
-   "error": "No module named 'shapely'",
-   "kind": "gap"
+   "by_intent": {
+    "Fee Simple Title": 2,
+    "Railway": 70
+   },
+   "count": 72,
+   "examples": [
+    {
+     "appellation": "Part Paekakariki 1E Block",
+     "id": 3792079,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Part Paekakariki 2A2 Block",
+     "id": 4041122,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4066933,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4066978,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4066997,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067001,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Part Totaranui 11F Block",
+     "id": 4067058,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067084,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067114,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067150,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067160,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Part Muaupoko 2 Block",
+     "id": 4067216,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067236,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067261,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067268,
+     "intent": "Railway"
+    },
+    {
+     "appellation": null,
+     "id": 4067287,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Part I Waopukatea Block",
+     "id": 7128085,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Part Ngakororo 3D Block",
+     "id": 7128086,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 1 SO 429649",
+     "id": 7238270,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 16 SO 427118",
+     "id": 7257692,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 1 SO 442372",
+     "id": 7323384,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 2 SO 442372",
+     "id": 7323385,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 3 SO 442372",
+     "id": 7323386,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 4 SO 442372",
+     "id": 7323387,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 1 SO 442373",
+     "id": 7337772,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 2 SO 442373",
+     "id": 7337773,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 4 SO 442373",
+     "id": 7337775,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 5 SO 442373",
+     "id": 7337776,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 6 SO 442373",
+     "id": 7337777,
+     "intent": "Railway"
+    },
+    {
+     "appellation": "Section 2 SO 437319",
+     "id": 7367597,
+     "intent": "Railway"
+    }
+   ],
+   "kind": "gap",
+   "mirror": 27614
   },
   "linz_parcels": {
    "count": 32537,
