@@ -51,7 +51,7 @@ class LandQuery:
 
     # ---- descriptions ----
     def about(self):
-        n = self.db.execute("SELECT count(*) FROM units").fetchone()[0]
+        n = self._run("SELECT count(*) FROM units", [])[0][0]  # under the lock like every query (T-62)
         return dict(
             dataset="Kāpiti Coast District parcels, compiled from public LINZ, KCDC and GWRC sources",
             run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),

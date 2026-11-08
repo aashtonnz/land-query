@@ -34,6 +34,7 @@ def load(name):
 unit_src = "parcels" if os.path.exists(os.path.join(RAW, "parcels.geojson")) else "buildings_2021"
 units = load(unit_src)
 print("unit source:", unit_src, len(units))
+if not units: raise SystemExit("no parcels in this block's part of the district: remove the block from kapiti_blocks.json (T-62)")
 
 poly_layers = ["zones", "ovl_flood_hazard", "ovl_ecological_sites", "ovl_noise_corridor", "ovl_coastal_env",
                "flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
@@ -230,7 +231,8 @@ for uid, (g, p) in enumerate(units):
     pid = p.get("id") or p.get("ID")
     if pid is None: raise SystemExit(f"parcel {uid} has no id: refusing to invent one")
     r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,
-             geometry_source=p.get("geometry_source") or "KCDC mirror", appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
+             geometry_source=p.get("geometry_source") or "KCDC mirror", district_share_pct=p.get("district_share_pct"),
+             appellation=p.get("appellation"), titles=p.get("titles"), parcel_intent=p.get("parcel_intent"),
              survey_area_m2=p.get("survey_area"), area_m2=round(g.area, 1),
              # location for area queries (NZTM2000): a point inside the parcel, and its bounding box (T-36)
              rep_x=round(g.representative_point().x, 1), rep_y=round(g.representative_point().y, 1),

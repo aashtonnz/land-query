@@ -151,13 +151,14 @@ def lidar_parcel_stats(z, sea, inside_frac, open_ground, slope, canopy, dz, clea
     inside_frac is the share of the parcel inside the LiDAR window (T-49, T-59)."""
     n = int(np.isfinite(z).sum())
     if n == 0:
-        return dict(lidar_coverage_pct=0.0 if z.size else 0.0, open_ground_slope_lt5_m2=None, canopy_gt3m_open_pct=None,
+        return dict(lidar_coverage_pct=0.0, open_ground_slope_lt5_m2=None, canopy_gt3m_open_pct=None,
                     dz_2021_2025_clear_pct=None, dz_2021_2025_clear_mean_m=None)
     og = open_ground & np.isfinite(z)
     both = np.isfinite(dz)                       # cells with 2021 and 2025 ground
     c = both & clear
     return dict(
-        lidar_coverage_pct=round(100 * float((np.isfinite(z) | sea).sum()) / z.size * inside_frac, 1),
+        # never shown as 0 when the parcel has LiDAR cells (T-62: two large parcels with a few cells rounded to 0.0)
+        lidar_coverage_pct=max(0.1, round(100 * float((np.isfinite(z) | sea).sum()) / z.size * inside_frac, 1)),
         open_ground_slope_lt5_m2=int((og & (slope < 5)).sum()),
         canopy_gt3m_open_pct=round(100 * float((canopy & og).sum()) / og.sum(), 1) if og.any() else None,
         dz_2021_2025_clear_pct=round(100 * float(c.sum()) / both.sum(), 1) if both.any() else None,

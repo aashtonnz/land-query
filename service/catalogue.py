@@ -19,6 +19,7 @@ P = ["parcels"]
 COLUMN_SOURCES = [
     (r"(unit_id|appellation|parcel_intent|survey_area_m2|titles|geometry_source|unit_source|area_m2|coverage_pct|rep_[xy]|bbox_\w+)", P),
     (r"block_id", []),
+    (r"district_share_pct", P + ["district_boundary"]),
     (r"title_count", P),  # counted from the parcel's own titles field
     (r"title_types", P + ["titles"]),
     (r"easements_n|land_covenants_n", P + ["nonprimary_parcels"]),
@@ -83,9 +84,16 @@ def load(path=os.path.join(ROOT, "SOURCES.md")):
 SOURCES, _COLUMNS = load()
 
 
+LIDAR = {"dem_2025", "dsm_2025", "dem_2021"}
+
+
 def column_sources(col):
     for pat, src in COLUMN_SOURCES:
-        if re.fullmatch(pat, col): return [col] + P if src is None else list(src)
+        if re.fullmatch(pat, col):
+            out = [col] + P if src is None else list(src)
+            # every LiDAR surface is masked by the district grid's sea before use (T-59, T-62)
+            if LIDAR & set(out) and "sea_mask" not in out: out.append("sea_mask")
+            return out
     return None
 
 

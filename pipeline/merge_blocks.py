@@ -20,6 +20,8 @@ for d in dirs:
     ps = p["sources"].get("parcels", {})
     blocks.append(dict(block=p.get("block"), fetch_bbox=p.get("fetch_bbox"), parcels=ps.get("features"), commit=p.get("commit"),
                        linz_not_in_mirror=ps.get("linz_not_in_mirror"), linz_not_in_mirror_examples=ps.get("linz_not_in_mirror_examples"),
+                       outside_district=ps.get("outside_district"), outside_district_examples=ps.get("outside_district_examples"),
+                       district_flow_sha256=p["sources"].get("district_flow", {}).get("sha256"),
                        failed_sources=failed, no_coverage=no_cov, qa=qa))
     provs.append(p)
 prov = merge_sources(provs)
@@ -47,6 +49,7 @@ n, nl, part = db.execute("SELECT count(*), count(*) FILTER (WHERE lidar_cells = 
 open(os.path.join(OUT, "commits.txt"), "w").write(", ".join(sorted({b["commit"] or "unknown" for b in blocks})))  # for RUN.txt (T-59)
 qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks if b["failed_sources"]),
           linz_not_in_mirror=sum(b["linz_not_in_mirror"] or 0 for b in blocks),
+          outside_district_dropped=sum(b.get("outside_district") or 0 for b in blocks),
           blocks_outside_lidar=sum(1 for b in blocks if b["no_coverage"]), parcels=n,
           duplicates_removed=dups, parcels_without_lidar=nl, parcels_partly_outside_window=part,
           ww_manhole_cover_minus_lidar_m=pooled("ww_manhole_cover_minus_lidar_m"),

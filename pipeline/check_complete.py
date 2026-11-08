@@ -7,9 +7,12 @@ block's results are missing.
 import glob, json, os, sys
 
 
-def problems(planned, present, only, district_blocks, failed=None):
-    """failed: {block id: [source keys that failed]} from each block's provenance (T-59)."""
+def problems(planned, present, only, district_blocks, failed=None, flow_shas=None):
+    """failed: {block id: [source keys that failed]}; flow_shas: {block id: district-flow sha256}, from each block's
+    provenance (T-59, T-62: a patch run must not mix district-flow grids)."""
     out = []
+    shas = {v for v in (flow_shas or {}).values() if v}
+    if len(shas) > 1: out.append(f"blocks used {len(shas)} different district-flow grids")
     bad = {b: f for b, f in (failed or {}).items() if f}
     if bad: out.append(f"{len(bad)} blocks have failed sources, which would publish as empty or 0: " + "; ".join(f"{b}: {', '.join(f)}" for b, f in sorted(bad.items())[:10]))
     if only.strip(): out.append(f"run limited to blocks {only!r}: not published as the district")
@@ -23,12 +26,13 @@ if __name__ == "__main__":
     planned = json.loads(sys.argv[1])
     present = {os.path.basename(d).removeprefix("block-") for d in glob.glob(os.path.join(sys.argv[2], "block-*"))
                if os.path.exists(os.path.join(d, "units.parquet"))}
-    failed = {}
+    failed, flow_shas = {}, {}
     for d in glob.glob(os.path.join(sys.argv[2], "block-*")):
         pp = os.path.join(d, "provenance.json")
         if os.path.exists(pp):
-            src = json.load(open(pp))["sources"]
-            failed[os.path.basename(d).removeprefix("block-")] = sorted(k for k, v in src.items() if not v.get("ok", True) and not v.get("no_coverage"))
-    p = problems(planned, present, sys.argv[3], int(sys.argv[4]), failed)
+            src = json.load(open(pp))["sources"]; bid = os.path.basename(d).removeprefix("block-")
+            failed[bid] = sorted(k for k, v in src.items() if not v.get("ok", True) and not v.get("no_coverage"))
+            flow_shas[bid] = src.get("district_flow", {}).get("sha256")
+    p = problems(planned, present, sys.argv[3], int(sys.argv[4]), failed, flow_shas)
     for x in p: print("NOT PUBLISHED:", x)
     sys.exit(1 if p else 0)

@@ -45,7 +45,7 @@ def arcgis(url):
 
 def linz(layer):
     key = os.environ.get("LINZ_API_KEY")
-    if not key: return None
+    if not key: raise RuntimeError("LINZ_API_KEY not set: LINZ layers not checked")  # flagged weekly, not silent (T-62)
     b = f"{DISTRICT[1]},{DISTRICT[0]},{DISTRICT[3]},{DISTRICT[2]},urn:ogc:def:crs:EPSG::2193"
     r = get(f"https://data.linz.govt.nz/services;key={key}/wfs", service="WFS", version="2.0.0", request="GetFeature",
             typeNames=f"layer-{layer}", bbox=b, resultType="hits")
@@ -91,8 +91,7 @@ def snapshot():
         except Exception as e: out[name] = dict(kind="arcgis", url=url, error=str(e)[:200])
     for name, lid in LINZ.items():
         try:
-            v = linz(lid)
-            if v is not None: out[name] = dict(kind="linz", layer=lid, **v)
+            out[name] = dict(kind="linz", layer=lid, **linz(lid))
         except Exception as e: out[name] = dict(kind="linz", layer=lid, error=str(e)[:200])
     for name, url in STAC.items():
         try: out[name] = dict(kind="stac", url=url, **stac(url))

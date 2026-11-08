@@ -24,6 +24,14 @@ t0 = time.time()
 feats = arcgis.query_all(URL, dict(geometry=",".join(map(str, te.BLOCK)), geometryType="esriGeometryEnvelope", inSR=2193,
                                    spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193))
 
+# the district, from KCDC's boundary line closed at sea: the mirror is NOT clipped to it, and holds hundreds of parcels in
+# Porirua and Horowhenua (fourth review, T-62), so membership is tested here on every run
+from overlays import district_polygon
+edge = arcgis.query_all(URL.rsplit("/", 1)[0] + "/1", dict(where="1=1", outFields="OBJECTID", outSR=2193))
+district = district_polygon([shape(f["geometry"]) for f in edge if f.get("geometry")])
+if district.is_empty: raise SystemExit("could not build the district outline from KCDC's boundary line")
+mirror_ids = {f["properties"].get("id") for f in feats}
+
 blk = box(*te.BLOCK); kept = []
 for f in feats:
     if not f.get("geometry"): continue
@@ -51,16 +59,21 @@ kept = units
 # parcels, railway parcels, or the mirror lagging. Counted and listed for QA, not compiled (T-59).
 missing = []
 if by_id:
-    from overlays import district_polygon
-    edge = arcgis.query_all(URL.rsplit("/", 1)[0] + "/1", dict(where="1=1", outFields="OBJECTID", outSR=2193))
-    district = district_polygon([shape(f["geometry"]) for f in edge if f.get("geometry")])
-    if district.is_empty: raise SystemExit("could not build the district outline from KCDC's boundary line")
-    have = {f["properties"].get("id") for f in kept}
     for i, f in by_id.items():
-        if i in have: continue
+        if i in mirror_ids: continue  # in the mirror, whichever block it was assigned to (T-62)
         p = shape(f["geometry"]).representative_point()
         if (blk.contains(p) or blk.touches(p)) and district.contains(p):
             missing.append(dict(id=i, appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
+# keep a parcel only if its representative point lies in the district; record the share of it inside (T-62)
+inside, outside = [], []
+for f in kept:
+    g = shape(f["geometry"])
+    if district.contains(g.representative_point()):
+        f["properties"]["district_share_pct"] = round(100 * g.intersection(district).area / g.area, 1) if g.area else None
+        inside.append(f)
+    else:
+        outside.append(dict(id=f["properties"].get("id"), appellation=f["properties"].get("appellation")))
+kept = inside
 from_linz = sum(1 for f in kept if f["properties"]["geometry_source"] == "LINZ")
 fc = dict(type="FeatureCollection", features=kept)
 b = json.dumps(fc).encode()
@@ -80,9 +93,11 @@ prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path)) if os.path.exists(prov_path) else {"sources": {}}
 prov.update(block=list(te.BLOCK), block_id=te.BLOCK_ID, fetch_bbox=win)
 prov.update(commit=os.environ.get("GITHUB_SHA"))  # the commit this block was compiled at (T-59)
+if linz.KEY and kept and not from_linz and not linz_err: linz_err = "LINZ returned none of the block's parcels"  # T-62
 prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=linz_err is None, features=len(kept),
                                   from_linz=from_linz, from_mirror=len(kept) - from_linz, linz_error=linz_err,
                                   linz_not_in_mirror=len(missing), linz_not_in_mirror_examples=missing[:20],
+                                  outside_district=len(outside), outside_district_examples=outside[:20],
                                   membership=URL, sha256=hashlib.sha256(b).hexdigest(),
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
                                   licence="LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)")

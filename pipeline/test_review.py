@@ -274,16 +274,18 @@ def test_ties_use_a_5_cm_tolerance():
     from shapely.geometry import Point, box
     from overlays import nearest_item
     parcel = box(0, 0, 1, 1)
-    items = [(Point(11, 0.5), {"asset_id": "C"}), (Point(11.03, 0.5), {"asset_id": "A"}), (Point(13, 0.5), {"asset_id": "B"})]
-    d, p, tied = nearest_item(items, [0, 1, 2], parcel)
-    assert tied == ["A", "C"] and p["asset_id"] == "A"
+    items = [(Point(11, 0.5), {"asset_id": "C"}), (Point(11.03, 0.5), {"asset_id": "A"}), (Point(11.06, 0.5), {"asset_id": "D"}),
+             (Point(13, 0.5), {"asset_id": "B"})]
+    d, p, tied = nearest_item(items, [0, 1, 2, 3], parcel)
+    assert tied == ["A", "C"] and p["asset_id"] == "A"                  # 6 cm farther is not a tie
 
 
 def test_district_sea_mask():
     import numpy as np
     from district_flow import sea_mask
-    z = np.array([[-0.56, 2.0, -0.4], [5.0, -1.005, 0.3]]); z8 = np.array([[np.nan, 2.1, -0.3], [5.1, np.nan, np.nan]])
-    assert sea_mask(z, z8).tolist() == [[True, False, False], [False, True, True]]
+    z = np.array([[-0.56, 2.0, -0.4, 0.6], [5.0, -1.005, 0.3, 0.5]])
+    z8 = np.array([[np.nan, 2.1, -0.3, np.nan], [5.1, np.nan, np.nan, np.nan]])
+    assert sea_mask(z, z8).tolist() == [[True, False, False, False], [False, True, True, True]]   # 0.6 m is land
 
 
 def test_partial_runs_with_failed_sources_are_refused():
@@ -291,6 +293,9 @@ def test_partial_runs_with_failed_sources_are_refused():
     planned = [dict(xmin=1, ymin=2)]
     assert problems(planned, {"1_2"}, "", 1, {"1_2": []}) == []
     assert problems(planned, {"1_2"}, "", 1, {"1_2": ["nonprimary_parcels"]})
+    two = [dict(xmin=1, ymin=2), dict(xmin=3, ymin=4)]
+    assert problems(two, {"1_2", "3_4"}, "", 2, {}, {"1_2": "aa", "3_4": "aa"}) == []
+    assert problems(two, {"1_2", "3_4"}, "", 2, {}, {"1_2": "aa", "3_4": "bb"})   # a patch must not mix district-flow grids
 
 
 def test_district_outline_closes_an_open_coastal_boundary_at_sea():
@@ -300,6 +305,25 @@ def test_district_outline_closes_an_open_coastal_boundary_at_sea():
     d = district_polygon([LineString([(100, 0), (300, 0), (300, 50)]), LineString([(300, 50), (300, 100), (100, 100)])], sea_x=-50)
     assert d.contains(Point(200, 50)) and d.contains(Point(0, 50)) and not d.contains(Point(400, 50))
     assert d.is_empty is False and district_polygon([LineString([(0, 0), (1, 1)]), LineString([(5, 5), (6, 6)])]).is_empty
+
+
+def test_coastal_land_below_sea_level_still_drains_into_the_sea():
+    import numpy as np
+    from rasterio.transform import from_origin
+    from flow import flow_routing
+    z = np.full((5, 6), 2.0, np.float32); z[:, 1] = -0.3              # a strip of land below 0 m beside the sea
+    z[:, 0] = np.nan                                                  # the sea
+    acc, trunc, step = flow_routing(z, from_origin(0, 5, 1, 1))
+    assert float(np.nanmax(acc[:, 1])) <= 3, acc[:, 1]                # each low cell drains west into the sea, not along the strip
+
+
+def test_coverage_is_never_0_when_a_parcel_has_lidar():
+    import numpy as np
+    import measures as M
+    z = np.full(100000, np.nan); z[:11] = 191.0                       # 11 cells on a large parcel
+    st = M.lidar_parcel_stats(z, np.zeros(z.size, bool), 1.0, np.ones(z.size, bool), np.zeros(z.size), np.zeros(z.size, bool),
+                              np.full(z.size, np.nan), np.zeros(z.size, bool))
+    assert st["lidar_coverage_pct"] == 0.1
 
 
 if __name__ == "__main__":

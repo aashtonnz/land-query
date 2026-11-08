@@ -193,13 +193,22 @@ def test_t59_service_limits_and_sources():
     for bad in (dict(bbox=[0, 0, 1e9, 1e9]), dict(where=[dict(column="zones", op="has_class", value={"class": "A", "min_pct": "x"})])):
         try: lq.search(**bad); assert False, bad
         except QueryError: pass
-    many = ["area_m2", "ground_mean_m", "zones", "bbox_xmin", "bbox_ymin", "bbox_xmax", "bbox_ymax", "geometry_source"] * 3
-    assert lq.search(columns=many, limit=10_000)["count"] == 100      # listing many columns does not lift the cap
+    import landquery
+    many = ["area_m2", "ground_mean_m", "zones", "bbox_xmin", "bbox_ymin", "bbox_xmax", "bbox_ymax", "geometry_source"]
+    saved, landquery.WIDE_COLUMNS = landquery.WIDE_COLUMNS, 5        # the fixture has fewer than 20 distinct columns
+    try: assert lq.search(columns=many, limit=10_000)["count"] == 100  # listing many distinct columns does not lift the cap
+    finally: landquery.WIDE_COLUMNS = saved
     import threading
     out = []
     ts = [threading.Thread(target=lambda: out.append(lq.search(columns=["area_m2"], limit=50)["count"])) for _ in range(8)]
     [t.start() for t in ts]; [t.join() for t in ts]
     assert out == [50] * 8                                            # concurrent requests do not interrupt each other
+    errs = []
+    def mixed():
+        try: lq.about(); lq.search(columns=["area_m2"], limit=5)
+        except Exception as e: errs.append(e)
+    ts = [threading.Thread(target=mixed) for _ in range(12)]; [t.start() for t in ts]; [t.join() for t in ts]
+    assert not errs, errs[:2]                                         # about() runs under the lock too (T-62)
     m = cat.column_meta
     for col in ("ground_min_m", "slope_p90_deg", "dz_2021_2025_mean_m", "lidar_cells"):
         assert "sea_mask" in m(col)["sources"] and m(col)["fit"] == "fit", col
