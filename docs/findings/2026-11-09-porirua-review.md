@@ -129,3 +129,16 @@ A new reviewer reviewed `1d01a44..357b58d` (T-90) and the republished Porirua re
     council's results, and the council text in `server.py` and `fetch_results.py`.
   - Of 12 mutants of the surviving kind, 11 are caught. The twelfth (Porirua's own sources for
     `buildings_coverage_pct` removed) is equivalent: the mapped Kāpiti rule gives the same sources.
+
+## T-92: rebuilt (9 Nov 2026)
+
+- **Run.** Run 42512213482 compiled all 17 blocks at `daf1c0c` and published. No source failed, and the service checks
+  (including the schema check with the new column) passed before publishing.
+- **Checked on the published results:**
+  - 21,954 parcels, 94 columns.
+  - `pcc_flood_model_catchments` is on 21,791 parcels. 163 lie wholly outside every model and outside the unmapped
+    area; partial overlaps show their share.
+  - Height controls carry their limits ("Height Control - Shading C; Height limit - 9m; ...").
+  - P2 has 348 rows (was 402), none in the Plimmerton Farm Zone. P1 304, P3 1,803.
+
+A fourteenth fresh-eyes review follows.
