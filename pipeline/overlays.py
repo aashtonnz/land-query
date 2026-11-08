@@ -110,8 +110,9 @@ SEA_SLIVER_M = 30.0
 
 def district_outline(lines, wards, stats, sea_x=1735000.0):
     """The district from three boundaries: KCDC's boundary line closed at sea, KCDC's whole-district ward polygon, and
-    Stats NZ's district polygon. Land counts where at least two of the three agree, so no single digitising decides
-    (T-70). The sea and islands come from the line's sea loop, where neither polygon reaches: thin strips there (up to
+    Stats NZ's district polygon. Land counts where at least two of the three agree (T-70). The ward and Stats NZ both
+    follow meshblocks and agree to within a metre almost everywhere, so in practice this is their boundary, with the
+    line deciding only where they differ (seventh review). The sea and islands come from the line's sea loop, where neither polygon reaches: thin strips there (up to
     2 * SEA_SLIVER_M wide) are where the line disagrees with both polygons on land, and are left out. Empty if any of
     the three is missing."""
     from shapely.geometry import Polygon
@@ -162,3 +163,31 @@ def parcels_error(key_set, kept, from_linz, err):
     if err: return err
     if key_set and kept and not from_linz: return "LINZ returned none of the block's parcels"
     return None
+
+
+# Columns that need the 2021 building outlines over the whole parcel: building area itself, and everything measured
+# on "open ground" (the parcel minus buildings). Where the outlines don't reach, a house would count as open ground
+# and its roof as no building, so these are empty, not 0 (seventh review, T-73; D-12).
+BUILDING_COLUMNS = ("building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct",
+                    "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct",
+                    "roof_pitch_p50_deg", "roof_flat_m2", "roof_north_m2", "roof_solar_rel_pct",
+                    "level_open_cut_m3", "level_open_fill_m3", "platform_15m_earthworks_min_m3")
+BUILDING_MIN_COVER = 0.99
+
+
+def building_cover(extent, outline):
+    """Where KCDC's 2021 building outlines were captured: the layer's extent, within the district (it holds no
+    outlines outside the district, nor on Kapiti Island). None if the extent is unknown."""
+    from shapely.geometry import box
+    if not extent: return None
+    b = box(extent["xmin"], extent["ymin"], extent["xmax"], extent["ymax"])
+    return b if outline is None or outline.is_empty else b.intersection(outline)
+
+
+def withhold_uncovered_buildings(row, g, cover):
+    """Sets buildings_coverage_pct and empties the building columns unless the outlines cover the parcel."""
+    share = g.intersection(cover).area / g.area if cover is not None and g.area else 0.0
+    row["buildings_coverage_pct"] = round(100 * share, 1)
+    if share < BUILDING_MIN_COVER:
+        for k in BUILDING_COLUMNS: row[k] = None
+    return row

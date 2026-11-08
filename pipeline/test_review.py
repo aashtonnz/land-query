@@ -398,6 +398,7 @@ def test_linz_parcels_missing_from_the_mirror_are_counted_once_and_only_in_the_d
     # 1 is in the mirror (assigned to whichever block); 3 lies outside the district
     assert [m["id"] for m in ov.linz_not_in_mirror(by_id, {1}, block, district)] == [2]
     assert ov.linz_not_in_mirror(by_id, {1}, box(500, 500, 600, 600), district) == []
+    assert ov.linz_not_in_mirror(by_id, {1}, box(4900, 0, 5100, 100), district) == []  # in the block, outside the district
 
 
 def test_parcels_source_fails_if_linz_returns_none_of_the_blocks_parcels():
@@ -473,6 +474,40 @@ def test_source_check_flags_a_missing_linz_key():
     except RuntimeError as e: assert "LINZ_API_KEY" in str(e)
     finally:
         if old is not None: os.environ["LINZ_API_KEY"] = old
+
+
+def test_building_values_are_empty_not_0_where_the_outlines_do_not_reach():
+    # KCDC's 2021 outlines have none on Kapiti Island or outside the district; islands with houses read 0 (seventh review)
+    from shapely.geometry import box
+    import overlays as ov
+    cover = ov.building_cover(dict(xmin=0, ymin=0, xmax=1000, ymax=1000), box(-500, 0, 800, 1000))
+    assert cover.bounds == (0.0, 0.0, 800.0, 1000.0)                      # the extent, within the district
+    full = {k: 7 for k in ov.BUILDING_COLUMNS}
+    r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), cover)
+    assert all(r[k] == 7 for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 100.0
+    r = ov.withhold_uncovered_buildings(dict(full), box(790, 0, 810, 100), cover)   # half outside the district
+    assert all(r[k] is None for k in ov.BUILDING_COLUMNS) and r["buildings_coverage_pct"] == 50.0
+    r = ov.withhold_uncovered_buildings(dict(full), box(701, 0, 801, 100), cover)   # 99% covered: kept
+    assert r["buildings_coverage_pct"] == 99.0 and r["open_ground_m2"] == 7
+    r = ov.withhold_uncovered_buildings(dict(full), box(702, 0, 802, 100), cover)   # 98%: empty
+    assert r["open_ground_m2"] is None
+    assert ov.withhold_uncovered_buildings({}, box(700, 0, 830, 100), cover)["buildings_coverage_pct"] == 76.9
+    r = ov.withhold_uncovered_buildings(dict(full), box(100, 100, 200, 200), None)   # extent unknown
+    assert r["building_2021_m2"] is None and r["buildings_coverage_pct"] == 0.0
+    for k in ["building_2021_m2", "open_ground_m2", "open_ground_slope_lt5_m2", "canopy_gt3m_open_pct", "open_ground_clear_pct",
+              "winter_sun_hours_open_mean", "roof_flat_m2", "roof_solar_rel_pct", "level_open_cut_m3", "platform_15m_earthworks_min_m3"]:
+        assert k in ov.BUILDING_COLUMNS, k
+
+
+def test_membership_floor_point_and_share_precision():
+    from shapely.geometry import box
+    import overlays as ov
+    district = box(0, 0, 100, 100)
+    assert ov.district_share(box(90, 0, 1090, 100), district) == 1.0       # exactly 1,000 m2 inside: kept
+    assert ov.district_share(box(90.01, 0, 1090.01, 100), district) is None  # 999 m2
+    frame = box(-200, -200, 300, 300).difference(box(-5, -5, 105, 105))       # a frame round the district, 5 m clear
+    assert frame.centroid.within(district) and ov.district_share(frame, district) is None  # its centre is not a point of it
+    assert ov.district_share(box(66.7, 0, 166.7, 100), box(0, 0, 100, 10000)) == 33.3  # one decimal place
 
 
 if __name__ == "__main__":

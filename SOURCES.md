@@ -35,7 +35,7 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 | `dem_2021` | Kāpiti Coast LiDAR 1 m DEM 2021 (LINZ, KCDC, AAM NZ) | ✅ CC BY 4.0 | 2021 flight | ✅ | +0.08 m offset against 2024–25 on flat ground |
 | `district_flow` | New Zealand LiDAR 1 m DEM, read at 10 m, gaps from the Contour-Interpolated 8 m DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic, surveys 2008–2026 | ⚠ | 10 m mosaic over the district and the Tararua catchments draining into it (1745000–1835000 E, 5440000–5510000 N), built once per run by `district_flow.py` |
 | `sea_mask` | Sea cells from the `district_flow` grid: no value in LINZ's 8 m contour DEM and no higher than 0.5 m, extended along the shoreline at the 1 m survey's flat sea value (LINZ) | ✅ CC BY 4.0 | as `district_flow` | ✅ | Removes the sea from the 1 m LiDAR before ground levels, slope and ground change are computed; provenance is the `district_flow` record |
-| `buildings_2021` | Kapiti Coast Building Outlines 2021 (KCDC, by AAM) | ◐ | catalogue 18 May 2023 | ⚠ | As at 2021; misses newer buildings |
+| `buildings_2021` | Kapiti Coast Building Outlines 2021 (KCDC, by AAM) | ◐ | catalogue 18 May 2023 | ⚠ | As at 2021; misses newer buildings. Captured only within the layer's extent (east 1762723–1786725, north 5458562–5492401) and the district: none on Kapiti Island, in the far south or north, or outside the district |
 | `zones` | Operative District Plan 2021 – Zones (KCDC) | ◐ | 27 May 2024 | ✅ | Drawn on the cadastre |
 | `ovl_flood_hazard` | ODP 2021 – Flood Hazards (KCDC) | ◐ | 13 Jul 2021 | ⚠ | Plan overlay; newer modelling is in the `flood_*` layers |
 | `ovl_heritage_places`, `ovl_notable_trees` | ODP 2021 – Historic Heritage Places, Notable Trees (KCDC) | ◐ | 13 Jul 2021 | ✅ | Points |
@@ -72,7 +72,7 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 
 | Columns | Kind | Meaning |
 | --- | --- | --- |
-| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2` | published | LINZ parcel id and fields as published |
+| `unit_id`, `appellation`, `parcel_intent`, `survey_area_m2` | published | LINZ parcel id and fields as published. `survey_area_m2` is the area of the whole surveyed parcel, which LINZ repeats on every part of a parcel in several pieces (Kapiti Island's 17.6 km² is on each of its 36 parts), so don't sum it |
 | `titles` | published | LINZ title references on the parcel, as published. Not served in public mode by the query service, because each is a key to owner records (D-15) |
 | `unit_source` | derived | What a unit is: `parcels` (a primary parcel); building outlines only in a run without parcels |
 | `district_share_pct` | derived | Share of the parcel's area inside `district_outline`; under 100 for parcels crossing the district boundary (down to 0.1% for large parcels with 1,000 m² inside). On those parcels, values cover different extents: council layers cover what the council maps (zoning often covers the whole parcel, other layers stop at the boundary); terrain and building columns cover the part inside the block's fetch window (`coverage_pct`); the district catchment covers the parcel's cells on the 10 m mosaic |
@@ -88,7 +88,8 @@ portal-wide statements cover the uncatalogued service layers (the owner makes th
 | `ovl_heritage_places`, `ovl_notable_trees` | derived | JSON list of the heritage or tree points inside or on the parcel boundary: KCDC id and significance text (empty significance as null). Before T-44 (7 Nov 2026), points within 1 m, without ids |
 | `ground_min_m`, `ground_mean_m`, `ground_max_m` | derived | 2024–25 LiDAR ground height over the parcel, metres NZVD2016 |
 | `slope_p50_deg`, `slope_p90_deg` | derived | Median and 90th-percentile ground slope over the parcel's 1 m cells |
-| `building_2021_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | derived | Area under 2021 building outlines; the rest (from the building outlines, so present without LiDAR); the rest that slopes under 5° (needs LiDAR). All within the fetch window, counting 1 m cells |
+| `building_2021_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | derived | Area under 2021 building outlines; the rest (from the building outlines, so present without LiDAR); the rest that slopes under 5° (needs LiDAR). All within the fetch window, counting 1 m cells. Empty, not 0, unless the outlines cover at least 99% of the parcel (`buildings_coverage_pct`); so are the other columns measured on open ground or roofs (T-73) |
+| `buildings_coverage_pct` | derived | Share of the parcel where the 2021 building outlines were captured (the layer's extent, within the district) |
 | `canopy_gt3m_open_pct` | derived | Share of open ground where the surface is more than 3 m above ground (trees or structures) |
 | `open_ground_clear_pct` | derived | Share of open ground with nothing standing more than 0.5 m above it in the 2024–25 DSM (no tree, shrub, hedge, fence, vehicle or building newer than the 2021 outlines) |
 | `dz_2021_2025_mean_m`, `dz_2021_2025_absmax_m` | derived | Ground change 2021 → 2024–25, mean and largest single cell; not offset-corrected: subtract `lidar_epoch_offset_block_m` |

@@ -241,7 +241,13 @@ def test_a_precomputed_query_ordered_or_filtered_on_a_withheld_column_is_withhel
     lq = LandQuery(d, "public")
     assert lq.inverse_query("T2")["withheld"] is True
     assert lq.inverse_query("T3").get("withheld") is not True
-    assert "1,000 m2" in lq.about()["boundary"]
+    b = lq.about()["boundary"]
+    assert "1,000 m2" in b and "representative point" in b and "buildings_coverage_pct" in b and "railway" in b
+    iq = json.load(open(os.path.join(d, "inverse_queries.json")))
+    iq["queries"].append(dict(id="T4", name="n", question="q", sql="SELECT unit_id FROM units ORDER BY titles_n",  # not a withheld name
+                              count=1, provenance={"parcels": dict(url="u")}, rows=[dict(unit_id=1, sources={})]))
+    json.dump(iq, open(os.path.join(d, "inverse_queries.json"), "w"))
+    assert LandQuery(d, "public").inverse_query("T4").get("withheld") is not True
 
 
 def test_every_column_defined_in_sources_md_is_published():

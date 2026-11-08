@@ -10,6 +10,7 @@ from rasterio.features import geometry_mask
 from rasterio.windows import from_bounds, Window
 import tile_env as te
 from overlays import class_shares, points_on, nearest_item, deepest_invert, worst_grade, largest_diameter, as_int
+import overlays as OV
 from shapely.geometry import shape, Point, box
 from shapely.strtree import STRtree
 from shapely.ops import unary_union
@@ -88,6 +89,9 @@ else:
 # the sea: the 1 m DEM stores it as a flat surface near -0.6 m, not as no data. Cells the district grid marks as sea
 # (no value there, inside the grid) and no higher than 0.5 m are set to no data, so flow can leave into the sea (T-47).
 SEA = np.zeros(Z.shape, bool); G10 = None
+_op = os.path.join(RAW, "district_outline.geojson")
+BLD_COVER = OV.building_cover(json.load(open(os.path.join(D, "provenance.json")))["sources"].get("buildings_2021", {}).get("extent"),
+                              shape(json.load(open(_op))) if os.path.exists(_op) else None)  # T-73
 LIDAR_BOX = box(*rasterio.transform.array_bounds(Z.shape[0], Z.shape[1], dem.transform)) if HAVE_LIDAR else box(0, 0, 0, 0)
 if DF is not None and HAVE_LIDAR:
     from rasterio.warp import reproject, Resampling
@@ -259,7 +263,7 @@ for uid, (g, p) in enumerate(units):
              ground_max_m=stat(np.max, z), slope_p50_deg=stat(lambda a: np.percentile(a, 50), s, 1),
              slope_p90_deg=stat(lambda a: np.percentile(a, 90), s, 1),
              building_2021_m2=int((m & Bw).sum()) if HAVE_LIDAR else int(round(sum(bld_geoms[i].intersection(g).area for i in (T_BLD.query(g) if T_BLD else [])))),
-             open_ground_m2=int(open_ground.sum()) if HAVE_LIDAR else None,
+             open_ground_m2=int(open_ground.sum()) if HAVE_LIDAR else None,  # set below if no LiDAR in the block
              dz_2021_2025_mean_m=stat(np.mean, Dw[m], 3), lidar_epoch_offset_block_m=EPOCH_OFFSET, dz_2021_2025_absmax_m=stat(lambda a: np.max(np.abs(a)), Dw[m]))
     # figures that need LiDAR on the parcel: empty, not 0, where it has none (T-59); clear-ground change (T-56)
     r.update(M.lidar_parcel_stats(z, SEA[rs, cs][m], (g.intersection(LIDAR_BOX).area / g.area) if g.area else 0.0,
@@ -341,6 +345,9 @@ for uid, (g, p) in enumerate(units):
         else:
             r.update(wind_obstruction_pct=None, wind_rel_height_m=None,
                      horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
+    if not HAVE_LIDAR and r["building_2021_m2"] is not None:  # the same definition as with LiDAR (seventh review)
+        r["open_ground_m2"] = max(0, int(round(g.intersection(TILE_BOX).area)) - r["building_2021_m2"])
+    OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73)
     # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
     dc = district_cells(g) if DF is not None else None
     if dc is not None and np.isfinite(dc["acc"]).any():

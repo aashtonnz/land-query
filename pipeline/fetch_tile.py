@@ -43,7 +43,8 @@ def main():
             meta = arcgis._get(url, {"f": "json"}, 60)
             prov["sources"][name] = dict(url=url, ok=True, features=len(fc["features"]), bytes=len(b), sha256=sha(b),
                                          seconds=round(time.time() - t0, 2), fetched=utc_now(), licence=lic,
-                                         layer_name=meta.get("name"), copyright=te.scrub_copyright(meta.get("copyrightText")))
+                                         layer_name=meta.get("name"), copyright=te.scrub_copyright(meta.get("copyrightText")),
+                                         extent=meta.get("extent"))  # where a layer was captured (T-73)
             print(f"{name:26s} {len(fc['features']):6d} features  {time.time()-t0:5.1f}s")
         except Exception as e:
             prov["sources"][name] = dict(url=url, ok=False, error=str(e)[:300], licence=lic)

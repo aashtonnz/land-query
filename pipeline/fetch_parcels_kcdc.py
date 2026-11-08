@@ -38,6 +38,8 @@ G = lambda fs: [shape(f["geometry"]) for f in fs if f.get("geometry")]
 district = ov.district_outline(G(edge), G(wards), G(stats))
 if district.is_empty: raise SystemExit("could not build the district outline from KCDC's line and ward and Stats NZ's polygon")
 outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards + stats), sort_keys=True).encode()
+from shapely.geometry import mapping
+json.dump(mapping(district), open(os.path.join(OUT, "raw", "district_outline.geojson"), "w"))  # for building cover (T-73)
 mirror_ids = {f["properties"].get("id") for f in feats}
 
 blk = box(*te.BLOCK); kept = []

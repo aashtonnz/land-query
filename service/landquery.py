@@ -60,12 +60,14 @@ class LandQuery:
                           "Wellington Regional Council as listed per source. In public mode, columns relying on a "
                           "portal-wide licence statement are withheld until confirmed in writing."),
             caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
-            boundary=("Whole parcels are published. A parcel crossing the district boundary is included if its centre "
-                      "point or at least 1,000 m2 of it lies in the district, so a few parcels reach far outside it (one "
-                      "forest section is 615 km2, about 40 km2 of it in the district). Their area and terrain values "
-                      "cover the whole parcel or as much of it as was fetched (coverage_pct); council layers cover what "
-                      "the council maps. district_share_pct gives the share inside; it is withheld in public mode until "
-                      "the council licence is confirmed (T-35)."),
+            boundary=("Whole parcels are published. A parcel crossing the district boundary is included if its "
+                      "representative point (a point always inside it) or at least 1,000 m2 of it lies in the district, "
+                      "so a few parcels reach far outside it (one forest section is 615 km2, about 40 km2 of it in the "
+                      "district). Their area covers the whole parcel; terrain covers the part with LiDAR "
+                      "(lidar_coverage_pct); building and open-ground values are empty unless the 2021 building outlines "
+                      "cover the parcel (buildings_coverage_pct); council layers cover what the council maps. "
+                      "district_share_pct gives the share inside; it is withheld in public mode until the council licence "
+                      "is confirmed (T-35). About 70 railway parcels are not included: the council's parcel list omits them."),
             provenance_available=bool(self.prov))
 
     def describe_columns(self, contains=None):
