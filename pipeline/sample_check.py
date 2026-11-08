@@ -53,7 +53,7 @@ def zones(g):
     j = get(f"{KC}/District_Plan_Zones/MapServer/0/query", geometry=esri_polygon(g), geometryType="esriGeometryPolygon",
             inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="ePlan_Zone", outSR=2193, f="geojson")
     by = {}
-    for f in j["features"]: by.setdefault(f["properties"]["ePlan_Zone"], []).append(shape(f["geometry"]).buffer(0))
+    for f in j["features"]: by.setdefault(f["properties"]["ePlan_Zone"], []).append(__import__("overlays").repaired(shape(f["geometry"])))
     out = {k: round(100 * unary_union(v).intersection(g).area / g.area, 1) for k, v in by.items()}
     return {k: v for k, v in out.items() if v * g.area / 100 > 0.5}
 
@@ -63,7 +63,7 @@ def overlay(url, field, g):
     j = get(url + "/query", geometry=esri_polygon(g), geometryType="esriGeometryPolygon", inSR=2193,
             spatialRel="esriSpatialRelIntersects", outFields=field or "OBJECTID", outSR=2193, f="geojson")
     return sorted({(f["properties"].get(field) if field else "present") for f in j["features"]
-                   if shape(f["geometry"]).buffer(0).intersection(g).area > 0.5})
+                   if __import__("overlays").repaired(shape(f["geometry"])).intersection(g).area > 0.5})
 
 
 def nearest_manhole(g, maxd=150):

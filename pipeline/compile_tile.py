@@ -29,7 +29,7 @@ def load(name):
     for f in json.load(open(p))["features"]:
         if f.get("geometry"):
             g = shape(f["geometry"])
-            if not g.is_valid: g = g.buffer(0)
+            if not g.is_valid: g = OV.repaired(g)   # not buffer(0), which can fill holes (fourteenth review)
             out.append((g, f["properties"]))
     return out
 

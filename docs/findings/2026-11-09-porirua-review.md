@@ -142,3 +142,48 @@ A new reviewer reviewed `1d01a44..357b58d` (T-90) and the republished Porirua re
   - P2 has 348 rows (was 402), none in the Plimmerton Farm Zone. P1 304, P3 1,803.
 
 A fourteenth fresh-eyes review follows.
+
+# Fourteenth fresh-eyes review (T-93, 9 Nov 2026)
+
+A new reviewer reviewed `357b58d..daf1c0c` (T-92) and took a fresh look at the whole Porirua product. Its method
+caught what earlier reviews had missed. It compared each layer's area, as the pipeline reads it, with PCC's own
+`Shape__Area`, and rebuilt shapes from ArcGIS's own rings. Earlier reviews had read PCC's layers the same way as the
+pipeline.
+
+| # | Finding | Status | Fix |
+| --- | --- | --- | --- |
+| 1 | Overlays were inflated where PCC's shapes are invalid. The compiler repaired them with `buffer(0)`, which fills the holes of some multi-ring polygons: the gas pipeline corridor read as 7.05 km² (true 0.667), overland flow 1.04 (0.86), inundation 7.67 (6.97), tsunami +9–11 ha each. 206 parcels were wrongly in the gas corridor, 115 in overland flow and 67 in inundation. | Confirmed, serious | T-94 |
+| 2 | `pcc_flood_model_catchments` read as "this land was modelled", but PCC does not say which model each operative flood overlay comes from. The Horokiri model covers the whole unmapped area, and in Whitby the operative plan maps 0.6 ha of inundation where the notified Plan Changes map 37.6 ha. | Confirmed, serious | T-94 |
+| 3 | The catchments leave small gaps (1.7 km²), so "outside every model" is not "never studied"; 19 of the 163 parcels outside have flood overlays. | Confirmed, minor | T-94 |
+| 4 | Text left stale after the rebuild ("after the next rebuild", "about 300", "since 2017", a height-control example not in PCC's data). | Confirmed, minor | T-94 |
+| 5 | One column row described three columns. | Confirmed, minor | T-94 |
+| 6 | P2's thresholds were mismatched: 1% to qualify, but any sliver of a current extent or the Plimmerton Farm Zone excluded; 4 rows had under 5 m² of footprint. | Confirmed, minor | T-94 |
+| 7 | 12 of 14 T-92 mutants survived: the tests looked for text in the SQL, not what it selects. | Confirmed, minor | T-94 |
+| 8 | Porirua's QA summary uses Kāpiti's names (n = 0), and the measure check's parcel universe is unexplained. | Confirmed, minor | Open |
+
+Checked and correct:
+- 19 parcels end to end in places earlier reviews had not covered: areas, layers (apart from finding 1) and LiDAR
+  match.
+- Height labels are PCC's three fields.
+- P1–P3 reproduce.
+- Kāpiti is unchanged by T-92.
+- Public mode leaks nothing about people.
+
+## T-94: fixes (9 Nov 2026)
+
+- **Shape repair** (1).
+  - Invalid source shapes are repaired with `make_valid`, keeping polygon parts (`overlays.repaired`). That gives
+    exactly PCC's `Shape__Area` for the gas corridor, overland flow, inundation and tsunami.
+  - Kāpiti's invalid shapes come out the same area either way. Checked on all of its layers: no difference.
+    Kāpiti's test tile still compiles identically, so Kāpiti needs no rebuild.
+  - A test reproduces the gas corridor's shape: one ring round the outside and back round the inside.
+- **Flood model catchments** (2, 3).
+  - Labelled with the model's report year ("Whitby (model report 2025)").
+  - Described as which model catchment a parcel lies in, not evidence that its flood overlay comes from that model.
+    The register gives the Whitby and Horokiri examples and the gaps.
+  - `about` now says PCC does not say which study each flood overlay comes from.
+- **P2** (6). Rows need 1% in a sea-level-rise overlay, under 1% in the current extents and the Plimmerton Farm Zone,
+  and at least 10 m² of footprint.
+- **Wording** (4, 5). Stale text fixed; one row per column.
+- **Tests** (7). P1–P3 now run on a small table of made-up parcels, one for each condition, so a test checks what the
+  SQL selects. All 9 mutants of this round are caught, including putting `buffer(0)` back.

@@ -87,14 +87,17 @@ Q_PORIRUA = [
          sources=["parcels", "zones", "pcc_buildings", "dem_2023", "dsm_2023", *PDP_FLOOD, *PDP_COAST, "pcc_flood_unmapped"]),
     dict(id="P2", name="Coastal hazard with 1 m sea-level rise",
          question="Parcels with buildings that the District Plan 2025 maps in coastal erosion or the 1-in-100-year storm surge "
-                  "with 1 m sea-level rise (at least 1% of the parcel), but not in the current-day extents; not in the Plimmerton "
-                  "Farm Zone, where the 2025 plan does not apply.",
+                  "with 1 m sea-level rise (at least 1% of the parcel), but under 1% in the current-day extents and in the Plimmerton "
+                  "Farm Zone, where the 2025 plan does not apply; at least 10 m² of PCC footprints.",
          sql=f"""SELECT unit_id, appellation, area_m2, building_m2, pdp_coastal_erosion_1m_slr, pdp_coastal_inundation_1m_slr
-                 {BASE} AND building_m2 > 0
+                 {BASE} AND building_m2 >= 10   -- not a neighbour's footprint edge (fourteenth review)
                  AND (coalesce(json_extract(pdp_coastal_erosion_1m_slr, '$."Coastal erosion with 1 m sea-level rise"')::DOUBLE, 0) >= 1
                       OR coalesce(json_extract(pdp_coastal_inundation_1m_slr, '$."1-in-100-year storm surge with 1 m sea-level rise"')::DOUBLE, 0) >= 1)
-                 AND pdp_coastal_erosion_current IS NULL AND pdp_coastal_inundation_current IS NULL
-                 AND plan_1999_plimmerton_farm IS NULL   -- the 2025 plan does not apply there (thirteenth review)
+                 -- the same 1% for what excludes a parcel: the current-day extents, and the Plimmerton Farm Zone, where the
+                 -- 2025 plan does not apply (thirteenth and fourteenth reviews)
+                 AND coalesce(json_extract(pdp_coastal_erosion_current, '$."Current coastal erosion"')::DOUBLE, 0) < 1
+                 AND coalesce(json_extract(pdp_coastal_inundation_current, '$."Current coastal inundation"')::DOUBLE, 0) < 1
+                 AND coalesce(json_extract(plan_1999_plimmerton_farm, '$."Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)"')::DOUBLE, 0) < 1
                  ORDER BY area_m2 DESC""",
          sources=["parcels", "pcc_buildings", *PDP_COAST, "plan_1999_plimmerton_farm"]),
     dict(id="P3", name="Heritage, notable tree or significant natural area on the parcel",

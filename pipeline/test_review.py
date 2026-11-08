@@ -669,23 +669,72 @@ def test_porirua_layers_labels_and_queries_say_what_they_claim():
     assert P.ARCGIS["pcc_flood_model_catchments"][0].endswith("/Hazards/Flood_Hazards/MapServer/90")
     assert P.ARCGIS["plan_1999_plimmerton_farm"][0].endswith("/Porirua_City_District_Plan_1999_Plimmerton_Farm_Zone/FeatureServer/0")
     assert ov.class_label("pdp_height_controls", {"SpecificControl": "Height Control - Shading C", "HeightControl": "Height limit - 9m",
-                                                  "HIRB": "3m x 45°"}, P) == "Height Control - Shading C; Height limit - 9m; 3m x 45°"
+                                                  "HIRB": "Standard for the underlying zone"}, P) == "Height Control - Shading C; Height limit - 9m; Standard for the underlying zone"
+    assert ov.class_label("pdp_height_controls", {"SpecificControl": "Height Increase A", "HIRB": None}, P) == "Height Increase A"   # no "None"
     assert ov.class_label("pdp_designations", {"Title": "State Highway 1", "ReqAuth": "NZTA", "ID": "D1"}, P) == "State Highway 1"
     assert ov.class_label("pdp_sites_significance_maori", {"Name": "Taupō Pā", "ID": "S1"}, P) == "Taupō Pā"
     assert ov.class_label("plan_1999_plimmerton_farm", {}, P) == "Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)"
-    assert ov.class_label("pcc_flood_model_catchments", {"Name": "Titahi Bay"}, P) == "Titahi Bay"
+    assert ov.class_label("pcc_flood_model_catchments", {"Name": "Titahi Bay", "RepDat": "2019"}, P) == "Titahi Bay (model report 2019)"
+    assert ov.class_label("pcc_flood_model_catchments", {"Name": "Horokiri", "RepDat": " "}, P) == "Horokiri"
     Q = {q["id"]: q["sql"] for q in iq.Q_PORIRUA}
     where = lambda s: s[s.index("FROM units"):]
     for z in ("High Density Residential Zone", "Medium Density Residential Zone"):
         assert f"json_extract(zones,'$.\"{z}\"')::DOUBLE >= 90" in where(Q["P1"]), z
-    for c in ("pdp_coastal_erosion_current IS NULL", "pdp_coastal_inundation_current IS NULL", "plan_1999_plimmerton_farm IS NULL", ">= 1"):
-        assert c in where(Q["P2"]), c
+    # P2's conditions: test_porirua_queries_select_what_their_questions_say runs them
     for c in ("pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"): assert f"{c} IS NOT NULL" in where(Q["P3"]), c
     root = os.path.join(os.path.dirname(__file__), "..", "service")
     assert 'os.environ.get("COUNCIL"' in open(os.path.join(root, "fetch_results.py")).read()
     assert "cat.COUNCIL.LABEL" in open(os.path.join(root, "server.py")).read()
     K = load("kapiti")
     assert "615 km2" in K.ABOUT["boundary"] and "KCDC" in K.ABOUT["boundary"] and "Kāpiti Coast District Council" in K.ABOUT["licence_note"]
+
+
+def test_porirua_queries_select_what_their_questions_say():
+    # run P1-P3 on a small table, so the SQL's meaning is tested, not its text (fourteenth review)
+    import duckdb, json, inverse_queries_defs as iq
+    J = lambda **k: json.dumps(k) if k else None
+    base = dict(coverage_pct=100.0, area_m2=1000.0, lidar_coverage_pct=100.0, building_m2=100.0, unmapped_structure_m2=0,
+                slope_p90_deg=5.0, zones=J(**{"Medium Density Residential Zone": 100.0}), zones_total_pct=100.0,
+                plan_1999_plimmerton_farm=None, pcc_flood_unmapped=None, pdp_heritage_items="[]", pdp_notable_trees="[]",
+                **{c: None for c in iq.PDP_FLOOD + iq.PDP_COAST + ["pdp_notable_tree_groups", "pdp_heritage_settings",
+                   "pdp_heritage_item_extents", "pdp_heritage_sites", "pdp_significant_natural_areas"]}, appellation="x")
+    slr = J(**{"1-in-100-year storm surge with 1 m sea-level rise": 30.0}); ero = J(**{"Coastal erosion with 1 m sea-level rise": 2.0})
+    rows = {1: {},                                                        # P1 yes
+            2: dict(zones=J(**{"General Residential Zone": 100.0})),      # P1 no: another zone
+            3: dict(building_m2=300.0),                                   # P1 no: 30% built
+            4: dict(pcc_flood_unmapped=J(**{"Flood hazard not mapped": 100.0})),   # P1 no: flooding not mapped
+            5: dict(pdp_coastal_erosion_current=J(**{"Current coastal erosion": 0.4})),  # P1 no (any overlay); P2 not asked
+            10: dict(pdp_coastal_inundation_1m_slr=slr),                  # P2 yes
+            11: dict(pdp_coastal_erosion_1m_slr=ero),                     # P2 yes (erosion)
+            12: dict(pdp_coastal_inundation_1m_slr=J(**{"1-in-100-year storm surge with 1 m sea-level rise": 0.5})),  # P2 no: under 1%
+            13: dict(pdp_coastal_inundation_1m_slr=slr, pdp_coastal_inundation_current=J(**{"Current coastal inundation": 5.0})),  # P2 no
+            14: dict(pdp_coastal_inundation_1m_slr=slr, pdp_coastal_erosion_current=J(**{"Current coastal erosion": 0.4})),  # P2 yes: sliver
+            15: dict(pdp_coastal_inundation_1m_slr=slr, plan_1999_plimmerton_farm=J(**{"Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)": 99.9})),  # P2 no
+            16: dict(pdp_coastal_inundation_1m_slr=slr, building_m2=4.0),  # P2 no: a footprint edge
+            20: dict(pdp_notable_tree_groups=J(**{"G1": 5.0})),           # P3 yes
+            21: dict(pdp_heritage_settings=J(**{"Setting": 10.0})),       # P3 yes
+            22: dict(pdp_heritage_items=json.dumps([{"id": "H1"}]))}      # P3 yes
+    db = duckdb.connect()
+    recs = [dict(base, unit_id=k, **v) for k, v in rows.items()]
+    import pandas as pd
+    db.register("t", pd.DataFrame(recs)); db.execute("CREATE TABLE units AS SELECT * FROM t")
+    got = {q["id"]: sorted(r[0] for r in db.execute(q["sql"]).fetchall()) for q in iq.Q_PORIRUA}
+    assert got["P1"] == [1, 20, 21, 22], got["P1"]
+    assert got["P2"] == [10, 11, 14], got["P2"]
+    assert got["P3"] == [20, 21, 22], got["P3"]
+
+
+def test_invalid_source_shapes_are_repaired_without_filling_their_holes():
+    # PCC's gas pipeline corridor is one ring that runs round the outside and back round the inside; buffer(0) filled
+    # it (7.05 km2 for 0.667, fourteenth review)
+    from shapely.geometry import Polygon, box
+    import overlays as ov
+    frame = Polygon([(0, 0), (100, 0), (100, 100), (0, 100), (0, 0), (10, 10), (90, 10), (90, 90), (10, 90), (10, 10)])
+    assert not frame.is_valid
+    r = ov.repaired(frame)
+    assert r.is_valid and round(r.area) == 3600 and not r.contains(box(40, 40, 60, 60))   # the middle stays outside
+    assert ov.repaired(box(0, 0, 1, 1)).equals(box(0, 0, 1, 1))
+    assert ov.repaired(Polygon([(0, 0), (10, 10), (10, 0), (0, 10)])).geom_type in ("Polygon", "MultiPolygon")   # no lines kept
 
 
 if __name__ == "__main__":

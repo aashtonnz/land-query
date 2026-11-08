@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 08:30 (Pacific/Auckland)
+Last updated: 2026-11-09 09:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -18,13 +18,15 @@ Standing priorities:
   - T-90 (done 2026-11-09): Twelfth-review fixes, republished (run 42506899575: 21,954 parcels, 93 columns, no failed source).
   - T-91 (done 2026-11-09): Thirteenth fresh-eyes review: data matches live layers city-wide; two suspected serious findings (flood mapping beyond the Horokiri valley and on Mana Island), one confirmed (P2's top row in Plimmerton Farm), eight minor. [Findings](docs/findings/2026-11-09-porirua-review.md#thirteenth-fresh-eyes-review-t-91-9-nov-2026)
   - T-92 (done 2026-11-09): Thirteenth-review fixes, rebuilt (run 42512213482: 94 columns; 163 parcels outside every flood model).
-  - T-93: Fourteenth fresh-eyes review. Started 2026-11-09.
+  - T-93 (done 2026-11-09): Fourteenth fresh-eyes review: two serious findings (overlays inflated by `buffer(0)` on PCC's invalid shapes; the flood model column over-read), six minor. [Findings](docs/findings/2026-11-09-porirua-review.md#fourteenth-fresh-eyes-review-t-93-9-nov-2026)
+  - T-94: Fourteenth-review fixes (in code 2026-11-09): `make_valid` repair, flood model column reworded, P2 thresholds, query tests on a table. Rebuild Porirua (about US$1), then a fifteenth review.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
+- T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
 - T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
 
 ## Planned (after Next, by phase)

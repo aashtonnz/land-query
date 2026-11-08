@@ -19,8 +19,7 @@ PUBLIC_EXCLUDE = {"titles": "title references are a direct key to owner records;
 
 # Defined in SOURCES.md but only computed by a full rebuild, so absent from results published by finish.py until one
 # runs (T-82). The schema check allows these to be missing; nothing else does.
-PENDING_COLUMNS = {"unmapped_structure_m2": "added at the next full rebuild (T-82)",
-                   "pcc_flood_model_catchments": "Porirua: added at its next full rebuild (T-92)"}
+PENDING_COLUMNS = {"unmapped_structure_m2": "added at the next full rebuild (T-82)"}
 
 
 def missing_columns(have, run_text):

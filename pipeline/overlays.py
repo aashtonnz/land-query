@@ -13,6 +13,11 @@ def class_label(layer, props, council=None):
     if layer in council.CLASS_FIELDS:   # a council's own class fields, then a fixed name (T-87)
         fields, default, *how = council.CLASS_FIELDS[layer]
         if how == ["join"]: return "; ".join(str(f(k)) for k in fields if f(k)) or default   # every field, e.g. a control and its limit
+        if how:   # format strings, the first whose fields are all set
+            for fmt in how[0]:
+                names = [n for _, n, _, _ in __import__("string").Formatter().parse(fmt) if n]
+                if all(f(n) for n in names): return fmt.format(**{n: f(n) for n in names})
+            return default
         return next((f(k) for k in fields if f(k)), None) or default
     if layer == "zones": return f("ePlan_Zone") or f("NPS_Zone") or "Zone not recorded"
     if layer == "ovl_fault_avoidance":
@@ -268,3 +273,17 @@ def buildings_cover_for(council, capture, outline):
     """Where the council's building outlines were captured: its capture area within the outline, or, for a council
     whose footprints span it (BUILDINGS_CAPTURE None), the outline itself (T-76, T-87)."""
     return building_cover(outline, outline) if council.BUILDINGS_CAPTURE is None else building_cover(capture, outline)
+
+
+def repaired(g):
+    """A valid geometry for an invalid source shape, keeping its true extent (fourteenth review): buffer(0), used
+    before, fills in the holes and gaps of some multi-ring polygons (PCC's gas pipeline corridor read as 7.05 km² for
+    0.667 km²). make_valid keeps them; for a polygon layer only its polygon parts are kept."""
+    from shapely.validation import make_valid
+    from shapely.geometry import MultiPolygon, GeometryCollection
+    if g.is_valid: return g
+    v = make_valid(g)
+    if g.geom_type in ("Polygon", "MultiPolygon") and isinstance(v, GeometryCollection) and not isinstance(v, MultiPolygon):
+        parts = [p for p in v.geoms if p.geom_type in ("Polygon", "MultiPolygon")]
+        v = parts[0] if len(parts) == 1 else MultiPolygon([q for p in parts for q in getattr(p, "geoms", [p])])
+    return v
