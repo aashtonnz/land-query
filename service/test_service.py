@@ -243,6 +243,7 @@ def test_a_precomputed_query_ordered_or_filtered_on_a_withheld_column_is_withhel
     assert lq.inverse_query("T3").get("withheld") is not True
     b = lq.about()["boundary"]
     assert "1,000 m2" in b and "representative point" in b and "buildings_coverage_pct" in b and "railway" in b
+    assert "miss some houses" in b and "unmapped_structure_m2" in b
     assert "withheld" in lq.about()["empty_values"] and "not mapped" in lq.about()["empty_values"]
     assert "cover only its flood models" in lq.about()["empty_values"]
     iq = json.load(open(os.path.join(d, "inverse_queries.json")))
@@ -260,8 +261,8 @@ def test_published_building_values_are_empty_where_the_outlines_do_not_cover_the
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "pipeline"))
     import overlays as ov
     f = os.path.join(p, "units.parquet")
-    bad = duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE buildings_coverage_pct IS NULL OR ((buildings_coverage_pct < 99 OR coverage_pct < 99 "
-                     "OR unmapped_structure_m2 >= 40) AND NOT ("
+    bad = duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE buildings_coverage_pct IS NULL OR ((buildings_coverage_pct < 99 OR coverage_pct < 99"
+                     ") AND NOT ("
                      + " AND ".join(f"{c} IS NULL" for c in ov.BUILDING_COLUMNS) + "))").fetchall()[0][0]
     assert bad == 0, f"{bad} parcels have building values where the outlines do not cover them"
     assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE rbl_in_parcel_n = 0 OR ww_pipe_condition_grade = 0").fetchall()[0][0] == 0

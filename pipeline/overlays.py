@@ -194,18 +194,16 @@ def capture_area_nztm(geojson):
     return transform(t, unary_union([shape(f["geometry"]) for f in feats]))
 
 
-UNMAPPED_MIN_M2 = 40
+UNMAPPED_MIN_M2 = 40  # from this, unmapped_structure_m2 warns that a building may stand where KCDC has no outline (D-19)
 
 
 def withhold_uncovered_buildings(row, g, cover):
-    """Sets buildings_coverage_pct and empties the building columns unless the outlines cover the parcel, the block's
-    fetch window covers it (`coverage_pct`, T-79), and the LiDAR shows no building-like structure of 40 m2 or more that
-    no outline covers (`unmapped_structure_m2`, T-79)."""
+    """Sets buildings_coverage_pct and empties the building columns unless the outlines cover the parcel and the
+    block's fetch window covers it (`coverage_pct`, T-79). The building columns describe KCDC's 2021 outlines, which
+    miss some houses; `unmapped_structure_m2` warns of those, without emptying anything (D-19, T-81)."""
     share = g.intersection(cover).area / g.area if cover is not None and g.area else 0.0
     row["buildings_coverage_pct"] = round(100 * share, 1)
-    unmapped = row.get("unmapped_structure_m2")
     if (row["buildings_coverage_pct"] < 100 * BUILDING_MIN_COVER  # the published figure decides: 98.96% shows as 99.0 (T-77)
-            or (row.get("coverage_pct") is not None and row["coverage_pct"] < 100 * BUILDING_MIN_COVER)
-            or (unmapped is not None and unmapped >= UNMAPPED_MIN_M2)):
+            or (row.get("coverage_pct") is not None and row["coverage_pct"] < 100 * BUILDING_MIN_COVER)):
         for k in BUILDING_COLUMNS: row[k] = None
     return row

@@ -527,7 +527,7 @@ def test_membership_floor_point_and_share_precision():
     assert ov.district_share(box(66.7, 0, 166.7, 100), box(0, 0, 100, 10000)) == 33.3  # one decimal place
 
 
-def test_unmapped_houses_on_the_lidar_empty_the_building_values():
+def test_lidar_warns_of_houses_the_outlines_miss():
     # KCDC's outlines miss some houses inside the area they cover (ninth review): the LiDAR finds them
     import numpy as np
     import measures as M, overlays as ov
@@ -536,6 +536,7 @@ def test_unmapped_houses_on_the_lidar_empty_the_building_values():
     dsm[30:40, 5:17] = 5.0; out = np.zeros((60, 60), bool); out[30:40, 5:17] = True   # an outlined one
     dsm[30:40, 17:22] = 5.0                                 # a 5 m wide overhang or lean-to touching the outline
     rng = np.random.default_rng(1); dsm[45:58, 30:50] = 6 + rng.uniform(-1.5, 1.5, (13, 20))  # a tree crown, rough
+    dsm[45:58, 5:25] = 6 + rng.uniform(-0.8, 0.8, (13, 20))    # a denser crown, about 0.45 m rough
     dsm[5:9, 40:58] = 4.0                                   # a 4 m wide, flat-topped hedge: 2 m wide once its rough edges go
     dsm[20:25, 40:45] = 20.0                                # a 20 m mast or tower (over 15 m)
     u = M.unmapped_structures(dsm, dem, out)
@@ -547,13 +548,21 @@ def test_unmapped_houses_on_the_lidar_empty_the_building_values():
         assert M.largest_structure_m2(M.unmapped_structures(g, np.zeros((40, 40)), np.zeros((40, 40), bool))) >= 100, pitch
     d = np.zeros((6, 6), bool); d[0:2, 0:2] = True; d[2:4, 2:4] = True   # two patches touching at a corner
     assert M.largest_structure_m2(d) == 8 and M.largest_structure_m2(np.zeros((3, 3), bool)) == 0
+    two = np.zeros((20, 20), bool); two[0:5, 0:5] = True; two[10:16, 10:16] = True    # two separate patches
+    assert M.largest_structure_m2(two) == 36
+    low = np.zeros((30, 30)); low[5:15, 5:15] = 2.0          # a 2 m flat object (a car, a fence line): too low
+    assert not M.unmapped_structures(low, np.zeros((30, 30)), np.zeros((30, 30), bool)).any()
+    # a warning only (D-19): it never empties the building columns
     full = {k: 7 for k in ov.BUILDING_COLUMNS}
     from shapely.geometry import box
     cover = box(0, 0, 1000, 1000); g = box(10, 10, 20, 20)
-    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=39, coverage_pct=100.0), g, cover)["open_ground_m2"] == 7
-    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=40, coverage_pct=100.0), g, cover)["open_ground_m2"] is None
+    assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=500, coverage_pct=100.0), g, cover)["open_ground_m2"] == 7
     assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=None, coverage_pct=98.9), g, cover)["building_2021_m2"] is None
     assert ov.withhold_uncovered_buildings(dict(full, unmapped_structure_m2=None, coverage_pct=99.0), g, cover)["building_2021_m2"] == 7
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "service"))
+    import catalogue as c
+    assert {"dsm_2025", "buildings_2021"} <= set(c.column_sources("unmapped_structure_m2"))  # withheld publicly with them
 
 
 def test_capture_area_from_several_features_and_share_on_the_parcel_itself():

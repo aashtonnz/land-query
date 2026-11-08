@@ -52,7 +52,7 @@ Checked and correct:
   - It catches houses KCDC missed and houses built since 2021.
   - Tried on a 2.5 km tile (2,557 parcels at Paraparaumu and Raumati), it flagged 70. That includes 6703303 (142 m²)
     and 3776223 (98 m²), and 39 parcels that had read 0 m².
-  - On the aerial photos, Lot 4 DP 58017 (3817530) is a whole house without an outline. Two of three flags checked on
+  - On the aerial photos, Lot 16 DP 46556 (3817530; first misnamed Lot 4 DP 58017, which is 3837395) is a whole house without an outline. Two of three flags checked on
     parcels that do have outlines were dense trees, and one was a reserve's trees.
   - False alarms only empty a parcel's building values; they never invent one. `SOURCES.md` says so.
 - **Fetch window** (2). Building values are also empty when the fetch window covers less than 99% of the parcel.

@@ -351,7 +351,9 @@ for uid, (g, p) in enumerate(units):
                      horizon_mean_deg=None, horizon_north_deg=None, sky_view_pct=None)
     if not HAVE_LIDAR and r["building_2021_m2"] is not None:  # the same definition as with LiDAR (seventh review)
         r["open_ground_m2"] = max(0, int(round(g.intersection(TILE_BOX).area)) - r["building_2021_m2"])
-    r["unmapped_structure_m2"] = _M.largest_structure_m2(UNMAPPED[rs, cs] & m) if HAVE_LIDAR and r["lidar_cells"] else None
+    # a warning, not a gap filler (D-19); unknown where the LiDAR doesn't cover the parcel, so not 0 (tenth review)
+    r["unmapped_structure_m2"] = (_M.largest_structure_m2(UNMAPPED[rs, cs] & m)
+                                  if HAVE_LIDAR and r["lidar_cells"] and r.get("lidar_coverage_pct", 0) >= 99 else None)
     OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73, T-79)
     # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
     dc = district_cells(g) if DF is not None else None
