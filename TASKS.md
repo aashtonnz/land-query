@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 13:00 (Pacific/Auckland)
+Last updated: 2026-11-08 13:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -13,10 +13,11 @@ Standing priorities:
 - T-57: Third fresh-eyes review (fresh-eyes review 1.1: review again after serious findings are fixed): a new reviewer checks everything changed since the second review was recorded (T-47 to T-56: coastal flow, LINZ geometry, service fixes, water mains, clear-ground columns, source check) before the second council builds on it. Started 2026-11-08.
 
 ## Waiting on you
+- T-58: Wellington Water's licence: its three-waters data for Porirua, Wellington City, Hutt, Upper Hutt and South Wairarapa says "not to be used for commercial purposes including … reselling". Decide whether to (a) build Porirua without three waters, (b) ask Wellington Water for commercial terms (your contact), or (c) pause the second council. Raised 2026-11-08. [Discovery](docs/findings/2026-11-08-porirua-discovery.md)
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council (after T-57): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council (after T-57; blocked on T-58; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
