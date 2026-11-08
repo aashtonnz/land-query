@@ -30,18 +30,30 @@ def page_through(fetch_page, page):
         if not fs or (len(fs) < page and not exceeded(j)): return feats
 
 
-def query_all(url, query):
+def query_all(url, query, workers=1):
     """Every feature matching query (ArcGIS query parameters), as GeoJSON features in the requested outSR.
 
     Pages at the layer's own maxRecordCount, then checks the total against returnCountOnly and fails if any are
-    missing, so a layer can never be silently cut short."""
+    missing, so a layer can never be silently cut short. With workers > 1 the pages are fetched in parallel (T-100)."""
     try: page = int(_get(url, {"f": "json"}, 60).get("maxRecordCount") or 1000)
     except Exception: page = 1000
     page = max(1, min(page, 5000))
     base = dict(query, f="geojson", orderByFields=query.get("orderByFields", "OBJECTID"))
-    feats = page_through(lambda o, n: _get(url + "/query", dict(base, resultOffset=o, resultRecordCount=n)), page)
-    n = _get(url + "/query", dict({k: v for k, v in query.items() if k not in ("outFields", "outSR")},
-                                  returnCountOnly="true", f="json")).get("count")
+    count = lambda: _get(url + "/query", dict({k: v for k, v in query.items() if k not in ("outFields", "outSR")},
+                                              returnCountOnly="true", f="json")).get("count")
+    fetch = lambda o, n: _get(url + "/query", dict(base, resultOffset=o, resultRecordCount=n))
+    if workers > 1:
+        from concurrent.futures import ThreadPoolExecutor
+        n = count()
+        with ThreadPoolExecutor(workers) as ex:
+            pages = list(ex.map(lambda o: fetch(o, page).get("features", []), range(0, n or 0, page)))
+        feats = [f for p in pages for f in p]
+        ids = [f.get("id", (f.get("properties") or {}).get("OBJECTID")) for f in feats]
+        if None not in ids and len(set(ids)) != len(ids):
+            raise RuntimeError("duplicate features across pages")
+    else:
+        feats = page_through(fetch, page)
+        n = count()
     if n is not None and n != len(feats):
         raise RuntimeError(f"incomplete download: {len(feats)} features of {n}")
     return feats

@@ -44,6 +44,7 @@ ORIGIN = (1000000.0, 4700000.0)
 MARGIN = 5000.0          # elevation read this far beyond the tile, so catchments are whole for nearly every parcel
 COAST_MAX = 10000.0      # coast distance searched to here; beyond it the distance is left empty and coast_over_10km set
 RES = 10.0
+WORKERS = 8           # pages fetched in parallel from LINZ's services
 FLAT_DEG, STEEP_DEG, LOW_M = 5.0, 15.0, 5.0
 
 GW_TA = "https://mapping.gw.govt.nz/arcgis/rest/services/Region_basemap_P/MapServer/1"
@@ -76,7 +77,7 @@ def fetch(layer, bbox, cache, where="1=1"):
         t0 = time.time()
         feats = arcgis.query_all(SVC + svc + "/FeatureServer/0", dict(
             where=where, geometry=",".join(str(round(v)) for v in bbox), geometryType="esriGeometryEnvelope", inSR=2193,
-            spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193))
+            spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193), workers=WORKERS)
         d = dict(features=feats, fetched=utc_now(), seconds=round(time.time() - t0, 1))
         os.makedirs(cache, exist_ok=True)
         json.dump(d, gzip.open(path + ".tmp", "wt")); os.replace(path + ".tmp", path)
