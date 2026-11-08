@@ -84,6 +84,8 @@ BUILDINGS_KEY = "buildings_2021"
 ABSENT_COLUMNS = ()        # regexes of columns this council has no source for
 RENAME_COLUMNS = {}
 
+DATASET_SOURCES = "public LINZ, KCDC and GWRC sources"   # in the service's `about`
+
 BLOCKS_FILE = "kapiti_blocks.json"
 FLOW_BBOX = (1745000, 5440000, 1835000, 5510000)   # the 10 m district flow mosaic (T-42)
 FLOW_OUT_BBOX = (1752000, 5452000, 1808000, 5498000)  # district blocks plus 3 km: every block's LiDAR window

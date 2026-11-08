@@ -606,6 +606,31 @@ def test_finish_rules_apply_to_published_rows_and_are_idempotent():
     assert "unmapped_structure_m2" not in r                                            # an absent column stays absent
 
 
+def test_porirua_settings_are_consistent():
+    # Porirua's settings (T-87): every layer read is fetched, labels come from its fields, nothing needed is absent
+    import re, json
+    import overlays as ov
+    from councils import load
+    P = load("porirua")
+    assert set(P.POLY_LAYERS + P.POINT_LAYERS) <= set(P.ARCGIS) and set(P.POINT_IDS) == set(P.POINT_LAYERS)
+    assert P.BUILDINGS_KEY in P.ARCGIS and P.LIDAR_KEYS["dem_old"] is None and {n for _, n in P.LIDAR} == {"dem_2023", "dsm_2023"}
+    assert ov.class_label("zones", {"ZONE": "Mixed Use Zone", "ePlan_Zone": "x"}, P) == "Mixed Use Zone"
+    assert ov.class_label("pdp_fault_rupture", {"Fault_Name": " Ohariu Fault "}, P) == "Ohariu Fault"
+    assert ov.class_label("pdp_tsunami_100yr", {}, P) == "1-in-100-year tsunami"
+    absent = lambda c: any(re.fullmatch(p, c) for p in P.ABSENT_COLUMNS)
+    for keep in P.POLY_LAYERS + P.POINT_LAYERS + ["wind_obstruction_pct", "wind_rel_height_m", "building_2021_m2", "ground_mean_m",
+                                                 "catchment_area_max_m2", "upslope_area_max_m2", "unmapped_structure_m2"]:
+        assert not absent(keep), keep
+    for gone in ["ww_pipe_year", "sw_mh_dist_m", "ws_pipe_dia_mm", "rbl_in_parcel_n", "dz_2021_2025_mean_m", "ovl_flood_hazard",
+                 "flood_ponding", "tsunami_zones", "earthworks", "wind_very_high"]:
+        assert absent(gone), gone
+    blocks = json.load(open(os.path.join(os.path.dirname(__file__), P.BLOCKS_FILE)))
+    assert len(blocks) == 17 and sum(b["parcels"] for b in blocks) == 24110
+    fb = P.FLOW_OUT_BBOX
+    assert all(fb[0] <= b["xmin"] - 1300 and b["xmin"] + 6300 <= fb[2] and fb[1] <= b["ymin"] - 1300 and b["ymin"] + 6300 <= fb[3]
+               for b in blocks)   # every block's LiDAR window (block, 1 km fetch margin, 300 m context) is in the flow grid
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

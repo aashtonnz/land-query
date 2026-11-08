@@ -80,9 +80,18 @@ CLASS_FIELDS = {   # (fields to try, name when none is set)
 }
 # no source for these in Porirua: left out, not published empty (D-12)
 ABSENT_COLUMNS = (r"ww_\w+", r"sw_\w+", r"ws_\w+", r"rbl_\w+", r"ground_min_minus_rbl_m", r"dz_2021_2025_\w+",
-                  r"lidar_epoch_offset_block_m")
+                  r"lidar_epoch_offset_block_m",
+                  # Kāpiti's own overlays: Porirua's are the pdp_* columns
+                  r"ovl_\w+", r"flood_\w+", r"wind_stainless", r"wind_very_high", r"tsunami_zones", r"earthworks")
 RENAME_COLUMNS = {"building_2021_m2": "building_m2"}   # PCC's footprints are not the 2021 KCDC capture
+
+DATASET_SOURCES = "public LINZ, Porirua City Council and GWRC sources"
+# Kāpiti's source keys (service/catalogue.py COLUMN_SOURCES) as Porirua names them
+SOURCE_KEYS = {"dem_2025": "dem_2023", "dsm_2025": "dsm_2023", "buildings_2021": "pcc_buildings",
+               "buildings_capture_area": "district_outline", "kcdc_parcels": "pcc_parcels"}
+COLUMN_SOURCES = [(r"building_m2", ["parcels", "dem_2023", "pcc_buildings"]),
+                  (r"pdp_\w+", None)]   # a District Plan layer: its own source key
 
 BLOCKS_FILE = "porirua_blocks.json"
 FLOW_BBOX = (1740000, 5432000, 1780000, 5468000)       # the city plus room for catchments draining into it
-FLOW_OUT_BBOX = (1744000, 5436000, 1772000, 5464000)
+FLOW_OUT_BBOX = (1743000, 5436000, 1772000, 5464000)  # every block's LiDAR window (T-87 test)

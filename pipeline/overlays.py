@@ -2,15 +2,16 @@
 from shapely.ops import unary_union
 
 
-def class_label(layer, props):
+def class_label(layer, props, council=None):
     """The class a polygon feature belongs to, from the layer's own class field (T-39).
 
     zones: ePlan_Zone, the operative District Plan zone (PDP_ZONE holds older names for some features).
     Layers without a class field get a fixed name for the overlay itself, never the column name."""
     f = lambda k: (props.get(k) or "").strip() if isinstance(props.get(k), str) else props.get(k)
     from councils import COUNCIL
-    if layer in COUNCIL.CLASS_FIELDS:   # a council's own class fields, then a fixed name (T-87)
-        fields, default = COUNCIL.CLASS_FIELDS[layer]
+    council = council or COUNCIL
+    if layer in council.CLASS_FIELDS:   # a council's own class fields, then a fixed name (T-87)
+        fields, default = council.CLASS_FIELDS[layer]
         return next((f(k) for k in fields if f(k)), None) or default
     if layer == "zones": return f("ePlan_Zone") or f("NPS_Zone") or "Zone not recorded"
     if layer == "ovl_fault_avoidance":

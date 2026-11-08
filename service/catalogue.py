@@ -4,9 +4,11 @@
 meaning; this module reads them from it. The one thing added here is which sources each column is computed from
 (COLUMN_SOURCES). Tests check that every compiled column is covered and every source key is in the register.
 """
-import os, re
+import os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+from councils import COUNCIL   # COUNCIL (environment) picks the council; Kāpiti Coast by default (T-87)
 LICENCE = {"✅": "dataset licence", "◐": "portal-wide statement, to be confirmed in writing (T-35)"}
 FIT = {"✅": "fit", "⚠": "use with caution", "❌": "not fit for parcel use", "—": "not applicable"}
 FIT_RANK = {"fit": 0, "not applicable": 0, "use with caution": 1, "not fit for parcel use": 2, "unknown": 3}
@@ -24,11 +26,18 @@ def missing_columns(have, run_text):
     """Columns defined in SOURCES.md but absent from results. Pending columns may be absent only from results
     published by finish.py (RUN.txt says so): a full rebuild must have every column (eleventh review)."""
     defined = {pat.pattern[1:-1] for pat, _, _ in _COLUMNS if "\\w" not in pat.pattern}
+    defined = {COUNCIL.RENAME_COLUMNS.get(c, c) for c in defined if not absent(c)}
     finished = "finish.py" in (run_text or "")
     return sorted(c for c in defined if c not in set(have) and not (finished and c in PENDING_COLUMNS))
 
+
+def absent(col):
+    """A column the council has no source for, left out of its results (T-87)."""
+    return any(re.fullmatch(p, col) for p in COUNCIL.ABSENT_COLUMNS)
+
 # Which sources each column is computed from, first match wins. Every derived value also depends on the parcel.
 P = ["parcels"]
+COUNCIL_COLUMN_SOURCES = [(p, s) for p, s in getattr(COUNCIL, "COLUMN_SOURCES", [])]   # a council's own, first
 COLUMN_SOURCES = [
     (r"(unit_id|appellation|parcel_intent|survey_area_m2|titles|geometry_source|unit_source|area_m2|coverage_pct|rep_[xy]|bbox_\w+)", P),
     (r"block_id", []),
@@ -81,15 +90,28 @@ def _symbol(cell, table):
     return None
 
 
-def load(path=os.path.join(ROOT, "SOURCES.md")):
+REGISTER = {"kapiti": "## Register", "porirua": "## Register: Porirua City"}       # each council's sources
+COUNCIL_COLUMNS = {"porirua": "## Columns: Porirua City"}                           # a council's own column rows
+
+
+def load(path=os.path.join(ROOT, "SOURCES.md"), council=COUNCIL.NAME):
     text = open(path, encoding="utf-8").read()
     sources = {}
-    for key_cell, dataset, lic, updated, fit, notes in (r[:6] for r in _table(text, "## Register")):
+    shared = ("titles", "nonprimary_parcels")   # LINZ rows every council uses, from the Kāpiti table
+    if council != "kapiti":
+        rows = [r for r in _table(text, REGISTER["kapiti"]) if any(f"`{k}`" in r[0] for k in shared)]
+        rows += _table(text, REGISTER[council])
+    else:
+        rows = _table(text, REGISTER["kapiti"])
+    for key_cell, dataset, lic, updated, fit, notes in (r[:6] for r in rows):
         for k in re.findall(r"`([^`]+)`", key_cell):
             sources[k] = dict(dataset=dataset, licence=lic, licence_status=_symbol(lic, LICENCE) or "unknown",
                               licence_cleared=lic.startswith("✅"), fit=_symbol(fit, FIT) or "unknown", updated=updated, notes=notes)
     exact, globs = [], []
-    for cols, kind, meaning in (r[:3] for r in _table(text, "| Columns | Kind | Meaning |", header_in_heading=True)):
+    rows = _table(text[text.index("## Compiled columns"):], "| Columns | Kind | Meaning |", header_in_heading=True)
+    if council in COUNCIL_COLUMNS:   # the council's own rows first: they win over the shared ones
+        rows = _table(text, COUNCIL_COLUMNS[council]) + rows
+    for cols, kind, meaning in (r[:3] for r in rows):
         for pat in re.findall(r"`([^`]+)`", cols):
             entry = (re.compile("^" + re.escape(pat).replace(r"\*", r"\w+") + "$"), kind, meaning)
             (globs if "*" in pat else exact).append(entry)
@@ -102,10 +124,15 @@ SOURCES, _COLUMNS = load()
 LIDAR = {"dem_2025", "dsm_2025", "dem_2021"}
 
 
+# Kāpiti's source keys in COLUMN_SOURCES as the council names them (T-87)
+SOURCE_KEYS = getattr(COUNCIL, "SOURCE_KEYS", {})
+LIDAR = {SOURCE_KEYS.get(k, k) for k in LIDAR}
+
+
 def column_sources(col):
-    for pat, src in COLUMN_SOURCES:
+    for pat, src in COUNCIL_COLUMN_SOURCES + COLUMN_SOURCES:
         if re.fullmatch(pat, col):
-            out = [col] + P if src is None else list(src)
+            out = [col] + P if src is None else [SOURCE_KEYS.get(k, k) for k in src]
             # every LiDAR surface is masked by the district grid's sea before use (T-59, T-62)
             if LIDAR & set(out) and "sea_mask" not in out: out.append("sea_mask")
             return out

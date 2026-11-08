@@ -58,6 +58,55 @@ This is a working record, not legal advice. Keys match `provenance.json` and the
 statement (◐). None are known to be closed to commercial reuse. Before anything is sold, someone should ask KCDC and GWRC to confirm, in writing, that the
 portal-wide statements cover the uncatalogued service layers (the owner makes that contact, not an agent).
 
+## Register: Porirua City
+
+Porirua City (T-24, T-87): the same pipeline with Porirua's own sources, chosen by `COUNCIL=porirua`. District Plan
+layers are the Porirua District Plan 2025, operative from 1 November 2025
+([council notice](https://poriruacity.govt.nz/your-council/news/public-notices/proposed-district-plan-operative)), from
+PCC's ArcGIS Online organisation. Three waters are left out: Wellington Water's licence bars commercial use (D-16). So
+are recommended building levels, wind and earthworks zones (PCC publishes none as layers), and ground change (one LiDAR
+survey). Absent columns are left out of Porirua's results, not published empty. `titles` and `nonprimary_parcels` are as
+in the register above.
+
+| Key | Dataset (publisher) | Licence | Updated | Fit for parcel use | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `parcels` | NZ Primary Parcels, layer 50823 (LINZ), by parcel id; city and block membership from PCC's copy (`pcc_parcels`), kept where the parcel's representative point, or at least 1,000 m² of it, lies in the city (`district_outline`) | ✅ LINZ CC BY 4.0 | weekly | ✅ | Whole parcels are published (D-18). Without the LINZ key, PCC's copy is used for every parcel (`geometry_source`) |
+| `pcc_parcels` | PCC's public copy of NZ Primary Parcels (Property/Parcel layer 2; 24,128 parcels) | ✅ LINZ CC BY 4.0 | not stated | ✅ | Same fields as LINZ's; 18 of its parcels lie outside the city and are dropped |
+| `district_outline` | Three polygons: PCC's city boundary (PropertyAdminExternal layer 4), PCC's two wards (ArcGIS Online `Ward`), and Stats NZ's district polygon (GWRC Region_basemap_P layer 1, © Statistics NZ, CC BY 4.0) | ◐ | not catalogued | — | Land counts where two agree. PCC's boundary and wards are the same 182.5 km² (harbour included), so in practice the outline is PCC's boundary; Stats NZ's is 174.5 km² |
+| `zones` | Porirua District Plan 2025 – Zones (`Zone_PDP2025`, field `ZONE`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_flood_overland_flow`, `pdp_flood_stream_corridor`, `pdp_flood_inundation` | District Plan 2025 flood hazard overlays (one extent each) | ◐ | Oct 2025 | ⚠ | Modelled extents; no depth or class |
+| `pdp_coastal_erosion_current`, `pdp_coastal_erosion_1m_slr`, `pdp_coastal_inundation_current`, `pdp_coastal_inundation_1m_slr` | District Plan 2025 coastal hazard overlays: current erosion and inundation, and with 1 m sea-level rise (the inundation one is the 1-in-100-year storm surge) | ◐ | Oct 2025 | ⚠ | Modelled extents |
+| `pdp_tsunami_100yr`, `pdp_tsunami_500yr`, `pdp_tsunami_1000yr` | District Plan 2025 tsunami inundation extents, 1-in-100, 500 and 1,000-year | ◐ | Oct 2025 | ⚠ | Modelled extents |
+| `pdp_fault_rupture` | District Plan 2025 fault rupture zones (field `Fault_Name`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_heritage_items`, `pdp_heritage_sites` | District Plan 2025 heritage items (points, field `ID`) and historic heritage sites (polygons, field `Name`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_notable_trees` | District Plan 2025 notable trees (points, field `Tree_ID`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_significant_natural_areas` | District Plan 2025 significant natural areas (field `SiteName`) | ◐ | Oct 2025 | ✅ | |
+| `pdp_noise_rail`, `pdp_noise_state_highway` | District Plan 2025 rail noise corridor and state highway noise control boundary | ◐ | Oct 2025 | ✅ | |
+| `pdp_coastal_environment` | District Plan 2025 landward extent of the coastal environment | ◐ | Oct 2025 | ✅ | |
+| `gw_liquefaction` | Earthquake Liquefaction Potential (GWRC, from GNS 2018) | ◐ (© GWRC, regional CC BY statement) | 2018 basis | ❌ | As for Kāpiti: GWRC maps only soils with significant potential, so empty means outside those areas |
+| `gw_eq_slope_failure` | Earthquake Slope Failure potential (GWRC, 1995 series) | ◐ (© GWRC) | 1995 basis | ⚠ | Classes all the land it maps, so empty means not mapped |
+| `pcc_buildings` | PCC building footprints (PropertyAdminExternal layer 2; 30,409) | ◐ | drawn from photos of 2013 and 2017 (field `SOURCE`) | ⚠ | Their extent matches the city, so coverage is taken as the whole city (`buildings_coverage_pct`). They miss what was built since; `unmapped_structure_m2` warns of most of it (in a 1.5 km test tile at Porirua's centre, 30 of 205 parcels) |
+| `dem_2023`, `dsm_2023` | Porirua LiDAR 1 m DEM/DSM 2023 (LINZ, nz-elevation `porirua_2023`) | ✅ CC BY 4.0 | 2023 flight | ✅ | 1 m cells. One survey only, so no ground-change columns |
+| `district_flow` | New Zealand LiDAR 1 m DEM, read at 10 m, gaps from the Contour-Interpolated 8 m DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic | ⚠ | 10 m mosaic over 1740000–1780000 E, 5432000–5468000 N, which takes in the catchments draining into the city |
+| `sea_mask` | Sea cells from the `district_flow` grid, as for Kāpiti | ✅ CC BY 4.0 | as `district_flow` | ✅ | |
+
+## Columns: Porirua City
+
+Rows here replace the shared rows below for Porirua; columns not listed have the shared meaning.
+
+| Columns | Kind | Meaning |
+| --- | --- | --- |
+| `pdp_*` | published | A District Plan 2025 overlay: JSON of its class (or its name, for a layer without classes) → % of parcel area covered; for `pdp_heritage_items` and `pdp_notable_trees`, the points on the parcel. Empty means the parcel is outside it |
+| `building_m2`, `open_ground_m2`, `open_ground_slope_lt5_m2` | derived | Area under PCC's building footprints (drawn from 2013 and 2017 photos); the rest of the parcel, outside them; the rest that slopes under 5° (needs LiDAR). 0 m² means no footprint, not no building: check `unmapped_structure_m2`. Empty unless the fetch window covers at least 99% of the parcel; so are the other open-ground and roof columns |
+| `buildings_coverage_pct` | derived | Share of the parcel inside the city: PCC's footprints are taken to cover the whole city |
+| `unmapped_structure_m2` | modelled | As for Kāpiti, against PCC's footprints and the 2023 LiDAR. Their age means more flags here: many are buildings built since 2017 |
+| `geometry_source` | published | `LINZ` (layer 50823) or `PCC mirror` (where LINZ was not fetched or did not return the parcel) |
+| `zones`, `zones_total_pct` | derived | `zones`: JSON of District Plan 2025 zone (PCC `ZONE`) → % of parcel area covered; overlapping features of the same zone count once. `zones_total_pct`: their sum |
+| `ground_min_m`, `ground_mean_m`, `ground_max_m` | derived | 2023 LiDAR ground height over the parcel, metres NZVD2016 |
+| `open_ground_clear_pct` | derived | Share of open ground with nothing standing more than 0.5 m above it in the 2023 DSM (no tree, shrub, hedge, fence, vehicle or building newer than PCC's footprints) |
+| `roof_pitch_p50_deg`, `roof_flat_m2`, `roof_north_m2` | derived | From the 2023 DSM inside PCC's footprints: median pitch, area under 5°, area facing north (315°–45°) at 5° or more |
+| `upslope_area_max_m2`, `upslope_area_truncated`, `flow_path_m` | modelled | As for Kāpiti, on the 2023 1 m DEM: overland flow within the block's LiDAR window (largest upslope area through the parcel; whether it reaches the window edge or a LiDAR gap; length of flow paths draining at least 2,000 m²). All three empty on parcels under 99% LiDAR coverage |
+
 ## Compiled columns (per parcel, table `units`)
 
 > **Second review (T-46 to T-51, 7 Nov 2026).** The problems it found are fixed and the district was rebuilt on

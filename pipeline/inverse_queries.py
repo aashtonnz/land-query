@@ -80,6 +80,43 @@ Q = [
          sources=["parcels", "ovl_heritage_places", "ovl_notable_trees", "ovl_ecological_sites"]),
 ]
 
+# Porirua City (T-87): no three waters (D-16), no recommended building levels, one LiDAR survey
+PDP_FLOOD = ["pdp_flood_overland_flow", "pdp_flood_stream_corridor", "pdp_flood_inundation"]
+PDP_COAST = ["pdp_coastal_erosion_current", "pdp_coastal_erosion_1m_slr", "pdp_coastal_inundation_current", "pdp_coastal_inundation_1m_slr"]
+Q_PORIRUA = [
+    dict(id="P1", name="Residential infill candidates",
+         question="High or Medium Density Residential parcels of at least 800 m² (that zone over at least 90% of the parcel, no other "
+                  "zone over 10%), under 25% covered by PCC's building footprints, 90th-percentile slope under 10°, outside every "
+                  "District Plan 2025 flood and coastal hazard overlay. No sewer condition: Porirua's three waters are not used (D-16). "
+                  "Footprints date from 2013–17, so check `unmapped_structure_m2` for newer buildings.",
+         sql=f"""SELECT unit_id, appellation, area_m2, building_m2, unmapped_structure_m2, slope_p90_deg, zones {BASE} {TERRAIN}
+                 AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
+                      OR json_extract(zones,'$."Medium Density Residential Zone"')::DOUBLE >= 90)
+                 AND zones_total_pct - greatest(coalesce(json_extract(zones,'$."High Density Residential Zone"')::DOUBLE, 0),
+                                                coalesce(json_extract(zones,'$."Medium Density Residential Zone"')::DOUBLE, 0)) < 10
+                 AND area_m2 >= 800 AND building_m2 < 0.25*area_m2 AND slope_p90_deg < 10
+                 AND {" AND ".join(f"{c} IS NULL" for c in PDP_FLOOD + PDP_COAST)}
+                 ORDER BY area_m2 DESC""",
+         sources=["parcels", "zones", "pcc_buildings", "dem_2023", "dsm_2023", *PDP_FLOOD, *PDP_COAST]),
+    dict(id="P2", name="Coastal hazard with 1 m sea-level rise",
+         question="Parcels with buildings that the District Plan 2025 maps in coastal erosion or the 1-in-100-year storm surge "
+                  "with 1 m sea-level rise, but not in the current-day extents.",
+         sql=f"""SELECT unit_id, appellation, area_m2, building_m2, pdp_coastal_erosion_1m_slr, pdp_coastal_inundation_1m_slr
+                 {BASE} AND building_m2 > 0 AND (pdp_coastal_erosion_1m_slr IS NOT NULL OR pdp_coastal_inundation_1m_slr IS NOT NULL)
+                 AND pdp_coastal_erosion_current IS NULL AND pdp_coastal_inundation_current IS NULL ORDER BY area_m2 DESC""",
+         sources=["parcels", "pcc_buildings", *PDP_COAST]),
+    dict(id="P3", name="Heritage, notable tree or significant natural area on the parcel",
+         question="Parcels with a District Plan 2025 heritage item or notable tree point inside or on their boundary, or "
+                  "overlapping a historic heritage site or significant natural area.",
+         sql=f"""SELECT unit_id, appellation, area_m2, pdp_heritage_items, pdp_notable_trees, pdp_heritage_sites, pdp_significant_natural_areas
+                 {BASE} AND (pdp_heritage_items <> '[]' OR pdp_notable_trees <> '[]' OR pdp_heritage_sites IS NOT NULL
+                             OR pdp_significant_natural_areas IS NOT NULL)""",
+         sources=["parcels", "pdp_heritage_items", "pdp_notable_trees", "pdp_heritage_sites", "pdp_significant_natural_areas"]),
+]
+from councils import COUNCIL
+Q = {"kapiti": Q, "porirua": Q_PORIRUA}[COUNCIL.NAME]
+
+
 def prov(keys):
     return {k: source_summary(PROV[k]) for k in keys if k in PROV}
 

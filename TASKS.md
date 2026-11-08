@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 05:00 (Pacific/Auckland)
+Last updated: 2026-11-09 06:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -12,8 +12,8 @@ Standing priorities:
 ## Doing (at most 3)
 - T-24: Second council, Porirua without three waters (D-16), to measure what a council adapter costs before the rest of the region (T-38). Steps:
   - T-86 (done 2026-11-09): Council settings in `pipeline/councils/`, chosen by `COUNCIL`: layers, parcel copy, boundary sources, LiDAR surveys, flow area. A Kāpiti test tile compiles identically, provenance included.
-  - T-87: Porirua settings. Found: District Plan 2025 layers on PCC's ArcGIS Online (operative since 1 Nov 2025; zones, 3 flood, 4 coastal, 3 tsunami, fault rupture, heritage, notable trees, SNAs, noise, coastal environment); PCC's parcel copy of LINZ (24,128, same fields as KCDC's); three boundary polygons (PCC city boundary and wards 182.5 km², Stats NZ 174.5 km²); PCC building footprints (30,409); LiDAR `porirua_2023` only. Still to do: per-council layer lists, class fields and columns in the compiler; Kāpiti-only columns (three waters, RBL, wind, earthworks, ground change) absent for Porirua, not empty; a Porirua section in `SOURCES.md` and the service catalogue; per-council queries.
-  - T-88: Porirua on local test tiles, then a district run (`porirua.yml`, about US$1–1.50) to `porirua-results`.
+  - T-87 (done 2026-11-09): Porirua settings (`pipeline/councils/porirua.py`): District Plan 2025 layers, PCC's parcel copy, three-polygon outline (in effect PCC's boundary, 182.5 km²), LiDAR 2023, PCC footprints (2013–17 photos), 24,110 parcels in 17 blocks. The compiler, QA, queries (P1–P3), measure check, catalogue and `SOURCES.md` are per council; Porirua's absent columns are left out. A 1.5 km tile at Porirua's centre compiles (205 parcels, 76 columns) and passes the service checks; the Kāpiti tile still compiles identically. LINZ's newer national building outlines would replace PCC's dated footprints (later).
+  - T-88: Porirua district run (`porirua.yml`, about US$1) to `porirua-results`. Started 2026-11-09.
   - T-89: Fresh-eyes review of the adapter and the Porirua results; record the adapter's cost.
 
 ## Waiting on you

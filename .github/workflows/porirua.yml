@@ -1,0 +1,165 @@
+name: Compile Porirua City
+
+# Porirua City (T-88): the same steps as kapiti.yml with COUNCIL=porirua (pipeline/councils/porirua.py).
+# Compiles every 5 km block listed in pipeline/porirua_blocks.json (each parcel belongs to the block holding its
+# representative point), then merges the blocks into one district database and runs the inverse queries (T-21).
+# Uses the LINZ_API_KEY repository secret. Results are pushed to the `porirua-results` branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reuse_blocks_from:
+        description: "Optional: a run id whose block results (kept 1 day) to merge again, instead of recomputing the blocks"
+        required: false
+        default: ""
+      only:
+        description: "Optional: comma-separated block xmin_ymin ids to run (default: all)"
+        required: false
+        default: ""
+
+env:
+  COUNCIL: porirua   # every step reads the council's settings (T-86)
+
+permissions:
+  contents: write
+  actions: read   # to download block results from an earlier run (reuse_blocks_from)
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      blocks: ${{ steps.b.outputs.blocks }}
+      all_blocks: ${{ steps.b.outputs.all_blocks }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: b
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, os
+          only = {s.strip() for s in os.environ.get("ONLY", "").split(",") if s.strip()}
+          b = [x for x in json.load(open("pipeline/porirua_blocks.json")) if not only or f"{x['xmin']}_{x['ymin']}" in only]
+          print("blocks=" + json.dumps([{"xmin": x["xmin"], "ymin": x["ymin"]} for x in b]))
+          print("all_blocks=" + json.dumps([{"xmin": x["xmin"], "ymin": x["ymin"]} for x in json.load(open("pipeline/porirua_blocks.json"))]))
+          EOF
+        env:
+          ONLY: ${{ inputs.only }}
+
+  flow:
+    # district-scale flow on a 10 m mosaic of LINZ's national DEM (T-42); cached for the month, as it changes rarely
+    if: inputs.reuse_blocks_from == '' || inputs.only != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - id: month
+        run: echo "m=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: pipeline/flowdata
+          key: district-flow-porirua-${{ steps.month.outputs.m }}-${{ hashFiles('pipeline/district_flow.py', 'pipeline/flow.py', 'pipeline/councils/porirua.py') }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: pipeline
+        run: |
+          pip install -r requirements.txt
+          mkdir -p flowdata && /usr/bin/time -v python3 district_flow.py flowdata/district_flow.tif 2> time_flow.txt
+          grep -h -E "Elapsed|Maximum resident" time_flow.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: district-flow
+          path: pipeline/flowdata/
+          retention-days: 1  # results are published to porirua-results; keep storage small (D-14)
+
+  block:
+    needs: [plan, flow]
+    if: inputs.reuse_blocks_from == '' || inputs.only != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 8   # gentle on council map servers
+      matrix:
+        block: ${{ fromJson(needs.plan.outputs.blocks) }}
+    env:
+      TILE_XMIN: ${{ matrix.block.xmin }}
+      TILE_YMIN: ${{ matrix.block.ymin }}
+      TILE_SIZE: "5000"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - run: pip install -r pipeline/requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: district-flow, path: pipeline/data/raw }
+      - name: Fetch and compile
+        working-directory: pipeline
+        env:
+          LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
+        run: |
+          COUNCIL=kapiti python3 test_measures.py   # the code's tests use Kāpiti fixtures; Porirua's settings
+          COUNCIL=kapiti python3 test_review.py     # have their own (test_porirua_settings_are_consistent)
+          python3 fetch_parcels_kcdc.py data
+          python3 fetch_tile.py data
+          python3 fetch_lidar.py data
+          python3 fetch_parcels.py data
+          /usr/bin/time -v python3 compile_tile.py data 2> time_compile.txt
+          python3 qa.py data
+          grep -h -E "Elapsed|Maximum resident" time_compile.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: block-${{ matrix.block.xmin }}_${{ matrix.block.ymin }}
+          path: |
+            pipeline/data/units.parquet
+            pipeline/data/provenance.json
+            pipeline/data/qa.json
+            pipeline/data/fetch_bbox.json
+          retention-days: 1  # results are published to porirua-results; keep storage small (D-14)
+
+  merge:
+    needs: [plan, block]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - run: pip install -r pipeline/requirements.txt
+      # reuse_blocks_from: start from an earlier run's blocks; with `only` as well, the listed blocks are recomputed here
+      # and replace those (a patch run, T-60)
+      - uses: actions/download-artifact@v4
+        if: inputs.reuse_blocks_from != ''
+        with: { pattern: "block-*", path: blocks, run-id: "${{ inputs.reuse_blocks_from }}", github-token: "${{ secrets.GITHUB_TOKEN }}" }
+      - if: inputs.reuse_blocks_from != '' && inputs.only != ''
+        env: { ONLY: "${{ inputs.only }}" }
+        run: for b in $(echo "$ONLY" | tr ',' ' '); do rm -rf "blocks/block-$b"; done
+      - uses: actions/download-artifact@v4
+        if: inputs.reuse_blocks_from == '' || inputs.only != ''
+        with: { pattern: "block-*", path: blocks }
+      - name: Merge and query
+        working-directory: pipeline
+        run: |
+          mkdir -p ../district && python3 merge_blocks.py ../blocks ../district | tee ../district/merge_log.txt
+          python3 inverse_queries.py ../district ../district/district.duckdb | tee ../district/summary.md
+          python3 check_measures.py ../district/district.duckdb ../district/measures_checks.json | tee -a ../district/summary.md
+      - name: Check the query service covers every column (T-36)
+        run: |
+          pip install -q -r service/requirements.txt
+          LANDQ_RESULTS=district python3 service/test_service.py
+      - name: Check the run is complete before publishing it as the district (T-48)
+        env:
+          ONLY: ${{ inputs.reuse_blocks_from == '' && inputs.only || '' }}
+          PLANNED: ${{ inputs.reuse_blocks_from == '' && needs.plan.outputs.blocks || needs.plan.outputs.all_blocks }}
+        run: |
+          python3 pipeline/check_complete.py "$PLANNED" blocks "$ONLY" \
+            "$(python3 -c 'import json; print(len(json.load(open("pipeline/porirua_blocks.json"))))')"
+      - name: Push results to porirua-results branch
+        run: |
+          mkdir -p /tmp/out && cp district/{units.parquet,provenance.json,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json} /tmp/out/
+          git fetch origin porirua-results && git checkout porirua-results || git checkout --orphan porirua-results
+          git rm -rq --cached . 2>/dev/null || true
+          rm -rf results && mkdir -p results && cp /tmp/out/* results/
+          echo "Run ${{ github.run_id }} on $(date -u +%FT%TZ) merged at commit ${{ github.sha }}; blocks compiled at commit $(cat district/commits.txt)${{ inputs.reuse_blocks_from != '' && format(' (blocks from run {0})', inputs.reuse_blocks_from) || '' }}" > results/RUN.txt
+          git add results && git -c user.name="porirua workflow" -c user.email="actions@github.com" \
+            commit -qm "Porirua compile: run ${{ github.run_id }}" && git push -q origin HEAD:porirua-results

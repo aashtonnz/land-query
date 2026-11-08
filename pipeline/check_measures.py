@@ -17,6 +17,13 @@ def lift(flag, ref):
                 share_of_all_in_reference=round(nr / n, 3) if n else None,
                 lift=round((nfr / nf) / (nr / n), 2) if nf and nr else None)
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from councils import COUNCIL
+if COUNCIL.NAME == "porirua":   # PCC's own layers (T-87)
+    json.dump(dict(overland_flow_path_vs_pcc_flood_overlays=lift("flow_path_m > 0", "(pdp_flood_overland_flow IS NOT NULL "
+              "OR pdp_flood_stream_corridor IS NOT NULL OR pdp_flood_inundation IS NOT NULL)")), open(sys.argv[2], "w"), indent=1)
+    sys.exit(0)
 flood = ("(ovl_flood_hazard IS NOT NULL OR flood_stream_corridor IS NOT NULL OR flood_overflow_path IS NOT NULL "
          "OR flood_storage IS NOT NULL OR flood_ponding IS NOT NULL)")
 out = dict(

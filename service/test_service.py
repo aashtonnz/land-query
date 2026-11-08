@@ -8,6 +8,15 @@ from landquery import LandQuery, QueryError
 B1, B2 = "1765000_5465000_5000", "1770000_5470000_5000"
 
 
+
+def kapiti_only(f):
+    """A test of Kāpiti's own columns, sources or fixture: skipped for another council (T-87)."""
+    def run():
+        if cat.COUNCIL.NAME != "kapiti": print("SKIPPED for", cat.COUNCIL.NAME + ":", f.__name__); return
+        return f()
+    run.__name__ = f.__name__
+    return run
+
 def fixture(extra_rows=0, mirror=False):
     d = tempfile.mkdtemp()
     rows = [
@@ -37,6 +46,7 @@ def fixture(extra_rows=0, mirror=False):
     return d
 
 
+@kapiti_only
 def test_catalogue_reads_licence_and_fit_from_sources_md():
     assert cat.SOURCES["zones"]["licence_cleared"] is False            # portal-wide statement only
     assert cat.SOURCES["dem_2025"]["licence_cleared"] is True
@@ -52,6 +62,7 @@ def test_every_published_column_is_catalogued():
     assert [c for c in cols if cat.column_meta(c) is None] == []
 
 
+@kapiti_only
 def test_public_mode_withholds_portal_statement_columns_and_refuses_filters_on_them():
     lq = LandQuery(fixture(), "public")
     assert "zones" in lq.withheld and "ground_mean_m" in lq.columns
@@ -64,6 +75,7 @@ def test_public_mode_withholds_portal_statement_columns_and_refuses_filters_on_t
     assert lq.inverse_query("Q1")["withheld"] is True and lq.inverse_query("Q4")["count"] == 1
 
 
+@kapiti_only
 def test_internal_mode_filters_overlay_classes_and_returns_provenance_per_block():
     lq = LandQuery(fixture(), "internal")
     r = lq.search(where=[dict(column="zones", op="has_class", value={"class": "General Residential Zone", "min_pct": 90})])
@@ -128,6 +140,7 @@ def test_database_errors_become_plain_messages():
     except QueryError as e: assert "Lot" not in str(e)
 
 
+@kapiti_only
 def test_precomputed_query_is_judged_by_every_source_it_draws_on():
     lq = LandQuery(fixture(), "public")
     assert lq.inverse_query("W1")["withheld"] is True and "rows" not in lq.inverse_query("W1") and "sql" not in lq.inverse_query("W1")
@@ -144,6 +157,7 @@ def test_parcel_on_mirror_geometry_names_the_mirror_as_a_source():
     assert r["rows"][0]["geometry_source"] == "KCDC mirror" and "kcdc_parcels" in r["sources"]
 
 
+@kapiti_only
 def test_column_metadata_matches_the_pipeline():
     m = cat.column_meta
     assert "obstruction" in m("wind_obstruction_pct")["meaning"] and "stormwater" not in m("ws_pipe_dia_mm")["meaning"]
@@ -184,6 +198,7 @@ def test_title_references_are_not_served_publicly():
     assert "title_types" in LandQuery(p, "internal").columns
 
 
+@kapiti_only
 def test_whole_number_columns_are_served_as_integers():
     p = os.environ.get("LANDQ_RESULTS")
     if not p: print("SKIPPED: set LANDQ_RESULTS to check whole-number columns"); return
@@ -191,6 +206,7 @@ def test_whole_number_columns_are_served_as_integers():
     assert all(isinstance(x["values"]["ww_pipe_year"], int) for x in r["rows"]), r["rows"][0]
 
 
+@kapiti_only
 def test_t59_service_limits_and_sources():
     lq = LandQuery(fixture(extra_rows=600), "internal")
     for bad in (dict(bbox=[0, 0, 1e9, 1e9]), dict(where=[dict(column="zones", op="has_class", value={"class": "A", "min_pct": "x"})])):
@@ -261,11 +277,14 @@ def test_published_building_values_are_empty_where_the_outlines_do_not_cover_the
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "pipeline"))
     import overlays as ov
     f = os.path.join(p, "units.parquet")
+    bcols = [cat.COUNCIL.RENAME_COLUMNS.get(c, c) for c in ov.BUILDING_COLUMNS]   # the council's names (T-87)
     bad = duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE buildings_coverage_pct IS NULL OR ((buildings_coverage_pct < 99 OR coverage_pct < 99"
                      ") AND NOT ("
-                     + " AND ".join(f"{c} IS NULL" for c in ov.BUILDING_COLUMNS) + "))").fetchall()[0][0]
+                     + " AND ".join(f"{c} IS NULL" for c in bcols) + "))").fetchall()[0][0]
     assert bad == 0, f"{bad} parcels have building values where the outlines do not cover them"
-    assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE rbl_in_parcel_n = 0 OR ww_pipe_condition_grade = 0").fetchall()[0][0] == 0
+    have = set(duckdb.sql(f"DESCRIBE SELECT * FROM '{f}'").df()["column_name"])
+    zero = [c for c in ("rbl_in_parcel_n", "ww_pipe_condition_grade") if c in have]
+    if zero: assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE " + " OR ".join(f"{c} = 0" for c in zero)).fetchall()[0][0] == 0
     flow = [c for c in ov.LIDAR_FLOW_COLUMNS if c in set(duckdb.sql(f"DESCRIBE SELECT * FROM '{f}'").df()["column_name"])]
     assert duckdb.sql(f"SELECT count(*) FROM '{f}' WHERE (lidar_coverage_pct IS NULL OR lidar_coverage_pct < 99) AND NOT ("
                       + " AND ".join(f"{c} IS NULL" for c in flow) + ")").fetchall()[0][0] == 0, "flow values under 99% LiDAR (T-81)"
@@ -276,6 +295,18 @@ def test_pending_columns_may_be_missing_only_from_finished_results():
     assert cat.missing_columns(have, "Run 1 ... (row rules only, finish.py)") == []
     assert cat.missing_columns(have, "Run 1 merged at commit x") == sorted(cat.PENDING_COLUMNS)
     assert cat.missing_columns([c for c in have if c != "flow_path_m"], "finish.py") == ["flow_path_m"]
+
+
+def test_porirua_register_and_columns_read_from_sources_md():
+    src, cols = cat.load(council="porirua")
+    assert src["dem_2023"]["licence_cleared"] and src["pcc_parcels"]["licence_cleared"]
+    assert not src["zones"]["licence_cleared"] and not src["pdp_tsunami_100yr"]["licence_cleared"]   # PCC portal statement: ◐
+    assert "ww_node" not in src and "dem_2025" not in src and "titles" in src
+    meaning = {}
+    for p, _, m in cols: meaning.setdefault(p.pattern, m)   # the first row for a column is the one used
+    assert "PCC" in meaning["^building_m2$"] and "2023" in meaning["^ground_mean_m$"]
+    first = [p.pattern for p, _, _ in cols]
+    assert first.index("^ground_mean_m$") < len(first) - 1    # Porirua's row comes first, so it wins
 
 
 def test_every_column_defined_in_sources_md_is_published():

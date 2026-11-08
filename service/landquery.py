@@ -53,7 +53,7 @@ class LandQuery:
     def about(self):
         n = self._run("SELECT count(*) FROM units", [])[0][0]  # under the lock like every query (T-62)
         return dict(
-            dataset="Kāpiti Coast District parcels, compiled from public LINZ, KCDC and GWRC sources",
+            dataset=f"{cat.COUNCIL.LABEL} parcels, compiled from {cat.COUNCIL.DATASET_SOURCES}",
             run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),
             coordinates="NZTM2000 (EPSG:2193), metres; heights NZVD2016",
             licence_note=("Values come from CC BY 4.0 sources; attribute LINZ, Kāpiti Coast District Council and Greater "
