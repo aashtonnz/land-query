@@ -21,7 +21,7 @@ from provenance import utc_now
 # district blocks span 1755000-1805000 E, 5455000-5495000 N; the mosaic extends east and south-east to the
 # Tararua divide so the Ōtaki, Waikanae and smaller catchments are whole (checked by the truncation flag)
 from councils import COUNCIL as C
-BBOX = tuple(int(v) for v in (sys.argv[2].split(",") if len(sys.argv) > 2 else C.FLOW_BBOX))
+BBOX = tuple(int(v) for v in (sys.argv[2].split(",") if __name__ == "__main__" and len(sys.argv) > 2 else C.FLOW_BBOX))
 RES = 10.0
 OUT_BBOX = C.FLOW_OUT_BBOX  # district blocks plus 3 km: every block's LiDAR window
 BASE = "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/"
@@ -31,8 +31,9 @@ COLLS = [("new-zealand/dem_1m/2193", "LINZ national 1 m DEM"), ("new-zealand-con
 ROWS = [a + b for a in "ABC" for b in "ABCDEFGHJKLMNPQRSTUVWXYZ"]  # Topo50 row codes skip I and O
 
 
-def topo50_candidates():
-    """Topo50 sheets (24 km wide, 36 km tall; BN32 spans 1756000-1780000 E, 5478000-5514000 N) touching BBOX."""
+def topo50_candidates(bbox=None):
+    """Topo50 sheets (24 km wide, 36 km tall; BN32 spans 1756000-1780000 E, 5478000-5514000 N) touching bbox."""
+    BBOX = bbox or globals()["BBOX"]
     out = []
     for i, rc in enumerate(ROWS):
         top = 5514000 - (i - ROWS.index("BN")) * 36000
@@ -54,11 +55,12 @@ def get(url, **kw):
             time.sleep(2 ** k)
 
 
-def sheets(coll):
-    """Sheets of the collection whose real bounds (read from the file) intersect BBOX."""
+def sheets(coll, bbox=None):
+    """Sheets of the collection whose real bounds (read from the file) intersect bbox (default BBOX)."""
+    BBOX = bbox or globals()["BBOX"]
     c = get(BASE + coll + "/collection.json").json()
     hits = []
-    for code in topo50_candidates():
+    for code in topo50_candidates(BBOX):
         if not get(BASE + coll + f"/{code}.json"): continue  # no sheet there (sea)
         h = BASE + coll + f"/{code}.tiff"
         with rasterio.open("/vsicurl/" + h) as d:
@@ -67,14 +69,16 @@ def sheets(coll):
     return c, hits
 
 
-def mosaic():
+def mosaic(bbox=None, res=None, lidar_mask=False):
+    """(ground, transform, provenance), or with lidar_mask also a mask of cells whose ground is from the 1 m LiDAR DEM."""
+    BBOX, RES = bbox or globals()["BBOX"], res or globals()["RES"]
     W, H = int((BBOX[2] - BBOX[0]) / RES), int((BBOX[3] - BBOX[1]) / RES)
     T = from_origin(BBOX[0], BBOX[3], RES, RES)
     Z = np.full((H, W), np.nan, np.float32)
     Z8 = np.full((H, W), np.nan, np.float32)  # the 8 m contour DEM alone: it has no data over the sea
     prov = []
     for coll, title in COLLS:
-        c, hrefs = sheets(coll)
+        c, hrefs = sheets(coll, BBOX)
         for h in hrefs:
             with rasterio.open("/vsicurl/" + h) as src:
                 # the part of the mosaic this sheet covers, read at 10 m (GDAL uses the file's overviews)
@@ -90,9 +94,10 @@ def mosaic():
             if "contour" in coll: Z8[r0:r0 + hgt, c0:c0 + w] = np.where(np.isfinite(part), part, Z8[r0:r0 + hgt, c0:c0 + w])
         prov.append(dict(collection=BASE + coll + "/collection.json", title=c.get("title"), items=hrefs,
                          licence=c.get("license"), fetched=utc_now()))
+        if lidar_mask and "contour" not in coll: L = np.isfinite(Z)
     Z[Z <= -100] = np.nan
     Z[sea_mask(Z, Z8)] = np.nan
-    return Z, T, prov
+    return (Z, T, prov, L & np.isfinite(Z)) if lidar_mask else (Z, T, prov)
 
 
 def sea_mask(Z, Z8, max_m=0.5):
