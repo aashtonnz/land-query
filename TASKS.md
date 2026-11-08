@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 01:30 (Pacific/Auckland)
+Last updated: 2026-11-09 01:55 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,13 +10,13 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-82: Cheaper republishing: `finish.yml` applies the row rules to published results (minutes, about US$0.02) instead of a rebuild. First use: the T-79 and T-81 rule fixes. The new LiDAR warning column waits for the next full rebuild, batched with other changes that need one. Started 2026-11-09.
 
 ## Waiting on you
+- T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-82; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-82: Cheaper republishing: `finish.yml` applies the row rules to published results. First run (42477497763, about 2 minutes) published the T-79 and T-81 rule fixes: 163 condition grades of 0, 113 flow values on partly-LiDAR parcels and 2 partly fetched parcels' building values now empty; query counts unchanged. The LiDAR warning column and 3818065's restored values wait for the next full rebuild. 2026-11-09.
 - T-81: Tenth-review fixes: building columns are KCDC's outlines, said plainly, with `unmapped_structure_m2` as a warning (D-19; a plane-fit test finds 90% of hidden-outline buildings); flow and structure columns empty under 99% LiDAR; wording; tests (8 of 8 mutants caught). Not yet rebuilt. [Findings](docs/findings/2026-11-08-tenth-review.md#t-81-fixes-89-nov-2026) 2026-11-09.
 - T-80 (review part): Tenth fresh-eyes review, on local tiles (no budget for a rebuild): four serious findings about the T-79 building check and partial-LiDAR flow values, three minor. [Findings](docs/findings/2026-11-08-tenth-review.md) 2026-11-09.
 - T-79: Ninth-review fixes: LiDAR check for buildings KCDC's outlines miss (`unmapped_structure_m2`), building values also need the fetch window, empty-value meanings corrected (flood models, liquefaction, condition grade 0, easements, truncation), tally updated, publishing check extended. [Findings](docs/findings/2026-11-08-ninth-review.md#t-79-fixes-8-nov-2026) 2026-11-08.
