@@ -35,11 +35,17 @@ def read(coll, name):
     local = []
     for h in hrefs:
         p = os.path.join(cache, coll.replace("/", "_") + "_" + os.path.basename(h))
-        if not os.path.exists(p):
-            with requests.get(h, stream=True, timeout=300) as r:
-                r.raise_for_status()
-                with open(p, "wb") as f:
-                    for chunk in r.iter_content(1 << 20): f.write(chunk)
+        for attempt in range(4):  # retry dropped connections; write to a temporary name so a broken download never counts as cached (T-60)
+            if os.path.exists(p): break
+            try:
+                with requests.get(h, stream=True, timeout=300) as r:
+                    r.raise_for_status()
+                    with open(p + ".part", "wb") as f:
+                        for chunk in r.iter_content(1 << 20): f.write(chunk)
+                os.replace(p + ".part", p)
+            except requests.exceptions.RequestException:
+                if attempt == 3: raise
+                time.sleep(10 * (attempt + 1))
         local.append(p)
     srcs = [rasterio.open(p) for p in local]
     arr, tr = merge(srcs, bounds=TILE, res=1.0, nodata=np.nan, dtype="float32")
