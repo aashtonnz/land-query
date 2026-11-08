@@ -58,3 +58,18 @@ Nothing new; the reviewer found nothing about people in public mode.
   - `SOURCES.md` now says 543.
   - The source check flags a missing LINZ key every week.
 - **`SOURCES.md` corrected:** the mirror is not clipped to the district.
+
+## T-63: rebuild (8 Nov 2026)
+
+- **Run.** Run 42437281659 compiled all 43 blocks, but GitHub refused to start its merge job: the month's Actions
+  budget had been reached. After the owner raised it, a merge-only run (42441707069) published the district from
+  those blocks.
+- **Checked on the published results:**
+  - 27,265 parcels, all with `district_share_pct` (lowest 43.8%; 45 parcels below 100%).
+  - The blocks dropped 337 parcels outside the district; the other 12 of the 349 lay in the three removed blocks.
+  - `linz_not_in_mirror` is 72, the weekly check's figure.
+  - All 43 blocks used one district-flow grid, and none had a failed source.
+  - No parcel with LiDAR cells shows 0% coverage.
+  - The service tests, including the schema check, passed before publishing.
+
+A fifth fresh-eyes review follows, under fresh-eyes review 1.1.

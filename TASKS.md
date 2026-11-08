@@ -1,22 +1,22 @@
 # Tasks
 
-Last updated: 2026-11-08 16:30 (Pacific/Auckland)
+Last updated: 2026-11-08 16:20 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
-- Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$12.95 of US$20, plus about US$2 for the T-63 rebuild: about US$15.
+- Costs: small and expected only, within the owner's monthly GitHub budget (D-14). November: the US$20 budget was reached during T-63 although my running total said about US$15, so the total undercounts (likely storage, or minutes rounded up per job); the owner raised the budget on 8 Nov. Check GitHub's billing page, not the estimate, before the next paid run.
 - Do not contact external people or organisations.
 - Keep what exists (the pipeline, tested on one tile) clearly distinct from what is planned. Scope per D-12.
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-63: Rebuild with the T-62 fixes (about US$2), then a fifth fresh-eyes review (fresh-eyes review 1.1) before the second council. Started 2026-11-08.
+- T-64: Fifth fresh-eyes review (fresh-eyes review 1.1), before the second council. Started 2026-11-08.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-63; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-64; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-63: District rebuilt with the T-62 fixes: 27,265 parcels, 337 outside parcels dropped, LINZ-not-in-mirror 72, one flow grid. The merge first failed on the Actions budget; published by a merge-only run after the owner raised it. [Findings](docs/findings/2026-11-08-fourth-review.md#t-63-rebuild-8-nov-2026) 2026-11-08.
 - T-62: Fourth-review fixes: district membership tested on every run (349 parcels outside the district, including 22 in Porirua, now dropped; 3 empty blocks removed: 27,265 parcels in 43 blocks), `district_share_pct`, LiDAR catalogue retries and a distinct no-coverage error, service lock for `about()`, coverage never 0 with LiDAR, flow-grid consistency for patch runs, tighter tests. [Findings](docs/findings/2026-11-08-fourth-review.md#t-62-fixes-8-nov-2026) 2026-11-08.
 - T-61: Fourth fresh-eyes review: one serious finding (349 published parcels outside the district: KCDC's mirror is not clipped to it), six minor. 13 parcels checked end to end; the patch run's mixed commits were consistent. [Findings](docs/findings/2026-11-08-fourth-review.md) 2026-11-08.
 - T-60: Rebuild with the T-59 fixes: the new failed-source guard stopped one publish (a dropped LiDAR download); downloads now retry, and a patch run recomputed the one block and published. No-LiDAR zeros gone (470 → 0); clear-ground columns and integer pipe fields published. LINZ parcels missing from the mirror: 72 (70 railway, by design; 2 freehold), now tracked weekly; a first count of 1,246 was wrong (open coastal boundary) and is corrected. [Findings](docs/findings/2026-11-08-third-review.md#t-60-rebuild-and-what-it-showed-8-nov-2026) 2026-11-08.
