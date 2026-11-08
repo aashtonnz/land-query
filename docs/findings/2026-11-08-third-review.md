@@ -53,9 +53,10 @@ A new reviewer, briefed with the repository only, reviewed everything changed si
   - The fill-rule test now tests its rule: a pit beside a higher survey gap fills and overflows downhill.
   - New tests cover 5 cm ties, the district sea mask, a low beach that must stay land, titles in a precomputed query,
     and the sun and horizon sources.
-  - A new check fails the publish if any column defined in `SOURCES.md` is missing from the results. It caught a
-    slip of mine before commit: one edit had dropped `ground_min_m` and `ground_mean_m` from the compiler. It also
-    shows the published results lack the clear-ground columns (finding 4).
+  - A new check fails the publish if any column defined in `SOURCES.md` is missing from the results. I added it after
+    a local compile crashed on a slip of mine: one edit had dropped `ground_min_m` and `ground_mean_m` from the
+    compiler, and no test would have caught it. It also shows the published results lack the clear-ground columns
+    (finding 4).
   - Of the reviewer's surviving mutants re-run here, all 11 are now caught.
 - **Sea level for flow** (8). Sea cells now sit below any land for flow (`flow.SEA_M`), so coastal land below 0 m drains
   into the sea.
