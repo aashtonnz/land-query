@@ -19,7 +19,7 @@ P = ["parcels"]
 COLUMN_SOURCES = [
     (r"(unit_id|appellation|parcel_intent|survey_area_m2|titles|geometry_source|unit_source|area_m2|coverage_pct|rep_[xy]|bbox_\w+)", P),
     (r"block_id", []),
-    (r"district_share_pct", P + ["district_boundary"]),
+    (r"district_share_pct", P + ["district_outline"]),
     (r"title_count", P),  # counted from the parcel's own titles field
     (r"title_types", P + ["titles"]),
     (r"easements_n|land_covenants_n", P + ["nonprimary_parcels"]),

@@ -1,4 +1,5 @@
 """Regression checks for fixes from the fresh-eyes review (T-39). Run: python3 test_review.py"""
+import os
 import tile_env as te
 
 
@@ -324,6 +325,124 @@ def test_coverage_is_never_0_when_a_parcel_has_lidar():
     st = M.lidar_parcel_stats(z, np.zeros(z.size, bool), 1.0, np.ones(z.size, bool), np.zeros(z.size), np.zeros(z.size, bool),
                               np.full(z.size, np.nan), np.zeros(z.size, bool))
     assert st["lidar_coverage_pct"] == 0.1
+
+
+def _outline():
+    import json
+    from shapely.geometry import shape
+    from overlays import district_outline
+    f = json.load(open(os.path.join(os.path.dirname(__file__), "fixtures", "district_outline.json")))
+    return district_outline([shape(g) for g in f["lines"]], [shape(g) for g in f["ward"]])
+
+
+def test_real_district_outline_takes_in_kapiti_island_and_land_the_line_misses_but_not_neighbours():
+    # fixture: KCDC's boundary line and its whole-district ward polygon, fetched 8 Nov 2026 (fifth review, T-65)
+    from shapely.geometry import Point
+    o = _outline()
+    assert 1900e6 < o.area < 1960e6  # land 731 km2 plus the sea loop
+    assert o.contains(Point(1759216, 5474823))  # Section 3 Block I Kapiti SD, on Kapiti Island
+    assert o.contains(Point(1779720, 5462958))  # Part Blk III Akatarawa SD: inside the ward, cut by the line
+    for p in [(1758500, 5449000), (1790000, 5500000), (1790000, 5445000)]:  # Pukerua Bay (Porirua), Levin, Upper Hutt side
+        assert not o.contains(Point(*p)), p
+
+
+def test_parcel_belongs_to_the_district_by_its_point_or_a_real_part_of_it():
+    from shapely.geometry import box
+    import overlays as ov
+    district = box(0, 0, 1000, 1000)
+    def f(i, g): return dict(properties=dict(id=i, appellation=str(i)), geometry=g.__geo_interface__)
+    parcels = [f(1, box(100, 100, 200, 200)),        # inside
+               f(2, box(700, 0, 1700, 1000)),        # 30% inside, point outside: kept
+               f(3, box(995, 0, 1995, 1000)),        # 0.5% (5,000 m2) inside: too small a share
+               f(4, box(999.5, 0, 1019.5, 100)),     # 2.5% but 50 m2 inside: a digitising sliver
+               f(5, box(2000, 0, 2100, 100))]        # outside
+    inside, outside = ov.split_by_district(parcels, district)
+    assert [p["properties"]["id"] for p in inside] == [1, 2]
+    assert [p["properties"]["district_share_pct"] for p in inside] == [100.0, 30.0]
+    assert [o["id"] for o in outside] == [3, 4, 5]
+    assert ov.district_share(box(990, 0, 1090, 20), district) is None  # 10% but 200 m2
+
+
+def test_linz_parcels_missing_from_the_mirror_are_counted_once_and_only_in_the_district():
+    from shapely.geometry import box
+    import overlays as ov
+    def f(i, g): return dict(properties=dict(id=i), geometry=g.__geo_interface__)
+    by_id = {1: f(1, box(10, 10, 20, 20)), 2: f(2, box(30, 30, 40, 40)), 3: f(3, box(5000, 10, 5010, 20))}
+    district, block = box(0, 0, 1000, 1000), box(0, 0, 100, 100)
+    # 1 is in the mirror (assigned to whichever block); 3 lies outside the district
+    assert [m["id"] for m in ov.linz_not_in_mirror(by_id, {1}, block, district)] == [2]
+    assert ov.linz_not_in_mirror(by_id, {1}, box(500, 500, 600, 600), district) == []
+
+
+def test_parcels_source_fails_if_linz_returns_none_of_the_blocks_parcels():
+    import overlays as ov
+    assert ov.parcels_error(True, [1, 2], 0, None) == "LINZ returned none of the block's parcels"
+    assert ov.parcels_error(True, [1, 2], 2, None) is None
+    assert ov.parcels_error(False, [1, 2], 0, "LINZ_API_KEY not set") == "LINZ_API_KEY not set"
+    assert ov.parcels_error(True, [], 0, None) is None
+
+
+def test_lidar_catalogue_retries_checks_status_and_only_no_coverage_is_not_a_failure():
+    import requests, lidar_catalogue as lc
+    calls = []
+    class R:
+        def __init__(self, code): self.code = code
+        def raise_for_status(self):
+            if self.code >= 400: raise requests.exceptions.HTTPError(str(self.code))
+        def json(self): return {"ok": 1}
+    seq = [requests.exceptions.ConnectionError("x"), R(503), R(200)]
+    def get(url, timeout):
+        calls.append(url); x = seq.pop(0)
+        if isinstance(x, Exception): raise x
+        return x
+    old = requests.get; requests.get = get
+    try:
+        assert lc.get_json("u", wait=0) == {"ok": 1} and len(calls) == 3
+        seq[:] = [R(500)] * 4
+        try: lc.get_json("u", wait=0); assert False, "an HTTP error must not pass"
+        except requests.exceptions.HTTPError: pass
+    finally: requests.get = old
+    def nocov(): raise lc.NoCoverage("none")
+    def broken(): return {}["links"]
+    assert lc.source_entry(nocov) == dict(ok=False, no_coverage=True, error="none")
+    e = lc.source_entry(broken)
+    assert e["ok"] is False and "no_coverage" not in e
+    assert lc.source_entry(lambda: dict(sha256="s")) == dict(ok=True, sha256="s")
+
+
+def test_publishing_reads_each_blocks_flow_grid_and_refuses_a_block_without_one():
+    import json, tempfile, check_complete as cc
+    d = tempfile.mkdtemp()
+    for b, sha in [("1_1", "a"), ("2_2", "b"), ("3_3", None)]:
+        os.makedirs(os.path.join(d, "block-" + b))
+        open(os.path.join(d, "block-" + b, "units.parquet"), "w").close()
+        src = {"district_flow": {"sha256": sha}} if sha else {}
+        json.dump({"sources": src}, open(os.path.join(d, "block-" + b, "provenance.json"), "w"))
+    present, failed, shas = cc.read_blocks(d)
+    assert present == {"1_1", "2_2", "3_3"} and shas == {"1_1": "a", "2_2": "b", "3_3": None}
+    planned = [dict(xmin=x, ymin=x) for x in (1, 2, 3)]
+    p = " ".join(cc.problems(planned, present, "", 3, failed, shas))
+    assert "1 blocks have no district-flow record" in p and "2 different district-flow grids" in p
+
+
+def test_every_column_built_on_lidar_lists_the_sea_mask_and_the_share_lists_the_outline():
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "service"))
+    import catalogue as c
+    for col in ["open_ground_m2", "roof_area_m2", "horizon_max_deg", "upslope_area_m2", "wind_rel_height_m",
+                "lidar_coverage_pct", "winter_sun_hours", "ground_mean_m"]:
+        src = c.column_sources(col)
+        assert src and "sea_mask" in src, (col, src)
+    assert "district_outline" in c.column_sources("district_share_pct")
+
+
+def test_source_check_flags_a_missing_linz_key():
+    import source_check as sc
+    old = os.environ.pop("LINZ_API_KEY", None)
+    try: sc.linz(50823); assert False, "a missing key must be flagged"
+    except RuntimeError as e: assert "LINZ_API_KEY" in str(e)
+    finally:
+        if old is not None: os.environ["LINZ_API_KEY"] = old
 
 
 if __name__ == "__main__":

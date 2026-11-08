@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-08 16:20 (Pacific/Auckland)
+Last updated: 2026-11-08 17:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,13 +10,14 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-64: Fifth fresh-eyes review (fresh-eyes review 1.1), before the second council. Started 2026-11-08.
+- T-66: Rebuild with the T-65 fixes (about US$2.20), then a sixth fresh-eyes review (fresh-eyes review 1.1). Started 2026-11-08.
 
 ## Waiting on you
+- T-67: Should public mode serve the "Life Estate" title type? It is on 4 parcels and signals that a living person holds a life interest; no names or title references are served. Recommendation: withhold `title_types` in public mode, as D-15 did for title references. Raised 2026-11-08.
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-64; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-66; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +34,8 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-65: Fifth-review fixes: district outline joins KCDC's boundary line and whole-district ward; parcels kept if their point or at least 1% and 1,000 m² lies inside (27,288 parcels, 44 blocks); tested functions for membership, mirror gap, LiDAR catalogue and publishing checks (20 of 20 mutants caught). [Findings](docs/findings/2026-11-08-fifth-review.md#t-65-fixes-8-nov-2026) 2026-11-08.
+- T-64: Fifth fresh-eyes review: one serious finding (T-62's rule dropped 17 parcels with district land, one wholly inside), seven minor, one for the owner (Life Estate title type). [Findings](docs/findings/2026-11-08-fifth-review.md) 2026-11-08.
 - T-63: District rebuilt with the T-62 fixes: 27,265 parcels, 337 outside parcels dropped, LINZ-not-in-mirror 72, one flow grid. The merge first failed on the Actions budget; published by a merge-only run after the owner raised it. [Findings](docs/findings/2026-11-08-fourth-review.md#t-63-rebuild-8-nov-2026) 2026-11-08.
 - T-62: Fourth-review fixes: district membership tested on every run (349 parcels outside the district, including 22 in Porirua, now dropped; 3 empty blocks removed: 27,265 parcels in 43 blocks), `district_share_pct`, LiDAR catalogue retries and a distinct no-coverage error, service lock for `about()`, coverage never 0 with LiDAR, flow-grid consistency for patch runs, tighter tests. [Findings](docs/findings/2026-11-08-fourth-review.md#t-62-fixes-8-nov-2026) 2026-11-08.
 - T-61: Fourth fresh-eyes review: one serious finding (349 published parcels outside the district: KCDC's mirror is not clipped to it), six minor. 13 parcels checked end to end; the patch run's mixed commits were consistent. [Findings](docs/findings/2026-11-08-fourth-review.md) 2026-11-08.

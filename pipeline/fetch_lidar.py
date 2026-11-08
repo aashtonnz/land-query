@@ -13,18 +13,7 @@ os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 os.environ.setdefault("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif,.tiff")
 lon0, lat0, lon1, lat1 = te.ll_envelope(TILE)
 
-class NoCoverage(Exception):
-    """No survey tile touches the window: not a failure (T-62: a separate class, so a malformed catalogue response,
-    such as a KeyError, can no longer pass as "no coverage")."""
-
-
-def get_json(url):
-    for attempt in range(4):  # retried, and checked, like the downloads (T-62)
-        try:
-            r = requests.get(url, timeout=60); r.raise_for_status(); return r.json()
-        except (requests.exceptions.RequestException, ValueError):
-            if attempt == 3: raise
-            time.sleep(10 * (attempt + 1))
+from lidar_catalogue import NoCoverage, get_json, source_entry
 
 
 def items_for(coll):
@@ -80,9 +69,6 @@ prov = json.load(open(prov_path))
 for coll, name in [("kapiti-coast_2024-2025/dem_1m/2193", "dem_2025"),
                    ("kapiti-coast_2024-2025/dsm_1m/2193", "dsm_2025"),
                    ("kapiti-coast_2021/dem_1m/2193", "dem_2021")]:
-    try: prov["sources"][name] = dict(ok=True, **read(coll, name))
-    except NoCoverage as e:  # outside the survey (hills, Kapiti Island): not a failure
-        prov["sources"][name] = dict(ok=False, no_coverage=True, error=str(e)); print(name, "no coverage")
-    except Exception as e:
-        prov["sources"][name] = dict(ok=False, error=str(e)[:300]); print(name, "FAILED", e)
+    prov["sources"][name] = e = source_entry(read, coll, name)  # no coverage (hills, Kapiti Island) is not a failure
+    if not e["ok"]: print(name, "no coverage" if e.get("no_coverage") else "FAILED " + e["error"])
 json.dump(prov, open(prov_path, "w"), indent=1)

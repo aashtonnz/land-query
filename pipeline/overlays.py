@@ -99,3 +99,59 @@ def district_polygon(lines, sea_x=1735000.0):
     sea = LineString([(x0, y0), (sea_x, y0), (sea_x, y1), (x1, y1)])
     polys = list(polygonize(unary_union(parts + [sea])))
     return unary_union(polys) if polys else Polygon()
+
+
+# A parcel belongs to the district if its representative point lies inside, or if a real part of it does: at least 1%
+# and at least 1,000 m², so that slivers where two digitisings of one boundary disagree don't count (T-65). Large rural
+# parcels crossing the boundary were lost under the representative-point rule alone (fifth review).
+MIN_SHARE, MIN_INSIDE_M2 = 0.01, 1000.0
+
+
+def district_outline(lines, wards):
+    """KCDC's boundary line closed at sea (which takes in the islands and foreshore), joined with KCDC's whole-district
+    ward polygon (which follows the land boundary more closely where the two disagree). Empty if either is missing."""
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+    d = district_polygon(lines)
+    if d.is_empty or not wards: return Polygon()
+    return unary_union([d] + list(wards))
+
+
+def district_share(g, outline):
+    """Percent of g inside outline if g belongs to the district, else None."""
+    if g.is_empty or not g.area: return None
+    inside = g.intersection(outline).area
+    if outline.contains(g.representative_point()) or (inside >= MIN_SHARE * g.area and inside >= MIN_INSIDE_M2):
+        return round(100 * inside / g.area, 1)
+    return None
+
+
+def split_by_district(features, outline):
+    """(members with district_share_pct set, [{id, appellation}] of the others)."""
+    from shapely.geometry import shape
+    inside, outside = [], []
+    for f in features:
+        s = district_share(shape(f["geometry"]), outline)
+        if s is None: outside.append(dict(id=f["properties"].get("id"), appellation=f["properties"].get("appellation")))
+        else: f["properties"]["district_share_pct"] = s; inside.append(f)
+    return inside, outside
+
+
+def linz_not_in_mirror(by_id, mirror_ids, block, outline):
+    """LINZ parcels assigned to this block (representative point inside it) and belonging to the district, whose id
+    no mirror feature in the block query has (T-59, T-62)."""
+    from shapely.geometry import shape
+    out = []
+    for i, f in by_id.items():
+        if i in mirror_ids: continue
+        g = shape(f["geometry"]); p = g.representative_point()
+        if (block.contains(p) or block.touches(p)) and district_share(g, outline) is not None:
+            out.append(dict(id=i, appellation=f["properties"].get("appellation"), intent=f["properties"].get("parcel_intent")))
+    return out
+
+
+def parcels_error(key_set, kept, from_linz, err):
+    """The parcels source's error: LINZ's own, or LINZ returning none of the block's parcels although the key is set."""
+    if err: return err
+    if key_set and kept and not from_linz: return "LINZ returned none of the block's parcels"
+    return None
