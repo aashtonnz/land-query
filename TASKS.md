@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 10:40 (Pacific/Auckland)
+Last updated: 2026-11-09 11:10 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -12,6 +12,7 @@ Standing priorities:
 ## Doing (at most 3)
 
 ## Waiting on you
+- T-99: Decide the [national MVP proposal](docs/proposals/2026-11-09-national-mvp.md): a site screen for any NZ parcel on LINZ data, in two tiers (a cheap national index for area search; the 1 m parcel report on demand), council layers added as licences are confirmed. It changes D-12's scope and needs a small server later (D-14). Raised 2026-11-09.
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
