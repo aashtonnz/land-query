@@ -202,3 +202,42 @@ Checked and correct:
 - **Queries.** P1 310, P2 385, P3 1,803; the flow check's lift is 1.91.
 
 A fifteenth fresh-eyes review follows.
+
+# Fifteenth fresh-eyes review (T-96, 9 Nov 2026)
+
+A new reviewer reviewed `daf1c0c..11dfb3d` (T-94) and checked every polygon layer of both councils independently. It
+fetched each layer both as GeoJSON and as ArcGIS rings, and compared the pipeline's repair with the rings and the
+layers' own area fields. It also recomputed all 37 Porirua overlay columns for every published parcel from shapes
+rebuilt from the rings.
+
+**No serious finding.** Under fresh-eyes review 1.1, the run of Porirua reviews that began with the twelfth ends here.
+
+- **Repair.** Correct on every layer of both councils.
+- **Kāpiti.** Kāpiti's 55 invalid shapes give identical results either way, so it needed no rebuild.
+- **Porirua's values.** They match the ring-based rebuild on every parcel, apart from one 0.1% sliver.
+
+| # | Finding | Status | Fix |
+| --- | --- | --- | --- |
+| 1 | Putting `buffer(0)` back in the compiler (not in `repaired`) passed every test. | Confirmed, minor | T-97 |
+| 2 | Most of `repaired` was untested: the polygon-plus-line case never ran. | Confirmed, minor | T-97 |
+| 3 | The query table test left most thresholds unchecked: no rows sat at them. | Confirmed, minor | T-97 |
+| 4 | Heritage items are multipoint; an item with points on two parcels would be on neither. None does today. | Confirmed (latent), minor | T-97 |
+| 5 | Only the compiler repaired shapes: the outline, membership and QA read raw shapes. None is invalid today. | Confirmed (latent), minor | T-97 |
+| 6 | 79 of P3's rows qualify only through slivers, the mismatch fixed in P2. | Confirmed, minor | T-97 |
+| 7 | P1's question omits that tsunami is not tested; `pdp_*` values of 0.0% count as in. | Confirmed, minor | T-97 (question; 0.0% as for slivers) |
+
+## T-97: fixes (9 Nov 2026)
+
+- **Shape repair everywhere** (1, 2, 5).
+  - `fetch_parcels_kcdc.py` (outline and membership) and `qa.py` repair shapes as the compiler does.
+  - A test fails if `buffer(0)` appears in any pipeline script, and covers `repaired`'s polygon-plus-line and
+    two-part cases.
+- **Multipoint items** (4). An item is on every parcel that holds one of its points (test).
+- **Queries** (6, 7).
+  - P3's area overlays need at least 1% of the parcel, as P2's do: 1,803 → 1,693 rows.
+  - P1's question says tsunami is not part of its test.
+  - The table test has rows at every threshold.
+  - Of 11 mutants, 10 are caught. The eleventh (keeping only the first part) is equivalent: `make_valid` gathers
+    polygon parts into one.
+- **Republishing.** `finish.yml` takes a `council` input. `finish.py` uses the council's building column name (a bug
+  found by trying it on Porirua; test added). Porirua's queries are republished this way.

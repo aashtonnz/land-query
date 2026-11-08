@@ -11,6 +11,7 @@ Each check compares two independent sources; it reports agreement, it does not c
 5. LiDAR coverage: share of parcels with no LiDAR cells.
 6. Roof surface (2024-25 DSM median inside each outline) against KCDC's 2021 photogrammetric building height (BLD_ave).
 """
+import overlays as _ov   # shape repair without buffer(0) (T-94)
 import json, os, sys
 import numpy as np, rasterio, duckdb
 from rasterio.features import geometry_mask
@@ -38,9 +39,9 @@ def area_check(db):
     The mirror clips parcels that cross the district boundary (expected); any other difference means the mirror
     truncates or alters the parcel, which is reported with examples. Units without LINZ geometry are counted."""
     units = {f["properties"].get("id"): f for f in feats("parcels")}
-    linz_geom = {i: shape(f["geometry"]) for i, f in units.items() if f["properties"].get("geometry_source") == "LINZ"}
+    linz_geom = {i: _ov.repaired(shape(f["geometry"])) for i, f in units.items() if f["properties"].get("geometry_source") == "LINZ"}
     from councils import COUNCIL
-    mirror = {f["properties"].get("id"): shape(f["geometry"]).area for f in feats(COUNCIL.PARCELS_KEY)}
+    mirror = {f["properties"].get("id"): _ov.repaired(shape(f["geometry"])).area for f in feats(COUNCIL.PARCELS_KEY)}
     if not linz_geom: return dict(n=0, units_without_linz_geometry=len(units), note="LINZ parcels not fetched (needs LINZ_API_KEY)")
     diffs = {i: mirror[i] - g.area for i, g in linz_geom.items() if i in mirror}
     lines = [shape(f["geometry"]) for f in feats("district_boundary")]
@@ -79,7 +80,7 @@ bl = [(shape(f["geometry"]).representative_point(), f["properties"].get("Ground"
 qa["building_ground_minus_lidar_m"] = summary([gh - sample(p.x, p.y) for p, gh in bl if gh is not None])
 
 gy, gx = np.gradient(Z, 1.0); slope = np.degrees(np.arctan(np.hypot(gx, gy)))
-geoms = [shape(f["geometry"]) for f in feats(_C.BUILDINGS_KEY)]
+geoms = [_ov.repaired(shape(f["geometry"])) for f in feats(_C.BUILDINGS_KEY)]
 bmask = ~geometry_mask(geoms, out_shape=Z.shape, transform=dem.transform) if geoms else np.zeros_like(Z, bool)
 flat = (slope < 2) & ((dsm - Z) < 0.5) & ~bmask & np.isfinite(Z) & np.isfinite(z21)
 dz = (Z - z21)[flat]

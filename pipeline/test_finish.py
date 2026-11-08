@@ -39,6 +39,16 @@ def test_finish_reports_what_only_a_rebuild_can_do():
     assert "unmapped_structure_m2" in ov.LIDAR_FLOW_COLUMNS       # empty under 99% LiDAR once it exists
 
 
+def test_finish_works_for_a_council_that_renames_the_building_column():
+    import subprocess
+    code = ("import pandas as pd, overlays as ov; from finish import finish_frame, limits; "
+            "df = pd.DataFrame([dict(unit_id=1, buildings_coverage_pct=100.0, coverage_pct=100.0, lidar_coverage_pct=100.0, building_m2=None, "
+            "**{k: 1.0 for k in ov.BUILDING_COLUMNS if k != 'building_2021_m2'})]); out, _ = finish_frame(df, ['unit_id']); print(limits(out)[1])")
+    r = subprocess.run([sys.executable, "-c", code], cwd=os.path.dirname(os.path.abspath(__file__)),
+                       env=dict(os.environ, COUNCIL="porirua"), capture_output=True, text=True)
+    assert r.returncode == 0 and r.stdout.strip() == "1", r.stderr[-300:]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

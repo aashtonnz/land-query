@@ -44,7 +44,9 @@ def class_shares(layer, parcel, features):
 
 def points_on(parcel, features, id_field):
     """Point features inside or on the boundary of the parcel, as [{id, significance}] (T-44: not within 1 m)."""
-    return [dict(id=p.get(id_field), significance=p.get("SIGNIFICANCE") or None) for g, p in features if parcel.covers(g)]
+    # a multipoint item (Porirua's heritage items) is on every parcel that holds one of its points (fifteenth review)
+    return [dict(id=p.get(id_field), significance=p.get("SIGNIFICANCE") or None) for g, p in features
+            if any(parcel.covers(q) for q in getattr(g, "geoms", [g]))]
 
 
 def nearest_item(items, candidates, g, prefer=None, maxd=None, tie_m=0.05):

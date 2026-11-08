@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 09:30 (Pacific/Auckland)
+Last updated: 2026-11-09 10:30 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,17 +10,6 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-24: Second council, Porirua without three waters (D-16), to measure what a council adapter costs before the rest of the region (T-38). Steps:
-  - T-86 (done 2026-11-09): Council settings in `pipeline/councils/`, chosen by `COUNCIL`: layers, parcel copy, boundary sources, LiDAR surveys, flow area. A Kāpiti test tile compiles identically, provenance included.
-  - T-87 (done 2026-11-09): Porirua settings (`pipeline/councils/porirua.py`): District Plan 2025 layers, PCC's parcel copy, three-polygon outline (in effect PCC's boundary, 182.5 km²), LiDAR 2023, PCC footprints (2013–17 photos), 24,110 parcels in 17 blocks. The compiler, QA, queries (P1–P3), measure check, catalogue and `SOURCES.md` are per council; Porirua's absent columns are left out. A 1.5 km tile at Porirua's centre compiles (205 parcels, 76 columns) and passes the service checks; the Kāpiti tile still compiles identically. LINZ's newer national building outlines would replace PCC's dated footprints (later).
-  - T-88: Porirua district run. First run 42499625052 (17 blocks, at b06e418) published 24,110 parcels to `porirua-results`, no failed source; P1 587, P2 426, P3 1,973; flow vs PCC's flood overlays lift 1.8. It included 2,137 road and 19 water parcels that LINZ's primary layer and KCDC's copy don't have; now left out in code (21,954 parcels), to be republished with the review's fixes.
-  - T-89 (done 2026-11-09): Twelfth fresh-eyes review (Porirua): five serious findings (Plimmerton Farm under the 1999 plan; flood not mapped in the Horokiri valley; Kāpiti text in Porirua's `about`; tree groups and heritage settings missing; Mana Island and the coastal environment), ten minor. [Findings](docs/findings/2026-11-09-porirua-review.md)
-  - T-90 (done 2026-11-09): Twelfth-review fixes, republished (run 42506899575: 21,954 parcels, 93 columns, no failed source).
-  - T-91 (done 2026-11-09): Thirteenth fresh-eyes review: data matches live layers city-wide; two suspected serious findings (flood mapping beyond the Horokiri valley and on Mana Island), one confirmed (P2's top row in Plimmerton Farm), eight minor. [Findings](docs/findings/2026-11-09-porirua-review.md#thirteenth-fresh-eyes-review-t-91-9-nov-2026)
-  - T-92 (done 2026-11-09): Thirteenth-review fixes, rebuilt (run 42512213482: 94 columns; 163 parcels outside every flood model).
-  - T-93 (done 2026-11-09): Fourteenth fresh-eyes review: two serious findings (overlays inflated by `buffer(0)` on PCC's invalid shapes; the flood model column over-read), six minor. [Findings](docs/findings/2026-11-09-porirua-review.md#fourteenth-fresh-eyes-review-t-93-9-nov-2026)
-  - T-94 (done 2026-11-09): Fourteenth-review fixes, rebuilt (run 42517549416; gas corridor 385 → 179 parcels, overland flow −115, inundation −67).
-  - T-96: Fifteenth fresh-eyes review. Started 2026-11-09.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
@@ -45,6 +34,10 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-24: Second council, Porirua City (D-20): 21,954 parcels, 94 columns on `porirua-results`; four fresh-eyes reviews (twelfth to fifteenth, the last with no serious finding); cost write-up. [Cost](docs/findings/2026-11-09-second-council-cost.md), [reviews](docs/findings/2026-11-09-porirua-review.md) 2026-11-09.
+- T-97: Fifteenth-review fixes: shape repair everywhere, multipoint items, P3 slivers (1,803 → 1,693), query tests at every threshold, `finish.yml` per council. 2026-11-09.
+- T-96: Fifteenth fresh-eyes review: no serious finding; seven minor. 2026-11-09.
+- T-86–T-94: Council settings, Porirua settings and runs, twelfth to fourteenth reviews and their fixes (see the reviews record). 2026-11-09.
 - T-84: Eleventh fresh-eyes review: no serious finding, which ends the run of reviews begun at T-61 (fresh-eyes review 1.1). Six minor findings fixed: finishing now says what it could not do, the publishing check covers the flow rule, `finish.py` has tests, pending columns are allowed only in finished results, warning rates given by building size. [Findings](docs/findings/2026-11-09-eleventh-review.md) 2026-11-09.
 - T-82: Cheaper republishing: `finish.yml` applies the row rules to published results. First run (42477497763, about 2 minutes) published the T-79 and T-81 rule fixes: 163 condition grades of 0, 113 flow values on partly-LiDAR parcels and 2 partly fetched parcels' building values now empty; query counts unchanged. The LiDAR warning column and 3818065's restored values wait for the next full rebuild. 2026-11-09.
 - T-81: Tenth-review fixes: building columns are KCDC's outlines, said plainly, with `unmapped_structure_m2` as a warning (D-19; a plane-fit test finds 90% of hidden-outline buildings); flow and structure columns empty under 99% LiDAR; wording; tests (8 of 8 mutants caught). Not yet rebuilt. [Findings](docs/findings/2026-11-08-tenth-review.md#t-81-fixes-89-nov-2026) 2026-11-09.

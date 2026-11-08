@@ -33,7 +33,7 @@ import overlays as ov
 Q = lambda s: arcgis.query_all(s[0], dict(where=s[1], outFields=s[2], outSR=2193))
 EDGE_URL, WARD_URL, STATS_URL = (C.OUTLINE[k][0] for k in ("line", "ward", "stats"))
 edge, wards, stats = Q(C.OUTLINE["line"]), Q(C.OUTLINE["ward"]), Q(C.OUTLINE["stats"])
-G = lambda fs: [shape(f["geometry"]) for f in fs if f.get("geometry")]
+G = lambda fs: [ov.repaired(shape(f["geometry"])) for f in fs if f.get("geometry")]   # never buffer(0) (T-94)
 district = (ov.district_outline_polygons(G(edge), G(wards), G(stats)) if C.OUTLINE.get("kind") == "polygons"
             else ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"]))
 if district.is_empty: raise SystemExit("could not build the district outline from the council's line and ward and Stats NZ's polygon")
@@ -47,7 +47,7 @@ blk = box(*te.BLOCK); kept = []
 # them; PCC's includes them, so they are left out here for every council (T-88)
 for f in feats:
     if not f.get("geometry") or f["properties"].get("parcel_intent") in ov.NOT_PRIMARY_INTENTS: continue
-    g = shape(f["geometry"])
+    g = ov.repaired(shape(f["geometry"]))
     if blk.contains(g.representative_point()) or blk.touches(g.representative_point()):
         kept.append(f)
 mirror = dict(type="FeatureCollection", features=kept)

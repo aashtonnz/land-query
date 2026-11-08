@@ -681,7 +681,7 @@ def test_porirua_layers_labels_and_queries_say_what_they_claim():
     for z in ("High Density Residential Zone", "Medium Density Residential Zone"):
         assert f"json_extract(zones,'$.\"{z}\"')::DOUBLE >= 90" in where(Q["P1"]), z
     # P2's conditions: test_porirua_queries_select_what_their_questions_say runs them
-    for c in ("pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"): assert f"{c} IS NOT NULL" in where(Q["P3"]), c
+    for c in ("pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"): assert c in iq.P3_AREAS, c   # run in the table test
     root = os.path.join(os.path.dirname(__file__), "..", "service")
     assert 'os.environ.get("COUNCIL"' in open(os.path.join(root, "fetch_results.py")).read()
     assert "cat.COUNCIL.LABEL" in open(os.path.join(root, "server.py")).read()
@@ -713,15 +713,26 @@ def test_porirua_queries_select_what_their_questions_say():
             16: dict(pdp_coastal_inundation_1m_slr=slr, building_m2=4.0),  # P2 no: a footprint edge
             20: dict(pdp_notable_tree_groups=J(**{"G1": 5.0})),           # P3 yes
             21: dict(pdp_heritage_settings=J(**{"Setting": 10.0})),       # P3 yes
-            22: dict(pdp_heritage_items=json.dumps([{"id": "H1"}]))}      # P3 yes
+            22: dict(pdp_heritage_items=json.dumps([{"id": "H1"}])),      # P3 yes
+            23: dict(pdp_heritage_sites=J(**{"Site": 1.0})),              # P3 yes: 1%
+            24: dict(pdp_significant_natural_areas=J(**{"SNA": 0.9})),    # P3 no: a sliver
+            25: dict(pdp_significant_natural_areas=J(**{"SNA": 50.0})),   # P3 yes
+            30: dict(area_m2=799.0), 31: dict(slope_p90_deg=10.0), 32: dict(coverage_pct=98.9), 33: dict(lidar_coverage_pct=98.9),
+            34: dict(zones=J(**{"Medium Density Residential Zone": 90.0, "Mixed Use Zone": 10.0}), zones_total_pct=100.0),  # P1 no
+            35: dict(zones=J(**{"Medium Density Residential Zone": 90.1, "Mixed Use Zone": 9.9}), zones_total_pct=100.0),   # P1 yes
+            40: dict(pdp_coastal_inundation_1m_slr=slr, pdp_coastal_erosion_current=J(**{"Current coastal erosion": 1.0})),  # P2 no
+            41: dict(pdp_coastal_inundation_1m_slr=slr, building_m2=10.0),   # P2 yes: exactly 10 m2
+            44: dict(pdp_coastal_inundation_1m_slr=slr, pdp_coastal_inundation_current=J(**{"Current coastal inundation": 1.0})),  # P2 no
+            42: dict(pdp_coastal_inundation_1m_slr=J(**{"1-in-100-year storm surge with 1 m sea-level rise": 1.0})),  # P2 yes: 1%
+            43: dict(pdp_coastal_inundation_1m_slr=slr, plan_1999_plimmerton_farm=J(**{"Plimmerton Farm Zone (1999 plan; the 2025 plan does not apply)": 0.9}))}  # P2 yes
     db = duckdb.connect()
     recs = [dict(base, unit_id=k, **v) for k, v in rows.items()]
     import pandas as pd
     db.register("t", pd.DataFrame(recs)); db.execute("CREATE TABLE units AS SELECT * FROM t")
     got = {q["id"]: sorted(r[0] for r in db.execute(q["sql"]).fetchall()) for q in iq.Q_PORIRUA}
-    assert got["P1"] == [1, 20, 21, 22], got["P1"]
-    assert got["P2"] == [10, 11, 14], got["P2"]
-    assert got["P3"] == [20, 21, 22], got["P3"]
+    assert got["P1"] == [1, 20, 21, 22, 23, 24, 25, 35], got["P1"]   # 41 is in a coastal overlay
+    assert got["P2"] == [10, 11, 14, 41, 42, 43], got["P2"]
+    assert got["P3"] == [20, 21, 22, 23, 25], got["P3"]
 
 
 def test_invalid_source_shapes_are_repaired_without_filling_their_holes():
@@ -735,6 +746,19 @@ def test_invalid_source_shapes_are_repaired_without_filling_their_holes():
     assert r.is_valid and round(r.area) == 3600 and not r.contains(box(40, 40, 60, 60))   # the middle stays outside
     assert ov.repaired(box(0, 0, 1, 1)).equals(box(0, 0, 1, 1))
     assert ov.repaired(Polygon([(0, 0), (10, 10), (10, 0), (0, 10)])).geom_type in ("Polygon", "MultiPolygon")   # no lines kept
+    spike = Polygon([(0, 0), (10, 0), (10, 10), (5, 10), (5, 20), (5, 10), (0, 10)])   # make_valid gives polygon + line
+    r = ov.repaired(spike); assert r.geom_type == "Polygon" and round(r.area) == 100
+    two = Polygon([(0, 0), (10, 0), (10, 10), (5, 10), (5, 20), (5, 10), (0, 10), (0, 0), (20, 0), (30, 0), (30, 10), (20, 10), (20, 0)])
+    r = ov.repaired(two); assert r.geom_type == "MultiPolygon" and round(r.area) == 200 and len(r.geoms) == 2   # both parts, not a hull
+    # every place a source shape is read repairs it this way, never with buffer(0) (fifteenth review)
+    here = os.path.dirname(__file__)
+    assert "OV.repaired(g)" in open(os.path.join(here, "compile_tile.py")).read()
+    for f in os.listdir(here):
+        if f.endswith(".py") and not f.startswith("test_"): assert "buffer(0)" not in open(os.path.join(here, f)).read().replace("not buffer(0)", "").replace("never buffer(0)", "").replace("without buffer(0)", "").replace("buffer(0), used", "").replace("buffer(0), which", ""), f
+    from shapely.geometry import MultiPoint, box
+    item = MultiPoint([(5, 5), (500, 500)])   # a heritage item with points on two parcels
+    assert ov.points_on(box(0, 0, 10, 10), [(item, {"ID": "H1"})], "ID") == [{"id": "H1", "significance": None}]
+    assert ov.points_on(box(490, 490, 510, 510), [(item, {"ID": "H1"})], "ID") == [{"id": "H1", "significance": None}]
 
 
 if __name__ == "__main__":

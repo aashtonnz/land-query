@@ -69,11 +69,15 @@ Q = [
 # Porirua City (T-87): no three waters (D-16), no recommended building levels, one LiDAR survey
 PDP_FLOOD = ["pdp_flood_overland_flow", "pdp_flood_stream_corridor", "pdp_flood_inundation"]
 PDP_COAST = ["pdp_coastal_erosion_current", "pdp_coastal_erosion_1m_slr", "pdp_coastal_inundation_current", "pdp_coastal_inundation_1m_slr"]
+# P3's area overlays: at least 1% of the parcel, as for P2, not a sliver (fifteenth review)
+P3_AREAS = ["pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents", "pdp_heritage_sites",
+            "pdp_significant_natural_areas"]
 Q_PORIRUA = [
     dict(id="P1", name="Residential infill candidates",
          question="High or Medium Density Residential parcels of at least 800 m² (that zone over at least 90% of the parcel, no other "
                   "zone over 10%), under 25% covered by PCC's building footprints, 90th-percentile slope under 10°, outside every "
-                  "District Plan 2025 flood and coastal hazard overlay. No sewer condition: Porirua's three waters are not used (D-16). "
+                  "District Plan 2025 flood and coastal hazard overlay (tsunami is not part of the test) and the area where PCC "
+                  "has not mapped flooding. No sewer condition: Porirua's three waters are not used (D-16). "
                   "PCC's footprints are mostly undated and miss newer buildings, so check `unmapped_structure_m2`.",
          sql=f"""SELECT unit_id, appellation, area_m2, building_m2, unmapped_structure_m2, slope_p90_deg, zones {BASE} {TERRAIN}
                  AND (json_extract(zones,'$."High Density Residential Zone"')::DOUBLE >= 90
@@ -103,12 +107,11 @@ Q_PORIRUA = [
     dict(id="P3", name="Heritage, notable tree or significant natural area on the parcel",
          question="Parcels with a District Plan 2025 heritage item or notable tree point inside or on their boundary, or "
                   "overlapping a notable tree group, heritage setting, heritage item extent, historic heritage site or "
-                  "significant natural area.",
+                  "significant natural area by at least 1% of the parcel.",
          sql=f"""SELECT unit_id, appellation, area_m2, pdp_heritage_items, pdp_notable_trees, pdp_notable_tree_groups,
                         pdp_heritage_settings, pdp_heritage_item_extents, pdp_heritage_sites, pdp_significant_natural_areas
-                 {BASE} AND (pdp_heritage_items <> '[]' OR pdp_notable_trees <> '[]' OR pdp_notable_tree_groups IS NOT NULL
-                             OR pdp_heritage_settings IS NOT NULL OR pdp_heritage_item_extents IS NOT NULL
-                             OR pdp_heritage_sites IS NOT NULL OR pdp_significant_natural_areas IS NOT NULL)""",
+                 {BASE} AND (pdp_heritage_items <> '[]' OR pdp_notable_trees <> '[]'
+                             OR {" OR ".join(f"coalesce(list_max(json_extract({c}, '$.*')::DOUBLE[]), 0) >= 1" for c in P3_AREAS)})""",
          sources=["parcels", "pdp_heritage_items", "pdp_notable_trees", "pdp_notable_tree_groups", "pdp_heritage_settings",
                   "pdp_heritage_item_extents", "pdp_heritage_sites", "pdp_significant_natural_areas"]),
 ]

@@ -36,8 +36,9 @@ def limits(out):
     sys.path.insert(0, os.path.join(HERE, "..", "service"))
     from catalogue import PENDING_COLUMNS
     missing = sorted(c for c in PENDING_COLUMNS if c not in out.columns)
-    restorable = int(((out["buildings_coverage_pct"] >= 99) & (out["coverage_pct"] >= 99)
-                      & out["building_2021_m2"].isna()).sum())
+    from councils import COUNCIL
+    bcol = COUNCIL.RENAME_COLUMNS.get("building_2021_m2", "building_2021_m2")   # the council's name for it (T-97)
+    restorable = int(((out["buildings_coverage_pct"] >= 99) & (out["coverage_pct"] >= 99) & out[bcol].isna()).sum())
     return missing, restorable
 
 
