@@ -71,3 +71,19 @@ whole parcels (D-18) over publishing only the part inside.
   - The fixture holds all three boundaries, simplified to 0.5 m, and says so.
   - A precomputed query that names a withheld column anywhere in its SQL is withheld.
   - `kcdc_mirror_vs_linz` counts parcels with LINZ geometry (27,285 of 27,286; one has none), as intended.
+
+## T-71: rebuild (8 Nov 2026)
+
+- **Run.** Run 42448558067 compiled all 44 blocks at `3df0677` and published.
+- **Checked on the published results:**
+  - 27,284 parcels, the number predicted from KCDC's shapes. Counts reconcile: 27,614 = 27,284 + 319 dropped + 11 in
+    the two removed blocks.
+  - 3910395, 3784322, 4033360 and 3954251 are out.
+  - Kept: 3836751 (0.9% inside by LINZ's shape), 3907637 (0.4%), 4024201 (100%), the Motungarara islets and the rock
+    off Kapiti Island (3887751).
+  - The outline used three sources and was identical in all 44 blocks; one flow grid; no failed source;
+    `linz_not_in_mirror` 72. `about` carries the boundary note.
+  - 66 parcels cross the boundary. Their whole area is 1,366.5 km², of which 715.6 km² lies inside the district.
+  - 450 parcels have no terrain values; `SOURCES.md` now says so.
+
+A seventh fresh-eyes review follows, under fresh-eyes review 1.1.

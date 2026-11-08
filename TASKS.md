@@ -10,13 +10,13 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-71: Rebuild with the T-70 fixes (about US$2.20), then a seventh fresh-eyes review (fresh-eyes review 1.1). Started 2026-11-08.
+- T-72: Seventh fresh-eyes review (fresh-eyes review 1.1), before the second council. Started 2026-11-08.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council, Porirua without three waters (D-16; after T-71; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council, Porirua without three waters (D-16; after T-72; discovery done): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
@@ -33,6 +33,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-71: District rebuilt with the T-70 fixes: 27,284 parcels in 44 blocks, as predicted; counts reconcile; the parcels the sixth review named are in or out as they should be. [Findings](docs/findings/2026-11-08-sixth-review.md#t-71-rebuild-8-nov-2026) 2026-11-08.
 - T-70: Sixth-review fixes: district land where two of three boundaries agree (KCDC line and ward, Stats NZ), parcels kept by point or 1,000 m² inside (27,284 by KCDC shapes), boundary note in `about`, extents documented, publishing check and query gate tightened (17 of 17 mutants caught). [Findings](docs/findings/2026-11-08-sixth-review.md#t-70-fixes-8-nov-2026) 2026-11-08.
 - T-69: Parcels crossing the district boundary are published whole (D-18). 2026-11-08.
 - T-68: Sixth fresh-eyes review: three serious findings, all at the district boundary (a sliver parcel included, two parcels with 1.5–2 ha inside dropped, public mode serving 645 km² outside the district without a share), seven minor. [Findings](docs/findings/2026-11-08-sixth-review.md) 2026-11-08.
