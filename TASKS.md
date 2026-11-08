@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 10:30 (Pacific/Auckland)
+Last updated: 2026-11-09 10:40 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -34,6 +34,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-98: Project page with a parcel explorer for both councils (public-mode columns only), published as a private Claude page: https://claude.ai/artifact/8m7s1bKxiNFTpwkV1Vk2JV. Rebuild it after a run with `python3 site/build_site.py OUT.html` and republish. 2026-11-09.
 - T-24: Second council, Porirua City (D-20): 21,954 parcels, 94 columns on `porirua-results`; four fresh-eyes reviews (twelfth to fifteenth, the last with no serious finding); cost write-up. [Cost](docs/findings/2026-11-09-second-council-cost.md), [reviews](docs/findings/2026-11-09-porirua-review.md) 2026-11-09.
 - T-97: Fifteenth-review fixes: shape repair everywhere, multipoint items, P3 slivers (1,803 → 1,693), query tests at every threshold, `finish.yml` per council; Porirua's queries republished by finish run 42523659672. 2026-11-09.
 - T-96: Fifteenth fresh-eyes review: no serious finding; seven minor. 2026-11-09.

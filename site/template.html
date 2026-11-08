@@ -1,0 +1,337 @@
+<title>Land Query</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a survey plan sheet. Narrow reading column for the story, a full-width plan (map + schedule) in the middle. */
+:root{
+  --paper:#f3f5f2; --sheet:#ffffff; --ink:#15211d; --muted:#5b6a64; --rule:#d5ddd8;
+  --accent:#0f6b5f; --accent-soft:#d9ece7; --mark:#c2410c; --lowland:#2f6f9f; --highland:#b45309;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1513; --sheet:#151d1a; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#0f1513; --sheet:#151d1a; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark }
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+.read{max-width:68ch}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;text-wrap:balance;margin:0}
+h1{font-weight:800;font-size:clamp(2.2rem,5vw,3.6rem);letter-spacing:-.01em;line-height:1.02}
+h2{font-weight:800;font-size:1.6rem;letter-spacing:-.005em}
+h3{font-weight:600;font-size:1.05rem}
+p{margin:0}
+.label{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;padding-block:20px;border-bottom:1px solid var(--rule)}
+.hero{display:grid;gap:18px;padding-block:40px 28px}
+.hero p.lede{font-size:1.15rem;max-width:62ch}
+.councils{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:8px}
+.council{background:var(--sheet);border:1px solid var(--rule);padding:18px 20px;display:grid;gap:10px}
+.council .figs{display:flex;gap:22px;flex-wrap:wrap}
+.fig{display:grid}
+.fig b{font-family:var(--mono);font-size:1.45rem;font-weight:600;font-variant-numeric:tabular-nums}
+.fig span{font-size:.8rem;color:var(--muted)}
+section{padding-block:36px;border-top:1px solid var(--rule)}
+section > .read{display:grid;gap:12px}
+/* plan */
+.plan{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-top:18px}
+@media (max-width:860px){.plan{grid-template-columns:minmax(0,1fr)}}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-top:14px}
+.controls label{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
+select,input[type=search]{font:inherit;font-size:.95rem;color:var(--ink);background:var(--sheet);border:1px solid var(--rule);padding:7px 10px;border-radius:4px;min-width:0}
+input[type=search]{width:min(320px,100%)}
+.mapbox{position:relative;background:var(--sheet);border:1px solid var(--rule);min-width:0}
+canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:none;cursor:crosshair}
+.legend{position:absolute;left:10px;bottom:44px;background:color-mix(in srgb,var(--sheet) 88%,transparent);border:1px solid var(--rule);padding:8px 10px;display:grid;gap:4px;font-size:.75rem;max-width:calc(100% - 20px)}
+.legend .bar{height:8px;width:180px;max-width:100%;border-radius:2px}
+.legend .ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.zoomhint{position:absolute;right:10px;top:10px;font-size:.72rem;color:var(--muted);background:color-mix(in srgb,var(--sheet) 85%,transparent);padding:3px 6px}
+.zoombtns{position:absolute;right:10px;bottom:44px;display:grid;gap:4px}
+.zoombtns button{font:600 1rem var(--mono);width:34px;height:34px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:4px;cursor:pointer}
+.panel{background:var(--sheet);border:1px solid var(--rule);padding:16px 18px;display:grid;gap:12px;align-content:start;min-width:0}
+.panel dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.9rem}
+.panel dt{color:var(--muted)}
+.panel dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;overflow-wrap:anywhere}
+.panel .empty{color:var(--muted);font-size:.9rem}
+.results{display:grid;gap:2px;max-height:220px;overflow:auto;border-top:1px solid var(--rule);padding-top:8px}
+.results button{all:unset;cursor:pointer;padding:5px 6px;border-radius:3px;font-size:.88rem;display:flex;justify-content:space-between;gap:8px}
+.results button:hover,.results button:focus-visible{background:var(--accent-soft)}
+.results .c{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--mono);font-size:.7rem;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent);letter-spacing:.03em}
+.pill.held{background:transparent;border:1px solid var(--rule);color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:16px}
+.col{background:var(--sheet);border:1px solid var(--rule);padding:16px 18px;display:grid;gap:8px;align-content:start}
+.col ul{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:.92rem}
+.steps{display:grid;gap:14px;margin-top:14px;counter-reset:s}
+.steps li{list-style:none;display:grid;grid-template-columns:2.2rem 1fr;gap:8px}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--mono);font-weight:600;color:var(--accent)}
+.steps ol{margin:0;padding:0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.tablewrap{overflow-x:auto;margin-top:14px;background:var(--sheet);border:1px solid var(--rule)}
+footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--rule);display:grid;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="label">Land Query · parcel facts from public data</div>
+  <div class="label mono">NZTM2000 · NZVD2016 · 9 Nov 2026</div>
+</header>
+
+<div class="hero">
+  <h1>Every parcel on the Kāpiti Coast and in Porirua, measured.</h1>
+  <p class="lede">Land Query compiles the facts about each land parcel from public sources: LINZ titles and survey, 1 m LiDAR, and council planning and asset layers. Each value records its source, licence and fetch time. The aim is to answer questions across a whole district, such as "which flat, sewered residential sections are big enough to subdivide?", in seconds rather than by checking parcels one at a time.</p>
+  <div class="councils" id="councils"></div>
+</div>
+
+<section id="explore">
+  <div class="read">
+    <div class="label">Explore</div>
+    <h2>The parcel plan</h2>
+    <p>Each dot is a parcel, placed at a point inside it. Colour the plan by a measure, search by legal description (for example <span class="mono">Lot 12 DP 45678</span>), and select a parcel to see its values. This page shows only columns whose sources are licensed for reuse on the dataset itself. Council zones, hazards and buildings stay hidden until the councils confirm their licences in writing.</p>
+  </div>
+  <div class="controls">
+    <label for="search">Search legal description
+      <input id="search" type="search" placeholder="Lot 3 DP 337497" autocomplete="off"></label>
+    <label for="colour">Colour by
+      <select id="colour">
+        <option value="ground_mean_m">Mean ground height</option>
+        <option value="slope_p90_deg">Steepness (90th percentile slope)</option>
+        <option value="catchment_area_max_m2">Upslope catchment</option>
+        <option value="ww_pipe_year">Nearest sewer's install year (Kāpiti)</option>
+        <option value="c">Council</option>
+      </select></label>
+    <label for="council">Show
+      <select id="council">
+        <option value="all">Both councils</option>
+        <option value="k">Kāpiti Coast</option>
+        <option value="p">Porirua</option>
+      </select></label>
+  </div>
+  <div class="plan">
+    <div class="mapbox">
+      <canvas id="map" aria-label="Map of parcels, coloured by the selected measure"></canvas>
+      <div class="legend" id="legend"></div>
+      <div class="zoombtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Show everything">⤢</button></div>
+      <div class="label" style="padding:6px 10px;border-top:1px solid var(--rule)">Drag to pan · scroll, pinch or use the buttons to zoom · select a dot for its values</div>
+    </div>
+    <aside class="panel" id="panel">
+      <div class="label">Selected parcel</div>
+      <div id="detail" class="empty">Select a dot on the plan, or search for a legal description.</div>
+      <div id="results" class="results" hidden></div>
+    </aside>
+  </div>
+</section>
+
+<section id="contents">
+  <div class="read">
+    <div class="label">What's in a parcel row</div>
+    <h2>About a hundred facts per parcel</h2>
+    <p>Each row is one LINZ primary parcel. Roads and water parcels are left out. Values are published, derived exactly from published data, or modelled, and each column says which. An empty value is never a measured 0. It means not mapped, not measured, or outside the source's coverage, as each column's notes say.</p>
+  </div>
+  <div class="cols">
+    <div class="col"><h3>Title and survey</h3><span class="pill">public</span>
+      <ul><li>Legal description, area, parcel intent</li><li>Number of titles, easements, covenants</li><li>Share inside the district <span class="pill held">held</span></li></ul></div>
+    <div class="col"><h3>Terrain (1 m LiDAR)</h3><span class="pill">public</span>
+      <ul><li>Ground height (min, mean, max) and slope</li><li>Overland flow paths and upslope area</li><li>Whole-river catchment on a 10 m grid</li><li>Ground change 2021 → 2025 (Kāpiti)</li></ul></div>
+    <div class="col"><h3>Three waters (Kāpiti)</h3><span class="pill">public</span>
+      <ul><li>Nearest wastewater manhole: distance, invert, head</li><li>Nearest sewer: material, size, year, condition</li><li>Nearest water main: distance, size, type</li><li>Not for Porirua: Wellington Water's licence bars commercial use</li></ul></div>
+    <div class="col"><h3>Planning and hazards</h3><span class="pill held">held until licence confirmed</span>
+      <ul><li>District plan zones and overlays</li><li>Flood, coastal, tsunami, fault, liquefaction</li><li>Heritage, notable trees, natural areas</li><li>Buildings, open ground, sun, roofs, earthworks</li></ul></div>
+  </div>
+</section>
+
+<section id="checks">
+  <div class="read">
+    <div class="label">How it's checked</div>
+    <h2>Every number has to survive a fresh pair of eyes</h2>
+    <p>The pipeline refuses to publish a run that is partial, built from a failed source, or that breaks a column's stated rule. Each finished stage is then reviewed by a reviewer who did not build it, working from the code and data alone. After a serious finding is fixed, the work is reviewed again, until a review finds nothing serious.</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Check</th><th>What it catches</th><th>Example it caught</th></tr></thead>
+    <tbody>
+      <tr><td>Independent recomputation</td><td>Values that are wrong, not just inconsistent</td><td>Porirua's gas pipeline corridor read as 7.05 km² for 0.667 km²; 206 parcels were wrongly inside it</td></tr>
+      <tr><td>Boundary from three sources</td><td>Parcels wrongly in or out of a district</td><td>349 Kāpiti parcels lay outside the district; later, one wholly inside had been dropped</td></tr>
+      <tr><td>"Empty never means 0"</td><td>Missing data read as a finding</td><td>Islands without building outlines read as having no buildings</td></tr>
+      <tr><td>Mutation testing</td><td>Tests that pass on broken code</td><td>Each fix is checked by breaking it on purpose and confirming a test fails</td></tr>
+      <tr><td>Publishing checks</td><td>A run that would publish gaps or mixed inputs</td><td>A failed LiDAR download stopped a district rebuild from publishing</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="sources">
+  <div class="read">
+    <div class="label">Sources and licences</div>
+    <h2>Where it comes from</h2>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Source</th><th>Used for</th><th>Licence</th></tr></thead>
+    <tbody>
+      <tr><td>LINZ: NZ Primary Parcels, titles, non-primary parcels</td><td>Parcels, titles, easements</td><td>CC BY 4.0</td></tr>
+      <tr><td>LINZ: LiDAR (Kāpiti 2021 and 2024–25, Porirua 2023) and the national 1 m DEM</td><td>Terrain, flow, catchments, sea mask</td><td>CC BY 4.0</td></tr>
+      <tr><td>Kāpiti Coast District Council</td><td>Zones, overlays, flood models, three waters, building outlines</td><td>CC BY 4.0, some on the dataset, some by portal statement (to confirm)</td></tr>
+      <tr><td>Porirua City Council</td><td>District Plan 2025 layers, building footprints, parcel copy</td><td>Portal statement (to confirm)</td></tr>
+      <tr><td>Greater Wellington Regional Council and Stats NZ</td><td>Liquefaction, slope failure, district boundary</td><td>CC BY 4.0 statements</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="status">
+  <div class="read">
+    <div class="label">Status</div>
+    <h2>Two councils, the rest of the region next</h2>
+    <ol class="steps">
+      <li><div><b>Kāpiti Coast District.</b> 27,284 parcels, about 105 columns, eleven reviews.</div></li>
+      <li><div><b>Porirua City.</b> 21,954 parcels, 94 columns on the District Plan 2025, four reviews.</div></li>
+      <li><div><b>Licences.</b> Written confirmation from the councils opens the planning and hazard columns to public use.</div></li>
+      <li><div><b>Rest of Greater Wellington.</b> Wellington, Hutt and Upper Hutt, each with half a day to a day of setup.</div></li>
+    </ol>
+  </div>
+</section>
+
+<footer class="read">
+  <div id="runs" class="mono"></div>
+  <div>Contains LINZ data (CC BY 4.0), Kāpiti Coast District Council data (CC BY 4.0), Porirua City Council data, and Greater Wellington Regional Council data. Derived and modelled values are estimates from public data; check against the sources before relying on them.</div>
+</footer>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+const D = JSON.parse(document.getElementById('data').textContent);
+const F = D.fields, I = Object.fromEntries(F.map((f,i)=>[f,i]));
+const rows = D.rows, N = rows.length;
+const COUNCIL = {k:'Kāpiti Coast', p:'Porirua'};
+const fmt = (v, d=0) => v==null ? '—' : Number(v).toLocaleString('en-NZ',{maximumFractionDigits:d});
+
+// council cards
+const st = D.stats, cc = document.getElementById('councils');
+[['k','Kāpiti Coast District'],['p','Porirua City']].forEach(([c,name])=>{
+  const s = st[c];
+  const div = document.createElement('div'); div.className='council';
+  div.innerHTML = `<div class="label">${c==='k'?'District':'City'}</div><h3>${name}</h3>
+    <div class="figs"><div class="fig"><b>${fmt(s.parcels)}</b><span>parcels</span></div>
+    <div class="fig"><b>${fmt(s.with_lidar)}</b><span>with LiDAR terrain</span></div>
+    <div class="fig"><b>${s.median_ground.toFixed(1)} m</b><span>median ground height</span></div></div>`;
+  cc.appendChild(div);
+});
+document.getElementById('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Porirua results: ' + st.p.run.split(';')[0];
+
+// projection: NZTM metres -> canvas
+const canvas = document.getElementById('map'), ctx = canvas.getContext('2d');
+let W=0,H=0,dpr=1, view={cx:0,cy:0,s:1}, selected=-1, filter='all', mode='ground_mean_m';
+const xs=new Float64Array(N), ys=new Float64Array(N);
+let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
+for(let i=0;i<N;i++){const r=rows[i]; xs[i]=r[I.rep_x]; ys[i]=r[I.rep_y];
+  if(xs[i]<minx)minx=xs[i]; if(xs[i]>maxx)maxx=xs[i]; if(ys[i]<miny)miny=ys[i]; if(ys[i]>maxy)maxy=ys[i];}
+function fit(){ const mx=(minx+maxx)/2, my=(miny+maxy)/2; view.cx=mx; view.cy=my;
+  view.s = Math.min(W/(maxx-minx+2000), H/(maxy-miny+2000)); }
+function resize(){ const r=canvas.getBoundingClientRect(); dpr=window.devicePixelRatio||1; W=r.width; H=r.height;
+  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr); if(!view.init){fit();view.init=true} draw(); }
+const sx = x => W/2 + (x-view.cx)*view.s, sy = y => H/2 - (y-view.cy)*view.s;
+
+// colour scales
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function lerp(a,b,t){return a+(b-a)*t}
+function hex(c){c=c.replace('#','');return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16))}
+function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
+  const [p,q,u] = t<.5?[a,m,t*2]:[m,b,(t-.5)*2]; return `rgb(${p.map((v,i)=>Math.round(lerp(v,q[i],u))).join(',')})`; }
+const SCALES = {
+  ground_mean_m:{lo:0,hi:Math.sqrt(200),tf:v=>Math.sqrt(Math.max(v,0)),label:'Mean ground height (m, square-root scale)',ends:['0','200+']},
+  slope_p90_deg:{lo:0,hi:35,tf:v=>v,label:'90th percentile slope (°)',ends:['0°','35°+']},
+  catchment_area_max_m2:{lo:Math.log10(1000),hi:Math.log10(1e8),tf:v=>Math.log10(Math.max(v,1)),label:'Upslope catchment (m², log)',ends:['1,000','100 km²']},
+  ww_pipe_year:{lo:1950,hi:2020,tf:v=>v,label:'Nearest sewer installed (Kāpiti)',ends:['1950','2020']},
+};
+function colourOf(i){ const r=rows[i];
+  if(mode==='c') return r[I.c]==='k'?css('--accent'):css('--highland');
+  const v=r[I[mode]]; if(v==null) return null; const s=SCALES[mode];
+  const t=Math.max(0,Math.min(1,(s.tf(v)-s.lo)/(s.hi-s.lo))); return ramp(t); }
+function legend(){ const L=document.getElementById('legend');
+  if(mode==='c'){ L.innerHTML=`<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua</div>`; return; }
+  const s=SCALES[mode]; const g=[0,.25,.5,.75,1].map(ramp).join(',');
+  L.innerHTML=`<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div style="color:var(--muted)">Grey: no value</div>`; }
+
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.fillStyle=css('--sheet'); ctx.fillRect(0,0,W,H);
+  // 5 km grid, as on a survey sheet
+  ctx.strokeStyle=css('--rule'); ctx.lineWidth=1; ctx.font='10px '+css('--mono'); ctx.fillStyle=css('--muted');
+  const step=5000, x0=Math.floor((view.cx-W/2/view.s)/step)*step, y0=Math.floor((view.cy-H/2/view.s)/step)*step;
+  for(let x=x0;x<view.cx+W/2/view.s;x+=step){const X=sx(x); ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke(); if(view.s*step>60) ctx.fillText((x/1000).toFixed(0)+' kE',X+3,H-4);}
+  for(let y=y0;y<view.cy+H/2/view.s;y+=step){const Y=sy(y); ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke(); if(view.s*step>60) ctx.fillText((y/1000).toFixed(0)+' kN',3,Y-3);}
+  const r = Math.max(1.2, Math.min(5, view.s*25)), grey=css('--rule');
+  for(let i=0;i<N;i++){ const c=rows[i][I.c]; if(filter!=='all'&&c!==filter) continue;
+    const X=sx(xs[i]), Y=sy(ys[i]); if(X<-5||Y<-5||X>W+5||Y>H+5) continue;
+    ctx.fillStyle=colourOf(i)||grey; ctx.fillRect(X-r/2,Y-r/2,r,r); }
+  if(selected>=0){ const X=sx(xs[selected]),Y=sy(ys[selected]); ctx.strokeStyle=css('--mark'); ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(X,Y,9,0,Math.PI*2); ctx.stroke(); }
+  // scale bar
+  const m=niceLen(120/view.s), px=m*view.s; ctx.fillStyle=css('--ink'); ctx.fillRect(W-px-14,14,px,3);
+  ctx.fillText(m>=1000?(m/1000)+' km':m+' m', W-px-14, 30);
+}
+function niceLen(m){const p=Math.pow(10,Math.floor(Math.log10(m)));for(const k of[1,2,5,10]) if(k*p>=m) return k*p;return 10*p}
+
+// selection and detail
+const ROWS = [
+  ['area_m2','Area','m²',0],['ground_mean_m','Mean ground height','m',1],['slope_p90_deg','Slope, 90th percentile','°',1],
+  ['lidar_coverage_pct','LiDAR coverage','%',1],['flow_path_m','Overland flow paths','m',0],['catchment_area_max_m2','Upslope catchment','m²',0],
+  ['title_count','Titles','',0],['easements_n','Easement parcels','',0],
+  ['ww_pipe_dist_m','Nearest sewer','m',1],['ww_pipe_year','Sewer installed','',0],['ww_pipe_condition_grade','Sewer condition grade (1–5)','',0],['ws_pipe_dist_m','Nearest water main','m',1]];
+function select(i, zoom){ selected=i; const r=rows[i];
+  const items = ROWS.filter(([k])=>r[I.c]==='k' || !k.startsWith('w'))   // three waters: Kāpiti only
+    .map(([k,l,u,d])=>`<dt>${l}</dt><dd>${r[I[k]]==null?'—':fmt(r[I[k]],d)+(u&&r[I[k]]!=null?' '+u:'')}</dd>`).join('');
+  document.getElementById('detail').className='';
+  document.getElementById('detail').innerHTML = `<h3>${r[I.appellation]||'Parcel '+r[I.unit_id]}</h3>
+    <div class="mono" style="font-size:.8rem;color:var(--muted)">${COUNCIL[r[I.c]]} · LINZ id ${r[I.unit_id]} · ${r[I.parcel_intent]||''}</div>
+    <dl>${items}</dl>
+    <div style="font-size:.78rem;color:var(--muted)">— means no value: not mapped, not measured, or outside the source's coverage.${r[I.c]==='p'?' Porirua has no three-waters data here.':''}</div>`;
+  if(zoom){ view.cx=xs[i]; view.cy=ys[i]; view.s=Math.max(view.s, 0.25); }
+  draw(); }
+function nearest(px,py){ let best=-1,bd=144; for(let i=0;i<N;i++){ const c=rows[i][I.c]; if(filter!=='all'&&c!==filter) continue;
+  const dx=sx(xs[i])-px, dy=sy(ys[i])-py, d=dx*dx+dy*dy; if(d<bd){bd=d;best=i} } return best; }
+
+// pan / zoom
+let drag=null, moved=false, pinch=null;
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,cx:view.cx,cy:view.cy}; moved=false;});
+canvas.addEventListener('pointermove',e=>{ if(!drag||pinch) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>3) moved=true;
+  view.cx=drag.cx-dx/view.s; view.cy=drag.cy+dy/view.s; draw(); });
+canvas.addEventListener('pointerup',e=>{ if(drag&&!moved){ const r=canvas.getBoundingClientRect(); const i=nearest(e.clientX-r.left,e.clientY-r.top); if(i>=0) select(i,false); } drag=null; });
+function zoomAt(f,px,py){ const wx=view.cx+(px-W/2)/view.s, wy=view.cy-(py-H/2)/view.s; view.s=Math.max(0.002,Math.min(2,view.s*f));
+  view.cx=wx-(px-W/2)/view.s; view.cy=wy+(py-H/2)/view.s; draw(); }
+canvas.addEventListener('wheel',e=>{e.preventDefault(); const r=canvas.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY*0.0015), e.clientX-r.left, e.clientY-r.top);},{passive:false});
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===2){ const [a,b]=e.touches; pinch={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}; }},{passive:true});
+canvas.addEventListener('touchmove',e=>{ if(pinch&&e.touches.length===2){ const [a,b]=e.touches, d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  const r=canvas.getBoundingClientRect(); zoomAt(d/pinch.d,(a.clientX+b.clientX)/2-r.left,(a.clientY+b.clientY)/2-r.top); pinch.d=d; }},{passive:true});
+canvas.addEventListener('touchend',()=>{ pinch=null; });
+document.getElementById('zin').onclick=()=>zoomAt(1.6,W/2,H/2);
+document.getElementById('zout').onclick=()=>zoomAt(1/1.6,W/2,H/2);
+document.getElementById('zreset').onclick=()=>{fit();draw();};
+
+// controls
+document.getElementById('colour').onchange=e=>{mode=e.target.value; legend(); draw();};
+document.getElementById('council').onchange=e=>{filter=e.target.value; draw();};
+const res=document.getElementById('results');
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase(); res.innerHTML=''; if(q.length<3){res.hidden=true;return;}
+  const hits=[]; for(let i=0;i<N&&hits.length<40;i++){ const a=(rows[i][I.appellation]||'').toLowerCase(); if(a.includes(q)||String(rows[i][I.unit_id])===q) hits.push(i); }
+  res.hidden=false;
+  if(!hits.length){ res.innerHTML='<div class="empty" style="padding:5px 6px">No parcel matches. Try the lot and DP number, for example "Lot 2 DP 12726".</div>'; return; }
+  hits.forEach(i=>{ const b=document.createElement('button'); b.innerHTML=`<span>${rows[i][I.appellation]}</span><span class="c">${rows[i][I.c]==='k'?'Kāpiti':'Porirua'}</span>`;
+    b.onclick=()=>select(i,true); res.appendChild(b); });
+});
+window.addEventListener('resize',resize);
+if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{legend();draw();});
+new MutationObserver(()=>{legend();draw();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+legend(); resize();
+// open on a real parcel so the panel shows what it does
+const start = rows.findIndex(r=>r[I.appellation]==='Lot 2 DP 12726'); if(start>=0) select(start,false);
+})();
+</script>

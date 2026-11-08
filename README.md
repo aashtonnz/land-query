@@ -29,6 +29,7 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   per council (`pipeline/councils/`, chosen by `COUNCIL`), and Porirua's results go to the `porirua-results` branch. Its
   sources are LINZ, Porirua City Council (District Plan 2025) and GWRC, without three waters (D-16); see
   `SOURCES.md` ("Register: Porirua City").
+- **[`site/`](site/)**: the project page, a parcel explorer of both councils showing only public-mode columns (T-98). `python3 site/build_site.py OUT.html` builds it from the published results; it is published as a private Claude page.
 - **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
   `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the
   same service checks. Use it for fixes that only change how a parcel's own values are published; anything that needs
