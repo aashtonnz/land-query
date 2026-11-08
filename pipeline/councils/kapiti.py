@@ -69,6 +69,21 @@ LIDAR = [("kapiti-coast_2024-2025/dem_1m/2193", "dem_2025"),
          ("kapiti-coast_2024-2025/dsm_1m/2193", "dsm_2025"),
          ("kapiti-coast_2021/dem_1m/2193", "dem_2021")]
 
+LIDAR_KEYS = dict(dem="dem_2025", dsm="dsm_2025", dem_old="dem_2021")
+
+# what the compiler reads (T-87)
+POLY_LAYERS = ["zones", "ovl_flood_hazard", "ovl_ecological_sites", "ovl_noise_corridor", "ovl_coastal_env",
+               "flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
+               "flood_fill_control", "flood_storage", "flood_ponding", "flood_residual_ponding", "flood_shallow_surface",
+               "wind_stainless", "wind_very_high", "tsunami_zones", "earthworks", "ovl_fault_avoidance",
+               "gw_liquefaction", "gw_eq_slope_failure"]
+POINT_LAYERS = ["ovl_heritage_places", "ovl_notable_trees"]
+POINT_IDS = {"ovl_heritage_places": "BUILDING_ID", "ovl_notable_trees": "TREE_ID"}
+CLASS_FIELDS = {}          # class fields beyond overlays.class_label's own rules (which are Kāpiti's)
+BUILDINGS_KEY = "buildings_2021"
+ABSENT_COLUMNS = ()        # regexes of columns this council has no source for
+RENAME_COLUMNS = {}
+
 BLOCKS_FILE = "kapiti_blocks.json"
 FLOW_BBOX = (1745000, 5440000, 1835000, 5510000)   # the 10 m district flow mosaic (T-42)
 FLOW_OUT_BBOX = (1752000, 5452000, 1808000, 5498000)  # district blocks plus 3 km: every block's LiDAR window

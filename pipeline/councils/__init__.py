@@ -1,7 +1,7 @@
 """Per-council settings (T-86). COUNCIL (environment) picks one; Kāpiti Coast is the default."""
 import importlib, os
 
-NAMES = ("kapiti",)
+NAMES = ("kapiti", "porirua")
 
 
 def load(name=None):

@@ -38,12 +38,9 @@ units = load(unit_src)
 print("unit source:", unit_src, len(units))
 if not units: raise SystemExit("no parcels in this block's part of the district: remove the block from kapiti_blocks.json (T-62)")
 
-poly_layers = ["zones", "ovl_flood_hazard", "ovl_ecological_sites", "ovl_noise_corridor", "ovl_coastal_env",
-               "flood_river_corridor", "flood_stream_corridor", "flood_overflow_path", "flood_residual_overflow",
-               "flood_fill_control", "flood_storage", "flood_ponding", "flood_residual_ponding", "flood_shallow_surface",
-               "wind_stainless", "wind_very_high", "tsunami_zones", "earthworks", "ovl_fault_avoidance",
-               "gw_liquefaction", "gw_eq_slope_failure"]
-point_layers = ["ovl_heritage_places", "ovl_notable_trees"]
+from councils import COUNCIL as _C   # the council's own layers (T-86, T-87)
+poly_layers = list(_C.POLY_LAYERS)
+point_layers = list(_C.POINT_LAYERS)
 L = {n: load(n) for n in poly_layers + point_layers}
 trees = {n: STRtree([g for g, _ in v]) for n, v in L.items() if v}
 
@@ -60,17 +57,18 @@ ws_pipes = [(g, p) for g, p in council(load("ws_pipe")) if p.get("pipe_type") in
 rbl = load("flood_rbl_nzvd2016")
 T = {k: STRtree([g for g, _ in v]) for k, v in dict(ww_nodes=ww_nodes, sw_nodes=sw_nodes, ww_pipes=ww_pipes,
                                                     ws_pipes=ws_pipes, rbl=rbl).items() if v}
-bld_geoms = [g for g, _ in load("buildings_2021")]
+bld_geoms = [g for g, _ in load(_C.BUILDINGS_KEY)]
 
-HAVE_LIDAR = all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in ("dem_2025", "dsm_2025", "dem_2021"))
+LK = _C.LIDAR_KEYS  # raw LiDAR names: the current DEM and DSM, and an earlier DEM for ground change (None: no such survey)
+HAVE_LIDAR = all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in (LK["dem"], LK["dsm"]) + ((LK["dem_old"],) if LK["dem_old"] else ()))
 if not HAVE_LIDAR:  # outside the LiDAR surveys (for example the Tararua foothills): terrain columns stay empty
     print("no LiDAR for this window")
     class _NoDem: transform = rasterio.transform.from_origin(0, 0, 1, 1)
     dem = _NoDem(); Z = dsm = z21 = np.full((3, 3), np.nan, dtype="float32")
 else:
-    dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
-    dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
-    z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
+    dem = rasterio.open(os.path.join(RAW, LK["dem"] + ".tif")); Z = dem.read(1)
+    dsm = rasterio.open(os.path.join(RAW, LK["dsm"] + ".tif")).read(1)
+    z21 = rasterio.open(os.path.join(RAW, LK["dem_old"] + ".tif")).read(1) if LK["dem_old"] else np.full(Z.shape, np.nan, Z.dtype)
 # district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
 DF_PATH = os.path.join(RAW, "district_flow.tif")
 DF = None
@@ -92,8 +90,10 @@ else:
 SEA = np.zeros(Z.shape, bool); G10 = None
 _op = os.path.join(RAW, "district_outline.geojson")
 _cp = os.path.join(RAW, "buildings_capture_area.geojson")
-BLD_COVER = OV.building_cover(OV.capture_area_nztm(json.load(open(_cp))) if os.path.exists(_cp) else None,
-                              shape(json.load(open(_op))) if os.path.exists(_op) else None)  # T-73, T-76
+_outline = shape(json.load(open(_op))) if os.path.exists(_op) else None
+from councils import COUNCIL as _CC
+BLD_COVER = (OV.building_cover(_outline, _outline) if _CC.BUILDINGS_CAPTURE is None   # footprints span the council (T-87)
+             else OV.building_cover(OV.capture_area_nztm(json.load(open(_cp))) if os.path.exists(_cp) else None, _outline))
 LIDAR_BOX = box(*rasterio.transform.array_bounds(Z.shape[0], Z.shape[1], dem.transform)) if HAVE_LIDAR else box(0, 0, 0, 0)
 if DF is not None and HAVE_LIDAR:
     from rasterio.warp import reproject, Resampling
@@ -255,7 +255,7 @@ for uid, (g, p) in enumerate(units):
         if n == "zones":  # above 100: the source stacks zones of different types on the parcel (T-49)
             r["zones_total_pct"] = round(sum(hits.values()), 1) if hits else None
     for n in point_layers:
-        idk = "BUILDING_ID" if n == "ovl_heritage_places" else "TREE_ID"
+        idk = _C.POINT_IDS[n]
         r[n] = json.dumps(points_on(g, [L[n][i] for i in (trees[n].query(g) if n in trees else [])], idk))
     # terrain (LINZ LiDAR 2024-25, 2021)
     rs, cs, m = window_mask(g)
@@ -365,8 +365,11 @@ for uid, (g, p) in enumerate(units):
     rows.append(r)
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"))
-import pandas as pd
+import pandas as pd, re as _re
 df = pd.DataFrame(rows)
+# columns the council has no source for are left out, not published empty (D-12, T-87); some are renamed where the
+# Kāpiti name would say something untrue of the council's source (for example a survey year)
+df = df[[c for c in df.columns if not any(_re.fullmatch(p, c) for p in _C.ABSENT_COLUMNS)]].rename(columns=_C.RENAME_COLUMNS)
 for c_ in ("ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dia_mm", "ww_pipe_dia_mm"):  # whole numbers, kept whole
     if c_ in df: df[c_] = pd.to_numeric(df[c_], errors="coerce").round().astype("Int64")
 db.execute("CREATE OR REPLACE TABLE units AS SELECT * FROM df")

@@ -8,6 +8,10 @@ def class_label(layer, props):
     zones: ePlan_Zone, the operative District Plan zone (PDP_ZONE holds older names for some features).
     Layers without a class field get a fixed name for the overlay itself, never the column name."""
     f = lambda k: (props.get(k) or "").strip() if isinstance(props.get(k), str) else props.get(k)
+    from councils import COUNCIL
+    if layer in COUNCIL.CLASS_FIELDS:   # a council's own class fields, then a fixed name (T-87)
+        fields, default = COUNCIL.CLASS_FIELDS[layer]
+        return next((f(k) for k in fields if f(k)), None) or default
     if layer == "zones": return f("ePlan_Zone") or f("NPS_Zone") or "Zone not recorded"
     if layer == "ovl_fault_avoidance":
         return ": ".join(x for x in (f("FAULT_NAME"), f("DESCRIPTIO")) if x) or "Fault avoidance area"
@@ -222,10 +226,24 @@ def finish_row(row):
         v = row.get(k)
         return v is None or v != v or v < 100 * BUILDING_MIN_COVER   # missing or NaN counts as not covered
     if below("buildings_coverage_pct") or below("coverage_pct"):
-        for k in BUILDING_COLUMNS: row[k] = None
+        from councils import COUNCIL
+        for k in BUILDING_COLUMNS:
+            row[k] = None
+            r = COUNCIL.RENAME_COLUMNS.get(k)
+            if r and r in row: row[r] = None   # published results carry the council's name for it (T-87)
     if below("lidar_coverage_pct"):
         for k in LIDAR_FLOW_COLUMNS:
             if k in row: row[k] = None
     if row.get("ww_pipe_condition_grade") == 0: row["ww_pipe_condition_grade"] = None
     if row.get("rbl_in_parcel_n") == 0: row["rbl_in_parcel_n"] = None
     return row
+
+
+def district_outline_polygons(a, b, c):
+    """A district from three boundary polygons (lists of geometries): land where at least two agree (T-87; Porirua,
+    which has no boundary line closed at sea). Empty if any is missing."""
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+    if not (a and b and c): return Polygon()
+    a, b, c = unary_union(a), unary_union(b), unary_union(c)
+    return unary_union([a.intersection(b), a.intersection(c), b.intersection(c)])

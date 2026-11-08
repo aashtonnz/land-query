@@ -14,7 +14,7 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 _W = te.fetch_bbox(OUT)  # block grown to cover its parcels (fetch_parcels_kcdc.py)
 TILE = dict(xmin=_W[0], ymin=_W[1], xmax=_W[2], ymax=_W[3])  # NZTM2000 (EPSG:2193)
 RAW = os.path.join(OUT, "raw"); os.makedirs(RAW, exist_ok=True)
-from layers import KC, KC_LIC, ARCGIS  # noqa: F401  (the layer list, shared with source_check.py)
+from layers import ARCGIS, BUILDINGS_CAPTURE  # the council's layer list, shared with source_check.py (T-86)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 
@@ -49,8 +49,7 @@ def main():
         except Exception as e:
             prov["sources"][name] = dict(url=url, ok=False, error=str(e)[:300], licence=lic)
             print(f"{name:26s} FAILED {e}")
-    if not only or "buildings_capture_area" in only:  # where the building outlines were captured (T-76)
-        from layers import BUILDINGS_CAPTURE
+    if BUILDINGS_CAPTURE and (not only or "buildings_capture_area" in only):  # where the building outlines were captured (T-76)
         import requests
         url, lic = BUILDINGS_CAPTURE
         try:

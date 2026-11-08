@@ -34,7 +34,8 @@ Q = lambda s: arcgis.query_all(s[0], dict(where=s[1], outFields=s[2], outSR=2193
 EDGE_URL, WARD_URL, STATS_URL = (C.OUTLINE[k][0] for k in ("line", "ward", "stats"))
 edge, wards, stats = Q(C.OUTLINE["line"]), Q(C.OUTLINE["ward"]), Q(C.OUTLINE["stats"])
 G = lambda fs: [shape(f["geometry"]) for f in fs if f.get("geometry")]
-district = ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"])
+district = (ov.district_outline_polygons(G(edge), G(wards), G(stats)) if C.OUTLINE.get("kind") == "polygons"
+            else ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"]))
 if district.is_empty: raise SystemExit("could not build the district outline from the council's line and ward and Stats NZ's polygon")
 outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards + stats), sort_keys=True).encode()
 from shapely.geometry import mapping

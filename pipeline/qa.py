@@ -55,14 +55,16 @@ def area_check(db):
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)
 qa = {"kcdc_mirror_area_minus_linz_m2": area_check(db)}
-if not all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in ("dem_2025", "dsm_2025", "dem_2021")):
+from councils import COUNCIL as _C
+LK = _C.LIDAR_KEYS  # the council's surveys (T-87)
+if not all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in (LK["dem"], LK["dsm"]) + ((LK["dem_old"],) if LK["dem_old"] else ())):
     n = db.execute("SELECT count(*) FROM units").fetchone()[0]
     qa.update(no_lidar_window=True, parcels=dict(n=n, no_lidar=n))
     json.dump(qa, open(os.path.join(D, "qa.json"), "w"), indent=1)
     print(f"QA: no LiDAR for this window; {n} parcels without terrain; area n {qa['kcdc_mirror_area_minus_linz_m2']['n']}"); sys.exit(0)
-dem = rasterio.open(os.path.join(RAW, "dem_2025.tif")); Z = dem.read(1)
-z21 = rasterio.open(os.path.join(RAW, "dem_2021.tif")).read(1)
-dsm = rasterio.open(os.path.join(RAW, "dsm_2025.tif")).read(1)
+dem = rasterio.open(os.path.join(RAW, LK["dem"] + ".tif")); Z = dem.read(1)
+z21 = rasterio.open(os.path.join(RAW, LK["dem_old"] + ".tif")).read(1) if LK["dem_old"] else np.full(Z.shape, np.nan, Z.dtype)
+dsm = rasterio.open(os.path.join(RAW, LK["dsm"] + ".tif")).read(1)
 
 def sample(x, y):
     r, c = dem.index(x, y)
@@ -73,11 +75,11 @@ for key, layer, kind in (("ww_manhole_cover_minus_lidar_m", "ww_node", "WWMH"), 
           if f["properties"].get("status") == "INUS" and f["properties"].get("node_type") == kind and f["geometry"]["type"] == "Point"]
     qa[key] = summary([cl - sample(*xy[:2]) for xy, cl in mh if cl is not None])
 
-bl = [(shape(f["geometry"]).representative_point(), f["properties"].get("Ground")) for f in feats("buildings_2021")]
+bl = [(shape(f["geometry"]).representative_point(), f["properties"].get("Ground")) for f in feats(_C.BUILDINGS_KEY)]
 qa["building_ground_minus_lidar_m"] = summary([gh - sample(p.x, p.y) for p, gh in bl if gh is not None])
 
 gy, gx = np.gradient(Z, 1.0); slope = np.degrees(np.arctan(np.hypot(gx, gy)))
-geoms = [shape(f["geometry"]) for f in feats("buildings_2021")]
+geoms = [shape(f["geometry"]) for f in feats(_C.BUILDINGS_KEY)]
 bmask = ~geometry_mask(geoms, out_shape=Z.shape, transform=dem.transform) if geoms else np.zeros_like(Z, bool)
 flat = (slope < 2) & ((dsm - Z) < 0.5) & ~bmask & np.isfinite(Z) & np.isfinite(z21)
 dz = (Z - z21)[flat]
@@ -86,7 +88,7 @@ qa["lidar_2025_minus_2021_flat_m"] = summary(dz)
 
 from shapely.geometry import box as _box
 rd = []
-for f in feats("buildings_2021")[:3000]:
+for f in feats(_C.BUILDINGS_KEY)[:3000]:
     p_ = f["properties"]
     if p_.get("BLD_ave") is None: continue
     g = shape(f["geometry"]).buffer(-0.5)
