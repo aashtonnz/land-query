@@ -1,7 +1,7 @@
 # Tasks
 
-Last updated: 2026-11-08 12:40 (Pacific/Auckland)
-Follows: task board v1.10 (ai-working-practices), changelog to entry 34
+Last updated: 2026-11-08 13:00 (Pacific/Auckland)
+Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
 - Costs: small and expected only, within the owner's monthly GitHub budget (D-14; US$20 for November 2026). November so far: an estimated US$10.85 of US$20 (T-54 rebuild about US$2, merge-only rerun a few cents).
@@ -10,12 +10,13 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
+- T-57: Third fresh-eyes review (fresh-eyes review 1.1: review again after serious findings are fixed): a new reviewer checks everything changed since the second review was recorded (T-47 to T-56: coastal flow, LINZ geometry, service fixes, water mains, clear-ground columns, source check) before the second council builds on it. Started 2026-11-08.
 
 ## Waiting on you
 - T-35: Confirm KCDC and GWRC licences in writing: 12 of the 23 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
-- T-24: Second council: one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
+- T-24: Second council (after T-57): one adapter (Porirua or Wellington City) to measure the per-council cost before the rest of the region.
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
