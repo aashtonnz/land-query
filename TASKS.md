@@ -1,6 +1,6 @@
 # Tasks
 
-Last updated: 2026-11-09 11:30 (Pacific/Auckland)
+Last updated: 2026-11-09 14:00 (Pacific/Auckland)
 Follows: task board v1.10 (ai-working-practices), changelog to entry 35
 
 Standing priorities:
@@ -10,7 +10,6 @@ Standing priorities:
 - Risk list: [`RISKS.md`](RISKS.md) | Decision log: [`DECISIONS.md`](DECISIONS.md) | Plan details: [`PLAN.md`](PLAN.md) | Sources: [`SOURCES.md`](SOURCES.md)
 
 ## Doing (at most 3)
-- T-100: Pilot the national index on Greater Wellington (about 200,000 parcels, LINZ data only): measure run time, cost and size. Started 2026-11-09.
 
 ## Waiting on you
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
@@ -18,8 +17,9 @@ Standing priorities:
 
 ## Next (in order, at most about 10)
 - T-101: The parcel report on demand: one parcel anywhere in New Zealand from the national LiDAR mosaics, as a page. Raised 2026-11-09.
-- T-102: Build the national index out to the whole country, monthly. After T-100. Raised 2026-11-09.
-- T-103: Fresh-eyes review of the index and the report before anyone outside sees them. Raised 2026-11-09.
+- T-102: Build the national index out to the whole country, monthly: about 6–7 hours of work, so on GitHub split over several jobs (about US$3 a run, estimate from T-100); the index (about 400 MB) as a release file. Needs a national district boundary source, and easements from the LINZ Data Service with the key. Raised 2026-11-09.
+- T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
+- T-103: Fresh-eyes review of the index and the report before anyone outside sees them. Include why LINZ's building outlines are 20 m² or more smaller than KCDC's on 22% of Kāpiti parcels. Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
 - T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
 
@@ -38,6 +38,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-100: National index pilot, Greater Wellington: 217,326 parcels, 34 MB, about 25 minutes a run, built here at no cost from LINZ's public services (D-22). Matches the Kāpiti results on area and title count for all 27,227 shared parcels. Found and fixed: records LINZ's services hold twice, and downloads now checked record by record. Results on the `national-pilot` branch. [Findings](docs/findings/2026-11-09-national-index-pilot.md) 2026-11-09.
 - T-99: National MVP approved (D-21): a site screen for any NZ parcel on LINZ data, two tiers. Buyer conversations to be worked out later. [Proposal](docs/proposals/2026-11-09-national-mvp.md) 2026-11-09.
 - T-98: Project page with a parcel explorer for both councils (public-mode columns only), published as a private Claude page: https://claude.ai/artifact/8m7s1bKxiNFTpwkV1Vk2JV. Rebuild it after a run with `python3 site/build_site.py OUT.html` and republish. 2026-11-09.
 - T-24: Second council, Porirua City (D-20): 21,954 parcels, 94 columns on `porirua-results`; four fresh-eyes reviews (twelfth to fifteenth, the last with no serious finding); cost write-up. [Cost](docs/findings/2026-11-09-second-council-cost.md), [reviews](docs/findings/2026-11-09-porirua-review.md) 2026-11-09.

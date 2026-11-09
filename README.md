@@ -29,6 +29,10 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   per council (`pipeline/councils/`, chosen by `COUNCIL`), and Porirua's results go to the `porirua-results` branch. Its
   sources are LINZ, Porirua City Council (District Plan 2025) and GWRC, without three waters (D-16); see
   `SOURCES.md` ("Register: Porirua City").
+- **[`pipeline/national_index.py`](pipeline/national_index.py)**: the national index (D-21, D-22): one row per parcel
+  anywhere in New Zealand from LINZ data only (parcels, titles, building outlines, addresses, road frontage, coast
+  distance, and ground, slope and flow from the national 10 m ground model), built in 40 km tiles. Piloted on Greater
+  Wellington (217,326 parcels, T-100); results on the `national-pilot` branch.
 - **[`site/`](site/)**: the project page, a parcel explorer of both councils showing only public-mode columns (T-98). `python3 site/build_site.py OUT.html` builds it from the published results; it is published as a private Claude page.
 - **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
   `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the

@@ -90,8 +90,9 @@ def fetch(layer, bbox, cache, where="1=1"):
 
 def once_each(feats, key):
     """(features with one record per key, records dropped, of those how many had other attribute values). LINZ's
-    ArcGIS copies hold some parcels and buildings twice, with the same values and shapes differing by under 0.1 m²
-    (1,368 parcels in Wellington City; T-100); the first record is kept."""
+    ArcGIS copies hold some parcels and buildings twice: parcels with the same values and shapes differing by under
+    0.1 m² (1,368 in Wellington City), buildings with the same shape, one copy's use_ "Unknown" and the other's empty
+    (433 in Greater Wellington; T-100). The first record is kept."""
     seen, out, repeats, differ = {}, [], 0, 0
     for f in feats:
         k = f["properties"].get(key)
