@@ -97,10 +97,10 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
   <div class="read">
     <div class="label">Explore</div>
     <h2>The parcel plan</h2>
-    <p>Each dot is a parcel, placed at a point inside it. Colour the plan by a measure, search by legal description (for example <span class="mono">Lot 12 DP 45678</span>), and select a parcel to see its values. This page shows only columns whose sources are licensed for reuse on the dataset itself. Council zones, hazards and buildings stay hidden until the councils confirm their licences in writing.</p>
+    <p>Each dot is a parcel, placed at a point inside it. Kāpiti Coast and Porirua show the full council builds; the rest of Greater Wellington shows the national index pilot, from LINZ data only. Colour the plan by a measure, search by legal description or address (for example <span class="mono">Lot 12 DP 45678</span>), and select a parcel to see its values. This page shows only columns whose sources are licensed for reuse on the dataset itself. Council zones, hazards and buildings stay hidden until the councils confirm their licences in writing.</p>
   </div>
   <div class="controls">
-    <label for="search">Search legal description
+    <label for="search">Search legal description or address
       <input id="search" type="search" placeholder="Lot 3 DP 337497" autocomplete="off"></label>
     <label for="colour">Colour by
       <select id="colour">
@@ -112,9 +112,10 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
       </select></label>
     <label for="council">Show
       <select id="council">
-        <option value="all">Both councils</option>
+        <option value="all">Everything</option>
         <option value="k">Kāpiti Coast</option>
         <option value="p">Porirua</option>
+        <option value="n">Rest of Greater Wellington (national index)</option>
       </select></label>
   </div>
   <div class="plan">
@@ -123,6 +124,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
       <div class="legend" id="legend"></div>
       <div class="zoombtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Show everything">⤢</button></div>
       <div class="label" style="padding:6px 10px;border-top:1px solid var(--rule)">Drag to pan · scroll, pinch or use the buttons to zoom · select a dot for its values</div>
+      <div class="label" id="natstatus" style="padding:0 10px 6px">Loading the Greater Wellington parcels…</div>
     </div>
     <aside class="panel" id="panel">
       <div class="label">Selected parcel</div>
@@ -227,31 +229,34 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 <script>
 (function(){
 const D = JSON.parse(document.getElementById('data').textContent);
-const F = D.fields, I = Object.fromEntries(F.map((f,i)=>[f,i]));
-const rows = D.rows, N = rows.length;
-const COUNCIL = {k:'Kāpiti Coast', p:'Porirua'};
+// the national index pilot's extra fields (T-100); council rows simply lack them
+const F = D.fields.concat(['building_cover_pct','street','place','territorial_authority']), I = Object.fromEntries(F.map((f,i)=>[f,i]));
+const rows = D.rows; let N = rows.length;
+const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national index'};
+const SHORT = {k:'Kāpiti', p:'Porirua', n:'Gtr Wellington'};
 const fmt = (v, d=0) => v==null ? '—' : Number(v).toLocaleString('en-NZ',{maximumFractionDigits:d});
 
 // council cards
 const st = D.stats, cc = document.getElementById('councils');
-[['k','Kāpiti Coast District'],['p','Porirua City']].forEach(([c,name])=>{
-  const s = st[c];
+[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n','Greater Wellington','National index pilot']].forEach(([c,name,kind])=>{
+  const s = st[c]; if(!s) return;
   const div = document.createElement('div'); div.className='council';
-  div.innerHTML = `<div class="label">${c==='k'?'District':'City'}</div><h3>${name}</h3>
+  div.innerHTML = `<div class="label">${kind}</div><h3>${name}</h3>
     <div class="figs"><div class="fig"><b>${fmt(s.parcels)}</b><span>parcels</span></div>
-    <div class="fig"><b>${fmt(s.with_lidar)}</b><span>with LiDAR terrain</span></div>
+    ${c==='n' ? `<div class="fig"><b>LINZ</b><span>data only, 10 m ground</span></div>` : `<div class="fig"><b>${fmt(s.with_lidar)}</b><span>with LiDAR terrain</span></div>`}
     <div class="fig"><b>${s.median_ground.toFixed(1)} m</b><span>median ground height</span></div></div>`;
   cc.appendChild(div);
 });
-document.getElementById('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Porirua results: ' + st.p.run.split(';')[0];
+document.getElementById('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Porirua results: ' + st.p.run.split(';')[0] + (st.n ? ' · Greater Wellington: ' + st.n.run : '');
 
 // projection: NZTM metres -> canvas
 const canvas = document.getElementById('map'), ctx = canvas.getContext('2d');
 let W=0,H=0,dpr=1, view={cx:0,cy:0,s:1}, selected=-1, filter='all', mode='ground_mean_m';
-const xs=new Float64Array(N), ys=new Float64Array(N);
-let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
-for(let i=0;i<N;i++){const r=rows[i]; xs[i]=r[I.rep_x]; ys[i]=r[I.rep_y];
-  if(xs[i]<minx)minx=xs[i]; if(xs[i]>maxx)maxx=xs[i]; if(ys[i]<miny)miny=ys[i]; if(ys[i]>maxy)maxy=ys[i];}
+const xs=[], ys=[];
+let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity, touched=false;
+function place(from){ for(let i=from;i<N;i++){const r=rows[i]; xs[i]=r[I.rep_x]; ys[i]=r[I.rep_y];
+  if(xs[i]<minx)minx=xs[i]; if(xs[i]>maxx)maxx=xs[i]; if(ys[i]<miny)miny=ys[i]; if(ys[i]>maxy)maxy=ys[i];} }
+place(0);
 function fit(){ const mx=(minx+maxx)/2, my=(miny+maxy)/2; view.cx=mx; view.cy=my;
   view.s = Math.min(W/(maxx-minx+2000), H/(maxy-miny+2000)); }
 function resize(){ const r=canvas.getBoundingClientRect(); dpr=window.devicePixelRatio||1; W=r.width; H=r.height;
@@ -271,11 +276,11 @@ const SCALES = {
   ww_pipe_year:{lo:1950,hi:2020,tf:v=>v,label:'Nearest sewer installed (Kāpiti)',ends:['1950','2020']},
 };
 function colourOf(i){ const r=rows[i];
-  if(mode==='c') return r[I.c]==='k'?css('--accent'):css('--highland');
+  if(mode==='c') return r[I.c]==='k'?css('--accent'):r[I.c]==='p'?css('--highland'):css('--lowland');
   const v=r[I[mode]]; if(v==null) return null; const s=SCALES[mode];
   const t=Math.max(0,Math.min(1,(s.tf(v)-s.lo)/(s.hi-s.lo))); return ramp(t); }
 function legend(){ const L=document.getElementById('legend');
-  if(mode==='c'){ L.innerHTML=`<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua</div>`; return; }
+  if(mode==='c'){ L.innerHTML=`<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div>`; return; }
   const s=SCALES[mode]; const g=[0,.25,.5,.75,1].map(ramp).join(',');
   L.innerHTML=`<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div style="color:var(--muted)">Grey: no value</div>`; }
 
@@ -304,12 +309,26 @@ const ROWS = [
   ['lidar_coverage_pct','LiDAR coverage','%',1],['flow_path_m','Overland flow paths','m',0],['catchment_area_max_m2','Upslope catchment','m²',0],
   ['title_count','Titles','',0],['easements_n','Easement parcels','',0],
   ['ww_pipe_dist_m','Nearest sewer','m',1],['ww_pipe_year','Sewer installed','',0],['ww_pipe_condition_grade','Sewer condition grade (1–5)','',0],['ws_pipe_dist_m','Nearest water main','m',1]];
+const NROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height (10 m grid)','m',1],
+  ['catchment_area_max_m2','Upslope catchment (10 m grid)','m²',0],['building_cover_pct','Under building outlines','%',0],['title_count','Titles','',0]];
+const addr = r => r[I.street]==null ? null : r[I.street] + (r[I.place] ? ', ' + r[I.place] : '');
 function select(i, zoom){ selected=i; const r=rows[i];
+  if(r[I.c]==='n'){
+    const items = NROWS.map(([k,l,u,d])=>`<dt>${l}</dt><dd>${r[I[k]]==null?'—':fmt(r[I[k]],d)+(u?' '+u:'')}</dd>`).join('');
+    document.getElementById('detail').className='';
+    document.getElementById('detail').innerHTML = `<h3>${r[I.appellation]||'Parcel '+r[I.unit_id]}</h3>
+      <div class="mono" style="font-size:.8rem;color:var(--muted)">${r[I.territorial_authority]||'Greater Wellington'} · LINZ id ${r[I.unit_id]} · ${r[I.parcel_intent]||''}</div>
+      ${addr(r)?`<div style="margin-top:6px">${addr(r)}</div>`:''}
+      <dl>${items}</dl>
+      <div style="font-size:.78rem;color:var(--muted)">From the national index pilot: LINZ data only, ground on a 10 m grid. The full 1 m report for this parcel is made on request. — means no value.</div>`;
+    if(zoom){ view.cx=xs[i]; view.cy=ys[i]; view.s=Math.max(view.s, 0.25); }
+    draw(); return; }
   const items = ROWS.filter(([k])=>r[I.c]==='k' || !k.startsWith('w'))   // three waters: Kāpiti only
     .map(([k,l,u,d])=>`<dt>${l}</dt><dd>${r[I[k]]==null?'—':fmt(r[I[k]],d)+(u&&r[I[k]]!=null?' '+u:'')}</dd>`).join('');
   document.getElementById('detail').className='';
   document.getElementById('detail').innerHTML = `<h3>${r[I.appellation]||'Parcel '+r[I.unit_id]}</h3>
     <div class="mono" style="font-size:.8rem;color:var(--muted)">${COUNCIL[r[I.c]]} · LINZ id ${r[I.unit_id]} · ${r[I.parcel_intent]||''}</div>
+    ${addr(r)?`<div style="margin-top:6px">${addr(r)}</div>`:''}
     <dl>${items}</dl>
     <div style="font-size:.78rem;color:var(--muted)">— means no value: not mapped, not measured, or outside the source's coverage.${r[I.c]==='p'?' Porirua has no three-waters data here.':''}</div>`;
   if(zoom){ view.cx=xs[i]; view.cy=ys[i]; view.s=Math.max(view.s, 0.25); }
@@ -319,7 +338,7 @@ function nearest(px,py){ let best=-1,bd=144; for(let i=0;i<N;i++){ const c=rows[
 
 // pan / zoom
 let drag=null, moved=false, pinch=null;
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,cx:view.cx,cy:view.cy}; moved=false;});
+canvas.addEventListener('pointerdown',e=>{touched=true; canvas.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,cx:view.cx,cy:view.cy}; moved=false;});
 canvas.addEventListener('pointermove',e=>{ if(!drag||pinch) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>3) moved=true;
   view.cx=drag.cx-dx/view.s; view.cy=drag.cy+dy/view.s; draw(); });
 canvas.addEventListener('pointerup',e=>{ if(drag&&!moved){ const r=canvas.getBoundingClientRect(); const i=nearest(e.clientX-r.left,e.clientY-r.top); if(i>=0) select(i,false); } drag=null; });
@@ -340,16 +359,34 @@ document.getElementById('council').onchange=e=>{filter=e.target.value; draw();};
 const res=document.getElementById('results');
 document.getElementById('search').addEventListener('input',e=>{
   const q=e.target.value.trim().toLowerCase(); res.innerHTML=''; if(q.length<3){res.hidden=true;return;}
-  const hits=[]; for(let i=0;i<N&&hits.length<40;i++){ const a=(rows[i][I.appellation]||'').toLowerCase(); if(a.includes(q)||String(rows[i][I.unit_id])===q) hits.push(i); }
+  const hits=[]; for(let i=0;i<N&&hits.length<40;i++){ const r=rows[i], a=(r[I.appellation]||'').toLowerCase();
+    if(a.includes(q)||String(r[I.unit_id])===q||(r[I.street]&&addr(r).toLowerCase().includes(q))) hits.push(i); }
   res.hidden=false;
   if(!hits.length){ res.innerHTML='<div class="empty" style="padding:5px 6px">No parcel matches. Try the lot and DP number, for example "Lot 2 DP 12726".</div>'; return; }
-  hits.forEach(i=>{ const b=document.createElement('button'); b.innerHTML=`<span>${rows[i][I.appellation]}</span><span class="c">${rows[i][I.c]==='k'?'Kāpiti':'Porirua'}</span>`;
+  hits.forEach(i=>{ const b=document.createElement('button'); b.innerHTML=`<span>${rows[i][I.appellation]}</span><span class="c">${SHORT[rows[i][I.c]]}</span>`;
+    if(rows[i][I.c]==='n' && rows[i][I.street]) b.title = addr(rows[i]);
     b.onclick=()=>select(i,true); res.appendChild(b); });
 });
 window.addEventListener('resize',resize);
 if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{legend();draw();});
 new MutationObserver(()=>{legend();draw();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 legend(); resize();
+// the national index pilot loads after the page opens: first the plan, then names and addresses for search
+const ns = document.getElementById('natstatus');
+const decode = c => c.codes.map(k => k<0 ? null : c.values[k]);
+fetch('national-1.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(d=>{
+  const from = N, intent = decode(d.parcel_intent), ta = decode(d.territorial_authority);
+  for(let j=0;j<d.unit_id.length;j++){ const r = new Array(F.length).fill(null);
+    r[I.unit_id]=d.unit_id[j]; r[I.rep_x]=d.rep_x[j]; r[I.rep_y]=d.rep_y[j]; r[I.area_m2]=d.area_m2[j];
+    r[I.ground_mean_m]=d.ground_mean_m[j]; r[I.catchment_area_max_m2]=d.catchment_area_max_m2[j]; r[I.title_count]=d.title_count[j];
+    r[I.building_cover_pct]=d.building_cover_pct[j]; r[I.parcel_intent]=intent[j]; r[I.territorial_authority]=ta[j]; r[I.c]='n'; rows.push(r); }
+  N = rows.length; place(from); if(!touched){ fit(); } draw();
+  ns.textContent = `Showing ${fmt(N)} parcels. Loading names and addresses for search…`;
+  return fetch('national-2.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(t=>{
+    const pl = decode(t.place);
+    for(let j=0;j<t.appellation.length;j++){ const r=rows[from+j]; r[I.appellation]=t.appellation[j]; r[I.street]=t.street[j]; r[I.place]=pl[j]; }
+    ns.textContent = `Showing ${fmt(N)} parcels. Search by legal description or address.`; });
+}).catch(()=>{ ns.textContent = 'The Greater Wellington parcels could not be loaded; Kāpiti Coast and Porirua are shown.'; });
 // open on a real parcel so the panel shows what it does
 const start = rows.findIndex(r=>r[I.appellation]==='Lot 2 DP 12726'); if(start>=0) select(start,false);
 })();
