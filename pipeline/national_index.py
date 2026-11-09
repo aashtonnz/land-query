@@ -402,7 +402,10 @@ def run(out, tiles, region=None, tas=None, rprov=None, key="nz"):
     t0 = time.time()
     rows, tprov = [], []
     for i, t in enumerate(tiles):
-        r, p = index_tile(t, cache, region, tas)
+        try: r, p = index_tile(t, cache, region, tas)
+        except Exception as e:   # a passing network fault: one more try, from the downloads already cached (T-102)
+            print(f"tile {t}: {type(e).__name__}: {e}; trying once more", flush=True)
+            r, p = index_tile(t, cache, region, tas)
         rows += r; tprov.append(p)
         print(f"tile {i + 1}/{len(tiles)} {t}: {len(r)} parcels, {p.get('seconds_vector', p.get('seconds'))}s vector, "
               f"{p.get('seconds_elevation', 0)}s elevation", flush=True)

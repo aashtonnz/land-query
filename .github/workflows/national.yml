@@ -50,7 +50,7 @@ jobs:
         env: { N: "${{ inputs.shares }}", K: "${{ matrix.k }}" }
         run: |
           python3 test_national.py
-          /usr/bin/time -v python3 national_index.py ../share nz nz_tiles.json "$K" "$N" 2> time.txt
+          /usr/bin/time -v -o time.txt python3 national_index.py ../share nz nz_tiles.json "$K" "$N"   # errors stay in the log
           grep -h -E "Elapsed|Maximum resident" time.txt
           rm -rf ../share/cache
       - uses: actions/upload-artifact@v4
