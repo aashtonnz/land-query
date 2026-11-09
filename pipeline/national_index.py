@@ -32,14 +32,23 @@ LDS = "https://data.linz.govt.nz/layer/"
 LICENCE = "LINZ, CC BY 4.0"
 # name: (service, fields, LINZ Data Service layer)
 LAYERS = dict(
-    parcels=("LINZ_NZ_Primary_Parcels", "id,appellation,parcel_intent,topology_type,statutory_actions,land_district,titles,survey_area,calc_area", 50823),
+    parcels=("LINZ_NZ_Primary_Parcels", "id,appellation,parcel_intent,topology_type,land_district,titles,survey_area,calc_area", 50823),
     titles=("LINZ_NZ_Property_Titles", "title_no,status,type", 50804),          # never owners or number_owners
     buildings=("LINZ_NZ_Building_Outlines", "building_id,use_,capture_source_to", 101290),
     addresses=("LINZ_NZ_Addresses", "address_id,full_address,address_number,suburb_locality,town_city,territorial_authority", 105689),
     coast=("LINZ_NZ_Coastline_Mean_High_Water_Springs", "id", None),            # LDS layer number to confirm
 )
 KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id")
-EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)"}
+EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)", "Riverbed", "Streambed"}
+# older bed parcels carry the DCDB intent: known by their legal description ("Part Bed Porirua Harbour", "River Bed",
+# "Part Mangapouri Stream Bed"), but not a former bed that is now land ("Old River Bed") (T-108)
+import re as _re
+BED = _re.compile(r"\b(?<!old )(river |stream |harbour )?bed\b", _re.I)
+def is_bed(app): return bool(app) and bool(BED.search(app)) and not _re.search(r"\bold\b[^,]*\bbed\b", app, _re.I)
+# a parcel belongs to a region if its point lies within this distance of the region's boundary polygons, which follow
+# a simplified coast: shore and island parcels fell just outside (T-108)
+REGION_MARGIN = 1000.0
+COAST_BAND = 300.0
 TILE = 40000.0
 ORIGIN = (1000000.0, 4700000.0)
 MARGIN = 5000.0          # elevation read this far beyond the tile, so catchments are whole for nearly every parcel
@@ -117,11 +126,17 @@ def select_parcels(feats, tile, region=None):
     """[(geometry, properties, representative point)] of the tile's own parcels."""
     out = []
     for g, p in geoms(feats):
-        if p.get("parcel_intent") in EXCLUDE_INTENTS or g.is_empty: continue
+        if p.get("parcel_intent") in EXCLUDE_INTENTS or is_bed(p.get("appellation")) or g.is_empty: continue
         rp = g.representative_point()
-        if in_tile(rp, tile) and (region is None or region.contains(rp)):
+        if in_tile(rp, tile) and (region is None or region.contains(rp)):   # region: already grown by REGION_MARGIN
             out.append((g, p, rp))
     return out
+
+
+def current_titles(feats):
+    """{title number: properties} of current titles: live, and partly cancelled (PRTC), which still apply to the land
+    that remains (T-108)."""
+    return {f["properties"]["title_no"]: f["properties"] for f in feats if f["properties"].get("status") in ("LIVE", "PRTC")}
 
 
 def _date(ms):
@@ -133,7 +148,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=()):
     tas: [(geometry, properties)]; titles: {title_no: properties}."""
     bt = STRtree([g for g, _ in buildings]) if buildings else None
     at = STRtree([g for g, _ in addresses]) if addresses else None
-    road_buf = [g.buffer(1.0) for g, _ in roads]
+    road_buf = [g.buffer(0.1) for g, _ in roads]   # road parcels share the boundary exactly; 0.1 m, not 1 m, so the sides don't count (T-108)
     rt = STRtree(road_buf) if road_buf else None
     ct = STRtree([g for g, _ in coast]) if coast else None
     tt = STRtree([g for g, _ in tas]) if tas else None
@@ -145,7 +160,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=()):
         tnos = [t.strip() for t in (p.get("titles") or "").split(",") if t.strip()]
         ttypes = sorted({titles[t]["type"] for t in tnos if t in titles and titles[t].get("type")})
         r = dict(parcel_id=p.get("id"), appellation=p.get("appellation"), parcel_intent=p.get("parcel_intent"),
-                 land_district=p.get("land_district"), statutory_actions=p.get("statutory_actions"),
+                 land_district=p.get("land_district"),
                  area_m2=round(a, 1), survey_area_m2=p.get("survey_area"), perimeter_m=round(per, 1),
                  compactness=round(4 * math.pi * a / per ** 2, 3) if per else None,
                  width_m=round(min(sides), 1) if sides else None,
@@ -170,7 +185,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=()):
                  suburb_locality=ads[0].get("suburb_locality") if ads else None, town_city=ads[0].get("town_city") if ads else None)
         ta = [tas[i][1].get("NAME") for i in (tt.query(rp, predicate="within") if tt else [])]
         r["territorial_authority"] = ta[0] if ta else (ads[0].get("territorial_authority") if ads else None)
-        # road frontage: the parcel's boundary within 1 m of a road parcel
+        # road frontage: the parcel's boundary within 0.1 m of a road parcel
         near = [road_buf[i] for i in (rt.query(g) if rt else [])]
         r["road_frontage_m"] = round(g.boundary.intersection(unary_union(near)).length, 1) if near else 0.0
         if ct is not None:
@@ -212,7 +227,7 @@ def elevation_columns(parcels, Z, T, lidar, acc, trunc):
                              slope_mean_deg=round(a.sm, 1), slope_max_deg=round(a.s1, 1), flat_pct=round(100 * a.flat, 1),
                              steep_pct=round(100 * a.steep, 1), low_lying_pct=round(100 * a.low, 1),
                              lidar_pct=round(100 * a.li, 1), ground_cells=int(a.n),
-                             ground_cells_pct=round(100 * a.n / max(allc[k], geom.area / RES ** 2), 1),   # under 100: no ground, or past the grid
+                             ground_cells_pct=round(100 * a.n / max(1, allc[k]), 1),   # of the parcel's own cell centres: under 100 means some have no ground (T-108)
                              upslope_area_max_m2=float(round(top.loc[k, "acc"])), upslope_truncated=bool(top.loc[k, "tr"]),
                              elevation_from="cells"))
             continue
@@ -253,7 +268,8 @@ def index_tile(tile, cache, region=None, tas=()):
     bf, prov["buildings"] = fetch("buildings", win, cache)
     af, prov["addresses"] = fetch("addresses", win, cache)
     cf, prov["coast"] = fetch("coast", (win[0] - COAST_MAX, win[1] - COAST_MAX, win[2] + COAST_MAX, win[3] + COAST_MAX), cache)
-    titles = {f["properties"]["title_no"]: f["properties"] for f in tf if f["properties"].get("status") == "LIVE"}
+    # partly cancelled titles (PRTC) are still current for the land that remains (T-108)
+    titles = current_titles(tf)
     rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas)
     t1 = time.time()
     Z, T, eprov, L, acc, tr = elevation_grid(tile)
@@ -268,8 +284,16 @@ def region_shapes(key):
     R = REGIONS[key]
     feats = arcgis.query_all(R["url"], dict(where=R["where"], outFields="NAME", outSR=2193))
     tas = [(ov.repaired(shape(f["geometry"])), f["properties"]) for f in feats if f.get("geometry")]
-    return unary_union([g for g, _ in tas]), tas, dict(url=R["url"], features=len(feats), licence=R["licence"],
-                                                     fetched=utc_now(), name=R["name"])
+    region = unary_union([g for g, _ in tas])
+    # grown only along the coast: the district polygons follow a simplified shore, so shore and island parcels fell
+    # just outside; inland borders with other regions are left as they are (T-108)
+    x0, y0, x1, y1 = region.bounds
+    coast = arcgis.query_all(SVC + LAYERS["coast"][0] + "/FeatureServer/0", dict(where="1=1", geometry=f"{x0},{y0},{x1},{y1}",
+        geometryType="esriGeometryEnvelope", inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193), workers=WORKERS)
+    shore = unary_union([shape(f["geometry"]) for f in coast if f.get("geometry")]).buffer(COAST_BAND)
+    grown = region.union(region.buffer(REGION_MARGIN).intersection(shore))
+    return grown, tas, dict(url=R["url"], features=len(feats), licence=R["licence"], fetched=utc_now(), name=R["name"],
+                            grown=f"by up to {REGION_MARGIN:.0f} m within {COAST_BAND:.0f} m of the coast")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ if not KEY and getattr(C, "TITLES_URL", None):
     # number and type only; easements have no public copy, so they are recorded as not fetched
     import arcgis
     t0 = time.time(); prov_path = os.path.join(OUT, "provenance.json"); prov = json.load(open(prov_path))
-    fs = arcgis.query_all(C.TITLES_URL, dict(where="status='LIVE'", geometry=",".join(map(str, TILE)), geometryType="esriGeometryEnvelope",
+    fs = arcgis.query_all(C.TITLES_URL, dict(where="status IN ('LIVE','PRTC')", geometry=",".join(map(str, TILE)), geometryType="esriGeometryEnvelope",
                                              inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="title_no,status,type", outSR=2193), workers=4)
     b = json.dumps(dict(type="FeatureCollection", features=fs)).encode()
     open(os.path.join(OUT, "raw", "titles.geojson"), "wb").write(b)

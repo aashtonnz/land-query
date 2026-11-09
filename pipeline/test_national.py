@@ -44,7 +44,7 @@ def test_vector_columns_measure_buildings_addresses_frontage_titles_and_coast():
     assert r["building_count"] == 1 and r["building_m2"] == 125 and r["largest_building_m2"] == 100
     assert r["building_cover_pct"] == round(100 * 125 / 600, 1) and r["buildings_captured_to"] == "2023-11-14"
     assert r["address_count"] == 2 and r["address"] == "1 A St" and r["territorial_authority"] == "X District"
-    assert 20 <= r["road_frontage_m"] <= 22                            # the south side, plus up to 1 m up each end
+    assert 19.8 <= r["road_frontage_m"] <= 20.4                        # the south side only, not the ends of the sides (T-108)
     assert r["title_count"] == 3 and r["title_types"] == "Cross lease, Freehold" and r["titles_not_found"] == 1
     assert r["coast_distance_m"] == 500 and r["coast_over_10km"] is False
     far = N.vector_columns([p], [], {}, [], [], [(LineString([(0, -20000), (1, -20000)]), {})])[0]
@@ -68,7 +68,8 @@ def test_elevation_columns_from_cells_and_for_a_parcel_too_small_for_a_cell():
     acc[3, 5] = 0
     assert N.elevation_columns([parcel(east)], Z, T, lid, acc, tr)[0]["upslope_truncated"] is True   # from cell (9, 9)
     assert N.elevation_columns([parcel(box(54, 0, 66, 10))], Z, T, lid, acc, tr)[0]["ground_cells_pct"] == 100   # 2 cells, 1.2 by area
-    assert N.elevation_columns([parcel(box(50, 0, 150, 100))], Z, T, lid, acc, tr)[0]["ground_cells_pct"] == 50   # half past the grid
+    Z3 = Z.copy(); Z3[:, 8:] = np.nan
+    assert N.elevation_columns([parcel(east)], Z3, T, lid, acc, tr)[0]["ground_cells_pct"] == 60   # of its own cells, 3 of 5 columns have ground
     assert t["elevation_from"] == "point" and t["ground_cells"] == 0 and t["ground_mean_m"] == round(float(Z[5, 4]), 1)
     Z2 = Z.copy(); Z2[:, :3] = np.nan                                   # no ground under the west parcel
     assert N.elevation_columns([parcel(big)], Z2, T, lid, acc, tr)[0]["ground_mean_m"] is None
@@ -124,6 +125,14 @@ def test_surface_model_columns_cover_what_the_dsm_measures():
     for c in ("open_ground_clear_pct", "winter_sun_hours_open_mean", "sky_view_pct", "roof_pitch_p50_deg", "canopy_gt3m_open_pct"):
         assert c in ov.DSM_COLUMNS
     assert "ground_mean_m" not in ov.DSM_COLUMNS and "slope_p50_deg" not in ov.DSM_COLUMNS
+
+
+def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
+    f = lambda no, st: dict(properties=dict(title_no=no, status=st, type="Freehold"))
+    assert set(N.current_titles([f("A", "LIVE"), f("B", "PRTC"), f("C", "CANC")])) == {"A", "B"}
+    assert N.is_bed("Part Bed Porirua Harbour") and N.is_bed("River Bed") and not N.is_bed("Old River Bed Block II")
+    feats = [dict(geometry=box(10, 10, 20, 20).__geo_interface__, properties=dict(id=1, parcel_intent="DCDB", appellation="Part Mangapouri Stream Bed"))]
+    assert N.select_parcels(feats, (0, 0, 100, 100)) == []
 
 
 if __name__ == "__main__":

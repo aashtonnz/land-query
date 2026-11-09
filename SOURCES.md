@@ -133,10 +133,10 @@ tile entries in its `provenance.json`.
 
 | Key | Dataset (owner) | Licence | Updated | Fit for parcel | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `parcels` | NZ Primary Parcels (LINZ; same as layer 50823) | ✅ LINZ CC BY 4.0 | days behind the Data Service | ✅ | Road, water (`Hydro`) and seabed parcels are left out of the rows. Some parcels are in the service twice; one is kept (`repeated_records`) |
+| `parcels` | NZ Primary Parcels (LINZ; same as layer 50823) | ✅ LINZ CC BY 4.0 | days behind the Data Service | ✅ | Road, water (`Hydro`, `Riverbed`, `Streambed`, and older parcels named as a bed) and seabed parcels are left out of the rows. Some parcels are in the service twice; one is kept (`repeated_records`). The pilot region is its district polygons grown by up to 1 km along the coast, so shore and island parcels are in |
 | `roads` | Road parcels from the same layer | ✅ LINZ CC BY 4.0 | as `parcels` | ✅ | For road frontage only |
 | `titles` | NZ Property Titles (LINZ; same as layer 50804) | ✅ LINZ CC BY 4.0 | as `parcels` | ✅ | Title number, status and type only; never owners or their number |
-| `buildings` | NZ Building Outlines (LINZ; same as layer 101290) | ✅ LINZ CC BY 4.0 | capture dates vary by area (`buildings_captured_to`) | ⚠ | Outlines drawn from aerial photos: they miss buildings newer than the photos. In Kāpiti they are 20 m² or more smaller than KCDC's 2021 outlines on 22% of parcels |
+| `buildings` | NZ Building Outlines (LINZ; same as layer 101290) | ✅ LINZ CC BY 4.0 | capture dates vary by area (`buildings_captured_to`) | ⚠ | Buildings of 10 m² or more, drawn from aerial photos: they miss buildings newer than the photos, and sheds. In Kāpiti they are 20 m² or more smaller than KCDC's outlines on 22% of parcels: KCDC's are mostly from 2017 photos, drawn wider, and include sheds (sixteenth review) |
 | `addresses` | NZ Addresses (LINZ; same as layer 105689) | ✅ LINZ CC BY 4.0 | as `parcels` | ✅ | |
 | `coast` | NZ Coastline - Mean High Water Springs (LINZ) | ◐ assumed LINZ CC BY 4.0; layer number and licence to confirm (T-104) | — | ✅ | Searched to 10 km |
 | `elevation` | New Zealand LiDAR 1 m DEM read at 10 m, gaps from the 8 m contour DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic, surveys 2008–2026 | ⚠ | Per tile plus 5 km, as `district_flow`. 10 m cells smooth small slopes and banks |
@@ -146,19 +146,19 @@ tile entries in its `provenance.json`.
 
 | Columns | Kind | Meaning |
 | --- | --- | --- |
-| `parcel_id`, `appellation`, `parcel_intent`, `land_district`, `statutory_actions`, `survey_area_m2` | published | LINZ parcel fields as published |
+| `parcel_id`, `appellation`, `parcel_intent`, `land_district`, `survey_area_m2` | published | LINZ parcel fields as published. Statutory actions are not included: they name who land vests in |
 | `area_m2`, `perimeter_m` | derived | From the parcel's shape, m² and m (NZTM2000) |
 | `compactness`, `width_m` | derived | 4πA/P² (1 for a circle, about 0.79 for a square, small for a strip); the short side of the smallest rectangle around the parcel |
-| `title_count`, `title_types`, `titles_not_found` | published | Titles listed on the parcel; the types of those found live in the titles layer; how many were not found there |
+| `title_count`, `title_types`, `titles_not_found` | published | Titles listed on the parcel; the types of those current in the titles layer (live or partly cancelled); how many were not found there |
 | `rep_x`, `rep_y` | derived | A point inside the parcel (NZTM2000); it decides the parcel's tile |
 | `building_count`, `building_m2`, `building_cover_pct`, `largest_building_m2`, `buildings_captured_to` | derived | LINZ outlines: buildings with at least half their area in the parcel; area of outlines inside the parcel and its share of the parcel; the largest counted building; the latest photo date among the outlines touching the parcel. 0 means no outline, not no building |
 | `address_count`, `address`, `suburb_locality`, `town_city`, `territorial_authority` | published | Addresses whose point lies in the parcel; the lowest-numbered names it. The district is from the region's district polygons, or else the address |
-| `road_frontage_m` | derived | Length of the parcel's boundary within 1 m of a road parcel |
+| `road_frontage_m` | derived | Length of the parcel's boundary shared with a road parcel (within 0.1 m) |
 | `coast_distance_m`, `coast_over_10km` | derived | Distance to the mean high water springs line; empty and `coast_over_10km` true when more than 10 km |
 | `ground_mean_m`, `ground_min_m`, `ground_max_m` | derived | Ground height over the parcel's 10 m cells, metres NZVD2016 |
-| `slope_mean_deg`, `slope_max_deg`, `flat_pct`, `steep_pct`, `low_lying_pct` | derived | Slope of the 10 m ground: mean, maximum, share under 5°, share over 15°; share of cells under 5 m above sea level |
+| `slope_mean_deg`, `slope_max_deg`, `flat_pct`, `steep_pct`, `low_lying_pct` | derived | Slope of the 10 m ground: mean, maximum, share under 5°, share over 15°; share of cells under 5 m above sea level. At 10 m, slope reads about 2° gentler than on the 1 m ground (up to 5°), so small sloping sections can read flat; the parcel report has 1 m slope |
 | `lidar_pct` | derived | Share of the parcel's cells from LiDAR rather than the 8 m contour DEM |
-| `ground_cells`, `ground_cells_pct`, `elevation_from` | derived | 10 m cells used, and as a share of the parcel (under 100 where there is no ground data or the parcel reaches past the tile's grid). A parcel too small to hold a cell centre is read at its point (`elevation_from` `point`: only mean height and slope) |
+| `ground_cells`, `ground_cells_pct`, `elevation_from` | derived | 10 m cells used, and the share of the parcel's own cell centres that have ground (under 100 where some have no ground data). A parcel too small to hold a cell centre is read at its point (`elevation_from` `point`: only mean height and slope) |
 | `upslope_area_max_m2`, `upslope_truncated` | modelled | Largest area draining through the parcel on the 10 m ground (D8 flow); true where that catchment may reach past the tile plus 5 km |
 | `geometry_wkb` | derived | The parcel's shape simplified to 0.5 m, for maps |
 
