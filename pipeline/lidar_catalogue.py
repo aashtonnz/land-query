@@ -23,3 +23,13 @@ def source_entry(read, *args):
     try: return dict(ok=True, **read(*args))
     except NoCoverage as e: return dict(ok=False, no_coverage=True, error=str(e))
     except Exception as e: return dict(ok=False, error=str(e)[:300])
+
+
+def no_data_to_nan(part, nodata):
+    """Heights with the file's no-data value, or any marker at or below -100 m, as NaN: a boundless windowed read does
+    not mask the file's own no-data value, so a gap in a mosaic came back as -9999 m (T-107)."""
+    import numpy as np
+    part = part.astype("float32", copy=True)
+    if nodata is not None: part[part == np.float32(nodata)] = np.nan
+    part[part <= -100] = np.nan
+    return part

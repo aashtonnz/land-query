@@ -220,6 +220,10 @@ def withhold_uncovered_buildings(row, g, cover):
 
 
 LIDAR_FLOW_COLUMNS = ("upslope_area_max_m2", "upslope_area_truncated", "flow_path_m", "unmapped_structure_m2")
+# measured from the surface model (DSM): empty where it does not cover at least 99% of the parcel's ground (T-107)
+DSM_COLUMNS = ("canopy_gt3m_open_pct", "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct",
+               "horizon_mean_deg", "horizon_north_deg", "sky_view_pct", "wind_obstruction_pct", "roof_pitch_p50_deg",
+               "roof_flat_m2", "roof_north_m2", "roof_solar_rel_pct", "unmapped_structure_m2")
 
 
 def finish_row(row, council=None):

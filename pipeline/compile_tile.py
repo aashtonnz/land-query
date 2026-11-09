@@ -69,6 +69,7 @@ else:
     dem = rasterio.open(os.path.join(RAW, LK["dem"] + ".tif")); Z = dem.read(1)
     dsm = rasterio.open(os.path.join(RAW, LK["dsm"] + ".tif")).read(1)
     z21 = rasterio.open(os.path.join(RAW, LK["dem_old"] + ".tif")).read(1) if LK["dem_old"] else np.full(Z.shape, np.nan, Z.dtype)
+    for a_ in (Z, dsm, z21): a_[a_ <= -100] = np.nan   # a no-data marker (-9999) is never a height (T-107)
 # district-scale flow and surroundings (district_flow.py, 10 m): whole catchments, and mean ground within ±500 m
 DF_PATH = os.path.join(RAW, "district_flow.tif")
 DF = None
@@ -357,6 +358,13 @@ for uid, (g, p) in enumerate(units):
     # a warning, not a gap filler (D-19); unknown where the LiDAR doesn't cover the parcel, so not 0 (tenth review)
     r["unmapped_structure_m2"] = (_M.largest_structure_m2(UNMAPPED[rs, cs] & m)
                                   if HAVE_LIDAR and r["lidar_cells"] and r.get("lidar_coverage_pct", 0) >= 99 else None)
+    # everything measured from the surface model is unknown where it does not cover the parcel's ground: the national
+    # mosaics have ground LiDAR without a surface model in places (Kaikoura, Tasman; T-107)
+    if HAVE_LIDAR and r["lidar_cells"]:
+        zg = np.isfinite(Zw) & m
+        dsm_pct = 100.0 * float((np.isfinite(dsm[rs, cs]) & zg).sum()) / max(1, int(zg.sum()))
+        if dsm_pct < 99:
+            for c_ in OV.DSM_COLUMNS: r[c_] = None
     OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73, T-79)
     # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
     dc = district_cells(g) if DF is not None else None

@@ -102,6 +102,30 @@ def test_report_page_shows_missing_values_as_not_known_and_never_zero():
     assert "No LiDAR survey covers this parcel" in h
 
 
+def test_a_gap_in_a_lidar_sheet_is_no_data_not_a_height(tmp=None):
+    """T-107: a boundless windowed read (as fetch_lidar's read_window does) returns the file's -9999 as a value."""
+    import tempfile, rasterio
+    from rasterio.windows import from_bounds
+    from lidar_catalogue import no_data_to_nan
+    path = os.path.join(tempfile.mkdtemp(), "sheet.tif")
+    a = np.full((20, 20), -9999, np.float32); a[:, :10] = 5.0
+    with rasterio.open(path, "w", driver="GTiff", height=20, width=20, count=1, dtype="float32", crs="EPSG:2193",
+                       transform=from_origin(0, 20, 1, 1), nodata=-9999) as d: d.write(a, 1)
+    with rasterio.open(path) as src:
+        part = src.read(1, window=from_bounds(-5, 0, 15, 20, src.transform), out_shape=(20, 20), boundless=True,
+                        fill_value=np.nan, masked=True).filled(np.nan).astype(np.float32)
+        out = no_data_to_nan(part, src.nodata)
+    assert np.nanmin(out) == 5.0 and np.isnan(out[:, 15:]).all() and np.isnan(out[:, :5]).all()
+    assert not np.isnan(out[:, 5:15]).all()
+
+
+def test_surface_model_columns_cover_what_the_dsm_measures():
+    import overlays as ov
+    for c in ("open_ground_clear_pct", "winter_sun_hours_open_mean", "sky_view_pct", "roof_pitch_p50_deg", "canopy_gt3m_open_pct"):
+        assert c in ov.DSM_COLUMNS
+    assert "ground_mean_m" not in ov.DSM_COLUMNS and "slope_p50_deg" not in ov.DSM_COLUMNS
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
