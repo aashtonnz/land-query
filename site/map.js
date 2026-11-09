@@ -88,6 +88,9 @@ function edgeTarget(){ if(edgeW === canvas.width && edgeH === canvas.height) ret
   gl.bindTexture(gl.TEXTURE_2D, edgeTex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, edgeW, edgeH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, edgeTex, 0); gl.bindFramebuffer(gl.FRAMEBUFFER, null); }
+// water drawn live over the boundaries, so a river is never covered by the outlines of the land beside it
+const WATERP = prog(`in vec2 p; in float cc; uniform vec2 sc, of; uniform vec3 col; out vec4 v;
+  void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = int(cc+.5) == 3 ? vec4(col, 1.) : vec4(0.); }`, FS);
 const LAND = prog(`in vec2 p; uniform vec2 sc, of; uniform vec4 col; out vec4 v; void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; }`, FS);
 const QUAD = prog(`uniform vec4 rect; uniform vec4 uvr; out vec2 uv;
   void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = mix(uvr.xy, uvr.zw, c); gl_Position = vec4(mix(rect.xy, rect.zw, c), 0., 1.); }`,
@@ -245,14 +248,21 @@ function render(){
     gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendEquation(gl.MAX);
     gl.useProgram(EDGE.p); const s = view.s;
     gl.uniform2f(EDGE.u.sc, 2*s/W, 2*s/H); gl.uniform2f(EDGE.u.of, (OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H);
-    gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), 1); gl.uniform1f(EDGE.u.pxm, s*dpr);
-    const n = Math.max(1, Math.round(1.5*dpr));
+    // thickness and strength follow the zoom: about 1.5 screen points at full strength from 0.3 pixels per metre in,
+    // easing to one device pixel at 60% by 0.05 and out
+    const k = Math.max(0, Math.min(1, (s - 0.05) / 0.25));
+    gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), 0.6 + 0.4*k); gl.uniform1f(EDGE.u.pxm, s*dpr);
+    const n = Math.max(1, Math.round(1 + (1.5*dpr - 1) * k));
     for(let a=0; a<n; a++) for(let b=0; b<n; b++){ gl.uniform2f(EDGE.u.shift, a*.75*2/canvas.width, b*.75*2/canvas.height);
       for(const P of eps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }
     gl.bindVertexArray(null); gl.blendEquation(gl.FUNC_ADD);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(COVER.p); gl.uniform1i(COVER.u.tex, 0); gl.uniform3fv(COVER.u.col, hex(css('--sheet'))); gl.bindTexture(gl.TEXTURE_2D, edgeTex);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.useProgram(WATERP.p); gl.uniform2f(WATERP.u.sc, 2*s/W, 2*s/H); gl.uniform2f(WATERP.u.of, (OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H);
+    gl.uniform3fv(WATERP.u.col, hex(css('--sea')));
+    for(const P of eps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
+    gl.bindVertexArray(null); }
   gl.disable(gl.BLEND);
   overlay();
   trimTiles(keep); trimPieces();
