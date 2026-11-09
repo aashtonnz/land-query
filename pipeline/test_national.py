@@ -185,7 +185,8 @@ def test_water_is_the_area_of_sea_lakes_and_rivers_together_never_from_the_grid(
                      "land": [(land, dict(id=1))],
                      "lakes": [(box(450, 450, 650, 650), dict(t50_fid=1)), (box(100, 700, 150, 800), dict(t50_fid=2))],
                      "rivers": [(box(150, 700, 200, 800), dict())]}, Z=Z)
-    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] == 100 and rows[3]["water_pct"] == 50
+    assert rows[1]["water_pct"] == 0 and rows[3]["water_pct"] == 50
+    assert rows[2]["water_pct"] is None                                     # wholly outside the outline, no heights: unknown (T-121)
     assert rows[4]["water_pct"] == 83.3                                     # 450-700 once: 250 of 300 (counted twice it would be 100)
     assert rows[5]["water_pct"] == 100 and rows[1]["ground_mean_m"] is None
 
@@ -211,15 +212,27 @@ def test_the_cache_key_includes_the_fetch_detail_and_the_window():
     assert calls == [5, 50, 50], calls
 
 
-def test_an_islet_missing_from_the_land_outline_is_unknown_not_sea():
-    """T-119: the islet lies inside the land outline's bounding box (as one does inside the North Island's) but far
-    from the land itself; the outline is an L whose arms stay inside the tile's window."""
-    land = box(70, 70, 300, 300).union(box(70, 70, 850, 120)).union(box(800, 70, 850, 850))
-    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(600, 600, 620, 620), dict(id=2, parcel_intent="DCDB")),
-                                 (box(330, 150, 360, 180), dict(id=3, parcel_intent="DCDB")), (box(840, 840, 850, 850), dict(id=4, parcel_intent="DCDB"))],
-                     "land": [(land, dict(id=1))]})
-    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] is None
-    assert rows[3]["water_pct"] == 100                                       # 30 m offshore, land near: measured as sea
+def test_a_parcel_the_outline_puts_wholly_in_the_sea_is_sea_only_where_the_heights_are_low():
+    """T-121: LINZ's outline leaves out rocks and islets, right by the shore as well as far out. A parcel it puts wholly
+    in the sea reads 100 only where its highest ground is known and at most SEA_HIGH_M; otherwise it is unknown."""
+    land = box(-500, -500, 300, 1500)                                       # sea east of x = 300
+    Z = np.full((140, 140), 0.5, np.float32)                                # low (seabed, tidal) everywhere ...
+    cell = lambda x, y: (int((1200 - y) // 10), int((x + 200) // 10))
+    r0, c0 = cell(310, 140); r1, c1 = cell(340, 110); Z[r0:r1, c0:c1] = 8.0     # ... but a rock 10 m off the shore
+    r0, c0 = cell(600, 640); r1, c1 = cell(640, 600); Z[r0:r1, c0:c1] = np.nan  # ... and no heights far out
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    rows = run_tile({"parcels": [(box(310, 110, 340, 140), P(1)),            # the rock, 10 m off the outline
+                                 (box(400, 300, 440, 340), P(2)),            # low, wholly in the sea
+                                 (box(600, 600, 640, 640), P(3)),            # far out, no heights
+                                 (box(280, 400, 320, 440), P(4)),            # half outside the outline
+                                 (box(360, 400, 400, 440), P(5))],           # wholly in the sea, at exactly SEA_HIGH_M
+                     "land": [(land, dict(id=1))]}, Z=_with_block(Z, cell(360, 440), cell(400, 400), N.SEA_HIGH_M))
+    assert rows[1]["water_pct"] is None and rows[3]["water_pct"] is None
+    assert rows[2]["water_pct"] == 100 and rows[5]["water_pct"] == 100 and rows[4]["water_pct"] == 50
+
+
+def _with_block(Z, a, b, v):
+    Z = Z.copy(); Z[a[0]:b[0], a[1]:b[1]] = v; return Z
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():

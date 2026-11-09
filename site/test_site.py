@@ -9,10 +9,10 @@ B = importlib.util.module_from_spec(spec); spec.loader.exec_module(B)
 
 def test_only_the_sea_part_of_a_part_water_parcel_is_drawn_as_water():
     land = [box(0, 0, 100, 100)]
-    geoms = {1: box(50, 0, 150, 100), 2: box(10, 10, 20, 20), 3: box(300, 300, 310, 310)}
+    geoms = {1: box(50, 0, 150, 100), 2: box(90, 10, 110, 20), 3: box(300, 300, 310, 310)}   # 2 and 3 reach past the outline
     P = {1: {}, 2: {}, 3: {}}
     out = B.sea_parts(P, geoms, {1: 50.0, 2: 0, 3: None}, land)
-    assert len(out) == 1 and abs(out[0].area - 5000) < 1 and out[0].bounds[0] == 100   # half of parcel 1; nothing for 2 or 3
+    assert len(out) == 1 and abs(out[0].area - 5000) < 1 and out[0].bounds[0] == 100   # half of parcel 1; nothing for 2 (measured 0) or 3 (unknown)
 
 
 if __name__ == "__main__":

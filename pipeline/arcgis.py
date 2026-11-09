@@ -16,7 +16,7 @@ def _get(url, params, timeout=300, post=False):
             r.raise_for_status()
             j = r.json()
             if "error" in j:
-                if (j["error"] or {}).get("code") == 429: raise _RateLimited()
+                if (j["error"] or {}).get("code") in (429, 500, 502, 503, 504): raise _RateLimited()   # T-121
                 raise RuntimeError(j["error"])
             return j
         except _RateLimited as e:
@@ -24,7 +24,8 @@ def _get(url, params, timeout=300, post=False):
             # (Retry-After), up to about 35 minutes in all (T-115, T-117, T-119)
             if limited >= len(RATE_LIMIT_WAITS): raise RuntimeError("rate limited or busy: gave up after waiting about 35 minutes")
             ask = e.args[0] if e.args else None
-            time.sleep(max(RATE_LIMIT_WAITS[limited], float(ask)) if ask and str(ask).isdigit() else RATE_LIMIT_WAITS[limited]); limited += 1
+            # Retry-After is honoured up to the longest pause, so the total stays about 35 minutes (T-121)
+            time.sleep(min(max(RATE_LIMIT_WAITS[limited], float(ask)), max(RATE_LIMIT_WAITS)) if ask and str(ask).isdigit() else RATE_LIMIT_WAITS[limited]); limited += 1
         except (requests.exceptions.RequestException, ValueError):
             if attempt - limited >= 3: raise
             time.sleep(5 * (attempt - limited + 1))

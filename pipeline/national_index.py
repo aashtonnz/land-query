@@ -168,28 +168,35 @@ def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
     return round(edge.length, 1), round(via, 1)
 
 
-LAND_NEAR_M = 50.0
+SEA_HIGH_M = 3.0   # highest ground (m) a parcel the land outline puts wholly in the sea may have and still read as sea
 
 
 def water_shares(parcels, water, land):
-    """Share (%) of each parcel under water, measured by area: the union of lake and river polygons and the sea, which
-    is everything outside the land outline. A part both lake and sea counts once; no elevation grid is involved, so
-    missing elevation data can never read as water (T-115). A parcel with no land outline within LAND_NEAR_M is unknown
-    (None), not sea: LINZ's outline leaves out many islets and rocks (Tarahiki Island, the Snares), which would otherwise
-    read 100 (T-119)."""
+    """[(share %, offshore)] per parcel. The share is under water, measured by area: the union of lake and river
+    polygons and the sea, which is everything outside the land outline. A part both lake and sea counts once; no
+    elevation grid is involved, so missing elevation data can never read as water (T-115). offshore is True when the
+    outline alone puts the parcel (almost) wholly in the sea: LINZ's 1:50,000 outline leaves out many islets and rocks,
+    near the shore as well as far out (Kapiti Island's reefs, Tarahiki Island, the Snares), so index_tile keeps such a
+    share only where the heights show the parcel is low (T-121)."""
     wt = STRtree([g for g, _ in water]) if water else None
     lt = STRtree([g for g, _ in land]) if land else None
     out = []
     for g, _, _ in parcels:
-        if not g.area: out.append(None); continue
-        # distance to the land itself, not to its bounding box (an islet sits inside the North Island's box) (T-119)
-        if lt is None or not len(lt.query(g, predicate="dwithin", distance=LAND_NEAR_M)): out.append(None); continue
+        if not g.area: out.append((None, False)); continue
         on_land = unary_union([land[i][0] for i in lt.query(g)]) if lt is not None else None
         sea = g.difference(on_land) if on_land is not None and not on_land.is_empty else g
-        wet = [water[i][0] for i in wt.query(g)] if wt is not None else []
-        allw = unary_union([sea] + [g.intersection(w) for w in wet])
-        out.append(round(min(100.0, 100 * allw.area / g.area), 1))
+        wet = unary_union([g.intersection(water[i][0]) for i in wt.query(g)]) if wt is not None else None
+        lakes = wet.area if wet is not None else 0.0
+        allw = unary_union([sea] + ([wet] if wet is not None else []))
+        out.append((round(min(100.0, 100 * allw.area / g.area), 1), sea.area >= 0.99 * g.area and lakes < 0.5 * g.area))
     return out
+
+
+def confirm_offshore(row, offshore):
+    """A parcel the outline puts wholly in the sea reads as water only if its highest ground is known and low; a rock
+    or islet the outline leaves out, or one with no heights, is unknown (T-121)."""
+    h = row.get("ground_max_m")
+    if offshore and (h is None or not np.isfinite(h) or h > SEA_HIGH_M): row["water_pct"] = None
 
 
 def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), neighbours=()):
@@ -334,7 +341,8 @@ def index_tile(tile, cache, region=None, tas=()):
     from shapely import clip_by_rect
     land = [(clip_by_rect(g, *win), p) for g, p in geoms(lf)]   # only this tile's part of the North Island outline
     if lf:
-        for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
+        for r, (s_, off) in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])):
+            r["water_pct"], r["_offshore"] = s_, off
     # a parcel taken in by the coastal margin is left out only on positive evidence that it is another district's: its
     # own address, or else the nearest address within 1 km. With no address near (islands), it stays (T-111, T-115)
     if REGION_NAMES:
@@ -351,6 +359,7 @@ def index_tile(tile, cache, region=None, tas=()):
     t1 = time.time()
     Z, T, eprov, L, acc, tr = elevation_grid(tile)
     for r, e in zip(rows, elevation_columns(parcels, Z, T, L, acc, tr)): r.update(e)
+    for r in rows: confirm_offshore(r, r.pop("_offshore", False))
     for r, (g, _, _) in zip(rows, parcels):
         r["geometry_wkb"] = wkb.dumps(g.simplify(0.5, preserve_topology=True))
     prov.update(elevation=eprov, rows=len(rows), seconds_vector=round(t1 - t0, 1), seconds_elevation=round(time.time() - t1, 1))
@@ -398,8 +407,12 @@ if __name__ == "__main__":
     path = os.path.join(out, "index.parquet")
     df.to_parquet(path, index=False, compression="zstd")
     import subprocess
-    commit = os.environ.get("GITHUB_SHA") or subprocess.run(["git", "rev-parse", "HEAD"], cwd=os.path.dirname(os.path.abspath(__file__)),
-                                                             capture_output=True, text=True).stdout.strip() or None   # T-119
+    def git(*a):
+        try: return subprocess.run(["git", *a], cwd=os.path.dirname(os.path.abspath(__file__)), capture_output=True, text=True).stdout.strip()
+        except OSError: return ""   # no git: provenance is still written (T-121)
+    commit = os.environ.get("GITHUB_SHA") or git("rev-parse", "HEAD") or None   # T-119
+    if commit and not os.environ.get("GITHUB_SHA") and git("status", "--porcelain", "--untracked-files=no"):
+        commit += "+uncommitted changes"   # the recorded commit is not exactly the code that ran (T-121)
     json.dump(dict(region=rprov, tiles=tprov, built=utc_now(), commit=commit),
               open(os.path.join(out, "provenance.json"), "w"), indent=1)
     run = dict(region=key, parcels=len(df), tiles=len(tiles), seconds=round(time.time() - t0),

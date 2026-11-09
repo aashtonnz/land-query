@@ -173,18 +173,23 @@ def test_downloads_refuse_a_page_of_repeats_that_a_count_check_would_pass(monkey
         arcgis._get = keep
 
 
-def test_a_rate_limit_is_waited_out_whether_as_http_429_or_in_the_reply():
+def test_a_rate_limit_or_busy_service_is_waited_out_with_the_long_pauses():
+    """T-115, T-119, T-121: HTTP 429, a 429 or 5xx inside the reply, and HTTP 5xx each wait the long pauses; Retry-After
+    is honoured, but never beyond the longest pause."""
     import arcgis
     class R:
-        def __init__(self, code, body): self.status_code, self.body, self.headers = code, body, {}
-        def raise_for_status(self): pass
+        def __init__(self, code, body, headers=None): self.status_code, self.body, self.headers = code, body, headers or {}
+        def raise_for_status(self):
+            if self.status_code >= 400: raise arcgis.requests.exceptions.HTTPError(str(self.status_code))
         def json(self): return self.body
-    for first in (R(429, {}), R(200, {"error": {"code": 429}}), R(503, {})):   # a busy service (503) is waited out too
-        replies = [first, R(200, {"ok": 1})]
-        keep = (arcgis.requests.get, arcgis.RATE_LIMIT_WAITS)
-        arcgis.requests.get = lambda *a, **k: replies.pop(0); arcgis.RATE_LIMIT_WAITS = (0, 0)
-        try: assert arcgis._get("u", {}) == {"ok": 1}
-        finally: arcgis.requests.get, arcgis.RATE_LIMIT_WAITS = keep
+    cases = [(R(429, {}), 65), (R(200, {"error": {"code": 429}}), 65), (R(200, {"error": {"code": 503}}), 65),
+             (R(503, {}), 65), (R(429, {}, {"Retry-After": "200"}), 200), (R(429, {}, {"Retry-After": "3600"}), 600)]
+    for first, want in cases:
+        replies, slept = [first, R(200, {"ok": 1})], []
+        keep = (arcgis.requests.get, arcgis.time.sleep)
+        arcgis.requests.get = lambda *a, **k: replies.pop(0); arcgis.time.sleep = slept.append
+        try: assert arcgis._get("u", {}) == {"ok": 1} and slept == [want], (first.status_code, first.body, slept)
+        finally: arcgis.requests.get, arcgis.time.sleep = keep
 
 
 def test_heritage_point_just_outside_the_parcel_is_not_counted():

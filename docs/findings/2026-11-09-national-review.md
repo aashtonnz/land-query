@@ -163,3 +163,18 @@ only wharves among built-on parcels read 20% water or more; the map's sea step i
 
 This round found one serious fault, at national scale only and in a single rule. Rounds 16 to 21 found 4, 3, 3, 3, 2
 and 1 serious faults. A seventh review follows (T-120), limited to T-119.
+
+## Twenty-second review: T-119 (T-120)
+
+| # | Finding | Seriousness | Fix (T-121) |
+| --- | --- | --- | --- |
+| 1 | Rocks LINZ's outline leaves out but lying within 50 m of it still read 100% sea: 16 parts of Section 3 Block I Kapiti SD (Kapiti Island's reefs), 0 to 36 m off the island's outline; most rocks lie near a shore, so the national fix was only partial | Serious | The 50 m rule is gone. A parcel the outline puts (almost) wholly in the sea, and not mostly lake or river, reads as water only where its highest ground is known and at most 3 m; otherwise unknown. Tested with a rock 10 m off the shore, a low seabed parcel, one with no heights, one at exactly 3 m |
+| 2 | Whether land lay "within 50 m" depended on the tile, as the outline was clipped 30 m beyond the parcels | Moderate | Gone with the 50 m rule: the new rule looks only inside the parcel |
+| 3 | Tests did not catch dropping Retry-After, short waits for a busy service, a different distance, or the map drawing sea for parcels measured as 0 | Moderate | Tests record the pauses; the map test's measured-0 parcel reaches past the outline. Each fix checked by undoing it |
+| 4 | A long Retry-After could make one wait an hour | Minor | Capped at the longest pause (10 minutes) |
+| 5 | A busy reply inside an ArcGIS answer (code 500 to 504) failed at once | Minor | Waited out like a 429 |
+| 6 | With no git installed, provenance was not written; a tree with uncommitted changes recorded a clean commit | Minor | Both handled: the commit is marked "+uncommitted changes" |
+
+Rounds 16 to 22 found 4, 3, 3, 3, 2, 1 and 1 serious faults; the last two were both about islets the land outline
+leaves out.
+
