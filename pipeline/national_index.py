@@ -182,7 +182,8 @@ def water_shares(parcels, water, land):
     out = []
     for g, _, _ in parcels:
         if not g.area: out.append(None); continue
-        if lt is None or not len(lt.query(g.buffer(LAND_NEAR_M))): out.append(None); continue
+        # distance to the land itself, not to its bounding box (an islet sits inside the North Island's box) (T-119)
+        if lt is None or not len(lt.query(g, predicate="dwithin", distance=LAND_NEAR_M)): out.append(None); continue
         on_land = unary_union([land[i][0] for i in lt.query(g)]) if lt is not None else None
         sea = g.difference(on_land) if on_land is not None and not on_land.is_empty else g
         wet = [water[i][0] for i in wt.query(g)] if wt is not None else []
