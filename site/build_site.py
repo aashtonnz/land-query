@@ -122,6 +122,23 @@ import base64
 gp = os.path.join(outdir, "national-shapes.txt"); open(gp, "wb").write(base64.b64encode(blob))
 assert os.path.getsize(gp) < 15.5e6, f"shapes file is {os.path.getsize(gp)/1e6:.1f} MB, over the limit"
 print("wrote", gp, len(ids), "shapes", round(os.path.getsize(gp) / 1e6, 1), "MB")
+# the land, so the plan can show the sea: LINZ NZ Coastline polygons (CC BY 4.0) around the region, generalised to 15 m
+# by LINZ's service and clipped to the plan; inlined as rings of whole metres, flattened [x0, y0, x1, y1, ...]
+sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import arcgis, overlays
+from shapely.geometry import shape as _shape
+from shapely import clip_by_rect
+x0, y0, x1, y1 = duckdb.sql(f"SELECT min(rep_x) - 20000, min(rep_y) - 20000, max(rep_x) + 20000, max(rep_y) + 20000 FROM '{nf}'").fetchall()[0]
+land = []
+for f in arcgis.query_all("https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+                          dict(where="1=1", geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
+                               spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=15)):
+    g = clip_by_rect(overlays.repaired(_shape(f["geometry"])), x0, y0, x1, y1)
+    for poly in getattr(g, "geoms", [g]):
+        if poly.geom_type != "Polygon" or poly.area < 2000: continue
+        land.append([[int(round(v)) for xy in r.coords for v in xy] for r in [poly.exterior, *poly.interiors]])
+data["land"] = land
+print("land:", len(land), "polygons,", sum(len(r) // 2 for p in land for r in p), "vertices")
 n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
 data["stats"]["n"] = dict(parcels=n_all, extra=len(q), median_ground=nmed,
                           run="national index pilot, built from " + open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())

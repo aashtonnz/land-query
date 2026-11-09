@@ -5,16 +5,16 @@
 <style>
 /* Layout: a survey plan sheet. Narrow reading column for the story, a full-width plan (map + schedule) in the middle. */
 :root{
-  --paper:#f3f5f2; --sheet:#ffffff; --ink:#15211d; --muted:#5b6a64; --rule:#d5ddd8;
+  --paper:#f3f5f2; --sheet:#ffffff; --sea:#000000; --land:#ffffff; --ink:#15211d; --muted:#5b6a64; --rule:#d5ddd8;
   --accent:#0f6b5f; --accent-soft:#d9ece7; --mark:#c2410c; --lowland:#2f6f9f; --highland:#b45309;
   --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#0f1513; --sheet:#151d1a; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
   --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark } }
 :root[data-theme="dark"]{
-  --paper:#0f1513; --sheet:#151d1a; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
   --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark }
 html,body{background:var(--paper);color:var(--ink)}
 body{font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
@@ -377,6 +377,16 @@ function inside(i, wx, wy){ let c = false;
     for(let v=a, w=e-1; v<e; w=v++){ const xi=S.X[v]/2, yi=S.Y[v]/2, xj=S.X[w]/2, yj=S.Y[w]/2;
       if(((yi>wy)!==(yj>wy)) && (wx < (xj-xi)*(wy-yi)/(yj-yi)+xi)) c = !c; } }
   return c; }
+// the land (LINZ coastline, inlined as D.land) on a black sea; without it the plan keeps its plain sheet
+const LOX = 1600000, LOY = 5600000; let landPath = null;
+function buildLand(){ landPath = new Path2D();
+  for(const poly of (D.land||[])) for(const ring of poly){ landPath.moveTo(ring[0]-LOX, LOY-ring[1]);
+    for(let j=2;j<ring.length;j+=2) landPath.lineTo(ring[j]-LOX, LOY-ring[j+1]); landPath.closePath(); } }
+function drawLand(){ if(!(D.land&&D.land.length)) return false; if(!landPath) buildLand(); const k=view.s;
+  ctx.setTransform(dpr*k,0,0,dpr*k, dpr*(W/2-(view.cx-LOX)*k), dpr*(H/2-(LOY-view.cy)*k));
+  ctx.fillStyle=css('--land'); ctx.fill(landPath,'evenodd'); ctx.setTransform(dpr,0,0,dpr,0,0); return true; }
+// map text with a halo, so it reads over land and sea
+function label(t,x,y){ ctx.save(); ctx.lineWidth=3; ctx.strokeStyle=css('--land'); ctx.lineJoin='round'; ctx.strokeText(t,x,y); ctx.fillStyle=css('--ink'); ctx.fillText(t,x,y); ctx.restore(); }
 let pending = false;
 let drawError = null;
 function safeRender(){ try { render(); drawError = null; }
@@ -385,12 +395,16 @@ function draw(){ if(pending) return; pending = true; requestAnimationFrame(()=>{
 function render(){
   if(!(W > 0 && H > 0)) return;   // not laid out yet
   if(!groups) buildGroups();
-  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.fillStyle=css('--sheet'); ctx.fillRect(0,0,W,H);
+  ctx.setTransform(dpr,0,0,dpr,0,0); const hasLand = D.land && D.land.length;
+  ctx.fillStyle = hasLand ? css('--sea') : css('--sheet'); ctx.fillRect(0,0,W,H); drawLand();
   // 5 km grid, as on a survey sheet
-  ctx.strokeStyle=css('--rule'); ctx.lineWidth=1; ctx.font='10px '+css('--mono'); ctx.fillStyle=css('--muted');
+  ctx.strokeStyle=css('--rule'); ctx.lineWidth=1; ctx.font='10px '+css('--mono'); ctx.fillStyle=css('--muted'); ctx.globalAlpha = hasLand ? .45 : 1;
   const step=5000, x0=Math.floor((view.cx-W/2/view.s)/step)*step, y0=Math.floor((view.cy-H/2/view.s)/step)*step;
-  for(let x=x0;x<view.cx+W/2/view.s;x+=step){const X=sx(x); ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke(); if(view.s*step>60) ctx.fillText((x/1000).toFixed(0)+' kE',X+3,H-4);}
-  for(let y=y0;y<view.cy+H/2/view.s;y+=step){const Y=sy(y); ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke(); if(view.s*step>60) ctx.fillText((y/1000).toFixed(0)+' kN',3,Y-3);}
+  for(let x=x0;x<view.cx+W/2/view.s;x+=step){const X=sx(x); ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke();}
+  for(let y=y0;y<view.cy+H/2/view.s;y+=step){const Y=sy(y); ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke();}
+  ctx.globalAlpha = 1;
+  if(view.s*step>60){ for(let x=x0;x<view.cx+W/2/view.s;x+=step) label((x/1000).toFixed(0)+' kE',sx(x)+3,H-4);
+    for(let y=y0;y<view.cy+H/2/view.s;y+=step) label((y/1000).toFixed(0)+' kN',3,sy(y)-3); }
   const poly = shown(); if(poly) shapesLayer();
   const BW = Math.max(1, Math.round(W)), BH = Math.max(1, Math.round(H));   // dots at screen points, not device pixels
   if(!img || img.width!==BW || img.height!==BH){ dots.width=BW; dots.height=BH; img = dctx.createImageData(BW, BH); pix = new Uint32Array(img.data.buffer); }
@@ -409,8 +423,8 @@ function render(){
     if(poly && S.ring0[selected]>=0 && asShape(S.cls[selected])){ const path=new Path2D(); ringsPath(path, selected); ctx.stroke(path); }
     else { const X=sx(xs[selected]),Y=sy(ys[selected]); ctx.beginPath(); ctx.arc(X,Y,9,0,Math.PI*2); ctx.stroke(); } }
   // scale bar
-  const m=niceLen(120/view.s), px=m*view.s; ctx.fillStyle=css('--ink'); ctx.fillRect(W-px-14,14,px,3);
-  ctx.fillText(m>=1000?(m/1000)+' km':m+' m', W-px-14, 30);
+  const m=niceLen(120/view.s), px=m*view.s; ctx.fillStyle=css('--land'); ctx.fillRect(W-px-20,8,px+12,28);
+  ctx.fillStyle=css('--ink'); ctx.fillRect(W-px-14,14,px,3); ctx.fillText(m>=1000?(m/1000)+' km':m+' m', W-px-14, 30);
 }
 function niceLen(m){const p=Math.pow(10,Math.floor(Math.log10(m)));for(const k of[1,2,5,10]) if(k*p>=m) return k*p;return 10*p}
 
