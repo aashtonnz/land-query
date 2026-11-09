@@ -230,7 +230,6 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 <script>
 (function(){
 const D = JSON.parse(document.getElementById('data').textContent);
-document.getElementById('data').remove();   // its text is no longer needed once parsed
 // the national index pilot's extra fields (T-100); council rows simply lack them
 const F = D.fields.concat(['building_cover_pct','street','place','territorial_authority']), I = Object.fromEntries(F.map((f,i)=>[f,i]));
 const rows = D.rows; let N = rows.length;
@@ -261,7 +260,7 @@ function place(from){ for(let i=from;i<N;i++){const r=rows[i]; xs[i]=r[I.rep_x];
 place(0);
 function fit(){ const mx=(minx+maxx)/2, my=(miny+maxy)/2; view.cx=mx; view.cy=my;
   view.s = Math.min(W/(maxx-minx+2000), H/(maxy-miny+2000)); }
-function resize(){ const r=canvas.getBoundingClientRect(); dpr=Math.min(2, window.devicePixelRatio||1);   // capped: a 3x phone screen needs 2.25x the memory per image W=r.width; H=r.height;
+function resize(){ const r=canvas.getBoundingClientRect(); dpr=Math.min(2, window.devicePixelRatio||1); W=r.width; H=r.height;   // density capped at 2: a 3x phone screen needs 2.25x the memory per image
   canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr); snapView=null; if(!view.init){fit();view.init=true} draw(); }
 const sx = x => W/2 + (x-view.cx)*view.s, sy = y => H/2 - (y-view.cy)*view.s;
 
@@ -379,7 +378,10 @@ function inside(i, wx, wy){ let c = false;
       if(((yi>wy)!==(yj>wy)) && (wx < (xj-xi)*(wy-yi)/(yj-yi)+xi)) c = !c; } }
   return c; }
 let pending = false;
-function draw(){ if(pending) return; pending = true; requestAnimationFrame(()=>{ pending = false; render(); }); }
+let drawError = null;
+function safeRender(){ try { render(); drawError = null; }
+  catch(e){ if(!drawError){ drawError = e; ns.textContent = 'The map could not be drawn (' + (e && e.message || e) + '). Please report this message.'; } } }
+function draw(){ if(pending) return; pending = true; requestAnimationFrame(()=>{ pending = false; safeRender(); }); }
 function render(){
   if(!(W > 0 && H > 0)) return;   // not laid out yet
   if(!groups) buildGroups();
@@ -481,6 +483,8 @@ document.getElementById('search').addEventListener('input',e=>{
     b.onclick=()=>select(i,true); res.appendChild(b); });
 });
 window.addEventListener('resize',resize);
+// the map also follows its own size, which can change without the window resizing (a page shown inside a frame)
+if(window.ResizeObserver) new ResizeObserver(()=>{ const r=canvas.getBoundingClientRect(); if(Math.round(r.width)!==Math.round(W)||Math.round(r.height)!==Math.round(H)) resize(); }).observe(canvas);
 if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{groups=null;legend();draw();});
 new MutationObserver(()=>{groups=null;legend();draw();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 legend(); resize();
@@ -496,7 +500,7 @@ fetch('national-1.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r
   N = rows.length; place(from); groups = null; if(!touched){ fit(); } draw();
   ns.textContent = `Showing ${fmt(N)} parcels. Loading names and addresses for search…`;
   fetch('national-shapes.txt').then(r=>{ if(!r.ok) throw new Error(r.status); return r.text(); })
-    .then(t=>{ t = t.trim(); if(Uint8Array.fromBase64) return Uint8Array.fromBase64(t).buffer;
+    .then(t=>{ t = t.trim();
       const pad = t.endsWith('==') ? 2 : t.endsWith('=') ? 1 : 0, u = new Uint8Array(t.length/4*3 - pad), C = 1<<20;   // 1 MB of text at a time
       for(let o=0, w=0; o<t.length; o+=C){ const bin = atob(t.slice(o, o+C)); for(let j=0;j<bin.length;j++) u[w++] = bin.charCodeAt(j); }
       return u.buffer; })
