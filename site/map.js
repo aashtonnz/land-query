@@ -350,8 +350,8 @@ canvas.addEventListener('touchstart', e => { if(e.touches.length === 2){ const [
 canvas.addEventListener('touchmove', e => { if(pinch && e.touches.length === 2){ const [a,b] = e.touches, d = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
   const r = canvas.getBoundingClientRect(); zoomAt(d/pinch.d, (a.clientX+b.clientX)/2-r.left, (a.clientY+b.clientY)/2-r.top); pinch.d = d; } }, {passive:true});
 canvas.addEventListener('touchend', () => { pinch = null; });
-// full screen: the browser's own where it offers it, else a fixed layer over the page (iPhone Safari); Esc leaves both
-const plan = $('plan'), fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+// full screen, the map alone: the browser's own where it offers it, else a fixed layer over the page (iPhone Safari); Esc leaves both
+const plan = $('mapfull'), fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
 function setFull(on){ const native = plan.requestFullscreen || plan.webkitRequestFullscreen;
   if(on && native && !plan.classList.contains('full')){ (plan.requestFullscreen ? plan.requestFullscreen() : (plan.webkitRequestFullscreen(), Promise.resolve())).catch(() => { plan.classList.add('full'); fullChanged(); }); return; }
   if(!on && fsEl()){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }

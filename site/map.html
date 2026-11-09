@@ -64,11 +64,11 @@ canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:
 .zoomhint{position:absolute;right:10px;top:10px;font-size:.72rem;color:var(--muted);background:color-mix(in srgb,var(--sheet) 85%,transparent);padding:3px 6px}
 .zoombtns{position:absolute;right:10px;bottom:10px;display:grid;gap:4px}
 .zoombtns button{font:600 1rem var(--mono);width:34px;height:34px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:4px;cursor:pointer;display:grid;place-items:center;padding:0}
-/* full screen: the map and its parcel panel fill the screen (browser full screen, or a fixed layer where that is not offered, as on iPhone) */
-.plan:fullscreen,.plan.full{position:fixed;inset:0;z-index:1000;margin:0;background:var(--paper);padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));overflow:auto;align-content:stretch}
-.plan:fullscreen canvas#map,.plan.full canvas#map{height:calc(100dvh - 90px)}
-.plan:fullscreen .panel,.plan.full .panel{max-height:calc(100dvh - 16px);overflow:auto}
-@media (max-width:860px){.plan:fullscreen canvas#map,.plan.full canvas#map{height:calc(100dvh - 140px)}}
+/* full screen: the map alone, edge to edge (browser full screen, or a fixed layer where that is not offered, as on iPhone) */
+.canvaswrap:fullscreen,.canvaswrap.full{position:fixed;inset:0;z-index:1000;margin:0;border:0;background:var(--sea);width:100vw;height:100dvh}
+.canvaswrap:fullscreen canvas#map,.canvaswrap.full canvas#map{height:100dvh}
+.canvaswrap:fullscreen .zoombtns,.canvaswrap.full .zoombtns{right:max(10px,env(safe-area-inset-right,0px));bottom:max(10px,env(safe-area-inset-bottom,0px))}
+.canvaswrap:fullscreen .legend,.canvaswrap.full .legend{left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px))}
 body.mapfull{overflow:hidden}
 .panel{background:var(--sheet);border:1px solid var(--rule);padding:16px 18px;display:grid;gap:12px;align-content:start;min-width:0}
 .panel dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.9rem}
@@ -135,9 +135,9 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
         <option value="n">Rest of Greater Wellington (national index)</option>
       </select></label>
   </div>
-  <div class="plan" id="plan">
+  <div class="plan">
     <div class="mapbox">
-      <div class="canvaswrap"><canvas id="map" aria-label="Map of parcels, coloured by the selected measure"></canvas>
+      <div class="canvaswrap" id="mapfull"><canvas id="map" aria-label="Map of parcels, coloured by the selected measure"></canvas>
       <canvas id="over" class="layer" aria-hidden="true"></canvas>
       <div class="legend" id="legend"></div>
       <div class="zoombtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Show everything">⤢</button><button id="zfull" aria-label="Full screen" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M1.5 5.5v-4h4M10.5 1.5h4v4M14.5 10.5v4h-4M5.5 14.5h-4v-4"/></svg></button></div></div>
