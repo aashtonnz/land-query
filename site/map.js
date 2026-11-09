@@ -177,7 +177,9 @@ gl.bindRenderbuffer(gl.RENDERBUFFER, msRB); gl.renderbufferStorageMultisample(gl
 gl.bindFramebuffer(gl.FRAMEBUFFER, msFB); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msRB);
 const outFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 const tiles = new Map();   // "z/i/j" -> {tex, gen, born, used}
-const levelFor = z => { const texel = BASE / 2**z / TEX; return texel <= 1 ? 0 : texel <= 4 ? 1 : texel <= 16 ? 2 : 3; };
+// the level whose simplification (0.5, 2, 8, 24 m) stays at or under about half a tile pixel, so switching levels
+// moves nothing visibly
+const levelFor = z => { const texel = BASE / 2**z / TEX; return texel < 4 ? 0 : texel < 16 ? 1 : texel < 48 ? 2 : 3; };
 function renderTile(z, i, j){
   const T = BASE / 2**z, x0 = OX + i*T, y0 = OY + j*T, lvl = levelFor(z);
   const keys = piecesFor(lvl, x0, y0, x0+T, y0+T), ps = keys.map(k => piece(lvl, k));

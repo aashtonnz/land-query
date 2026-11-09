@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 OUT = sys.argv[1] if len(sys.argv) > 1 else "map-site"
 ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM2000)
 # (square side m, simplification m): full detail for street level, then simpler shapes for zoomed-out views. Each
-# level is used where a tile pixel covers about 2-4 times its simplification (map.js levelFor), so simplifying never
+# level is used once a tile pixel covers at least twice its simplification (map.js levelFor), so simplifying never
 # shows; only parcels smaller than the simplification become squares of their own area
 LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
 MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
