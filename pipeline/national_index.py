@@ -127,9 +127,7 @@ def select_parcels(feats, tile, region=None):
     out = []
     for g, p in geoms(feats):
         if p.get("parcel_intent") in EXCLUDE_INTENTS or g.is_empty: continue
-        # a bed by name only when it is an old survey record with no title: reclaimed and railway land named "Part Bed
-        # Port Nicholson" has titles and is land (T-111)
-        if p.get("parcel_intent") == "DCDB" and not (p.get("titles") or "").strip() and is_bed(p.get("appellation")): continue
+
         rp = g.representative_point()
         if in_tile(rp, tile) and (region is None or region.contains(rp)):   # region: already grown by REGION_MARGIN
             out.append((g, p, rp))
@@ -147,13 +145,18 @@ def _date(ms):
 
 
 def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
-    """Length of g's boundary within 1 m of a road parcel (road parcels often sit 0.2-0.3 m off the lot line), less the
-    parts within 0.1 m of another land parcel, so the side boundaries at each end of the frontage do not count (T-111)."""
+    """Length of g's boundary within 1 m of a road parcel (road parcels often sit 0.2-0.4 m off the lot line), less the
+    short pieces, up to 1.5 m, where a side boundary with another land parcel runs into the road: the ends of the
+    frontage. Longer stretches are kept, so messy surveys (a road a little off a lot's side, a thin reserve strip
+    between lot and road) can lengthen a frontage but never empty it (T-111, T-112)."""
     near = [road_buf[i] for i in (road_tree.query(g) if road_tree else [])]
     if not near: return 0.0
     edge = g.boundary.intersection(unary_union(near))
-    sides = [nb[i][0] for i in (nb_tree.query(g.buffer(0.2)) if nb_tree else []) if nb[i][1] != own_id]
-    if sides: edge = edge.difference(unary_union([q.buffer(0.1) for q in sides]))
+    sides = [q for q in (nb[i][0] for i in (nb_tree.query(g.buffer(0.2)) if nb_tree else []) if nb[i][1] != own_id)]
+    # each neighbour separately: one that shares only an end piece is a side; one sharing more (a strip along the
+    # frontage) is not
+    ends = [piece for piece in (edge.intersection(q.buffer(0.1)) for q in sides) if 0 < piece.length <= 1.5]
+    if ends: edge = edge.difference(unary_union([x.buffer(0.01) for x in ends]))
     return round(edge.length, 1)
 
 
@@ -286,6 +289,12 @@ def index_tile(tile, cache, region=None, tas=()):
     titles = current_titles(tf)
     neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
     rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas, neighbours)
+    # a bed by name only when it is an old survey record with no title and no address: reclaimed and railway land named
+    # "Part Bed Port Nicholson" has a title or a street address and is land (T-111, T-112)
+    keep = [k for k, (r, (_, p, _)) in enumerate(zip(rows, parcels)) if not (p.get("parcel_intent") == "DCDB"
+            and not (p.get("titles") or "").strip() and not r.get("address_count") and is_bed(p.get("appellation")))]
+    prov["beds_by_name"] = len(rows) - len(keep)
+    rows = [rows[k] for k in keep]; parcels = [parcels[k] for k in keep]
     # a parcel taken in by the coastal margin whose address puts it in another district is not this region's (T-111)
     if REGION_NAMES:
         keep = [k for k, r in enumerate(rows) if parcels[k][2].within(REGION_CORE) or not r.get("territorial_authority")

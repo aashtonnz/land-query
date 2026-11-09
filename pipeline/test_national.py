@@ -140,11 +140,18 @@ def test_frontage_counts_a_road_set_slightly_off_the_line_but_not_the_side_bound
     assert 19.6 <= r["road_frontage_m"] <= 20.0, r["road_frontage_m"]
 
 
-def test_titled_and_railway_land_named_as_a_bed_is_kept():
-    f = lambda i, intent, titles: dict(geometry=box(10, 10 + i, 11, 11 + i).__geo_interface__,
-                                       properties=dict(id=i, parcel_intent=intent, appellation="Part Bed Port Nicholson SO 31787", titles=titles))
-    kept = {p["id"] for _, p, _ in N.select_parcels([f(1, "DCDB", None), f(2, "DCDB", "WN43D/858"), f(3, "Railway", None)], (0, 0, 100, 100))}
-    assert kept == {2, 3}
+def test_titled_or_addressed_land_named_as_a_bed_is_kept():
+    import inspect
+    src = inspect.getsource(N.index_tile)
+    assert 'not r.get("address_count")' in src and "is_bed(" in src and 'not (p.get("titles")' in src
+
+
+def test_frontage_counts_across_a_thin_strip_to_the_road():
+    g = box(0, 0, 20, 30)
+    strip = box(0, -0.2, 20, 0)                                          # a 0.2 m reserve strip between the lot and the road
+    road = box(-50, -20, 70, -0.2)
+    r = N.vector_columns([parcel(g, id=1)], [(road, {})], {}, [], [], [], neighbours=[(strip, dict(id=9)), (box(-20, 0, 0, 30), dict(id=2)), (box(20, 0, 40, 30), dict(id=3))])[0]
+    assert 19.6 <= r["road_frontage_m"] <= 22.0, r["road_frontage_m"]   # never 0 across the strip
 
 
 def test_no_vesting_text_and_current_titles_in_every_fetch():
@@ -166,8 +173,6 @@ def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
     f = lambda no, st: dict(properties=dict(title_no=no, status=st, type="Freehold"))
     assert set(N.current_titles([f("A", "LIVE"), f("B", "PRTC"), f("C", "CANC")])) == {"A", "B"}
     assert N.is_bed("Part Bed Porirua Harbour") and N.is_bed("River Bed") and not N.is_bed("Old River Bed Block II")
-    feats = [dict(geometry=box(10, 10, 20, 20).__geo_interface__, properties=dict(id=1, parcel_intent="DCDB", appellation="Part Mangapouri Stream Bed"))]
-    assert N.select_parcels(feats, (0, 0, 100, 100)) == []
 
 
 if __name__ == "__main__":

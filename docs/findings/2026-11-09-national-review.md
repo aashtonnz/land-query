@@ -75,8 +75,8 @@ A new reviewer reviewed the T-107 to T-109 fixes. Three of them had serious faul
 
 | # | Finding | Seriousness | Fix |
 | --- | --- | --- | --- |
-| 1 | The bed-name rule dropped titled and reclaimed land (railway land "Part Bed Poirua Harbour", 3.8 ha at 476 Hutt Road): 36 pilot parcels, 926 nationally, 94 with titles | Serious | A bed by name only when its intent is DCDB and it has no title |
-| 2 | The 0.1 m frontage tolerance missed roads set 0.2–0.3 m off the lot line: 291 parcels went from over 5 m to 0 | Serious | 1 m to the road, less the boundary within 0.1 m of other land parcels (the sides) |
+| 1 | The bed-name rule dropped titled and reclaimed land (railway land "Part Bed Poirua Harbour", 3.8 ha at 476 Hutt Road): 36 pilot parcels, 926 nationally, 94 with titles | Serious | A bed by name only when its intent is DCDB, it has no title and it has no address (476 Hutt Road is untitled but addressed) |
+| 2 | The 0.1 m frontage tolerance missed roads set 0.2–0.3 m off the lot line: 291 parcels went from over 5 m to 0 | Serious | 1 m to the road, less only the short end pieces (1.5 m or less) shared with a neighbouring parcel. A first attempt that subtracted all boundary shared with other parcels zeroed 532 frontages, because thin reserve strips run between many lots and their roads; caught in the check of the rebuilt pilot before publishing |
 | 3 | Clipping lakes by parcels erased Lake Wairarapa, whose bed is a 75 km² parcel | Serious (map) | Lakes are clipped only by parcels mostly outside them |
 | 4 | The coastal margin took 11 Waikawa Beach (Horowhenua) parcels into Greater Wellington | Moderate | A parcel in the margin whose address names another district is left out |
 | 5 | Sun and horizon treat missing surface-model cells nearby as open sky | Suspected | Open: T-110 |
