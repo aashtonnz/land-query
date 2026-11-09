@@ -36,6 +36,9 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
 - **[`pipeline/parcel_report.py`](pipeline/parcel_report.py)**: the parcel report on demand (T-101): the full 1 m
   analysis for any one parcel in New Zealand, by LINZ parcel id or address, in about a minute, from LINZ data and the
   national LiDAR mosaics; `report_page.py` turns it into a page. On GitHub: [`report.yml`](.github/workflows/report.yml).
+- **[`site/build_map.py`](site/build_map.py), [`site/map.js`](site/map.js)**: the public map site (T-105): parcels cut into
+  pieces at three levels of detail and loaded by area, drawn on the graphics card (WebGL 2) into map tiles so a
+  zoomed-out view blends parcels by area. Published by [`pages.yml`](.github/workflows/pages.yml) to GitHub Pages.
 - **[`site/`](site/)**: the project page, a parcel explorer of both councils showing only public-mode columns (T-98). `python3 site/build_site.py OUT.html` builds it from the published results; it is published as a private Claude page.
 - **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
   `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the

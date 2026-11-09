@@ -1,0 +1,43 @@
+name: Map site
+
+# Builds the public map site (site/build_map.py, T-105, D-23, D-24) from the published results and the national
+# index pilot, and publishes it with GitHub Pages. Free: the repository is public (D-24). Pages must be switched on
+# once in the repository settings (Settings, Pages, Source: GitHub Actions).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/pages.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q duckdb pandas pyarrow shapely numpy requests "mcp==2.3.0"
+      - name: Build the site
+        run: python3 site/build_map.py _site
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
