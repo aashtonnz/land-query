@@ -74,6 +74,11 @@ def in_tile(pt, t):
     return t[0] <= pt.x < t[2] and t[1] <= pt.y < t[3]
 
 
+# the land outline is a few very large polygons: the service limits those per minute, so one request at a time,
+# simplified to 1 m (ample for measuring water by area; T-115)
+FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=1))
+
+
 def fetch(layer, bbox, cache, where="1=1"):
     """GeoJSON features of a LINZ layer intersecting bbox, cached gzipped; (features, provenance entry)."""
     svc, fields, lds = LAYERS[layer]
@@ -85,7 +90,8 @@ def fetch(layer, bbox, cache, where="1=1"):
         t0 = time.time()
         feats = arcgis.query_all(SVC + svc + "/FeatureServer/0", dict(
             where=where, geometry=",".join(str(round(v)) for v in bbox), geometryType="esriGeometryEnvelope", inSR=2193,
-            spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193), workers=WORKERS)
+            spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193,
+            **{k: v for k, v in FETCH_OPTS.get(layer, {}).items() if k != "workers"}), workers=FETCH_OPTS.get(layer, {}).get("workers", WORKERS))
         d = dict(features=feats, fetched=utc_now(), seconds=round(time.time() - t0, 1))
         os.makedirs(cache, exist_ok=True)
         json.dump(d, gzip.open(path + ".tmp", "wt")); os.replace(path + ".tmp", path)

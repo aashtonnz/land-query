@@ -9,7 +9,11 @@ def _get(url, params, timeout=300, post=False):
             r = (requests.post(url, data=params, timeout=timeout) if post else requests.get(url, params=params, timeout=timeout))
             r.raise_for_status()
             j = r.json()
-            if "error" in j: raise RuntimeError(j["error"])
+            if "error" in j:
+                # a rate limit ("too many requests", 429) is waited out, not treated as a failure (T-115)
+                if (j["error"] or {}).get("code") == 429 and attempt < 3:
+                    time.sleep(65); continue
+                raise RuntimeError(j["error"])
             return j
         except (requests.exceptions.RequestException, ValueError):
             if attempt == 3: raise
