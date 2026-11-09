@@ -162,6 +162,17 @@ tile entries in its `provenance.json`.
 | `upslope_area_max_m2`, `upslope_truncated` | modelled | Largest area draining through the parcel on the 10 m ground (D8 flow); true where that catchment may reach past the tile plus 5 km |
 | `geometry_wkb` | derived | The parcel's shape simplified to 0.5 m, for maps |
 
+## Parcel report (national)
+
+The parcel report (T-101, `pipeline/parcel_report.py`) compiles the shared columns below for one parcel with the national
+settings (`pipeline/councils/national.py`). Its sources: `linz_parcels_service`, `titles` and `linz_buildings` from
+LINZ's public ArcGIS services as in "Register: national index" (or the LINZ Data Service with the key, which adds
+`nonprimary_parcels`); `dem_national` and `dsm_national`, the New Zealand LiDAR 1 m DEM and DSM mosaics (LINZ,
+CC BY 4.0, surveys 2008–2026; the report names each survey under the parcel, with its dates, producer and licensor);
+and `district_flow` over 8 km around the parcel. Differences from the shared meanings: `building_m2` is the area under
+LINZ's national building outlines; `easements_n` and `land_covenants_n` are empty without the key; council columns
+(zones, overlays, flood, three waters) and ground change are not compiled.
+
 ## Compiled columns (per parcel, table `units`)
 
 > **Second review (T-46 to T-51, 7 Nov 2026).** The problems it found are fixed and the district was rebuilt on
