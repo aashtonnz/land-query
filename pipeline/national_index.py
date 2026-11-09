@@ -75,8 +75,8 @@ def in_tile(pt, t):
 
 
 # the land outline is a few very large polygons: the service limits those per minute, so one request at a time,
-# simplified to 1 m (ample for measuring water by area; T-115)
-FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=1))
+# simplified to 5 m: well within its 1:50k accuracy (about 25 m), and 9 s a tile rather than minutes (T-115)
+FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=5))
 
 
 def fetch(layer, bbox, cache, where="1=1"):
@@ -317,7 +317,9 @@ def index_tile(tile, cache, region=None, tas=()):
     lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
     lf, prov["land"] = fetch("land", win, cache)
     if not lf: raise RuntimeError("no land outline returned for this window: water cannot be measured")
-    for r, s_ in zip(rows, water_shares(parcels, lw, geoms(lf))): r["water_pct"] = s_
+    from shapely import clip_by_rect
+    land = [(clip_by_rect(g, *win), p) for g, p in geoms(lf)]   # only this tile's part of the North Island outline
+    for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
     # a parcel taken in by the coastal margin is left out only on positive evidence that it is another district's: its
     # own address, or else the nearest address within 1 km. With no address near (islands), it stays (T-111, T-115)
     if REGION_NAMES:
