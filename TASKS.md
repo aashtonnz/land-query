@@ -12,13 +12,14 @@ Standing priorities:
 ## Doing (at most 3)
 
 ## Waiting on you
-- T-105 (your part): When the site is ready to go public, create an empty public GitHub repository (for example `aashtonnz/land-query-map`) and give `land-query` permission to publish to it; I'll give exact steps then (D-23). Raised 2026-11-09.
+- T-105 (your part): When the site is ready, turn on GitHub Pages for this repository (Settings, Pages, source "GitHub Actions"); I'll give exact steps then. No second repository is needed now that `land-query` is public (D-24). Raised 2026-11-09.
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
 - T-102: Build the national index out to the whole country, monthly: about 6–7 hours of work, so on GitHub split over several jobs (about US$3 a run, estimate from T-100); the index (about 400 MB) as a release file. Needs a national district boundary source, and easements from the LINZ Data Service with the key. Raised 2026-11-09.
-- T-105: Public map site (D-23): the page on GitHub Pages, with the map's data split into pieces loaded by area (and graphics-card tiles so zooming shows no change); a workflow in `land-query` builds it and publishes only the site. Goes live after T-103 and T-104. Raised 2026-11-09.
+- T-106: Before the project is announced anywhere (D-24): rebuild the results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) without `titles` and `title_types`, history included, and make every build publish only public-mode columns. Ask the owner before rewriting the branches. Raised 2026-11-09.
+- T-105: Public map site (D-23, D-24: served from this repository): the page on GitHub Pages, with the map's data split into pieces loaded by area (and graphics-card tiles so zooming shows no change); a workflow in `land-query` builds it and publishes only the site. Goes live after T-103 and T-104. Raised 2026-11-09.
 - T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
 - T-103: Fresh-eyes review of the index and the report before anyone outside sees them. Include why LINZ's building outlines are 20 m² or more smaller than KCDC's on 22% of Kāpiti parcels. Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
