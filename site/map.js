@@ -286,17 +286,9 @@ function render(){
 let loadedOnce = false;
 const status = () => `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
 
-// ---- overlay: grid, labels, selected parcel, scale bar
-function label(t, x, y){ const c = octx; c.save(); c.font = '10px ' + css('--mono'); c.lineWidth = 3; c.strokeStyle = css('--land'); c.lineJoin = 'round'; c.strokeText(t,x,y); c.fillStyle = css('--ink'); c.fillText(t,x,y); c.restore(); }
+// ---- overlay: selected parcel, scale bar
 function niceLen(m){ const p = 10**Math.floor(Math.log10(m)); for(const k of [1,2,5,10]) if(k*p >= m) return k*p; return 10*p; }
 function overlay(){ const c = octx; c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,over.width,over.height); c.setTransform(dpr,0,0,dpr,0,0);
-  const step = 5000, x0 = Math.floor((view.cx-W/2/view.s)/step)*step, y0 = Math.floor((view.cy-H/2/view.s)/step)*step;
-  c.strokeStyle = css('--rule'); c.globalAlpha = .35; c.lineWidth = 1; c.beginPath();
-  for(let x=x0; x<view.cx+W/2/view.s; x+=step){ c.moveTo(sx(x),0); c.lineTo(sx(x),H); }
-  for(let y=y0; y<view.cy+H/2/view.s; y+=step){ c.moveTo(0,sy(y)); c.lineTo(W,sy(y)); }
-  c.stroke(); c.globalAlpha = 1;
-  if(view.s*step > 60){ for(let x=x0; x<view.cx+W/2/view.s; x+=step) label((x/1000).toFixed(0)+' kE', sx(x)+3, H-4);
-    for(let y=y0; y<view.cy+H/2/view.s; y+=step) label((y/1000).toFixed(0)+' kN', 3, sy(y)-3); }
   if(selected){ c.strokeStyle = css('--mark'); c.lineWidth = 2.5; c.beginPath(); const d = selected.cpu;
     for(let r=d.pr0[selected.k]; r<d.pr0[selected.k+1]; r++){ const a = d.rs[r], e = d.rs[r+1];
       c.moveTo(sx(d.pos[2*a]+OX), sy(d.pos[2*a+1]+OY)); for(let v=a+1; v<e; v++) c.lineTo(sx(d.pos[2*v]+OX), sy(d.pos[2*v+1]+OY)); c.closePath(); }
