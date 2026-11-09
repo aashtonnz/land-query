@@ -88,8 +88,8 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 </header>
 
 <div class="hero">
-  <h1>Every parcel on the Kāpiti Coast and in Porirua, measured.</h1>
-  <p class="lede">Land Query compiles the facts about each land parcel from public sources: LINZ titles and survey, 1 m LiDAR, and council planning and asset layers. Each value records its source, licence and fetch time. The aim is to answer questions across a whole district, such as "which flat, sewered residential sections are big enough to subdivide?", in seconds rather than by checking parcels one at a time.</p>
+  <h1>Every parcel in New Zealand, measured from public data.</h1>
+  <p class="lede">Land Query compiles the facts about each land parcel from public sources: LINZ titles and survey, 1 m LiDAR, and council planning and asset layers. Each value records its source, licence and fetch time. The aim is to answer questions across a whole district, such as "which flat, sewered residential sections are big enough to subdivide?", in seconds rather than by checking parcels one at a time. Kāpiti Coast and Porirua are compiled in full with council data; any other parcel in the country gets a report on request from national LINZ data.</p>
   <div class="councils" id="councils"></div>
 </div>
 
@@ -129,6 +129,22 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
       <div id="detail" class="empty">Select a dot on the plan, or search for a legal description.</div>
       <div id="results" class="results" hidden></div>
     </aside>
+  </div>
+</section>
+
+<section id="national">
+  <div class="read">
+    <div class="label">Nationwide</div>
+    <h2>Any parcel in the country, in about a minute</h2>
+    <p>Beyond the two councils, Land Query works from national LINZ data alone: parcels, titles, building outlines, addresses, the coastline, and the national 1 m LiDAR, whose surveys run from 2008 to 2026. It comes in two parts. A national index holds every parcel for area searches. A full report for one parcel is computed when someone asks for it.</p>
+  </div>
+  <div class="cols">
+    <div class="col"><h3>National index</h3><span class="pill">pilot done</span>
+      <ul><li>Greater Wellington: 217,326 parcels in about 25 minutes, a 34 MB file</li><li>Area, shape, titles, buildings, address, road frontage, distance to the coast</li><li>Ground height, slope and catchment from the 10 m national ground model</li><li>Matches the Kāpiti build on area and title count for all 27,227 shared parcels</li><li>Whole country next: about 2.5 million parcels, about US$3 a run</li></ul></div>
+    <div class="col"><h3>Parcel report</h3><span class="pill">working</span>
+      <ul><li>Any parcel by LINZ parcel number or address</li><li>The full 1 m analysis: slope, sun, outlook, roof, earthworks, water flow</li><li>Names the LiDAR survey used, with its dates</li><li>Tried in Paraparaumu, Christchurch and Auckland</li><li><a href="https://claude.ai/artifact/PxLFZ1SQFgHk5uqDXiNeYV">Sample report: 15 Queen Street, Northcote Point</a></li></ul></div>
+    <div class="col"><h3>Not in the national data</h3><span class="pill held">council by council</span>
+      <ul><li>District plan zoning and overlays</li><li>Council flood and hazard maps</li><li>Three waters</li><li>Added per council once its licence is confirmed</li></ul></div>
   </div>
 </section>
 
@@ -177,7 +193,8 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
     <thead><tr><th>Source</th><th>Used for</th><th>Licence</th></tr></thead>
     <tbody>
       <tr><td>LINZ: NZ Primary Parcels, titles, non-primary parcels</td><td>Parcels, titles, easements</td><td>CC BY 4.0</td></tr>
-      <tr><td>LINZ: LiDAR (Kāpiti 2021 and 2024–25, Porirua 2023) and the national 1 m DEM</td><td>Terrain, flow, catchments, sea mask</td><td>CC BY 4.0</td></tr>
+      <tr><td>LINZ: building outlines, addresses and coastline (public ArcGIS services)</td><td>National index and parcel reports</td><td>CC BY 4.0 (coastline to confirm)</td></tr>
+      <tr><td>LINZ: LiDAR (Kāpiti 2021 and 2024–25, Porirua 2023) and the national 1 m DEM and DSM</td><td>Terrain, flow, catchments, sea mask</td><td>CC BY 4.0</td></tr>
       <tr><td>Kāpiti Coast District Council</td><td>Zones, overlays, flood models, three waters, building outlines</td><td>CC BY 4.0, some on the dataset, some by portal statement (to confirm)</td></tr>
       <tr><td>Porirua City Council</td><td>District Plan 2025 layers, building footprints, parcel copy</td><td>Portal statement (to confirm)</td></tr>
       <tr><td>Greater Wellington Regional Council and Stats NZ</td><td>Liquefaction, slope failure, district boundary</td><td>CC BY 4.0 statements</td></tr>
@@ -188,12 +205,14 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 <section id="status">
   <div class="read">
     <div class="label">Status</div>
-    <h2>Two councils, the rest of the region next</h2>
+    <h2>Two councils in full, the country next</h2>
     <ol class="steps">
       <li><div><b>Kāpiti Coast District.</b> 27,284 parcels, about 105 columns, eleven reviews.</div></li>
       <li><div><b>Porirua City.</b> 21,954 parcels, 94 columns on the District Plan 2025, four reviews.</div></li>
-      <li><div><b>Licences.</b> Written confirmation from the councils opens the planning and hazard columns to public use.</div></li>
-      <li><div><b>Rest of Greater Wellington.</b> Wellington, Hutt and Upper Hutt, each with half a day to a day of setup.</div></li>
+      <li><div><b>National index pilot.</b> Greater Wellington, 217,326 parcels from LINZ data only.</div></li>
+      <li><div><b>Parcel report.</b> Any parcel in New Zealand on request, in about a minute.</div></li>
+      <li><div><b>Review, then the whole country.</b> A fresh review of the index and report, then the national index, rebuilt monthly.</div></li>
+      <li><div><b>Licences.</b> Written confirmation from the councils opens zoning and hazard columns, starting with the largest cities.</div></li>
     </ol>
   </div>
 </section>
