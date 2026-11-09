@@ -190,21 +190,29 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     meta = dict(origin=ORIGIN, levels=[], measures=MEASURES, councils=list(COUNCILS), detail_fields=DETAIL, stats=stats,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
-    # Topo50 lakes and LINZ's river areas are mapped at 1:50k, so their edges can stray over sections: within EDGE_M of a
-    # lake's edge, land parcels (mostly outside it) are cut out; the middle of a lake is never cut, so small lakes inside
-    # a farm parcel stay (T-109, T-113)
+    # Topo50 lakes and LINZ's river areas are mapped at 1:50k, so their edges can stray over sections (T-109, T-113, T-115)
     EDGE_M = 25.0
     from shapely import STRtree
     from shapely.ops import unary_union
     pg = [geoms[pid] for pid in P if pid in geoms]; tree = STRtree(pg); waters = []
+    before = after = 0.0; lost_half = n_topo = 0
     for g, topo in water(bounds):
+        g0 = g.area
         if topo:
             # only by parcels mostly outside the lake: a lake bed that is itself a parcel (Lake Wairarapa's is 75 km²)
             # keeps its water (T-111)
-            hit = [q for q in (pg[i] for i in tree.query(g, predicate="intersects")) if q.intersection(g).area < 0.5 * q.area]
-            if hit: g = g.difference(unary_union(hit).intersection(g.boundary.buffer(EDGE_M)))
+            # a 1:50k edge strays over a section as a thin sliver: those slivers (nothing left after shrinking by EDGE_M)
+            # are cut out; any wider overlap is real water inside the parcel and is kept (T-115)
+            cut = []
+            for q in (pg[i] for i in tree.query(g, predicate="intersects")):
+                ov = q.intersection(g)
+                for piece in getattr(ov, "geoms", [ov]):
+                    if piece.area > 0 and piece.buffer(-EDGE_M).is_empty: cut.append(piece)
+            if cut: g = g.difference(unary_union(cut))
+            before += g0; after += g.area; n_topo += 1; lost_half += g.area < 0.5 * g0
         if not g.is_empty and g.area > 1: waters.append(g)
-    print(len(waters), "water polygons")
+    print(len(waters), "water polygons;", f"lakes and river areas: {after / max(before, 1):.1%} of their area drawn, "
+          f"{lost_half} of {n_topo} lose more than half to sliver cuts")
     nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):
         os.makedirs(os.path.join(OUT, "data", f"L{li}"))
@@ -224,7 +232,7 @@ def main():
                 p = P[pid]; g = level_shape(geoms.get(pid), p, tol)
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 v = [float(p[m]) if p.get(m) is not None else float("nan") for m in MEASURES]
-                items.append((pid, WATER if WET.get(pid) else COUNCILS[p["c"]], v, g))
+                items.append((pid, COUNCILS[p["c"]], v, g))   # water is drawn over parcels from the water layers, not by parcel
             for g in wet.get((i, j), []):
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 items.append((-1, WATER, nanv, g))

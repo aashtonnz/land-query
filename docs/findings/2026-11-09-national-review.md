@@ -109,3 +109,19 @@ offset-road lots match); partly cancelled titles; the LiDAR read path and the su
 The serious findings were all in water and parcel membership, decided until now from names and paperwork. T-113
 replaces that with measurement, and a fourth fresh review follows (T-114).
 
+
+## Nineteenth review: measured water (T-114)
+
+| # | Finding | Seriousness | Fix (T-115) |
+| --- | --- | --- | --- |
+| 1 | Kapiti Island, Mana Island and Motungarara parcels (41) were dropped: no address within 1 km, so no district | Serious | A margin parcel is left out only on positive evidence (an address, or the nearest within 1 km, in another district); otherwise it stays |
+| 2 | Lake Ōnoke counted twice: its surface is below 0.5 m with no 8 m DEM, so the grid's "sea" overlapped the lake (Lot 43 DP 12843: 45% water read 85.8) | Serious | Water by area of the union of sea, lakes and rivers; the grid is not used |
+| 3 | Missing elevation data read as 100% sea (would hit the Chatham Islands) | Serious (national) | As 2: sea is outside LINZ's land outline, never from the grid; a window with no land outline stops the run |
+| 4 | Tidal flats read as land (22 parcels mostly seaward of the coast read under 20%) | Moderate | As 2: the Topo50 land outline puts tidal flats in the sea |
+| 5 | The map's 25 m edge cut erased most lakes inside farm parcels (4,237 of 4,912) and stretches of the Hutt, Ruamāhanga and other rivers | Serious (map) | Only thin slivers (nothing left after shrinking by 25 m) are cut; the build now reports the share of lake and river area drawn |
+| 6 | Parcels 50% or more water were drawn wholly as water | Moderate | Removed: water is drawn from the water layers over the parcels |
+| 7 | Six ways to break the water and margin rules passed the tests | Moderate | New tests through `index_tile`: water counted once, no grid used, lake over sea, islands kept; each rule fails a test when undone |
+| 8 | SOURCES said Lake Wairarapa's bed reads 100 (95.8); the river-areas layer is a 2018 snapshot | Minor | Corrected and recorded |
+
+Each round has found fewer and narrower faults, but four rounds running have found serious ones, all in rules I wrote
+to guess something the data does not say directly. T-115 replaces the last of them with plain area measurement.

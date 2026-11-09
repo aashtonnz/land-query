@@ -141,6 +141,7 @@ def test_frontage_counts_a_road_set_slightly_off_the_line_but_not_the_side_bound
 
 
 def run_tile(monkey_layers, Z=None, region=None, core=None, names=()):
+    monkey_layers.setdefault("land", [(box(-1e6, -1e6, 1e6, 1e6), dict(id=0))])
     """index_tile on made-up LINZ data (no network): monkey_layers maps a layer name (or 'roads') to [(geometry, props)]."""
     from shapely.geometry import box as _box
     feat = lambda g, p: dict(geometry=g.__geo_interface__, properties=p)
@@ -165,16 +166,28 @@ def test_water_is_measured_not_guessed_from_names_or_titles():
     rows = run_tile({"parcels": [(lot, P(1, "Lot 1 DP 1", "Fee Simple Title", "T1")), (lakebed, P(2, "Section 1 SO 518213", "Legalisation", "T2")),
                                  (reclaimed, P(3, "Part Bed Port Nicholson SO 31787"))],
                      "lakes": [(box(280, 280, 520, 520), dict(t50_fid=1))],
+                     "land": [(box(-1000, -1000, 2000, 2000), dict(id=1))],
                      "titles": [(lot, dict(title_no="T1", status="LIVE", type="Freehold")), (lakebed, dict(title_no="T2", status="PRTC", type="Freehold"))]})
     assert rows[2]["title_types"] == "Freehold" and rows[2]["titles_not_found"] == 0   # partly cancelled is current, through index_tile
     assert set(rows) == {1, 2, 3}                                       # nothing dropped by its name or paperwork
     assert rows[2]["water_pct"] == 100 and rows[1]["water_pct"] == 0 and rows[3]["water_pct"] == 0
 
 
-def test_sea_share_comes_from_the_grid():
-    Z = np.full((140, 140), 5.0, np.float32); Z[:, 80:] = np.nan          # the sea east of x = 600
-    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(700, 100, 800, 200), dict(id=2, parcel_intent="DCDB"))]}, Z=Z)
-    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] == 100
+def test_water_is_the_area_of_sea_lakes_and_rivers_together_never_from_the_grid():
+    """T-115: sea is outside the land outline; a part both lake and sea counts once; no elevation data is not water."""
+    Z = np.full((140, 140), np.nan, np.float32)                           # no elevation data at all
+    land = box(-500, -500, 600, 1500)                                       # sea east of x = 600
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), P(1)), (box(700, 100, 800, 200), P(2)),
+                                 (box(550, 300, 650, 400), P(3)),           # half sea
+                                 (box(400, 500, 700, 600), P(4)),           # under a lake (450-650) that runs over the sea edge (600)
+                                 (box(100, 700, 200, 800), P(5))],          # half under a lake, half under a river
+                     "land": [(land, dict(id=1))],
+                     "lakes": [(box(450, 450, 650, 650), dict(t50_fid=1)), (box(100, 700, 150, 800), dict(t50_fid=2))],
+                     "rivers": [(box(150, 700, 200, 800), dict())]}, Z=Z)
+    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] == 100 and rows[3]["water_pct"] == 50
+    assert rows[4]["water_pct"] == 83.3                                     # 450-700 once: 250 of 300 (counted twice it would be 100)
+    assert rows[5]["water_pct"] == 100 and rows[1]["ground_mean_m"] is None
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():
@@ -186,6 +199,11 @@ def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():
                                    (Point(640, 860), dict(full_address="2 Shore Rd", address_number=2, territorial_authority="Kāpiti Coast District"))]},
                     region=grown, core=core, names=["kapiti coast district"])
     assert set(rows) == {1, 3}
+    # an island in the margin with no address within 1 km stays (Kapiti Island; T-115)
+    island = run_tile({"parcels": [(box(900, 450, 950, 500), dict(id=4, parcel_intent="DCDB"))],
+                       "addresses": [(Point(-900, 450), dict(full_address="9 Far Rd", address_number=9, territorial_authority="Horowhenua District"))]},
+                      region=grown, core=core, names=["kapiti coast district"])
+    assert set(island) == {4}
 
 
 def test_frontage_counts_across_a_thin_strip_to_the_road():
