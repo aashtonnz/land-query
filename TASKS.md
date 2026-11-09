@@ -12,14 +12,12 @@ Standing priorities:
 ## Doing (at most 3)
 
 ## Waiting on you
-- T-105 (your part): Switch on GitHub Pages for this repository: Settings → Pages → Build and deployment → Source: "GitHub Actions". The map site then publishes itself (D-24). Raised 2026-11-09.
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
 - T-102: Build the national index out to the whole country, monthly: about 6–7 hours of work, so on GitHub split over several jobs (about US$3 a run, estimate from T-100); the index (about 400 MB) as a release file. Needs a national district boundary source, and easements from the LINZ Data Service with the key. Raised 2026-11-09.
 - T-106: Before the project is announced anywhere (D-24): rebuild the results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) without `titles` and `title_types`, history included, and make every build publish only public-mode columns. Ask the owner before rewriting the branches. Raised 2026-11-09.
-- T-105: Public map site (D-23, D-24): built. `site/build_map.py` cuts parcels into pieces at three levels of detail (loaded by area); `site/map.js` draws them on the graphics card into tiles, area-blended when zoomed out; `.github/workflows/pages.yml` publishes it. Waiting for Pages to be switched on; then check it on real devices. Raised 2026-11-09.
 - T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
 - T-103: Fresh-eyes review of the index and the report before anyone outside sees them. Include why LINZ's building outlines are 20 m² or more smaller than KCDC's on 22% of Kāpiti parcels. Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
@@ -40,6 +38,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-105: Public map site live at https://aashtonnz.github.io/land-query/ (D-23, D-24): Greater Wellington parcels in pieces loaded by area at four levels of detail, drawn on the graphics card; two levels blended by the exact zoom so nothing jumps; boundaries live; rivers and lakes from LINZ; published by `pages.yml`. Checked by the owner on their devices. 2026-11-09.
 - T-101: Parcel report on demand: any parcel in New Zealand by id or address, in about a minute, from LINZ data and the national 1 m LiDAR (`parcel_report.py`, `report_page.py`; `report.yml` on GitHub with the key adds easements, not yet run). Checked against the Kāpiti results; tried in Christchurch and Auckland. Sample page: https://claude.ai/artifact/PxLFZ1SQFgHk5uqDXiNeYV. [Findings](docs/findings/2026-11-09-parcel-report.md) 2026-11-09.
 - T-100: National index pilot, Greater Wellington: 217,326 parcels, 34 MB, about 25 minutes a run, built here at no cost from LINZ's public services (D-22). Matches the Kāpiti results on area and title count for all 27,227 shared parcels. Found and fixed: records LINZ's services hold twice, and downloads now checked record by record. Results on the `national-pilot` branch. [Findings](docs/findings/2026-11-09-national-index-pilot.md) 2026-11-09.
 - T-99: National MVP approved (D-21): a site screen for any NZ parcel on LINZ data, two tiers. Buyer conversations to be worked out later. [Proposal](docs/proposals/2026-11-09-national-mvp.md) 2026-11-09.
