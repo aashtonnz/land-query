@@ -6,7 +6,9 @@ import numpy as np, requests, rasterio
 from rasterio.windows import from_bounds
 from rasterio.merge import merge
 
-BASE = "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/"
+from councils import COUNCIL as C
+BASE = getattr(C, "LIDAR_BASE", "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/")
+WINDOWED = getattr(C, "LIDAR_WINDOWED", False)   # national mosaic sheets are read in place, never downloaded (T-101)
 OUT = sys.argv[1] if len(sys.argv) > 1 else "data"
 TILE = te.lidar_bbox(OUT)  # fetch window plus LIDAR_CONTEXT_M on every side
 os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
@@ -16,12 +18,20 @@ lon0, lat0, lon1, lat1 = te.ll_envelope(TILE)
 from lidar_catalogue import NoCoverage, get_json, source_entry
 
 
+def item_links(c, coll):
+    """The collection's item links; for a national mosaic only the Topo50 sheets near the window (it has 424)."""
+    links = [l["href"] for l in c["links"] if l.get("rel") == "item"]
+    if not WINDOWED: return links
+    from district_flow import topo50_candidates
+    near = {f"./{s}.json" for s in topo50_candidates(TILE)}
+    return [h for h in links if h in near]
+
+
 def items_for(coll):
     c = get_json(BASE + coll + "/collection.json")
     hrefs = []
-    for l in c["links"]:
-        if l.get("rel") != "item": continue
-        it = get_json(BASE + coll + "/" + l["href"].lstrip("./"))
+    for href in item_links(c, coll):
+        it = get_json(BASE + coll + "/" + href.lstrip("./"))
         b = it["bbox"]  # WGS84
         if b[0] <= lon1 and b[2] >= lon0 and b[1] <= lat1 and b[3] >= lat0:
             a = it["assets"]["visual"] if "visual" in it["assets"] else next(iter(it["assets"].values()))
@@ -34,6 +44,7 @@ def read(coll, name):
     t0 = time.time()
     c, hrefs = items_for(coll)
     if not hrefs: raise NoCoverage("no LiDAR survey in this collection covers the window")
+    if WINDOWED: return read_window(c, coll, name, hrefs, t0)
     cache = os.path.join(OUT, "cache"); os.makedirs(cache, exist_ok=True)
     local = []
     for h in hrefs:
@@ -64,9 +75,30 @@ def read(coll, name):
     print(name, meta["shape"], "valid", round(meta["valid_frac"], 3), meta["seconds"], "s", len(hrefs), "COGs")
     return meta
 
+def read_window(c, coll, name, hrefs, t0):
+    """The window at 1 m from each sheet in place (/vsicurl), the first sheet with data winning on an overlap."""
+    from rasterio.transform import from_origin
+    x0, y0, x1, y1 = TILE
+    W, H = int(round(x1 - x0)), int(round(y1 - y0)); tr = from_origin(x0, y1, 1.0, 1.0)
+    arr = np.full((H, W), np.nan, np.float32)
+    for h in hrefs:
+        with rasterio.open("/vsicurl/" + h) as src:
+            part = src.read(1, window=from_bounds(x0, y0, x1, y1, src.transform), out_shape=(H, W), boundless=True,
+                            fill_value=np.nan, masked=True).filled(np.nan).astype(np.float32)
+        fill = np.isnan(arr) & np.isfinite(part); arr[fill] = part[fill]
+    prof = dict(driver="GTiff", height=H, width=W, count=1, dtype="float32", crs="EPSG:2193", transform=tr,
+                nodata=np.nan, compress="deflate")
+    with rasterio.open(os.path.join(OUT, "raw", name + ".tif"), "w", **prof) as d: d.write(arr, 1)
+    meta = dict(collection=BASE + coll + "/collection.json", items=hrefs, title=c.get("title"),
+                licence=(c.get("license") or "") + " " + json.dumps([p.get("name") for p in c.get("providers", [])]),
+                shape=list(arr.shape), valid_frac=float(np.isfinite(arr).mean()),
+                sha256=hashlib.sha256(arr.tobytes()).hexdigest(), seconds=round(time.time() - t0, 1), fetched=utc_now())
+    print(name, meta["shape"], "valid", round(meta["valid_frac"], 3), meta["seconds"], "s", len(hrefs), "sheets")
+    return meta
+
+
 prov_path = os.path.join(OUT, "provenance.json")
 prov = json.load(open(prov_path))
-from councils import COUNCIL as C
 for coll, name in C.LIDAR:  # the council's surveys (T-86)
     prov["sources"][name] = e = source_entry(read, coll, name)  # no coverage (hills, Kapiti Island) is not a failure
     if not e["ok"]: print(name, "no coverage" if e.get("no_coverage") else "FAILED " + e["error"])

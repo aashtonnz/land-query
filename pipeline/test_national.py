@@ -80,6 +80,28 @@ def test_repeated_records_are_kept_once_and_counted():
     assert [x["properties"]["v"] for x in out] == ["a", "b", "x", "y"] and rep == 2 and diff == 1
 
 
+def test_report_block_holds_the_whole_parcel_and_refuses_huge_ones():
+    import parcel_report as R
+    g = box(1000.3, 2000.7, 1062.0, 2031.0)
+    x, y, size = R.block_for(g)
+    assert x <= 1000.3 and y <= 2000.7 and x + size >= 1062 and y + size >= 2031 and size % 10 == 0
+    assert box(x, y, x + size, y + size).contains(g.representative_point())
+    try: R.block_for(box(0, 0, 3500, 10)); raise AssertionError("accepted")
+    except SystemExit: pass
+
+
+def test_report_page_shows_missing_values_as_not_known_and_never_zero():
+    import report_page as P
+    rep = dict(parcel_id=7, address="1 Test Road, Town", geometry=box(0, 0, 20, 30).__geo_interface__, buildings_nearby=[],
+               values=dict(area_m2=600.0, easements_n=None, building_m2=0, upslope_area_truncated=False, rep_x=1.0, rep_y=2.0),
+               lidar_surveys=dict(dem=[], dsm=[]), sources={})
+    h = P.page(rep)
+    assert "<title>1 Test Road, Town</title>" in h and "not known" in h and "600" in h
+    row = lambda label: h.split(f"<dt>{label}</dt>")[1].split("</dd>")[0]
+    assert "not known" in row("Easements") and row("Under buildings").count("0") >= 1 and "No" in row("Could be larger")
+    assert "No LiDAR survey covers this parcel" in h
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

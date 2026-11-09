@@ -1,0 +1,45 @@
+name: Parcel report
+
+# The parcel report on demand (T-101, D-21): the full 1 m analysis for one parcel anywhere in New Zealand from LINZ
+# data, run with the LINZ_API_KEY repository secret so parcels, titles and easements come from the LINZ Data Service.
+# About 1–2 minutes (about US$0.02). The report (JSON and page) is kept as a run artifact for 7 days, not pushed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      parcel_id: { description: "LINZ primary parcel id (or leave empty and give an address)", required: false, default: "" }
+      address: { description: "LINZ full address, e.g. 15 Queen Street, Northcote Point, Auckland", required: false, default: "" }
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r pipeline/requirements.txt
+      - name: Tests
+        working-directory: pipeline
+        run: python3 test_national.py
+      - name: Report
+        working-directory: pipeline
+        env:
+          LINZ_API_KEY: ${{ secrets.LINZ_API_KEY }}
+          PARCEL_ID: ${{ inputs.parcel_id }}
+          ADDRESS: ${{ inputs.address }}
+        run: |
+          if [ -n "$PARCEL_ID" ]; then python3 parcel_report.py ../report --id "$PARCEL_ID"
+          else python3 parcel_report.py ../report --address "$ADDRESS"; fi
+          python3 report_page.py ../report/report.json ../report/report.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parcel-report
+          path: |
+            report/report.json
+            report/report.html
+            report/run.log
+          retention-days: 7

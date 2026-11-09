@@ -33,6 +33,9 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   anywhere in New Zealand from LINZ data only (parcels, titles, building outlines, addresses, road frontage, coast
   distance, and ground, slope and flow from the national 10 m ground model), built in 40 km tiles. Piloted on Greater
   Wellington (217,326 parcels, T-100); results on the `national-pilot` branch.
+- **[`pipeline/parcel_report.py`](pipeline/parcel_report.py)**: the parcel report on demand (T-101): the full 1 m
+  analysis for any one parcel in New Zealand, by LINZ parcel id or address, in about a minute, from LINZ data and the
+  national LiDAR mosaics; `report_page.py` turns it into a page. On GitHub: [`report.yml`](.github/workflows/report.yml).
 - **[`site/`](site/)**: the project page, a parcel explorer of both councils showing only public-mode columns (T-98). `python3 site/build_site.py OUT.html` builds it from the published results; it is published as a private Claude page.
 - **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
   `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the

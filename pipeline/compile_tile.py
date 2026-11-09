@@ -226,6 +226,8 @@ def nearest(key, items, g, maxd=150, prefer=None):
 # LINZ titles (type and estate only; no owner names) and non-primary parcels (easements, land covenants)
 TITLES = {p["title_no"]: p for _, p in load("titles")}
 NONPRI = load("nonprimary_parcels"); T_NP = STRtree([g for g, _ in NONPRI]) if NONPRI else None
+# easement counts are unknown, not 0, where the non-primary parcels were not fetched (no key; T-101)
+NP_OK = bool(json.load(open(os.path.join(D, "provenance.json")))["sources"].get("nonprimary_parcels", {}).get("ok"))
 
 rows = []
 for uid, (g, p) in enumerate(units):
@@ -234,7 +236,8 @@ for uid, (g, p) in enumerate(units):
     np_hits = [NONPRI[i][1]["parcel_intent"] for i in (T_NP.query(g) if T_NP else [])
                if NONPRI[i][0].intersection(g).area > 1]
     extra = dict(title_types=", ".join(tts) or None, title_count=len(tnos),
-                 easements_n=np_hits.count("Easement"), land_covenants_n=np_hits.count("Covenant - Land"))
+                 easements_n=np_hits.count("Easement") if NP_OK else None,
+                 land_covenants_n=np_hits.count("Covenant - Land") if NP_OK else None)
     pid = p.get("id") or p.get("ID")
     if pid is None: raise SystemExit(f"parcel {uid} has no id: refusing to invent one")
     r = dict(unit_id=pid, unit_source=unit_src, block_id=te.BLOCK_ID,

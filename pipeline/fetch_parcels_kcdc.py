@@ -31,11 +31,15 @@ feats = arcgis.query_all(URL, dict(geometry=",".join(map(str, te.BLOCK)), geomet
 # tested here on every run, against three boundaries: KCDC's line and ward, and Stats NZ's polygon (T-65, T-70)
 import overlays as ov
 Q = lambda s: arcgis.query_all(s[0], dict(where=s[1], outFields=s[2], outSR=2193))
-EDGE_URL, WARD_URL, STATS_URL = (C.OUTLINE[k][0] for k in ("line", "ward", "stats"))
-edge, wards, stats = Q(C.OUTLINE["line"]), Q(C.OUTLINE["ward"]), Q(C.OUTLINE["stats"])
 G = lambda fs: [ov.repaired(shape(f["geometry"])) for f in fs if f.get("geometry")]   # never buffer(0) (T-94)
-district = (ov.district_outline_polygons(G(edge), G(wards), G(stats)) if C.OUTLINE.get("kind") == "polygons"
-            else ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"]))
+if C.OUTLINE.get("kind") == "none":   # no district (the national report, T-101): the block decides alone
+    EDGE_URL = WARD_URL = STATS_URL = None; edge = wards = stats = []
+    district = box(*te.BLOCK).buffer(100000)
+else:
+    EDGE_URL, WARD_URL, STATS_URL = (C.OUTLINE[k][0] for k in ("line", "ward", "stats"))
+    edge, wards, stats = Q(C.OUTLINE["line"]), Q(C.OUTLINE["ward"]), Q(C.OUTLINE["stats"])
+    district = (ov.district_outline_polygons(G(edge), G(wards), G(stats)) if C.OUTLINE.get("kind") == "polygons"
+                else ov.district_outline(G(edge), G(wards), G(stats), sea_x=C.OUTLINE["sea_x"]))
 if district.is_empty: raise SystemExit("could not build the district outline from the council's line and ward and Stats NZ's polygon")
 outline_b = json.dumps(dict(type="FeatureCollection", features=edge + wards + stats), sort_keys=True).encode()
 from shapely.geometry import mapping
@@ -43,6 +47,13 @@ json.dump(mapping(district), open(os.path.join(OUT, "raw", "district_outline.geo
 mirror_ids = {f["properties"].get("id") for f in feats}
 
 blk = box(*te.BLOCK); kept = []
+# LINZ's own ArcGIS copy holds some parcels twice with the same values (T-100): keep one record per parcel id
+_seen, _once = set(), []
+for f in feats:
+    i = f["properties"].get("id")
+    if i is None: _once.append(f)
+    elif i not in _seen: _once.append(f); _seen.add(i)
+repeated, feats = len(feats) - len(_once), _once
 # road and water parcels are not in LINZ's primary parcel layer (they have layers of their own), and KCDC's copy omits
 # them; PCC's includes them, so they are left out here for every council (T-88)
 for f in feats:
@@ -59,6 +70,8 @@ if linz.KEY:
         by_id = {f["properties"].get("id"): f for f in linz.wfs(50823, te.BLOCK) if f.get("geometry")}
     except Exception as e:
         by_id, linz_err = {}, str(e)[:300]
+elif C.PARCELS_COPY == "LINZ ArcGIS service":   # the national report: the copy is LINZ's own (D-22)
+    by_id, linz_err = {}, None
 else:
     by_id, linz_err = {}, "LINZ_API_KEY not set: mirror geometry used"
 units = []
@@ -100,10 +113,10 @@ prov["sources"]["parcels"] = dict(url=LINZ_URL if from_linz else URL, ok=linz_er
                                   seconds=round(time.time() - t0, 1), fetched=utc_now(),
                                   licence=f"LINZ NZ Primary Parcels, CC BY 4.0 (district membership from {C.PARCELS_FROM})")
 mb = json.dumps(mirror).encode()
-prov["sources"]["district_outline"] = dict(url=[EDGE_URL, WARD_URL, STATS_URL], ok=True, features=len(edge) + len(wards) + len(stats),
+if EDGE_URL is not None: prov["sources"]["district_outline"] = dict(url=[EDGE_URL, WARD_URL, STATS_URL], ok=True, features=len(edge) + len(wards) + len(stats),
                                            area_km2=round(district.area / 1e6, 1), sha256=hashlib.sha256(outline_b).hexdigest(),
                                            fetched=utc_now(), licence=C.OUTLINE_LICENCE)
-prov["sources"][C.PARCELS_KEY] = dict(url=URL, ok=True, features=len(mirror["features"]), sha256=hashlib.sha256(mb).hexdigest(),
+prov["sources"][C.PARCELS_KEY] = dict(url=URL, ok=True, features=len(mirror["features"]), repeated_records=repeated, sha256=hashlib.sha256(mb).hexdigest(),
                                        fetched=utc_now(), licence=f"LINZ NZ Primary Parcels, CC BY 4.0, via {C.PARCELS_VIA}")
 json.dump(prov, open(prov_path, "w"), indent=1)
 print("parcels", len(kept), "of", len(feats), "intersecting;", from_linz, "with LINZ geometry; window", win, round(time.time() - t0, 1), "s", linz_err or "")
