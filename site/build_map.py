@@ -33,7 +33,7 @@ ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM
 LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
 MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
 COUNCILS = {"k": 0, "p": 1, "n": 2}
-WET = {}    # parcel id -> mostly water (national index water_pct >= 50)
+WATER_PCT = {}   # parcel id -> national index water_pct
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y", "area_m2", "ground_mean_m", "slope_p90_deg",
                 "lidar_coverage_pct", "flow_path_m", "catchment_area_max_m2", "title_count", "easements_n"]
@@ -70,7 +70,7 @@ def parcels():
     nd = results("national-pilot"); nf = os.path.join(nd, "index.parquet")
     for r in duckdb.sql(f"""SELECT parcel_id, appellation, parcel_intent, rep_x, rep_y, area_m2, ground_mean_m,
             upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority, water_pct FROM '{nf}'""").fetchall():
-        WET[r[0]] = (r[12] or 0) >= 50   # mostly sea, lake or river: drawn as water (T-113)
+        WATER_PCT[r[0]] = r[12] or 0   # measured water share; parcels above 0 get their sea part drawn (T-117)
         P[r[0]] = dict(c="n", appellation=r[1], parcel_intent=r[2], rep_x=r[3], rep_y=r[4], area_m2=r[5], ground_mean_m=r[6],
                        catchment_area_max_m2=r[7], title_count=r[8], building_cover_pct=r[9], address=r[10],
                        territorial_authority=r[11])
@@ -213,11 +213,13 @@ def main():
     land = land_outline(bounds)
     from shapely import STRtree as _T
     from shapely.ops import unary_union as _U
+    # only parcels the national index measured as part water need it; the outline is clipped to each parcel first
+    from shapely import clip_by_rect as _clip
     lt = _T(land); n_sea = 0
     for pid, p in P.items():
         g = geoms.get(pid)
-        if g is None: continue
-        near = [land[i] for i in lt.query(g)]
+        if g is None or not WATER_PCT.get(pid): continue
+        near = [c for c in (_clip(land[i], *g.bounds) for i in lt.query(g)) if not c.is_empty]
         sea = g.difference(_U(near)) if near else g
         if not sea.is_empty and sea.area > 1: waters.append(sea); n_sea += 1
     print(n_sea, "parcels with sea drawn over them")
