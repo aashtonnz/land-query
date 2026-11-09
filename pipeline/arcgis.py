@@ -3,10 +3,11 @@ import time
 import requests
 
 
-def _get(url, params, timeout=300):
+def _get(url, params, timeout=300, post=False):
     for attempt in range(4):
         try:
-            r = requests.get(url, params=params, timeout=timeout); r.raise_for_status()
+            r = (requests.post(url, data=params, timeout=timeout) if post else requests.get(url, params=params, timeout=timeout))
+            r.raise_for_status()
             j = r.json()
             if "error" in j: raise RuntimeError(j["error"])
             return j
@@ -30,30 +31,67 @@ def page_through(fetch_page, page):
         if not fs or (len(fs) < page and not exceeded(j)): return feats
 
 
+def _with_field(out_fields, oid):
+    """outFields plus the object id field, and whether it was added (so it can be dropped again)."""
+    fields = [f.strip() for f in (out_fields or "*").split(",")]
+    if "*" in fields or oid in fields: return ",".join(fields), False
+    return ",".join(fields + [oid]), True
+
+
+def check_chunk(feats, want, oid):
+    """Fail unless the features are exactly the requested object ids, once each (T-100: a service returned another
+    page's features in place of the last page, which a count check cannot see)."""
+    got = [(f.get("properties") or {}).get(oid, f.get("id")) for f in feats]
+    if len(got) != len(set(got)) or set(got) != set(want):
+        raise RuntimeError(f"features returned are not the {len(want)} requested: {len(got)} returned, "
+                           f"{len(set(want) - set(got))} missing, {len(got) - len(set(got))} repeated")
+
+
+SELECT_KEYS = frozenset({"where", "geometry", "geometryType", "inSR", "spatialRel", "text", "time", "distance", "units"})
+
+
 def query_all(url, query, workers=1):
     """Every feature matching query (ArcGIS query parameters), as GeoJSON features in the requested outSR.
 
-    Pages at the layer's own maxRecordCount, then checks the total against returnCountOnly and fails if any are
-    missing, so a layer can never be silently cut short. With workers > 1 the pages are fetched in parallel (T-100)."""
-    try: page = int(_get(url, {"f": "json"}, 60).get("maxRecordCount") or 1000)
-    except Exception: page = 1000
-    page = max(1, min(page, 5000))
-    base = dict(query, f="geojson", orderByFields=query.get("orderByFields", "OBJECTID"))
-    count = lambda: _get(url + "/query", dict({k: v for k, v in query.items() if k not in ("outFields", "outSR")},
-                                              returnCountOnly="true", f="json")).get("count")
-    fetch = lambda o, n: _get(url + "/query", dict(base, resultOffset=o, resultRecordCount=n))
-    if workers > 1:
-        from concurrent.futures import ThreadPoolExecutor
-        n = count()
-        with ThreadPoolExecutor(workers) as ex:
-            pages = list(ex.map(lambda o: fetch(o, page).get("features", []), range(0, n or 0, page)))
+    Asks for the matching object ids first, then fetches them in chunks and checks that each chunk holds exactly the
+    ids asked for, so a layer is never silently cut short or padded with repeats (T-100). A layer that cannot list its
+    ids is paged by offset instead, with the total checked against returnCountOnly and repeats refused (T-44).
+    With workers > 1 the chunks are fetched in parallel."""
+    try: info = _get(url, {"f": "json"}, 60)
+    except Exception: info = {}
+    page = max(1, min(int(info.get("maxRecordCount") or 1000), 2000))
+    oid = info.get("objectIdField") or next((f["name"] for f in info.get("fields") or [] if f.get("type") == "esriFieldTypeOID"), "OBJECTID")
+    sel = {k: v for k, v in query.items() if k in SELECT_KEYS}
+    try:
+        r = _get(url + "/query", dict(sel, returnIdsOnly="true", f="json"), post=True)
+        ids = None if exceeded(r) else sorted(r.get("objectIds") or [])
+        oid = r.get("objectIdFieldName") or oid
+    except Exception:
+        ids = None
+    fields, added = _with_field(query.get("outFields"), oid)
+    base = dict(query, outFields=fields, f="geojson")
+    if ids is not None:
+        def chunk(c):
+            fs = _get(url + "/query", dict({k: v for k, v in base.items() if k not in SELECT_KEYS},
+                                            where="1=1", objectIds=",".join(map(str, c))), post=True).get("features", [])
+            check_chunk(fs, c, oid)
+            return fs
+        chunks = [ids[i:i + page] for i in range(0, len(ids), page)]
+        if workers > 1:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(workers) as ex: pages = list(ex.map(chunk, chunks))
+        else:
+            pages = [chunk(c) for c in chunks]
         feats = [f for p in pages for f in p]
-        ids = [f.get("id", (f.get("properties") or {}).get("OBJECTID")) for f in feats]
-        if None not in ids and len(set(ids)) != len(ids):
-            raise RuntimeError("duplicate features across pages")
     else:
-        feats = page_through(fetch, page)
-        n = count()
+        base["orderByFields"] = query.get("orderByFields", oid)
+        feats = page_through(lambda o, n: _get(url + "/query", dict(base, resultOffset=o, resultRecordCount=n)), page)
+        got = [(f.get("properties") or {}).get(oid, f.get("id")) for f in feats]
+        if None not in got and len(set(got)) != len(got):
+            raise RuntimeError(f"repeated features across pages: {len(got) - len(set(got))}")
+    n = _get(url + "/query", dict(sel, returnCountOnly="true", f="json")).get("count")
     if n is not None and n != len(feats):
         raise RuntimeError(f"incomplete download: {len(feats)} features of {n}")
+    if added:
+        for f in feats: (f.get("properties") or {}).pop(oid, None)
     return feats

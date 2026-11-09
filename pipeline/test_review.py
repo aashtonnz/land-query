@@ -135,6 +135,44 @@ def test_paging_continues_when_the_server_returns_fewer_than_asked_and_flags_it_
     assert len(page_through(server, 1000)) == 1234
 
 
+def fake_arcgis(n=4500, bad_last_page=False, ids_ok=True):
+    """A fake ArcGIS layer of n features for arcgis._get: lists ids, counts, and serves pages or id chunks. With
+    bad_last_page, the last offset page repeats an earlier page, as LINZ's service did (T-100)."""
+    def get(url, params, timeout=300, post=False):
+        if url.endswith("/0"): return dict(maxRecordCount=2000, objectIdField="OBJECTID")
+        if params.get("returnIdsOnly"):
+            if not ids_ok: raise RuntimeError("not supported")
+            return dict(objectIdFieldName="OBJECTID", objectIds=list(range(1, n + 1)))
+        if params.get("returnCountOnly"): return dict(count=n)
+        feat = lambda i: dict(type="Feature", geometry=None, properties=dict(OBJECTID=i, name=f"f{i}"))
+        if "objectIds" in params:
+            want = [int(x) for x in params["objectIds"].split(",")]
+            if bad_last_page and want[-1] == n: want = [w - 2000 for w in want]
+            return dict(features=[feat(i) for i in want])
+        o, k = params["resultOffset"], params["resultRecordCount"]
+        if bad_last_page and o + k >= n: o -= 2000
+        return dict(features=[feat(i) for i in range(o + 1, min(o + k, n) + 1)])
+    return get
+
+
+def test_downloads_refuse_a_page_of_repeats_that_a_count_check_would_pass(monkeypatch=None):
+    import arcgis
+    keep = arcgis._get
+    try:
+        for workers in (1, 4):
+            arcgis._get = fake_arcgis()
+            fs = arcgis.query_all("u/0", dict(where="1=1", outFields="name"), workers=workers)
+            assert [f["properties"] for f in fs[:1]] == [dict(name="f1")] and len({f["properties"]["name"] for f in fs}) == 4500
+            for ids_ok in (True, False):
+                arcgis._get = fake_arcgis(bad_last_page=True, ids_ok=ids_ok)
+                try: arcgis.query_all("u/0", dict(where="1=1", outFields="name"), workers=workers); raise AssertionError("accepted")
+                except RuntimeError as e: assert "repeated" in str(e) or "not the" in str(e), e
+        arcgis._get = fake_arcgis(ids_ok=False)
+        assert len(arcgis.query_all("u/0", dict(where="1=1", outFields="*"))) == 4500
+    finally:
+        arcgis._get = keep
+
+
 def test_heritage_point_just_outside_the_parcel_is_not_counted():
     from shapely.geometry import Point, box
     from overlays import points_on

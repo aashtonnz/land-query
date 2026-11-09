@@ -74,6 +74,12 @@ def test_elevation_columns_from_cells_and_for_a_parcel_too_small_for_a_cell():
     assert N.elevation_columns([parcel(big)], Z2, T, lid, acc, tr)[0]["ground_mean_m"] is None
 
 
+def test_repeated_records_are_kept_once_and_counted():
+    f = lambda k, v: dict(properties=dict(id=k, v=v))
+    out, rep, diff = N.once_each([f(1, "a"), f(2, "b"), f(1, "a"), f(2, "c"), f(None, "x"), f(None, "y")], "id")
+    assert [x["properties"]["v"] for x in out] == ["a", "b", "x", "y"] and rep == 2 and diff == 1
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

@@ -38,6 +38,7 @@ LAYERS = dict(
     addresses=("LINZ_NZ_Addresses", "address_id,full_address,address_number,suburb_locality,town_city,territorial_authority", 105689),
     coast=("LINZ_NZ_Coastline_Mean_High_Water_Springs", "id", None),            # LDS layer number to confirm
 )
+KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id")
 EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)"}
 TILE = 40000.0
 ORIGIN = (1000000.0, 4700000.0)
@@ -81,8 +82,25 @@ def fetch(layer, bbox, cache, where="1=1"):
         d = dict(features=feats, fetched=utc_now(), seconds=round(time.time() - t0, 1))
         os.makedirs(cache, exist_ok=True)
         json.dump(d, gzip.open(path + ".tmp", "wt")); os.replace(path + ".tmp", path)
-    return d["features"], dict(url=SVC + svc + "/FeatureServer/0", same_as=(LDS + str(lds)) if lds else None,
-                               features=len(d["features"]), fetched=d["fetched"], licence=LICENCE)
+    feats, repeats, differ = once_each(d["features"], KEYS[layer])
+    return feats, dict(url=SVC + svc + "/FeatureServer/0", same_as=(LDS + str(lds)) if lds else None,
+                       features=len(feats), repeated_records=repeats, repeated_with_other_values=differ,
+                       fetched=d["fetched"], licence=LICENCE)
+
+
+def once_each(feats, key):
+    """(features with one record per key, records dropped, of those how many had other attribute values). LINZ's
+    ArcGIS copies hold some parcels and buildings twice, with the same values and shapes differing by under 0.1 m²
+    (1,368 parcels in Wellington City; T-100); the first record is kept."""
+    seen, out, repeats, differ = {}, [], 0, 0
+    for f in feats:
+        k = f["properties"].get(key)
+        if k is None: out.append(f); continue
+        if k in seen:
+            repeats += 1; differ += seen[k]["properties"] != f["properties"]
+            continue
+        seen[k] = f; out.append(f)
+    return out, repeats, differ
 
 
 def geoms(feats):
