@@ -90,6 +90,38 @@ for name, obj in (("national-1.json", core), ("national-2.json", text)):
     size = os.path.getsize(pth) / 1e6
     assert size < 15, f"{name} is {size:.1f} MB, over the limit for a published file"
     print("wrote", pth, round(size, 1), "MB")
+# parcel shapes for the plan when zoomed in (all of Greater Wellington, councils included), as a compact binary
+# layout (base64-encoded below):
+# header (parcels, rings, vertices: uint32), ids (int32), ring vertex counts (uint32), each ring's first vertex in
+# half-metres (int32 x, y), rings per parcel (uint16), then each later vertex as a step from the one before (int16
+# x, y, half-metres). Shapes are simplified to 0.5 m; a step too long for int16 is split.
+import struct
+import numpy as np
+from shapely import wkb
+ids, rper, rlen, starts, steps = [], [], [], [], []
+for pid, b in duckdb.sql(f"SELECT parcel_id, geometry_wkb FROM '{nf}' ORDER BY parcel_id").fetchall():
+    g = wkb.loads(b).simplify(0.5, preserve_topology=True)
+    rings = [r for p in getattr(g, "geoms", [g]) for r in [p.exterior, *p.interiors]]
+    ids.append(pid); rper.append(len(rings))
+    for r in rings:
+        c = np.round(np.asarray(r.coords)[:-1] * 2).astype(np.int64)
+        pts = [c[0]]
+        for v in c[1:]:
+            d = v - pts[-1]; k = max(1, int(np.ceil(np.abs(d).max() / 32000)))
+            base = pts[-1]
+            for j in range(1, k + 1): pts.append(base + np.round(d * j / k).astype(np.int64))
+        pts = np.array(pts)
+        rlen.append(len(pts)); starts.append(pts[0]); steps.append(np.diff(pts, axis=0))
+st = np.concatenate([x for x in steps if len(x)]) if steps else np.zeros((0, 2))
+assert np.abs(st).max() <= 32767
+blob = (struct.pack("<3I", len(ids), len(rlen), int(sum(rlen))) + np.array(ids, "<i4").tobytes()
+        + np.array(rlen, "<u4").tobytes() + np.array(starts, "<i4").tobytes() + np.array(rper, "<u2").tobytes()
+        + (b"\0\0" if len(rper) % 2 else b"") + st.astype("<i2").tobytes())
+# published as base64 text: the page host serves text and images, not raw binary files
+import base64
+gp = os.path.join(outdir, "national-shapes.txt"); open(gp, "wb").write(base64.b64encode(blob))
+assert os.path.getsize(gp) < 15.5e6, f"shapes file is {os.path.getsize(gp)/1e6:.1f} MB, over the limit"
+print("wrote", gp, len(ids), "shapes", round(os.path.getsize(gp) / 1e6, 1), "MB")
 n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
 data["stats"]["n"] = dict(parcels=n_all, extra=len(q), median_ground=nmed,
                           run="national index pilot, built from " + open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
