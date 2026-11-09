@@ -100,8 +100,12 @@ def level_shape(g, p, tol):
     """The parcel at this level: simplified, or a square of its own area if too small to keep its shape."""
     if g is None or g.is_empty or math.sqrt(max(p.get("area_m2") or 0, 0)) < tol:
         return square(p["rep_x"], p["rep_y"], p.get("area_m2"))
-    s = g.simplify(tol, preserve_topology=True)
-    return s if not s.is_empty else square(p["rep_x"], p["rep_y"], p.get("area_m2"))
+    # simplifying a section not much wider than the tolerance can collapse it; then less is simplified, so every
+    # parcel keeps its area (within 10%) at every level
+    for t in (tol, tol / 4, tol / 16):
+        sg = g.simplify(t, preserve_topology=True)
+        if not sg.is_empty and abs(sg.area - g.area) <= 0.1 * g.area: return sg
+    return g
 
 
 def encode(items):
