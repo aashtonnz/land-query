@@ -73,8 +73,8 @@ const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; 
     if(tf == 1) x = sqrt(max(x, 0.)); else if(tf == 2) x = log(max(x, 1.)) / log(10.);
     float t = clamp((x-lo)/(hi-lo), 0., 1.);
     v = vec4(t < .5 ? mix(c0, c1, t*2.) : mix(c1, c2, (t-.5)*2.), 1.); }`, FS);
-const EDGE = prog(`in vec2 p; in float cc; uniform vec2 sc, of; uniform int filt; uniform vec4 col; out vec4 v;
-  void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = (filt >= 0 && int(cc+.5) != filt) ? vec4(0.) : col; }`, FS);
+const EDGE = prog(`in vec2 p; in float cc; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; out vec4 v;
+  void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.); v = (filt >= 0 && int(cc+.5) != filt) ? vec4(0.) : col; }`, FS);
 const LAND = prog(`in vec2 p; uniform vec2 sc, of; uniform vec4 col; out vec4 v; void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; }`, FS);
 const QUAD = prog(`uniform vec4 rect; uniform vec4 uvr; out vec2 uv;
   void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = mix(uvr.xy, uvr.zw, c); gl_Position = vec4(mix(rect.xy, rect.zw, c), 0., 1.); }`,
@@ -175,11 +175,16 @@ function renderTile(z, i, j){
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
   gl.uniform3fv(u.grey, hex(css('--rule'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
   for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
-  // boundaries one texel wide: crisp up close, fading naturally as the tile shrinks; none at the coarsest level
-  const texel = T / TEX, ea = lvl === 2 ? 0 : Math.min(.9, .9 / texel);
+  // boundaries: about 1.5 screen points thick up close (tiles are shown at about one texel per device pixel), full
+  // strength until a typical 15 m section is under 8 texels wide, fading out by 3; none at the coarsest level
+  const texel = T / TEX, secPx = 15 / texel, ea = lvl === 2 ? 0 : Math.max(0, Math.min(1, (secPx - 3) / 5));
+  const thick = secPx >= 8 ? Math.max(1, Math.round(1.5 * dpr)) : 1, offs = [];
+  for(let a=0; a<thick; a++) for(let c=0; c<thick; c++) offs.push([a*.75, c*.75]);
   if(ea > .03){ gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(EDGE.p); gl.uniform2fv(EDGE.u.sc, sc); gl.uniform2fv(EDGE.u.of, of); gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), ea);
-    for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); }
+    const t = 2 / TEX;   // one texel in clip units
+    for(const [dx, dy] of offs){ gl.uniform2f(EDGE.u.shift, dx*t, dy*t);
+      for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }
     gl.disable(gl.BLEND); }
   gl.bindVertexArray(null);
   const key = z+'/'+i+'/'+j; let t = tiles.get(key);
