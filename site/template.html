@@ -230,6 +230,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 <script>
 (function(){
 const D = JSON.parse(document.getElementById('data').textContent);
+document.getElementById('data').remove();   // its text is no longer needed once parsed
 // the national index pilot's extra fields (T-100); council rows simply lack them
 const F = D.fields.concat(['building_cover_pct','street','place','territorial_authority']), I = Object.fromEntries(F.map((f,i)=>[f,i]));
 const rows = D.rows; let N = rows.length;
@@ -260,7 +261,7 @@ function place(from){ for(let i=from;i<N;i++){const r=rows[i]; xs[i]=r[I.rep_x];
 place(0);
 function fit(){ const mx=(minx+maxx)/2, my=(miny+maxy)/2; view.cx=mx; view.cy=my;
   view.s = Math.min(W/(maxx-minx+2000), H/(maxy-miny+2000)); }
-function resize(){ const r=canvas.getBoundingClientRect(); dpr=window.devicePixelRatio||1; W=r.width; H=r.height;
+function resize(){ const r=canvas.getBoundingClientRect(); dpr=Math.min(2, window.devicePixelRatio||1);   // capped: a 3x phone screen needs 2.25x the memory per image W=r.width; H=r.height;
   canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr); snapView=null; if(!view.init){fit();view.init=true} draw(); }
 const sx = x => W/2 + (x-view.cx)*view.s, sy = y => H/2 - (y-view.cy)*view.s;
 
@@ -313,15 +314,16 @@ function loadShapes(buf){
   let o = 12; const ids = new Int32Array(buf,o,n); o += 4*n; const rlen = new Uint32Array(buf,o,nr); o += 4*nr;
   const st = new Int32Array(buf,o,2*nr); o += 8*nr; const rper = new Uint16Array(buf,o,n); o += 2*n; if(n%2) o += 2;
   const d = new Int16Array(buf,o,2*(nv-nr));
-  const X = new Float64Array(nv), Y = new Float64Array(nv), rs = new Uint32Array(nr+1);
-  for(let r=0,v=0,q=0;r<nr;r++){ rs[r]=v; let x=st[2*r], y=st[2*r+1]; X[v]=x/2; Y[v]=y/2; v++;
-    for(let k=1;k<rlen[r];k++){ x+=d[q++]; y+=d[q++]; X[v]=x/2; Y[v]=y/2; v++; } rs[r+1]=v; }
+  // vertices kept as whole half-metres (4 bytes each, exact), halved where used
+  const X = new Int32Array(nv), Y = new Int32Array(nv), rs = new Uint32Array(nr+1);
+  for(let r=0,v=0,q=0;r<nr;r++){ rs[r]=v; let x=st[2*r], y=st[2*r+1]; X[v]=x; Y[v]=y; v++;
+    for(let k=1;k<rlen[r];k++){ x+=d[q++]; y+=d[q++]; X[v]=x; Y[v]=y; v++; } rs[r+1]=v; }
   const at = new Map(); for(let i=0;i<N;i++) at.set(rows[i][I.unit_id], i);
   const ring0 = new Int32Array(N).fill(-1), nring = new Uint16Array(N), bb = new Float64Array(4*N), cls = new Uint8Array(N);
   for(let k=0,r=0;k<n;k++){ const i = at.get(ids[k]);
     if(i!==undefined){ ring0[i]=r; nring[i]=rper[k]; let a=Infinity,b=Infinity,c=-Infinity,e=-Infinity;
       for(let v=rs[r]; v<rs[r+rper[k]]; v++){ if(X[v]<a)a=X[v]; if(X[v]>c)c=X[v]; if(Y[v]<b)b=Y[v]; if(Y[v]>e)e=Y[v]; }
-      bb[4*i]=a; bb[4*i+1]=b; bb[4*i+2]=c; bb[4*i+3]=e; cls[i]=Math.max(0, Math.floor(Math.log2(Math.max(c-a, e-b, 1)))); }
+      a/=2; b/=2; c/=2; e/=2; bb[4*i]=a; bb[4*i+1]=b; bb[4*i+2]=c; bb[4*i+3]=e; cls[i]=Math.max(0, Math.floor(Math.log2(Math.max(c-a, e-b, 1)))); }
     r += rper[k]; }
   S = {X, Y, rs, ring0, nring, bb, cls};
 }
@@ -331,19 +333,23 @@ const asShape = c => Math.pow(2, c) * view.s >= SHAPE_PX;
 function inView(i, m){ const b=4*i, vx0=view.cx-W/2/view.s-m, vx1=view.cx+W/2/view.s+m, vy0=view.cy-H/2/view.s-m, vy1=view.cy+H/2/view.s+m;
   return !(S.bb[b]>vx1||S.bb[b+2]<vx0||S.bb[b+1]>vy1||S.bb[b+3]<vy0); }
 function ringsPath(path, i){ for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1];
-  path.moveTo(sx(S.X[a]),sy(S.Y[a])); for(let v=a+1; v<e; v++) path.lineTo(sx(S.X[v]),sy(S.Y[v])); path.closePath(); } }
+  path.moveTo(sx(S.X[a]/2),sy(S.Y[a]/2)); for(let v=a+1; v<e; v++) path.lineTo(sx(S.X[v]/2),sy(S.Y[v]/2)); path.closePath(); } }
 // Shapes are kept as paths in map coordinates, one per colour group and 2 km square, built the first time they are
 // on screen and reused while panning and zooming; only the squares in view are drawn.
 let tiles = null; const TILE_M = 2000; let ORX = 0, ORY = 0;
-function buildTiles(){ const m = new Map(); tiles = []; ORX = Math.floor(minx); ORY = Math.ceil(maxy);
+function buildTiles(){ const m = new Map(); tiles = []; cachedV = 0; ORX = Math.floor(minx); ORY = Math.ceil(maxy);
   groups.forEach((g,gi)=>{ for(const i of g.idx){ if(S.ring0[i]<0) continue; const b=4*i;
     const c = S.cls[i], key = gi+':'+c+':'+Math.floor(S.bb[b]/TILE_M)+':'+Math.floor(S.bb[b+1]/TILE_M); let t = m.get(key);
     if(!t){ t = {gi, c, ids:[], bb:[Infinity,Infinity,-Infinity,-Infinity], path:null}; m.set(key,t); tiles.push(t); }
     t.ids.push(i); t.bb[0]=Math.min(t.bb[0],S.bb[b]); t.bb[1]=Math.min(t.bb[1],S.bb[b+1]); t.bb[2]=Math.max(t.bb[2],S.bb[b+2]); t.bb[3]=Math.max(t.bb[3],S.bb[b+3]); } }); }
-function tilePath(t){ if(t.path) return t.path; const p = new Path2D();
-  for(const i of t.ids) for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1];
-    p.moveTo(S.X[a]-ORX, ORY-S.Y[a]); for(let v=a+1; v<e; v++) p.lineTo(S.X[v]-ORX, ORY-S.Y[v]); p.closePath(); }
-  return t.path = p; }
+// cached paths are capped at PATH_BUDGET vertices; past that, paths not drawn in the latest frame are dropped
+const PATH_BUDGET = 400000; let cachedV = 0, frameNo = 0;
+function tilePath(t){ t.used = frameNo; if(t.path) return t.path; const p = new Path2D(); let nv = 0;
+  for(const i of t.ids) for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1]; nv += e-a;
+    p.moveTo(S.X[a]/2-ORX, ORY-S.Y[a]/2); for(let v=a+1; v<e; v++) p.lineTo(S.X[v]/2-ORX, ORY-S.Y[v]/2); p.closePath(); }
+  t.nv = nv; cachedV += nv; return t.path = p; }
+function trimPaths(){ if(cachedV <= PATH_BUDGET) return;
+  for(const t of tiles) if(t.path && t.used !== frameNo){ t.path = null; cachedV -= t.nv; } }
 // While the plan is being dragged or zoomed, the last full drawing of the shapes is moved and scaled to follow;
 // the shapes are drawn in full again once it stops (QUIET_MS later).
 const snap = document.createElement('canvas'), sctx = snap.getContext('2d'); let snapView = null, quick = false, quietTimer = 0;
@@ -362,19 +368,20 @@ function drawShapes(ctx){
   if(!tiles) buildTiles();
   const k = view.s, vx0=view.cx-W/2/k, vx1=view.cx+W/2/k, vy0=view.cy-H/2/k, vy1=view.cy+H/2/k;
   ctx.setTransform(dpr*k, 0, 0, dpr*k, dpr*(W/2-(view.cx-ORX)*k), dpr*(H/2-(ORY-view.cy)*k));
-  ctx.lineWidth = Math.max(0.3, Math.min(1, k*4))/k; ctx.strokeStyle = css('--sheet');
+  ctx.lineWidth = Math.max(0.3, Math.min(1, k*4))/k; ctx.strokeStyle = css('--sheet'); frameNo++;
   for(const t of tiles){ if(!asShape(t.c) || t.bb[0]>vx1||t.bb[2]<vx0||t.bb[1]>vy1||t.bb[3]<vy0) continue;
     const p = tilePath(t); ctx.fillStyle = groups[t.gi].colour; ctx.fill(p, 'evenodd'); ctx.stroke(p); }
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.setTransform(dpr,0,0,dpr,0,0); trimPaths();
 }
 function inside(i, wx, wy){ let c = false;
   for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1];
-    for(let v=a, w=e-1; v<e; w=v++){ const xi=S.X[v], yi=S.Y[v], xj=S.X[w], yj=S.Y[w];
+    for(let v=a, w=e-1; v<e; w=v++){ const xi=S.X[v]/2, yi=S.Y[v]/2, xj=S.X[w]/2, yj=S.Y[w]/2;
       if(((yi>wy)!==(yj>wy)) && (wx < (xj-xi)*(wy-yi)/(yj-yi)+xi)) c = !c; } }
   return c; }
 let pending = false;
 function draw(){ if(pending) return; pending = true; requestAnimationFrame(()=>{ pending = false; render(); }); }
 function render(){
+  if(!(W > 0 && H > 0)) return;   // not laid out yet
   if(!groups) buildGroups();
   ctx.setTransform(dpr,0,0,dpr,0,0); ctx.fillStyle=css('--sheet'); ctx.fillRect(0,0,W,H);
   // 5 km grid, as on a survey sheet
@@ -383,11 +390,11 @@ function render(){
   for(let x=x0;x<view.cx+W/2/view.s;x+=step){const X=sx(x); ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke(); if(view.s*step>60) ctx.fillText((x/1000).toFixed(0)+' kE',X+3,H-4);}
   for(let y=y0;y<view.cy+H/2/view.s;y+=step){const Y=sy(y); ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke(); if(view.s*step>60) ctx.fillText((y/1000).toFixed(0)+' kN',3,Y-3);}
   const poly = shown(); if(poly) shapesLayer();
-  const BW = canvas.width, BH = canvas.height;
+  const BW = Math.max(1, Math.round(W)), BH = Math.max(1, Math.round(H));   // dots at screen points, not device pixels
   if(!img || img.width!==BW || img.height!==BH){ dots.width=BW; dots.height=BH; img = dctx.createImageData(BW, BH); pix = new Uint32Array(img.data.buffer); }
   pix.fill(0);
-  const r = Math.max(1, Math.round(Math.max(1.2, Math.min(5, view.s*25))*dpr)), h = r>>1;
-  const ox = (W/2 - view.cx*view.s)*dpr, oy = (H/2 + view.cy*view.s)*dpr, k = view.s*dpr;
+  const r = Math.max(1, Math.round(Math.max(1.2, Math.min(5, view.s*25)))), h = r>>1;
+  const ox = W/2 - view.cx*view.s, oy = H/2 + view.cy*view.s, k = view.s;
   for(const g of groups){ const c = g.rgba, ix = g.idx;
     for(let n=0;n<ix.length;n++){ const i = ix[n]; if(poly && S.ring0[i]>=0 && asShape(S.cls[i])) continue;
       const X = Math.round(ox + xs[i]*k) - h, Y = Math.round(oy - ys[i]*k) - h;
@@ -395,7 +402,7 @@ function render(){
       const x0 = X<0?0:X, x1 = X+r>BW?BW:X+r, y1 = Y+r>BH?BH:Y+r;
       for(let y = Y<0?0:Y; y<y1; y++){ const row = y*BW; for(let x=x0; x<x1; x++) pix[row+x] = c; } } }
   dctx.putImageData(img, 0, 0);
-  ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(dots, 0, 0); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.imageSmoothingEnabled = false; ctx.drawImage(dots, 0, 0, W, H); ctx.imageSmoothingEnabled = true;
   if(selected>=0){ ctx.strokeStyle=css('--mark'); ctx.lineWidth=2.5;
     if(poly && S.ring0[selected]>=0 && asShape(S.cls[selected])){ const path=new Path2D(); ringsPath(path, selected); ctx.stroke(path); }
     else { const X=sx(xs[selected]),Y=sy(ys[selected]); ctx.beginPath(); ctx.arc(X,Y,9,0,Math.PI*2); ctx.stroke(); } }
@@ -489,7 +496,10 @@ fetch('national-1.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r
   N = rows.length; place(from); groups = null; if(!touched){ fit(); } draw();
   ns.textContent = `Showing ${fmt(N)} parcels. Loading names and addresses for search…`;
   fetch('national-shapes.txt').then(r=>{ if(!r.ok) throw new Error(r.status); return r.text(); })
-    .then(t=>{ const bin = atob(t.trim()), u = new Uint8Array(bin.length); for(let j=0;j<bin.length;j++) u[j] = bin.charCodeAt(j); return u.buffer; })
+    .then(t=>{ t = t.trim(); if(Uint8Array.fromBase64) return Uint8Array.fromBase64(t).buffer;
+      const pad = t.endsWith('==') ? 2 : t.endsWith('=') ? 1 : 0, u = new Uint8Array(t.length/4*3 - pad), C = 1<<20;   // 1 MB of text at a time
+      for(let o=0, w=0; o<t.length; o+=C){ const bin = atob(t.slice(o, o+C)); for(let j=0;j<bin.length;j++) u[w++] = bin.charCodeAt(j); }
+      return u.buffer; })
     .then(b=>{ loadShapes(b); tiles = null; draw(); hint = ' Parcels too small to see at this zoom show as dots.'; ns.textContent += hint; })
     .catch(()=>{});
   return fetch('national-2.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(t=>{
