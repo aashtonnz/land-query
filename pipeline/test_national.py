@@ -212,12 +212,14 @@ def test_the_cache_key_includes_the_fetch_detail_and_the_window():
 
 
 def test_an_islet_missing_from_the_land_outline_is_unknown_not_sea():
-    """T-119: mainland outline in the window, an islet 500 m offshore that the outline leaves out."""
-    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(800, 800, 820, 820), dict(id=2, parcel_intent="DCDB")),
-                                 (box(330, 100, 360, 130), dict(id=3, parcel_intent="DCDB"))],
-                     "land": [(box(0, 0, 300, 300).union(box(0, 0, 1000, 50)).union(box(950, 0, 1000, 1000)), dict(id=1))]})   # an L: the islet is inside its box
+    """T-119: the islet lies inside the land outline's bounding box (as one does inside the North Island's) but far
+    from the land itself; the outline is an L whose arms stay inside the tile's window."""
+    land = box(70, 70, 300, 300).union(box(70, 70, 850, 120)).union(box(800, 70, 850, 850))
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(600, 600, 620, 620), dict(id=2, parcel_intent="DCDB")),
+                                 (box(330, 150, 360, 180), dict(id=3, parcel_intent="DCDB")), (box(840, 840, 850, 850), dict(id=4, parcel_intent="DCDB"))],
+                     "land": [(land, dict(id=1))]})
     assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] is None
-    assert rows[3]["water_pct"] == 100                                       # 30 m offshore, outline near: measured as sea
+    assert rows[3]["water_pct"] == 100                                       # 30 m offshore, land near: measured as sea
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():
