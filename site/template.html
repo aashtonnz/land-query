@@ -303,9 +303,11 @@ function legend(){ const L=document.getElementById('legend');
   const s=SCALES[mode]; const g=[0,.25,.5,.75,1].map(ramp).join(',');
   L.innerHTML=`<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div style="color:var(--muted)">Grey: no value</div>`; }
 
-// parcel shapes (national-shapes.txt, base64, from the national index): drawn instead of dots once zoomed in to street level
+// parcel shapes (national-shapes.txt, base64, from the national index): at any zoom, a parcel big enough to see is drawn
+// as its shape and a smaller one as a dot. Parcels are sorted into size classes (by their larger side, in powers of 2 m)
+// so the shapes for a zoom can be picked without measuring each parcel.
 let S = null;
-const SHAPE_SCALE = 0.3;    // pixels per metre at which shapes replace dots (a 20 m section is 6 px wide)
+const SHAPE_PX = 4;         // a parcel is drawn as a shape once its larger side is at least this many pixels
 function loadShapes(buf){
   const dv = new DataView(buf), n = dv.getUint32(0,true), nr = dv.getUint32(4,true), nv = dv.getUint32(8,true);
   let o = 12; const ids = new Int32Array(buf,o,n); o += 4*n; const rlen = new Uint32Array(buf,o,nr); o += 4*nr;
@@ -315,15 +317,17 @@ function loadShapes(buf){
   for(let r=0,v=0,q=0;r<nr;r++){ rs[r]=v; let x=st[2*r], y=st[2*r+1]; X[v]=x/2; Y[v]=y/2; v++;
     for(let k=1;k<rlen[r];k++){ x+=d[q++]; y+=d[q++]; X[v]=x/2; Y[v]=y/2; v++; } rs[r+1]=v; }
   const at = new Map(); for(let i=0;i<N;i++) at.set(rows[i][I.unit_id], i);
-  const ring0 = new Int32Array(N).fill(-1), nring = new Uint16Array(N), bb = new Float64Array(4*N);
+  const ring0 = new Int32Array(N).fill(-1), nring = new Uint16Array(N), bb = new Float64Array(4*N), cls = new Uint8Array(N);
   for(let k=0,r=0;k<n;k++){ const i = at.get(ids[k]);
     if(i!==undefined){ ring0[i]=r; nring[i]=rper[k]; let a=Infinity,b=Infinity,c=-Infinity,e=-Infinity;
       for(let v=rs[r]; v<rs[r+rper[k]]; v++){ if(X[v]<a)a=X[v]; if(X[v]>c)c=X[v]; if(Y[v]<b)b=Y[v]; if(Y[v]>e)e=Y[v]; }
-      bb[4*i]=a; bb[4*i+1]=b; bb[4*i+2]=c; bb[4*i+3]=e; }
+      bb[4*i]=a; bb[4*i+1]=b; bb[4*i+2]=c; bb[4*i+3]=e; cls[i]=Math.max(0, Math.floor(Math.log2(Math.max(c-a, e-b, 1)))); }
     r += rper[k]; }
-  S = {X, Y, rs, ring0, nring, bb};
+  S = {X, Y, rs, ring0, nring, bb, cls};
 }
-const shown = () => S && view.s >= SHAPE_SCALE;
+const shown = () => !!S;
+// whether parcels of size class c are shapes at the current zoom (the smallest of the class must reach SHAPE_PX)
+const asShape = c => Math.pow(2, c) * view.s >= SHAPE_PX;
 function inView(i, m){ const b=4*i, vx0=view.cx-W/2/view.s-m, vx1=view.cx+W/2/view.s+m, vy0=view.cy-H/2/view.s-m, vy1=view.cy+H/2/view.s+m;
   return !(S.bb[b]>vx1||S.bb[b+2]<vx0||S.bb[b+1]>vy1||S.bb[b+3]<vy0); }
 function ringsPath(path, i){ for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1];
@@ -333,8 +337,8 @@ function ringsPath(path, i){ for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++)
 let tiles = null; const TILE_M = 2000; let ORX = 0, ORY = 0;
 function buildTiles(){ const m = new Map(); tiles = []; ORX = Math.floor(minx); ORY = Math.ceil(maxy);
   groups.forEach((g,gi)=>{ for(const i of g.idx){ if(S.ring0[i]<0) continue; const b=4*i;
-    const key = gi+':'+Math.floor(S.bb[b]/TILE_M)+':'+Math.floor(S.bb[b+1]/TILE_M); let t = m.get(key);
-    if(!t){ t = {gi, ids:[], bb:[Infinity,Infinity,-Infinity,-Infinity], path:null}; m.set(key,t); tiles.push(t); }
+    const c = S.cls[i], key = gi+':'+c+':'+Math.floor(S.bb[b]/TILE_M)+':'+Math.floor(S.bb[b+1]/TILE_M); let t = m.get(key);
+    if(!t){ t = {gi, c, ids:[], bb:[Infinity,Infinity,-Infinity,-Infinity], path:null}; m.set(key,t); tiles.push(t); }
     t.ids.push(i); t.bb[0]=Math.min(t.bb[0],S.bb[b]); t.bb[1]=Math.min(t.bb[1],S.bb[b+1]); t.bb[2]=Math.max(t.bb[2],S.bb[b+2]); t.bb[3]=Math.max(t.bb[3],S.bb[b+3]); } }); }
 function tilePath(t){ if(t.path) return t.path; const p = new Path2D();
   for(const i of t.ids) for(let r=S.ring0[i]; r<S.ring0[i]+S.nring[i]; r++){ const a=S.rs[r], e=S.rs[r+1];
@@ -358,8 +362,8 @@ function drawShapes(ctx){
   if(!tiles) buildTiles();
   const k = view.s, vx0=view.cx-W/2/k, vx1=view.cx+W/2/k, vy0=view.cy-H/2/k, vy1=view.cy+H/2/k;
   ctx.setTransform(dpr*k, 0, 0, dpr*k, dpr*(W/2-(view.cx-ORX)*k), dpr*(H/2-(ORY-view.cy)*k));
-  ctx.lineWidth = 1/k; ctx.strokeStyle = css('--sheet');
-  for(const t of tiles){ if(t.bb[0]>vx1||t.bb[2]<vx0||t.bb[1]>vy1||t.bb[3]<vy0) continue;
+  ctx.lineWidth = Math.max(0.3, Math.min(1, k*4))/k; ctx.strokeStyle = css('--sheet');
+  for(const t of tiles){ if(!asShape(t.c) || t.bb[0]>vx1||t.bb[2]<vx0||t.bb[1]>vy1||t.bb[3]<vy0) continue;
     const p = tilePath(t); ctx.fillStyle = groups[t.gi].colour; ctx.fill(p, 'evenodd'); ctx.stroke(p); }
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
@@ -385,7 +389,7 @@ function render(){
   const r = Math.max(1, Math.round(Math.max(1.2, Math.min(5, view.s*25))*dpr)), h = r>>1;
   const ox = (W/2 - view.cx*view.s)*dpr, oy = (H/2 + view.cy*view.s)*dpr, k = view.s*dpr;
   for(const g of groups){ const c = g.rgba, ix = g.idx;
-    for(let n=0;n<ix.length;n++){ const i = ix[n]; if(poly && S.ring0[i]>=0) continue;
+    for(let n=0;n<ix.length;n++){ const i = ix[n]; if(poly && S.ring0[i]>=0 && asShape(S.cls[i])) continue;
       const X = Math.round(ox + xs[i]*k) - h, Y = Math.round(oy - ys[i]*k) - h;
       if(X < -r || Y < -r || X >= BW || Y >= BH) continue;
       const x0 = X<0?0:X, x1 = X+r>BW?BW:X+r, y1 = Y+r>BH?BH:Y+r;
@@ -393,7 +397,7 @@ function render(){
   dctx.putImageData(img, 0, 0);
   ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(dots, 0, 0); ctx.setTransform(dpr,0,0,dpr,0,0);
   if(selected>=0){ ctx.strokeStyle=css('--mark'); ctx.lineWidth=2.5;
-    if(poly && S.ring0[selected]>=0){ const path=new Path2D(); ringsPath(path, selected); ctx.stroke(path); }
+    if(poly && S.ring0[selected]>=0 && asShape(S.cls[selected])){ const path=new Path2D(); ringsPath(path, selected); ctx.stroke(path); }
     else { const X=sx(xs[selected]),Y=sy(ys[selected]); ctx.beginPath(); ctx.arc(X,Y,9,0,Math.PI*2); ctx.stroke(); } }
   // scale bar
   const m=niceLen(120/view.s), px=m*view.s; ctx.fillStyle=css('--ink'); ctx.fillRect(W-px-14,14,px,3);
@@ -433,7 +437,7 @@ function select(i, zoom){ selected=i; const r=rows[i];
   draw(); }
 function nearest(px,py){
   if(shown()){ const wx=view.cx+(px-W/2)/view.s, wy=view.cy-(py-H/2)/view.s;
-    for(let i=0;i<N;i++){ if(S.ring0[i]<0 || (filter!=='all'&&rows[i][I.c]!==filter)) continue; const b=4*i;
+    for(let i=0;i<N;i++){ if(S.ring0[i]<0 || !asShape(S.cls[i]) || (filter!=='all'&&rows[i][I.c]!==filter)) continue; const b=4*i;
       if(wx<S.bb[b]||wx>S.bb[b+2]||wy<S.bb[b+1]||wy>S.bb[b+3]) continue; if(inside(i,wx,wy)) return i; } }
   let best=-1,bd=144; for(let i=0;i<N;i++){ const c=rows[i][I.c]; if(filter!=='all'&&c!==filter) continue;
   const dx=sx(xs[i])-px, dy=sy(ys[i])-py, d=dx*dx+dy*dy; if(d<bd){bd=d;best=i} } return best; }
@@ -486,7 +490,7 @@ fetch('national-1.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r
   ns.textContent = `Showing ${fmt(N)} parcels. Loading names and addresses for search…`;
   fetch('national-shapes.txt').then(r=>{ if(!r.ok) throw new Error(r.status); return r.text(); })
     .then(t=>{ const bin = atob(t.trim()), u = new Uint8Array(bin.length); for(let j=0;j<bin.length;j++) u[j] = bin.charCodeAt(j); return u.buffer; })
-    .then(b=>{ loadShapes(b); tiles = null; draw(); hint = ' Zoom in to street level to see parcel boundaries.'; ns.textContent += hint; })
+    .then(b=>{ loadShapes(b); tiles = null; draw(); hint = ' Parcels too small to see at this zoom show as dots.'; ns.textContent += hint; })
     .catch(()=>{});
   return fetch('national-2.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(t=>{
     const pl = decode(t.place);
