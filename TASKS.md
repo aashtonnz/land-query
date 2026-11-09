@@ -19,7 +19,6 @@ Standing priorities:
 - T-102: Build the national index out to the whole country, monthly: about 6–7 hours of work, so on GitHub split over several jobs (about US$3 a run, estimate from T-100); the index (about 400 MB) as a release file. Needs a national district boundary source, and easements from the LINZ Data Service with the key. Raised 2026-11-09.
 - T-106: Before the project is announced anywhere (D-24): rebuild the results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) without `titles` and `title_types`, history included, and make every build publish only public-mode columns. Ask the owner before rewriting the branches. Raised 2026-11-09.
 - T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
-- T-124: Ninth fresh-eyes review, of T-123. Raised 2026-11-09.
 - T-110: Parcel-report findings left open by the sixteenth and seventeenth reviews: sun and horizon next to a surface-model gap; warn where ground and surface surveys differ; tall structures without outlines read as open ground; the 10 m catchment against the Kāpiti build; title references in report.json; page limits (500 m horizon, 300 m shadows); addresses over several parcels. [Review](docs/findings/2026-11-09-national-review.md) Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
 - T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
@@ -39,6 +38,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-124: Twenty-fourth fresh-eyes review: no serious findings, so the cycle ends; moderate points fixed in T-125 (one rule for unconfirmed sea; thresholds pinned by tests). [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-122: Twenty-third fresh-eyes review: the height check let rocks read as sea (the grid holds a flat sea surface); fixed in T-123: half or more outside the land outline reads unknown. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-120: Twenty-second fresh-eyes review: rocks near the shore still read as sea; fixed in T-121 (open-sea parcels read as water only where the heights are low), with tighter retry and map tests. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-118: Twenty-first fresh-eyes review: islets missing from the land outline read as sea (national scale); fixed in T-119 per parcel, with behavioural tests for the cache and the map's sea step. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.

@@ -212,22 +212,24 @@ def test_the_cache_key_includes_the_fetch_detail_and_the_window():
     assert calls == [5, 50, 50], calls
 
 
-def test_a_parcel_the_outline_puts_mostly_in_the_sea_is_unknown_whatever_the_heights():
-    """T-123: LINZ's outline leaves out rocks and islets, right by the shore as well as far out, and the elevation grid
-    holds a flat sea surface there, so neither can tell a rock from the sea. Half or more outside the outline is unknown,
-    unless lakes or rivers cover most of it; under half is measured."""
+def test_a_parcel_half_or_more_in_unconfirmed_sea_is_unknown_whatever_the_heights():
+    """T-123, T-125: LINZ's outline leaves out rocks and islets, right by the shore as well as far out, and the elevation
+    grid holds a flat sea surface there, so neither can tell a rock from the sea. Sea that no lake or river covers, on
+    half the parcel or more, means unknown; under half is measured."""
     land = box(-500, -500, 300, 1500)                                       # sea east of x = 300
     Z = np.full((140, 140), -0.6, np.float32)                               # the sea surface, low everywhere
     P = lambda i: dict(id=i, parcel_intent="DCDB")
     rows = run_tile({"parcels": [(box(310, 110, 340, 140), P(1)),            # a rock 10 m off the outline, low "heights"
-                                 (box(270, 200, 330, 260), P(2)),            # exactly half outside
-                                 (box(260, 300, 320, 360), P(3)),            # a third outside: measured
-                                 (box(600, 600, 700, 700), P(4)),            # wholly outside but mostly under a river mouth
-                                 (box(240, 400, 300, 460), P(5))],           # wholly inside
-                     "rivers": [(box(600, 600, 670, 700), dict())],
+                                 (box(250, 200, 350, 300), P(2)),            # exactly half outside
+                                 (box(247, 320, 347, 420), P(3)),            # 47% outside: measured
+                                 (box(600, 600, 700, 700), P(4)),            # wholly outside, a river mouth over 55%
+                                 (box(600, 800, 700, 900), P(5)),            # wholly outside, a river over 45%
+                                 (box(240, 700, 400, 780), P(6)),           # 62.5% outside, a river over the sea part of 25 of it
+                                 (box(240, 450, 300, 510), P(7))],           # wholly inside
+                     "rivers": [(box(600, 600, 655, 700), dict()), (box(600, 800, 645, 900), dict()), (box(375, 700, 400, 780), dict())],
                      "land": [(land, dict(id=1))]}, Z=Z)
-    assert rows[1]["water_pct"] is None and rows[2]["water_pct"] is None
-    assert rows[3]["water_pct"] == 33.3 and rows[4]["water_pct"] == 100 and rows[5]["water_pct"] == 0
+    assert rows[1]["water_pct"] is None and rows[2]["water_pct"] is None and rows[5]["water_pct"] is None
+    assert rows[3]["water_pct"] == 47 and rows[4]["water_pct"] == 100 and rows[6]["water_pct"] == 62.5 and rows[7]["water_pct"] == 0
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():

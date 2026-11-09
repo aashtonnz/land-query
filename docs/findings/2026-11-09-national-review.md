@@ -185,7 +185,22 @@ leaves out.
 | 1 | The height check does not work: offshore, the elevation grid holds the sea as a flat surface near −0.6 m, so a rock blended into it reads "low" and stays sea. Five Kapiti reef parts still read 98 to 100% water, two more were under the 99% cut; 3 m is also above high water (about +0.8 m), so a dry rock could pass | Serious | Heights are no longer used. Half or more of the parcel outside the outline means water unknown, unless lakes or rivers cover most of it. Under half is measured. True seabed parcels (marinas) become unknown too: the outline cannot tell them from rocks |
 | 2 | The 99% cut left a parcel with no heights at 98.1% | Moderate | Covered by the half rule |
 | 3 | "Highest ground known" held when heights covered 11% of the parcel | Moderate | Heights no longer used |
-| 4 | Tests did not pin the lake/river exception, the cut, or max against min/mean | Serious (tests) | New test: a rock with low "heights", exactly half outside, a third outside, wholly outside under a river mouth, wholly inside. Each threshold and the exception checked by changing it |
+| 4 | Tests did not pin the lake/river exception, the cut, or max against min/mean | Serious (tests) | New test: a rock with low "heights", exactly half outside, a third outside, wholly outside under a river mouth, wholly inside. The exception was not pinned (review 24) |
 | 5 | The docs overstated the rule | Minor | `SOURCES.md` rewritten |
 | 6 | The map shaded the remaining reef parts as sea | Follows from 1 | Unknown water draws no sea |
+
+## Twenty-fourth review: T-123 (T-124)
+
+No serious findings.
+
+| # | Finding | Seriousness | Fix (T-125) |
+| --- | --- | --- | --- |
+| 1 | The lake/river exception let up to half the parcel be sea no lake or river covers (Hutt River mouth, Porirua inlet: 14 parcels, probably tidal flats) | Moderate | One rule instead of a rule and an exception: sea that no lake or river covers, on half the parcel or more, means unknown |
+| 2 | The test pinned neither threshold; changing either to another value passed | Moderate | Test parcels at 47% and 50% sea, rivers over 45% and 55%, and sea partly under a river; 0.45, 0.55, `>` and the old rule each fail it |
+| 3 | A rock reaching just inside the outline reads part water (Kapiti reef parts at 29 to 39%) | Minor | Stated in `SOURCES.md`; no source can tell |
+| 4 | "Most" in the docs where the code meant "half or more" | Minor | Reworded |
+| 5 | The map handles unknown water correctly | Checked | — |
+
+Rounds 16 to 24 found 4, 3, 3, 3, 2, 1, 1, 1 and 0 serious faults. With a round that found none, the review cycle on
+the national index ends here, as the practice says.
 

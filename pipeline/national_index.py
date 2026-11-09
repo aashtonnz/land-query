@@ -171,8 +171,8 @@ def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
 def water_shares(parcels, water, land):
     """Share (%) of each parcel under water, measured by area: the union of lake and river polygons and the sea, which
     is everything outside the land outline. A part both lake and sea counts once; no elevation grid is involved, so
-    missing elevation data can never read as water (T-115). Unknown (None) where the outline alone puts half the parcel
-    or more in the sea: LINZ's 1:50,000 outline leaves out many islets and rocks, near the shore as well as far out
+    missing elevation data can never read as water (T-115). Unknown (None) where half the parcel or more is sea that no
+    lake or river polygon covers: LINZ's 1:50,000 outline leaves out many islets and rocks, near the shore as well as far out
     (Kapiti Island's reefs, Tarahiki Island, the Snares), and neither it nor the elevation grid, which holds a flat sea
     surface offshore, can tell such a rock from the sea (T-121, T-123)."""
     wt = STRtree([g for g, _ in water]) if water else None
@@ -183,7 +183,8 @@ def water_shares(parcels, water, land):
         on_land = unary_union([land[i][0] for i in lt.query(g)]) if lt is not None else None
         sea = g.difference(on_land) if on_land is not None and not on_land.is_empty else g
         wet = unary_union([g.intersection(water[i][0]) for i in wt.query(g)]) if wt is not None else None
-        if sea.area >= 0.5 * g.area and (wet is None or wet.area < 0.5 * g.area): out.append(None); continue
+        unproven = sea.difference(wet) if wet is not None and not wet.is_empty else sea   # sea no lake or river confirms
+        if unproven.area >= 0.5 * g.area: out.append(None); continue
         allw = unary_union([sea] + ([wet] if wet is not None else []))
         out.append(round(min(100.0, 100 * allw.area / g.area), 1))
     return out
