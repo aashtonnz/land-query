@@ -44,7 +44,7 @@ def test_vector_columns_measure_buildings_addresses_frontage_titles_and_coast():
     assert r["building_count"] == 1 and r["building_m2"] == 125 and r["largest_building_m2"] == 100
     assert r["building_cover_pct"] == round(100 * 125 / 600, 1) and r["buildings_captured_to"] == "2023-11-14"
     assert r["address_count"] == 2 and r["address"] == "1 A St" and r["territorial_authority"] == "X District"
-    assert 19.8 <= r["road_frontage_m"] <= 20.4                        # the south side only, not the ends of the sides (T-108)
+    assert 20 <= r["road_frontage_m"] <= 22                            # no neighbours given: up to 1 m up each side counts
     assert r["title_count"] == 3 and r["title_types"] == "Cross lease, Freehold" and r["titles_not_found"] == 1
     assert r["coast_distance_m"] == 500 and r["coast_over_10km"] is False
     far = N.vector_columns([p], [], {}, [], [], [(LineString([(0, -20000), (1, -20000)]), {})])[0]
@@ -103,21 +103,56 @@ def test_report_page_shows_missing_values_as_not_known_and_never_zero():
     assert "No LiDAR survey covers this parcel" in h
 
 
-def test_a_gap_in_a_lidar_sheet_is_no_data_not_a_height(tmp=None):
-    """T-107: a boundless windowed read (as fetch_lidar's read_window does) returns the file's -9999 as a value."""
+def test_a_gap_in_a_lidar_sheet_is_no_data_not_a_height():
+    """T-107: the read the report uses (lidar_catalogue.read_sheets) never returns a sheet's -9999 as a height, and the
+    second sheet fills only where the first has no data."""
     import tempfile, rasterio
-    from rasterio.windows import from_bounds
+    from lidar_catalogue import read_sheets
+    d = tempfile.mkdtemp(); paths = []
+    for k, (lo, val) in enumerate([(0, 5.0), (10, 7.0)]):
+        a = np.full((20, 20), -9999, np.float32); a[:, lo:lo + 10] = val
+        p = os.path.join(d, f"s{k}.tif"); paths.append(p)
+        with rasterio.open(p, "w", driver="GTiff", height=20, width=20, count=1, dtype="float32", crs="EPSG:2193",
+                           transform=from_origin(0, 20, 1, 1), nodata=-9999) as f: f.write(a, 1)
+    out = read_sheets(paths, (-5, 0, 25, 20))
+    assert np.nanmin(out) == 5.0 and np.isnan(out[:, :5]).all() and np.isnan(out[:, 25:]).all()
+    assert (out[:, 5:15] == 5.0).all() and (out[:, 15:25] == 7.0).all()
+
+
+def test_a_real_low_height_is_kept():
     from lidar_catalogue import no_data_to_nan
-    path = os.path.join(tempfile.mkdtemp(), "sheet.tif")
-    a = np.full((20, 20), -9999, np.float32); a[:, :10] = 5.0
-    with rasterio.open(path, "w", driver="GTiff", height=20, width=20, count=1, dtype="float32", crs="EPSG:2193",
-                       transform=from_origin(0, 20, 1, 1), nodata=-9999) as d: d.write(a, 1)
-    with rasterio.open(path) as src:
-        part = src.read(1, window=from_bounds(-5, 0, 15, 20, src.transform), out_shape=(20, 20), boundless=True,
-                        fill_value=np.nan, masked=True).filled(np.nan).astype(np.float32)
-        out = no_data_to_nan(part, src.nodata)
-    assert np.nanmin(out) == 5.0 and np.isnan(out[:, 15:]).all() and np.isnan(out[:, :5]).all()
-    assert not np.isnan(out[:, 5:15]).all()
+    assert no_data_to_nan(np.array([-101.5, -9999.0], np.float32), None)[0] == np.float32(-101.5)   # Martha pit, Waihi
+
+
+def test_surface_model_rule_empties_only_below_99_pct():
+    import overlays as ov
+    r = {c: 1.0 for c in ov.DSM_COLUMNS}; r["ground_mean_m"] = 5.0
+    assert ov.empty_without_dsm(dict(r), 99.5) == r
+    e = ov.empty_without_dsm(dict(r), 98.0)
+    assert all(e[c] is None for c in ov.DSM_COLUMNS) and e["ground_mean_m"] == 5.0
+
+
+def test_frontage_counts_a_road_set_slightly_off_the_line_but_not_the_side_boundaries():
+    g = box(0, 0, 20, 30)
+    left, right = box(-20, 0, 0, 30), box(20, 0, 40, 30)
+    road = box(-50, -20, 70, -0.25)                                     # 0.25 m off the lot line, as LINZ roads often are
+    r = N.vector_columns([parcel(g, id=1)], [(road, {})], {}, [], [], [], neighbours=[(g, dict(id=1)), (left, dict(id=2)), (right, dict(id=3))])[0]
+    assert 19.6 <= r["road_frontage_m"] <= 20.0, r["road_frontage_m"]
+
+
+def test_titled_and_railway_land_named_as_a_bed_is_kept():
+    f = lambda i, intent, titles: dict(geometry=box(10, 10 + i, 11, 11 + i).__geo_interface__,
+                                       properties=dict(id=i, parcel_intent=intent, appellation="Part Bed Port Nicholson SO 31787", titles=titles))
+    kept = {p["id"] for _, p, _ in N.select_parcels([f(1, "DCDB", None), f(2, "DCDB", "WN43D/858"), f(3, "Railway", None)], (0, 0, 100, 100))}
+    assert kept == {2, 3}
+
+
+def test_no_vesting_text_and_current_titles_in_every_fetch():
+    import inspect
+    assert "statutory_actions" not in N.LAYERS["parcels"][1]
+    assert "current_titles(tf)" in inspect.getsource(N.index_tile)
+    assert "PRTC" in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_parcels.py")).read()
+    assert N.plain("Kāpiti Coast District") == "kapiti coast district"
 
 
 def test_surface_model_columns_cover_what_the_dsm_measures():

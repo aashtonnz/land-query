@@ -223,7 +223,16 @@ LIDAR_FLOW_COLUMNS = ("upslope_area_max_m2", "upslope_area_truncated", "flow_pat
 # measured from the surface model (DSM): empty where it does not cover at least 99% of the parcel's ground (T-107)
 DSM_COLUMNS = ("canopy_gt3m_open_pct", "open_ground_clear_pct", "winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct",
                "horizon_mean_deg", "horizon_north_deg", "sky_view_pct", "wind_obstruction_pct", "roof_pitch_p50_deg",
-               "roof_flat_m2", "roof_north_m2", "roof_solar_rel_pct", "unmapped_structure_m2")
+               "roof_flat_m2", "roof_north_m2", "roof_solar_rel_pct", "unmapped_structure_m2",
+               "dz_2021_2025_clear_pct", "dz_2021_2025_clear_mean_m")
+
+
+def empty_without_dsm(row, dsm_pct):
+    """Surface-model columns empty (unknown) where the surface model covers under 99% of the parcel's ground (T-107)."""
+    if dsm_pct < 99:
+        for c in DSM_COLUMNS:
+            if c in row: row[c] = None
+    return row
 
 
 def finish_row(row, council=None):

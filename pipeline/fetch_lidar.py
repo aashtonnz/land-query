@@ -15,7 +15,7 @@ os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 os.environ.setdefault("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif,.tiff")
 lon0, lat0, lon1, lat1 = te.ll_envelope(TILE)
 
-from lidar_catalogue import NoCoverage, get_json, source_entry, no_data_to_nan
+from lidar_catalogue import NoCoverage, get_json, source_entry, read_sheets
 
 
 def item_links(c, coll):
@@ -80,13 +80,7 @@ def read_window(c, coll, name, hrefs, t0):
     from rasterio.transform import from_origin
     x0, y0, x1, y1 = TILE
     W, H = int(round(x1 - x0)), int(round(y1 - y0)); tr = from_origin(x0, y1, 1.0, 1.0)
-    arr = np.full((H, W), np.nan, np.float32)
-    for h in hrefs:
-        with rasterio.open("/vsicurl/" + h) as src:
-            part = src.read(1, window=from_bounds(x0, y0, x1, y1, src.transform), out_shape=(H, W), boundless=True,
-                            fill_value=np.nan, masked=True).filled(np.nan).astype(np.float32)
-            part = no_data_to_nan(part, src.nodata)   # T-107
-        fill = np.isnan(arr) & np.isfinite(part); arr[fill] = part[fill]
+    arr = read_sheets(["/vsicurl/" + h for h in hrefs], TILE)
     prof = dict(driver="GTiff", height=H, width=W, count=1, dtype="float32", crs="EPSG:2193", transform=tr,
                 nodata=np.nan, compress="deflate")
     with rasterio.open(os.path.join(OUT, "raw", name + ".tif"), "w", **prof) as d: d.write(arr, 1)

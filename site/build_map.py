@@ -193,7 +193,9 @@ def main():
     pg = [geoms[pid] for pid in P if pid in geoms]; tree = STRtree(pg); waters = []
     for g, topo in water(bounds):
         if topo:
-            hit = [pg[i] for i in tree.query(g, predicate="intersects")]
+            # only by parcels mostly outside the lake: a lake bed that is itself a parcel (Lake Wairarapa's is 75 km²)
+            # keeps its water (T-111)
+            hit = [q for q in (pg[i] for i in tree.query(g, predicate="intersects")) if q.intersection(g).area < 0.5 * q.area]
             if hit: g = g.difference(unary_union(hit))
         if not g.is_empty and g.area > 1: waters.append(g)
     print(len(waters), "water polygons")

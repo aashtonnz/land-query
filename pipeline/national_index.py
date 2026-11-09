@@ -126,7 +126,10 @@ def select_parcels(feats, tile, region=None):
     """[(geometry, properties, representative point)] of the tile's own parcels."""
     out = []
     for g, p in geoms(feats):
-        if p.get("parcel_intent") in EXCLUDE_INTENTS or is_bed(p.get("appellation")) or g.is_empty: continue
+        if p.get("parcel_intent") in EXCLUDE_INTENTS or g.is_empty: continue
+        # a bed by name only when it is an old survey record with no title: reclaimed and railway land named "Part Bed
+        # Port Nicholson" has titles and is land (T-111)
+        if p.get("parcel_intent") == "DCDB" and not (p.get("titles") or "").strip() and is_bed(p.get("appellation")): continue
         rp = g.representative_point()
         if in_tile(rp, tile) and (region is None or region.contains(rp)):   # region: already grown by REGION_MARGIN
             out.append((g, p, rp))
@@ -143,12 +146,24 @@ def _date(ms):
     return dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc).date().isoformat() if ms else None
 
 
-def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=()):
+def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
+    """Length of g's boundary within 1 m of a road parcel (road parcels often sit 0.2-0.3 m off the lot line), less the
+    parts within 0.1 m of another land parcel, so the side boundaries at each end of the frontage do not count (T-111)."""
+    near = [road_buf[i] for i in (road_tree.query(g) if road_tree else [])]
+    if not near: return 0.0
+    edge = g.boundary.intersection(unary_union(near))
+    sides = [nb[i][0] for i in (nb_tree.query(g.buffer(0.2)) if nb_tree else []) if nb[i][1] != own_id]
+    if sides: edge = edge.difference(unary_union([q.buffer(0.1) for q in sides]))
+    return round(edge.length, 1)
+
+
+def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), neighbours=()):
     """One dict per parcel. parcels: [(geometry, properties, representative point)]; roads, buildings, addresses, coast,
     tas: [(geometry, properties)]; titles: {title_no: properties}."""
     bt = STRtree([g for g, _ in buildings]) if buildings else None
     at = STRtree([g for g, _ in addresses]) if addresses else None
-    road_buf = [g.buffer(0.1) for g, _ in roads]   # road parcels share the boundary exactly; 0.1 m, not 1 m, so the sides don't count (T-108)
+    road_buf = [g.buffer(1.0) for g, _ in roads]
+    nb = [(g, p.get("id")) for g, p in neighbours]; nt = STRtree([g for g, _ in nb]) if nb else None
     rt = STRtree(road_buf) if road_buf else None
     ct = STRtree([g for g, _ in coast]) if coast else None
     tt = STRtree([g for g, _ in tas]) if tas else None
@@ -186,8 +201,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=()):
         ta = [tas[i][1].get("NAME") for i in (tt.query(rp, predicate="within") if tt else [])]
         r["territorial_authority"] = ta[0] if ta else (ads[0].get("territorial_authority") if ads else None)
         # road frontage: the parcel's boundary within 0.1 m of a road parcel
-        near = [road_buf[i] for i in (rt.query(g) if rt else [])]
-        r["road_frontage_m"] = round(g.boundary.intersection(unary_union(near)).length, 1) if near else 0.0
+        r["road_frontage_m"] = frontage(g, p.get("id"), rt, road_buf, nt, nb)
         if ct is not None:
             idx, dist = ct.query_nearest(g, max_distance=COAST_MAX, return_distance=True)
             d = float(dist.min()) if len(dist) else None
@@ -270,7 +284,15 @@ def index_tile(tile, cache, region=None, tas=()):
     cf, prov["coast"] = fetch("coast", (win[0] - COAST_MAX, win[1] - COAST_MAX, win[2] + COAST_MAX, win[3] + COAST_MAX), cache)
     # partly cancelled titles (PRTC) are still current for the land that remains (T-108)
     titles = current_titles(tf)
-    rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas)
+    neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
+    rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas, neighbours)
+    # a parcel taken in by the coastal margin whose address puts it in another district is not this region's (T-111)
+    if REGION_NAMES:
+        keep = [k for k, r in enumerate(rows) if parcels[k][2].within(REGION_CORE) or not r.get("territorial_authority")
+                or plain(r["territorial_authority"]) in REGION_NAMES]
+        prov["outside_region_by_address"] = len(rows) - len(keep)
+        rows = [rows[k] for k in keep]; parcels = [parcels[k] for k in keep]
+    if not rows: return [], dict(prov, rows=0, seconds=round(time.time() - t0, 1))
     t1 = time.time()
     Z, T, eprov, L, acc, tr = elevation_grid(tile)
     for r, e in zip(rows, elevation_columns(parcels, Z, T, L, acc, tr)): r.update(e)
@@ -278,6 +300,14 @@ def index_tile(tile, cache, region=None, tas=()):
         r["geometry_wkb"] = wkb.dumps(g.simplify(0.5, preserve_topology=True))
     prov.update(elevation=eprov, rows=len(rows), seconds_vector=round(t1 - t0, 1), seconds_elevation=round(time.time() - t1, 1))
     return rows, prov
+
+
+REGION_CORE, REGION_NAMES = None, set()   # set by main for a region run
+
+
+def plain(name):
+    import unicodedata
+    return unicodedata.normalize("NFKD", name or "").encode("ascii", "ignore").decode().strip().lower()
 
 
 def region_shapes(key):
@@ -301,6 +331,7 @@ if __name__ == "__main__":
     os.makedirs(out, exist_ok=True); cache = os.path.join(out, "cache")
     t0 = time.time()
     region, tas, rprov = region_shapes(key)
+    REGION_CORE = unary_union([g for g, _ in tas]); REGION_NAMES = {plain(p.get("NAME")) for _, p in tas}
     tiles = [t for t in tiles_for(region.bounds) if region.intersects(box(*t))]
     rows, tprov = [], []
     for i, t in enumerate(tiles):

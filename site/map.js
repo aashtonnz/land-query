@@ -53,7 +53,7 @@ function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(c
 function legend(){ const L = $('legend');
   if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div><div class="keys"><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel</span></div>`; return; }
   const s = SCALES[mode], g = [0,.25,.5,.75,1].map(ramp).join(',');
-  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel (roads, railways)</span></div>`; }
+  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel (mostly roads)</span></div>`; }
 
 // ---- GL programs
 function prog(vs, fs){ const p = gl.createProgram();

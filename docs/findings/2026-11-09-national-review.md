@@ -68,3 +68,24 @@ real roof or structure. Neither is exact. `SOURCES.md` now says LINZ's outlines 
 
 Findings 1–4 were serious, so after the fixes a new reviewer reviews again (fresh-eyes review 1.1). Finding 18
 (T-106) must be done before the project is announced anywhere.
+
+## Seventeenth review: the fixes (T-111)
+
+A new reviewer reviewed the T-107 to T-109 fixes. Three of them had serious faults of their own:
+
+| # | Finding | Seriousness | Fix |
+| --- | --- | --- | --- |
+| 1 | The bed-name rule dropped titled and reclaimed land (railway land "Part Bed Poirua Harbour", 3.8 ha at 476 Hutt Road): 36 pilot parcels, 926 nationally, 94 with titles | Serious | A bed by name only when its intent is DCDB and it has no title |
+| 2 | The 0.1 m frontage tolerance missed roads set 0.2–0.3 m off the lot line: 291 parcels went from over 5 m to 0 | Serious | 1 m to the road, less the boundary within 0.1 m of other land parcels (the sides) |
+| 3 | Clipping lakes by parcels erased Lake Wairarapa, whose bed is a 75 km² parcel | Serious (map) | Lakes are clipped only by parcels mostly outside them |
+| 4 | The coastal margin took 11 Waikawa Beach (Horowhenua) parcels into Greater Wellington | Moderate | A parcel in the margin whose address names another district is left out |
+| 5 | Sun and horizon treat missing surface-model cells nearby as open sky | Suspected | Open: T-110 |
+| 6 | Seven of the fixes had no test that failed when the fix was undone | Moderate | New tests; each of ten fixes now fails a test when undone (the compiler's call to the surface-model rule is the exception, as the compiler is a script) |
+| 7 | −100 m dropped a real height (Martha pit, −101 m); two ground-change columns use the surface model; stale page text; railways called land without a parcel | Minor | Floor −1,000 m; columns added; text corrected |
+
+Checked correct by this reviewer: the council builds are not changed by T-107 (no surface-model gaps or heights near
+−100 m in their surveys, and their read path already masked no-data); the Kaikōura and gap parcels now read unknown;
+partly cancelled titles are counted once; the shore parcels are present; the map's escaping, search order and workflow
+rights.
+
+As this review had serious findings, a further fresh review follows the fixes (T-112).
