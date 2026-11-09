@@ -1,0 +1,90 @@
+name: National index
+
+# The national index (T-102): every parcel in New Zealand, from LINZ's public services (no key), built in shares of the
+# 40 km tiles listed in pipeline/nz_tiles.json (`national_index.py plan` lists them again), merged, checked and
+# published as a release file. Free: the repository is public (D-24).
+
+on:
+  workflow_dispatch:
+    inputs:
+      shares:
+        description: "How many jobs to split the tiles over"
+        required: false
+        default: "40"
+      publish_run:
+        description: "Instead of building: publish the index an earlier run built (its run id), once it has been reviewed"
+        required: false
+        default: ""
+
+permissions:
+  contents: write   # the release
+  actions: read     # to fetch an earlier run's index (publish_run)
+
+jobs:
+  plan:
+    if: inputs.publish_run == ''
+    runs-on: ubuntu-latest
+    outputs:
+      shares: ${{ steps.s.outputs.shares }}
+    steps:
+      - id: s
+        env: { N: "${{ inputs.shares }}" }
+        run: python3 -c "import json, os; print('shares=' + json.dumps(list(range(int(os.environ['N'])))))" >> "$GITHUB_OUTPUT"
+
+  share:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 6   # LINZ's service limits large-geometry requests per minute, shared by every job
+      matrix:
+        k: ${{ fromJson(needs.plan.outputs.shares) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - run: pip install -r pipeline/requirements.txt
+      - name: Build this share
+        working-directory: pipeline
+        env: { N: "${{ inputs.shares }}", K: "${{ matrix.k }}" }
+        run: |
+          python3 test_national.py
+          /usr/bin/time -v python3 national_index.py ../share nz nz_tiles.json "$K" "$N" 2> time.txt
+          grep -h -E "Elapsed|Maximum resident" time.txt
+          rm -rf ../share/cache
+      - uses: actions/upload-artifact@v4
+        with:
+          name: share-${{ matrix.k }}
+          path: share/
+          retention-days: 3
+
+  merge:
+    needs: share
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - run: pip install -r pipeline/requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { pattern: "share-*", path: shares }
+      - name: Merge and check
+        run: python3 pipeline/national_merge.py shares nz "${{ inputs.shares }}"
+      - uses: actions/upload-artifact@v4
+        with: { name: national-index, path: nz/, retention-days: 30 }
+
+  publish:
+    # a build is published only once reviewed: run again with publish_run set to the build's run id
+    if: inputs.publish_run != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: national-index, path: nz, run-id: "${{ inputs.publish_run }}", github-token: "${{ github.token }}" }
+      - env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          commit=$(python3 -c "import json; print(json.load(open('nz/provenance.json'))['commit'])")
+          tag="national-$(date -u +%Y-%m-%d)-${{ inputs.publish_run }}"
+          gh release create "$tag" nz/index.parquet nz/provenance.json nz/run.json --repo "${{ github.repository }}" \
+            --title "National index $(date -u +%Y-%m-%d)" \
+            --notes "Every primary parcel in New Zealand from LINZ data (CC BY 4.0), built from $commit by run ${{ inputs.publish_run }}. Columns: SOURCES.md. Counts: run.json."

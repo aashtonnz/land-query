@@ -14,7 +14,7 @@ NZTM grid) so the same code runs for one region or the whole country. For each t
 Vector data comes from LINZ's own public ArcGIS services (no key), each the same dataset as the LINZ Data Service
 layer named in LAYERS, under CC BY 4.0. Nothing about owners is read (D-12, D-15).
 
-Usage: national_index.py OUT_DIR [REGION]. REGION is a key of REGIONS (default: wellington). Writes OUT_DIR/index.parquet,
+Usage: see the end of this file (one region, or New Zealand in shares for GitHub jobs: T-102). Writes OUT_DIR/index.parquet,
 OUT_DIR/provenance.json and OUT_DIR/run.json (time and size); raw downloads are cached under OUT_DIR/cache.
 """
 import datetime as dt, gzip, hashlib, json, math, os, sys, time
@@ -40,8 +40,9 @@ LAYERS = dict(
     lakes=("NZ_Lake_Polygons_Topo_1_50k", "t50_fid", None),                     # Topo50 lakes (T-113)
     rivers=("LINZ_NZ_River_Name_Polygons_Pilot", "river_section_id", None),     # river areas (T-113)
     land=("LINZ_NZ_Coastline", "id", None),                                     # land outline (Topo50): the sea is outside it (T-115)
+    localities=("LINZ_NZ_Suburbs_and_Localities", "id,territorial_authority", None),  # districts, nationally (T-102)
 )
-KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id", lakes="t50_fid", rivers=None, land="id")
+KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id", lakes="t50_fid", rivers=None, land="id", localities="id")
 EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)", "Riverbed", "Streambed"}
 # a parcel belongs to a region if its point lies within this distance of the region's boundary polygons, which follow
 # a simplified coast: shore and island parcels fell just outside (T-108)
@@ -76,7 +77,7 @@ def in_tile(pt, t):
 
 # the land outline is a few very large polygons: the service limits those per minute, so one request at a time,
 # simplified to 5 m: well within its 1:50k accuracy (about 25 m), and 9 s a tile rather than minutes (T-115)
-FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=5))
+FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=5), localities=dict(workers=2, maxAllowableOffset=1))
 
 
 def fetch(layer, bbox, cache, where="1=1"):
@@ -301,8 +302,9 @@ def elevation_grid(tile):
     return Z, T, prov, L, acc, tr
 
 
-def index_tile(tile, cache, region=None, tas=()):
-    """(rows, provenance) for one tile."""
+def index_tile(tile, cache, region=None, tas=None):
+    """(rows, provenance) for one tile. tas: district polygons [(geometry, {"NAME": ...})]; None takes them from LINZ's
+    suburbs and localities, each of which names its district (the national build, T-102)."""
     t0 = time.time()
     pf, pp = fetch("parcels", tile, cache)
     parcels = select_parcels(pf, tile, region)
@@ -310,6 +312,9 @@ def index_tile(tile, cache, region=None, tas=()):
     if not parcels: return [], dict(prov, rows=0, seconds=round(time.time() - t0, 1))
     bs = np.array([g.bounds for g, _, _ in parcels])
     win = (bs[:, 0].min() - 30, bs[:, 1].min() - 30, bs[:, 2].max() + 30, bs[:, 3].max() + 30)
+    if tas is None:
+        lf_, prov["localities"] = fetch("localities", win, cache)
+        tas = [(g, dict(NAME=p.get("territorial_authority"))) for g, p in geoms(lf_) if p.get("territorial_authority")]
     rf, prov["roads"] = fetch("parcels", win, cache, where="parcel_intent='Road'")
     tf, prov["titles"] = fetch("titles", win, cache)
     bf, prov["buildings"] = fetch("buildings", win, cache)
@@ -379,13 +384,22 @@ def region_shapes(key):
                             grown=f"by up to {REGION_MARGIN:.0f} m within {COAST_BAND:.0f} m of the coast")
 
 
-if __name__ == "__main__":
-    out = sys.argv[1]; key = sys.argv[2] if len(sys.argv) > 2 else "wellington"
+def nz_tiles(workers=WORKERS):
+    """Every tile in NZTM's reach (the Kermadecs to Campbell Island, the Chathams) that holds a primary parcel."""
+    from concurrent.futures import ThreadPoolExecutor
+    url = SVC + LAYERS["parcels"][0] + "/FeatureServer/0/query"
+    def count(t):
+        j = arcgis._get(url, dict(where="1=1", geometry=",".join(str(round(v)) for v in t), geometryType="esriGeometryEnvelope",
+                                  inSR=2193, spatialRel="esriSpatialRelIntersects", returnCountOnly="true", f="json"))
+        return j["count"]
+    cand = tiles_for((200000.0, 3900000.0, 2700000.0, 7300000.0))
+    with ThreadPoolExecutor(workers) as ex: n = list(ex.map(count, cand))
+    return [t for t, c in zip(cand, n) if c]
+
+
+def run(out, tiles, region=None, tas=None, rprov=None, key="nz"):
     os.makedirs(out, exist_ok=True); cache = os.path.join(out, "cache")
     t0 = time.time()
-    region, tas, rprov = region_shapes(key)
-    REGION_CORE = unary_union([g for g, _ in tas]); REGION_NAMES = {plain(p.get("NAME")) for _, p in tas}
-    tiles = [t for t in tiles_for(region.bounds) if region.intersects(box(*t))]
     rows, tprov = [], []
     for i, t in enumerate(tiles):
         r, p = index_tile(t, cache, region, tas)
@@ -404,8 +418,26 @@ if __name__ == "__main__":
         commit += "+uncommitted changes"   # the recorded commit is not exactly the code that ran (T-121)
     json.dump(dict(region=rprov, tiles=tprov, built=utc_now(), commit=commit),
               open(os.path.join(out, "provenance.json"), "w"), indent=1)
-    run = dict(region=key, parcels=len(df), tiles=len(tiles), seconds=round(time.time() - t0),
-               index_mb=round(os.path.getsize(path) / 1e6, 1),
-               duplicate_ids=int(df.parcel_id.duplicated().sum()) if len(df) else 0)
-    json.dump(run, open(os.path.join(out, "run.json"), "w"), indent=1)
-    print(json.dumps(run))
+    run_ = dict(region=key, parcels=len(df), tiles=len(tiles), seconds=round(time.time() - t0),
+                index_mb=round(os.path.getsize(path) / 1e6, 1),
+                duplicate_ids=int(df.parcel_id.duplicated().sum()) if len(df) else 0)
+    json.dump(run_, open(os.path.join(out, "run.json"), "w"), indent=1)
+    print(json.dumps(run_))
+
+
+if __name__ == "__main__":
+    # national_index.py OUT_DIR [REGION]          a region of REGIONS (default wellington)
+    # national_index.py plan TILES.json           list every tile in New Zealand that holds a parcel (T-102)
+    # national_index.py OUT_DIR nz TILES.json K N the K-th of N shares of those tiles (0-based), districts from LINZ
+    if sys.argv[1] == "plan":
+        t = nz_tiles(); json.dump(t, open(sys.argv[2], "w")); print(len(t), "tiles with parcels")
+    elif len(sys.argv) > 2 and sys.argv[2] == "nz":
+        tiles = [tuple(t) for t in json.load(open(sys.argv[3]))]
+        k, n = int(sys.argv[4]), int(sys.argv[5])
+        run(sys.argv[1], tiles[k::n], rprov=dict(name="New Zealand", share=f"{k + 1} of {n}",
+                                                  districts="LINZ NZ Suburbs and Localities (territorial_authority)"))
+    else:
+        key = sys.argv[2] if len(sys.argv) > 2 else "wellington"
+        region, tas, rprov = region_shapes(key)
+        REGION_CORE = unary_union([g for g, _ in tas]); REGION_NAMES = {plain(p.get("NAME")) for _, p in tas}
+        run(sys.argv[1], [t for t in tiles_for(region.bounds) if region.intersects(box(*t))], region, tas, rprov, key)

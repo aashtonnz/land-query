@@ -278,6 +278,33 @@ def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
     assert set(N.current_titles([f("A", "LIVE"), f("B", "PRTC"), f("C", "CANC")])) == {"A", "B"}
 
 
+def test_national_districts_come_from_linz_localities():
+    """T-102: with no district polygons given, a parcel's district is that of the LINZ locality holding its point."""
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(600, 100, 700, 200), dict(id=2, parcel_intent="DCDB"))],
+                     "localities": [(box(0, 0, 500, 1000), dict(id=1, territorial_authority="Kāpiti Coast District")),
+                                    (box(500, 0, 1000, 1000), dict(id=2, territorial_authority="Porirua City"))]})
+    assert rows[1]["territorial_authority"] == "Kāpiti Coast District" and rows[2]["territorial_authority"] == "Porirua City"
+
+
+def test_the_national_merge_writes_nothing_unless_every_share_and_tile_is_there_once():
+    import tempfile, json, pandas as pd, national_merge as M
+    d = tempfile.mkdtemp(); tiles = [(0, 0, 1, 1), (1, 0, 2, 1)]
+    def share(k, tile, ids, commit="c"):
+        os.makedirs(f"{d}/s/{k}", exist_ok=True)
+        pd.DataFrame(dict(parcel_id=ids, water_pct=[1.0] * len(ids), territorial_authority=["X"] * len(ids))).to_parquet(f"{d}/s/{k}/index.parquet")
+        json.dump(dict(tiles=[dict(tile=list(tile))], built="2026", commit=commit, region=dict(districts="L")), open(f"{d}/s/{k}/provenance.json", "w"))
+        json.dump(dict(seconds=1), open(f"{d}/s/{k}/run.json", "w"))
+    share(0, tiles[0], [1, 2])
+    for bad in ("missing", "duplicate", "commit", "tile"):
+        share(1, tiles[1], {"missing": [3], "duplicate": [2, 3], "commit": [3], "tile": [3]}[bad],
+              commit="other" if bad == "commit" else "c")
+        if bad == "tile": json.dump(dict(tiles=[dict(tile=list(tiles[0]))], built="2026", commit="c", region={}), open(f"{d}/s/1/provenance.json", "w"))
+        try: M.merge(f"{d}/s", f"{d}/out", 3 if bad == "missing" else 2, tiles); assert False, bad
+        except SystemExit: assert not os.path.exists(f"{d}/out"), bad
+    share(1, tiles[1], [3]); M.merge(f"{d}/s", f"{d}/out", 2, tiles)
+    assert len(pd.read_parquet(f"{d}/out/index.parquet")) == 3
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

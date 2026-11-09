@@ -142,6 +142,11 @@ tile entries in its `provenance.json`.
 | `coast` | NZ Coastline - Mean High Water Springs (LINZ) | ◐ assumed LINZ CC BY 4.0; layer number and licence to confirm (T-104) | — | ✅ | Searched to 10 km |
 | `elevation` | New Zealand LiDAR 1 m DEM read at 10 m, gaps from the 8 m contour DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic, surveys 2008–2026 | ⚠ | Per tile plus 5 km, as `district_flow`. 10 m cells smooth small slopes and banks |
 | `region` | Stats NZ district polygons, via GWRC (pilot only) | ✅ Stats NZ CC BY 4.0 | — | — | Which parcels are in the pilot region, and the district name |
+| `localities` | NZ Suburbs and Localities (LINZ), each naming its district | ◐ assumed LINZ CC BY 4.0; to confirm (T-104) | — | ✅ | The national build's district names (T-102): the district of the locality holding the parcel's point; simplified to 1 m |
+
+The national build (`.github/workflows/national.yml`, T-102) covers the 370 tiles that hold a parcel (`pipeline/nz_tiles.json`),
+from the Kermadecs to Campbell Island and the Chathams. The elevation sources do not reach the Chathams or the outlying
+islands, so their height columns are empty; nor do LINZ's building outlines reach the Chathams.
 
 ## Columns: national index
 
@@ -153,7 +158,7 @@ tile entries in its `provenance.json`.
 | `title_count`, `title_types`, `titles_not_found` | published | Titles listed on the parcel; the types of those current in the titles layer (live or partly cancelled); how many were not found there |
 | `rep_x`, `rep_y` | derived | A point inside the parcel (NZTM2000); it decides the parcel's tile |
 | `building_count`, `building_m2`, `building_cover_pct`, `largest_building_m2`, `buildings_captured_to` | derived | LINZ outlines: buildings with at least half their area in the parcel; area of outlines inside the parcel and its share of the parcel; the largest counted building; the latest photo date among the outlines touching the parcel. 0 means no outline, not no building |
-| `address_count`, `address`, `suburb_locality`, `town_city`, `territorial_authority` | published | Addresses whose point lies in the parcel; the lowest-numbered names it. The district is from the region's district polygons, or else the address |
+| `address_count`, `address`, `suburb_locality`, `town_city`, `territorial_authority` | published | Addresses whose point lies in the parcel; the lowest-numbered names it. The district is from the region's district polygons (pilot) or LINZ's localities (national), or else the address |
 | `water_pct` | derived | Share of the parcel's area under water, measured by area: the sea (outside LINZ's Topo50 land outline, fetched at 5 m, so tidal flats count as sea), Topo50 lakes and LINZ's river areas together, each part counted once. All three are 1:50k, so edges can be some metres out, and small shore parcels (a few hundred m²) can be tens of points out. A lake bed held as a parcel (Lake Wairarapa) reads near 100; reclaimed land named as a harbour bed reads near 0. Empty (unknown) where half the parcel or more is sea that no lake or river polygon covers: the outline leaves out many islets and rocks, near the shore and far out (Kapiti Island's reefs, Tarahiki Island, the Snares), and the elevation grid holds a flat sea surface there, so neither can tell a rock from the sea. This also empties true seabed parcels such as marinas; and a rock reaching just inside the outline reads part water (some Kapiti Island reef parts read 29 to 39%). Empty too where the outline has nothing at all (the Chathams) |
 | `road_frontage_via_strip_m` | derived | The part of `road_frontage_m` reached only across a strip under 1 m wide between the lot and the road, often a reserve that bars access: legal frontage may be 0 there |
 | `road_frontage_m` | derived | Length of the parcel's boundary within 1 m of a road parcel (LINZ roads often sit 0.2–0.4 m off the lot line), less the short end pieces where a neighbour's side boundary meets it. Across a thin reserve strip between lot and road it still counts, so it can overstate legal frontage there |
