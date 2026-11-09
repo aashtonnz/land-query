@@ -190,29 +190,12 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     meta = dict(origin=ORIGIN, levels=[], measures=MEASURES, councils=list(COUNCILS), detail_fields=DETAIL, stats=stats,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
-    # Topo50 lakes and LINZ's river areas are mapped at 1:50k, so their edges can stray over sections (T-109, T-113, T-115)
-    EDGE_M = 25.0
-    from shapely import STRtree
-    from shapely.ops import unary_union
-    pg = [geoms[pid] for pid in P if pid in geoms]; tree = STRtree(pg); waters = []
-    before = after = 0.0; lost_half = n_topo = 0
-    for g, topo in water(bounds):
-        g0 = g.area
-        if topo:
-            # only by parcels mostly outside the lake: a lake bed that is itself a parcel (Lake Wairarapa's is 75 km²)
-            # keeps its water (T-111)
-            # a 1:50k edge strays over a section as a thin sliver: those slivers (nothing left after shrinking by EDGE_M)
-            # are cut out; any wider overlap is real water inside the parcel and is kept (T-115)
-            cut = []
-            for q in (pg[i] for i in tree.query(g, predicate="intersects")):
-                ov = q.intersection(g)
-                for piece in getattr(ov, "geoms", [ov]):
-                    if piece.area > 0 and piece.buffer(-EDGE_M).is_empty: cut.append(piece)
-            if cut: g = g.difference(unary_union(cut))
-            before += g0; after += g.area; n_topo += 1; lost_half += g.area < 0.5 * g0
-        if not g.is_empty and g.area > 1: waters.append(g)
-    print(len(waters), "water polygons;", f"lakes and river areas: {after / max(before, 1):.1%} of their area drawn, "
-          f"{lost_half} of {n_topo} lose more than half to sliver cuts")
+    # Topo50 lakes and LINZ's river areas (1:50k) are drawn whole, over the parcels. Three rules that cut them where
+    # they overlap land parcels each erased real water (small lakes in farm parcels, rivers whose banks are parcel
+    # boundaries), so none is used: an edge can stray a few metres over a section, and the legend says edges are
+    # approximate. Each parcel's own water share is measured separately (national index water_pct) (T-109 to T-116)
+    waters = [g for g, _ in water(bounds) if not g.is_empty and g.area > 1]
+    print(len(waters), "water polygons, drawn whole")
     nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):
         os.makedirs(os.path.join(OUT, "data", f"L{li}"))

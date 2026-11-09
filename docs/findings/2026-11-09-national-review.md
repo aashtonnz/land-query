@@ -118,10 +118,12 @@ replaces that with measurement, and a fourth fresh review follows (T-114).
 | 2 | Lake Ōnoke counted twice: its surface is below 0.5 m with no 8 m DEM, so the grid's "sea" overlapped the lake (Lot 43 DP 12843: 45% water read 85.8) | Serious | Water by area of the union of sea, lakes and rivers; the grid is not used |
 | 3 | Missing elevation data read as 100% sea (would hit the Chatham Islands) | Serious (national) | As 2: sea is outside LINZ's land outline, never from the grid; a window with no land outline stops the run |
 | 4 | Tidal flats read as land (22 parcels mostly seaward of the coast read under 20%) | Moderate | As 2: the Topo50 land outline puts tidal flats in the sea |
-| 5 | The map's 25 m edge cut erased most lakes inside farm parcels (4,237 of 4,912) and stretches of the Hutt, Ruamāhanga and other rivers | Serious (map) | Only thin slivers (nothing left after shrinking by 25 m) are cut; the build now reports the share of lake and river area drawn |
+| 5 | The map's 25 m edge cut erased most lakes inside farm parcels (4,237 of 4,912) and stretches of the Hutt, Ruamāhanga and other rivers | Serious (map) | Lakes and rivers are drawn whole, over the parcels, with "edges approximate, from 1:50,000 maps" in the legend. A thin-sliver rule was tried first: it still cut rivers whose banks are parcel boundaries (the Hutt River runs through Lot 2 DP 28647). Every cutting rule tried erased real water somewhere, so none is used; an edge can stray a few metres over a section. Parcel figures are unaffected |
 | 6 | Parcels 50% or more water were drawn wholly as water | Moderate | Removed: water is drawn from the water layers over the parcels |
 | 7 | Six ways to break the water and margin rules passed the tests | Moderate | New tests through `index_tile`: water counted once, no grid used, lake over sea, islands kept; each rule fails a test when undone |
 | 8 | SOURCES said Lake Wairarapa's bed reads 100 (95.8); the river-areas layer is a 2018 snapshot | Minor | Corrected and recorded |
+
+Measured on the rebuilt pilot: Lot 43 DP 12843 reads 45.1% water (reviewer: 45), Lot 16 DP 74688 37.1 (37), the tidal flat Lot 7 DP 57550 95.6, Kapiti and Mana island parcels are rows again, and no row has an empty water share. Fetching LINZ's land outline at full detail hit the service's rate limit; it is fetched at 5 m (within its 1:50k accuracy), and rate limits are waited out.
 
 Each round has found fewer and narrower faults, but four rounds running have found serious ones, all in rules I wrote
 to guess something the data does not say directly. T-115 replaces the last of them with plain area measurement.
