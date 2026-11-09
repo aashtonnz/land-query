@@ -78,11 +78,11 @@ const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; 
 // across and fades out by 6, so it changes smoothly with the zoom; none for water
 const EDGE = prog(`in vec2 p; in float cc; in float sz; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; uniform float pxm; out vec4 v;
   void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.); int c = int(cc+.5);
-    float a = (c == 3 || (filt >= 0 && c != filt)) ? 0. : col.a * clamp((sz*pxm - 6.)/14., 0., 1.); v = vec4(a, a, a, 1.); }`,
+    float a = (c == 3 || (filt >= 0 && c != filt)) ? 0. : col.a * clamp((sz*pxm - 6.)/14., 0., 1.); v = vec4(a); }`,
   'in vec4 v; out vec4 o; void main(){ o = v; }');
 // boundary coverage layer: copies of the lines are combined by keeping the strongest, not adding, then laid on once
 const COVER = prog(`out vec2 uv; void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = c; gl_Position = vec4(c*2.-1., 0., 1.); }`,
-  'in vec2 uv; uniform sampler2D tex; uniform vec3 col; out vec4 o; void main(){ o = vec4(col, texture(tex, uv).r); }');
+  'in vec2 uv; uniform sampler2D tex; uniform vec3 col; uniform vec4 w; out vec4 o; void main(){ o = vec4(col, clamp(dot(texture(tex, uv), w), 0., 1.)); }');
 const edgeTex = gl.createTexture(), edgeFB = gl.createFramebuffer(); let edgeW = 0, edgeH = 0;
 function edgeTarget(){ if(edgeW === canvas.width && edgeH === canvas.height) return; edgeW = canvas.width; edgeH = canvas.height;
   gl.bindTexture(gl.TEXTURE_2D, edgeTex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, edgeW, edgeH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -90,7 +90,7 @@ function edgeTarget(){ if(edgeW === canvas.width && edgeH === canvas.height) ret
   gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, edgeTex, 0); gl.bindFramebuffer(gl.FRAMEBUFFER, null); }
 // water drawn live over the boundaries, so a river is never covered by the outlines of the land beside it
 const WATERP = prog(`in vec2 p; in float cc; uniform vec2 sc, of; uniform vec3 col; out vec4 v;
-  void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = int(cc+.5) == 3 ? vec4(col, 1.) : vec4(0.); }`, FS);
+  void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = int(cc+.5) == 3 ? vec4(1.) : vec4(0.); }`, 'in vec4 v; out vec4 o; void main(){ if(v.a < .5) discard; o = v; }');
 const LAND = prog(`in vec2 p; uniform vec2 sc, of; uniform vec4 col; out vec4 v; void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; }`, FS);
 const QUAD = prog(`uniform vec4 rect; uniform vec4 uvr; out vec2 uv;
   void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = mix(uvr.xy, uvr.zw, c); gl_Position = vec4(mix(rect.xy, rect.zw, c), 0., 1.); }`,
@@ -220,51 +220,63 @@ function quad(t, alpha){ const T = BASE / 2**t.z, x0 = OX + t.i*T, y0 = OY + t.j
   const cx = x => (sx(x)/W)*2-1, cy = y => 1-(sy(y)/H)*2;
   gl.uniform4f(QUAD.u.rect, cx(x0), cy(y0), cx(x0+T), cy(y0+T)); gl.uniform4f(QUAD.u.uvr, 0, 0, 1, 1);
   gl.bindTexture(gl.TEXTURE_2D, t.tex); gl.uniform1f(QUAD.u.alpha, alpha); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
-function render(){
-  if(!(W > 0 && H > 0)) return; frame++;
-  const z = Math.max(0, Math.min(ZMAX, Math.round(Math.log2(BASE * view.s * dpr / TEX)))), T = BASE / 2**z;
-  const vx0 = view.cx - W/2/view.s, vx1 = view.cx + W/2/view.s, vy0 = view.cy - H/2/view.s, vy1 = view.cy + H/2/view.s;
-  const i0 = Math.floor((vx0-OX)/T), i1 = Math.floor((vx1-OX)/T), j0 = Math.floor((vy0-OY)/T), j1 = Math.floor((vy1-OY)/T);
-  // render missing or out-of-date tiles nearest the centre first, a few per frame
+// Two adjacent tile levels are always drawn and blended by the exact zoom (t), and so are their boundaries and water:
+// nothing ever switches at once, so zooming changes the picture gradually.
+function ensureTiles(z, x0, y0, x1, y1, keep, state){ const T = BASE / 2**z;
+  const i0 = Math.floor((x0-OX)/T), i1 = Math.floor((x1-OX)/T), j0 = Math.floor((y0-OY)/T), j1 = Math.floor((y1-OY)/T);
   const want = []; for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++) want.push([i, j, Math.hypot(OX+(i+.5)*T-view.cx, OY+(j+.5)*T-view.cy)]);
   want.sort((a,b)=>a[2]-b[2]);
-  let budget = 4, waiting = false; const keep = new Set();
   for(const [i, j] of want){ const k = z+'/'+i+'/'+j, t = tiles.get(k); keep.add(k);
     if(t && t.gen === gen){ t.used = frame; continue; }
-    if(budget > 0){ if(renderTile(z, i, j)) budget--; else waiting = true; } else waiting = true; }
+    if(state.budget > 0){ if(renderTile(z, i, j)) state.budget--; else state.waiting = true; } else state.waiting = true; }
+  return want; }
+function render(){
+  if(!(W > 0 && H > 0)) return; frame++;
+  const zf = Math.max(0, Math.min(ZMAX, Math.log2(BASE * view.s * dpr / TEX))), za = Math.min(ZMAX-1, Math.floor(zf)), zb = za + 1, t = Math.min(1, zf - za);
+  const vx0 = view.cx - W/2/view.s, vx1 = view.cx + W/2/view.s, vy0 = view.cy - H/2/view.s, vy1 = view.cy + H/2/view.s;
+  const keep = new Set(), state = {budget: 4, waiting: false};
+  // the nearer level first, so it is ready first
+  const order = t < .5 ? [za, zb] : [zb, za], wants = {};
+  for(const z of order) wants[z] = ensureTiles(z, vx0, vy0, vx1, vy1, keep, state);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(...hex(css('--sea')), 1); gl.clear(gl.COLOR_BUFFER_BIT);
   gl.useProgram(QUAD.p); gl.uniform1i(QUAD.u.tex, 0); gl.activeTexture(gl.TEXTURE0); gl.bindVertexArray(null);
   gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  // coarser and finer tiles already made cover the view while this level's tiles arrive; then this level fades in
   const now = performance.now(); let fading = false;
-  const inView = t => { const TT = BASE / 2**t.z, x0 = OX+t.i*TT, y0 = OY+t.j*TT; return !(x0>vx1||x0+TT<vx0||y0>vy1||y0+TT<vy0); };
-  const others = [...tiles.values()].filter(t => t.z !== z && Math.abs(t.z - z) <= 3 && inView(t)).sort((a,b)=>a.z-b.z);
-  for(const t of others){ quad(t, 1); keep.add(t.z+'/'+t.i+'/'+t.j); t.used = frame; }
-  for(const [i, j] of want){ const t = tiles.get(z+'/'+i+'/'+j); if(!t) continue;
-    const a = Math.min(1, (now - t.born) / 220); if(a < 1) fading = true; quad(t, a); }
-  // boundaries live, at the exact zoom, from this level's pieces in view; about 1.5 screen points thick
-  const lvl = levelFor(z), filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
-  const eps = piecesFor(lvl, vx0, vy0, vx1, vy1).map(k => piece(lvl, k)).filter(P => P.state === 'ready');
-  if(eps.length){ gl.disable(gl.BLEND); edgeTarget(); gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.viewport(0, 0, edgeW, edgeH);
-    gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendEquation(gl.MAX);
-    gl.useProgram(EDGE.p); const s = view.s;
-    gl.uniform2f(EDGE.u.sc, 2*s/W, 2*s/H); gl.uniform2f(EDGE.u.of, (OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H);
+  const inView = q => { const TT = BASE / 2**q.z, x0 = OX+q.i*TT, y0 = OY+q.j*TT; return !(x0>vx1||x0+TT<vx0||y0>vy1||y0+TT<vy0); };
+  // tiles of other levels already made cover the view while these arrive
+  const others = [...tiles.values()].filter(q => q.z !== za && q.z !== zb && Math.abs(q.z - zf) <= 3 && inView(q)).sort((a,b)=>a.z-b.z);
+  for(const q of others){ quad(q, 1); keep.add(q.z+'/'+q.i+'/'+q.j); q.used = frame; }
+  // level a at full strength, level b over it at strength t (each also fading in when first made)
+  for(const [z, w] of [[za, 1], [zb, t]]) for(const [i, j] of wants[z]){ const q = tiles.get(z+'/'+i+'/'+j); if(!q) continue;
+    const a = Math.min(1, (now - q.born) / 220); if(a < 1) fading = true; if(w*a > 0.002) quad(q, w*a); }
+  // boundaries and water from both levels' pieces into one coverage layer (red, green: boundaries of a and b; blue,
+  // alpha: water of a and b), combined by keeping the strongest, then laid on blended by t
+  const la = levelFor(za), lb = levelFor(zb), filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
+  const ready = l => piecesFor(l, vx0, vy0, vx1, vy1).map(k => piece(l, k)).filter(P => P.state === 'ready');
+  const pa = ready(la), pb = lb === la ? pa : ready(lb);
+  if(pa.length || pb.length){ gl.disable(gl.BLEND); edgeTarget(); gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.viewport(0, 0, edgeW, edgeH);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendEquation(gl.MAX);
+    const s = view.s, sc = [2*s/W, 2*s/H], of = [(OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H];
     // thickness and strength follow the zoom: about 1.5 screen points at full strength from 0.3 pixels per metre in,
     // easing to one device pixel at 60% by 0.05 and out
-    const k = Math.max(0, Math.min(1, (s - 0.05) / 0.25));
-    gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), 0.6 + 0.4*k); gl.uniform1f(EDGE.u.pxm, s*dpr);
-    const n = Math.max(1, Math.round(1 + (1.5*dpr - 1) * k));
-    for(let a=0; a<n; a++) for(let b=0; b<n; b++){ gl.uniform2f(EDGE.u.shift, a*.75*2/canvas.width, b*.75*2/canvas.height);
-      for(const P of eps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }
-    gl.bindVertexArray(null); gl.blendEquation(gl.FUNC_ADD);
+    const k = Math.max(0, Math.min(1, (s - 0.05) / 0.25)), n = Math.max(1, Math.round(1 + (1.5*dpr - 1) * k));
+    gl.useProgram(EDGE.p); gl.uniform2fv(EDGE.u.sc, sc); gl.uniform2fv(EDGE.u.of, of);
+    gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, 1, 1, 1, 0.6 + 0.4*k); gl.uniform1f(EDGE.u.pxm, s*dpr);
+    for(const [ps, mask] of [[pa, [true,false,false,false]], [pb, [false,true,false,false]]]){ gl.colorMask(...mask);
+      for(let a=0; a<n; a++) for(let b=0; b<n; b++){ gl.uniform2f(EDGE.u.shift, a*.75*2/canvas.width, b*.75*2/canvas.height);
+        for(const P of ps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } } }
+    gl.useProgram(WATERP.p); gl.uniform2fv(WATERP.u.sc, sc); gl.uniform2fv(WATERP.u.of, of); gl.uniform3f(WATERP.u.col, 1, 1, 1);
+    for(const [ps, mask] of [[pa, [false,false,true,false]], [pb, [false,false,false,true]]]){ gl.colorMask(...mask);
+      for(const P of ps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); } }
+    gl.colorMask(true, true, true, true); gl.bindVertexArray(null); gl.blendEquation(gl.FUNC_ADD);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.useProgram(COVER.p); gl.uniform1i(COVER.u.tex, 0); gl.uniform3fv(COVER.u.col, hex(css('--sheet'))); gl.bindTexture(gl.TEXTURE_2D, edgeTex);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    gl.useProgram(WATERP.p); gl.uniform2f(WATERP.u.sc, 2*s/W, 2*s/H); gl.uniform2f(WATERP.u.of, (OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H);
-    gl.uniform3fv(WATERP.u.col, hex(css('--sea')));
-    for(const P of eps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
-    gl.bindVertexArray(null); }
+    // a level whose pieces are not loaded yet takes the other's
+    const wa = pb.length ? 1 - t : 1, wb = pa.length ? t : 1;
+    gl.useProgram(COVER.p); gl.uniform1i(COVER.u.tex, 0); gl.bindTexture(gl.TEXTURE_2D, edgeTex);
+    gl.uniform3fv(COVER.u.col, hex(css('--sheet'))); gl.uniform4f(COVER.u.w, wa, wb, 0, 0); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.uniform3fv(COVER.u.col, hex(css('--sea'))); gl.uniform4f(COVER.u.w, 0, 0, wa, wb); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+  const waiting = state.waiting;
   gl.disable(gl.BLEND);
   overlay();
   trimTiles(keep); trimPieces();
