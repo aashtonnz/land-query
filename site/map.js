@@ -57,7 +57,7 @@ function legend(){ const L = $('legend');
 function prog(vs, fs){ const p = gl.createProgram();
   for(const [t,src] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){ const sh = gl.createShader(t); gl.shaderSource(sh, '#version 300 es\nprecision highp float;\n'+src); gl.compileShader(sh);
     if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); gl.attachShader(p, sh); }
-  gl.bindAttribLocation(p, 0, 'p'); gl.bindAttribLocation(p, 1, 'vals'); gl.bindAttribLocation(p, 2, 'cc');
+  gl.bindAttribLocation(p, 0, 'p'); gl.bindAttribLocation(p, 1, 'vals'); gl.bindAttribLocation(p, 2, 'cc'); gl.bindAttribLocation(p, 3, 'sz');
   gl.linkProgram(p); if(!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
   const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
   for(let i=0;i<n;i++){ const a = gl.getActiveUniform(p, i); u[a.name] = gl.getUniformLocation(p, a.name); }
@@ -73,8 +73,10 @@ const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; 
     if(tf == 1) x = sqrt(max(x, 0.)); else if(tf == 2) x = log(max(x, 1.)) / log(10.);
     float t = clamp((x-lo)/(hi-lo), 0., 1.);
     v = vec4(t < .5 ? mix(c0, c1, t*2.) : mix(c1, c2, (t-.5)*2.), 1.); }`, FS);
-const EDGE = prog(`in vec2 p; in float cc; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; out vec4 v;
-  void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.); v = (filt >= 0 && int(cc+.5) != filt) ? vec4(0.) : col; }`, FS);
+// a boundary is full strength while its parcel is at least 20 tile pixels across, fading out by 6
+const EDGE = prog(`in vec2 p; in float cc; in float sz; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; uniform float texel; out vec4 v;
+  void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.);
+    v = (filt >= 0 && int(cc+.5) != filt) ? vec4(0.) : vec4(col.rgb, col.a * clamp((sz/texel - 6.)/14., 0., 1.)); }`, FS);
 const LAND = prog(`in vec2 p; uniform vec2 sc, of; uniform vec4 col; out vec4 v; void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; }`, FS);
 const QUAD = prog(`uniform vec4 rect; uniform vec4 uvr; out vec2 uv;
   void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = mix(uvr.xy, uvr.zw, c); gl_Position = vec4(mix(rect.xy, rect.zw, c), 0., 1.); }`,
@@ -93,13 +95,14 @@ const land = (function(){ const pos = [], idx = [];
 
 // ---- pieces: downloaded and cut into triangles in a worker
 const workerSrc = `importScripts(${JSON.stringify(new URL('earcut.min.js', location.href).href)});
-onmessage = e => { const {key, buf, M, OX, OY} = e.data; const dv = new DataView(buf);
+onmessage = e => { try { work(e.data); } catch(err){ postMessage({key: e.data.key, failed: true}); } };
+function work({key, buf, M, OX, OY}){ const dv = new DataView(buf);
   const n = dv.getUint32(4,true), nr = dv.getUint32(8,true), nv = dv.getUint32(12,true); let o = 16;
   const ids = new Int32Array(buf, o, n); o += 4*n; const vals = new Float32Array(buf, o, n*M); o += 4*n*M;
   const rlen = new Uint32Array(buf, o, nr); o += 4*nr; const st = new Int32Array(buf, o, 2*nr); o += 8*nr;
   const rper = new Uint16Array(buf, o, n); o += Math.ceil(2*n/4)*4; const cc = new Uint8Array(buf, o, n); o += Math.ceil(n/4)*4;
   const d = new Int16Array(buf, o, 2*(nv-nr));
-  const pos = new Float32Array(2*nv), pv = new Float32Array(4*nv), pc = new Uint8Array(nv), edge = new Uint32Array(2*nv);
+  const pos = new Float32Array(2*nv), pv = new Float32Array(4*nv), pc = new Uint8Array(nv), psz = new Float32Array(nv), edge = new Uint32Array(2*nv);
   const rs = new Uint32Array(nr+1), hole = new Uint8Array(nr), hx = new Int32Array(nv), hy = new Int32Array(nv);
   for(let r=0, v=0, q=0; r<nr; r++){ rs[r] = v; hole[r] = rlen[r]>>>31; const len = rlen[r] & 0x7FFFFFFF;
     let x = st[2*r], y = st[2*r+1]; hx[v] = x; hy[v] = y; v++;
@@ -113,6 +116,7 @@ onmessage = e => { const {key, buf, M, OX, OY} = e.data; const dv = new DataView
       if(x<a0)a0=x; if(x>a1)a1=x; if(y<b0)b0=y; if(y>b1)b1=y;
       edge[ne++] = v; edge[ne++] = v+1 < rs[k+1] ? v+1 : rs[k]; }
     bb[4*i]=a0; bb[4*i+1]=b0; bb[4*i+2]=a1; bb[4*i+3]=b1;
+    const size = Math.max(a1-a0, b1-b0); for(let k=r; k<r1; k++) for(let v=rs[k]; v<rs[k+1]; v++) psz[v] = size;
     for(let k=r; k<r1; ){ let q = k+1; while(q < r1 && hole[q]) q++;
       const base = rs[k], ax = hx[base], ay = hy[base], holes = []; flat.length = 0;
       for(let j=k; j<q; j++){ if(j > k) holes.push(flat.length/2); for(let v=rs[j]; v<rs[j+1]; v++) flat.push(hx[v]-ax, hy[v]-ay); }
@@ -121,16 +125,17 @@ onmessage = e => { const {key, buf, M, OX, OY} = e.data; const dv = new DataView
       for(let j=0;j<t.length;j++) tri[nt++] = base + t[j]; k = q; }
     r = r1; }
   pr0[n] = nr; tri = tri.slice(0, nt);
-  postMessage({key, n, ids: ids.slice(), pos, pv, pc, tri, edge, rs, pr0, bb},
-    [pos.buffer, pv.buffer, pc.buffer, tri.buffer, edge.buffer, rs.buffer, pr0.buffer, bb.buffer]); };`;
+  postMessage({key, n, ids: ids.slice(), pos, pv, pc, psz, tri, edge, rs, pr0, bb},
+    [pos.buffer, pv.buffer, pc.buffer, psz.buffer, tri.buffer, edge.buffer, rs.buffer, pr0.buffer, bb.buffer]); }`;
 const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], {type:'text/javascript'})));
 const pieces = new Map();   // "L/key" -> {state, vao, ntri, nedge, cpu (level 0, for picking), used}
 let pieceWaiters = [];
 worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return;
+  if(d.failed){ P.state = 'failed'; pieceWaiters = pieceWaiters.filter(w => !w(P)); draw(); return; }   // a piece that could not be read is skipped
   const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
   const ab = (data, loc, size, type, norm=false) => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, size, type, norm, 0, 0); return b; };
-  P.bufs = [ab(d.pos, 0, 2, gl.FLOAT), ab(d.pv, 1, 4, gl.FLOAT), ab(d.pc, 2, 1, gl.UNSIGNED_BYTE)];
+  P.bufs = [ab(d.pos, 0, 2, gl.FLOAT), ab(d.pv, 1, 4, gl.FLOAT), ab(d.pc, 2, 1, gl.UNSIGNED_BYTE), ab(d.psz, 3, 1, gl.FLOAT)];
   const t = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, t); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, d.tri, gl.STATIC_DRAW);
   gl.bindVertexArray(null);
   const eb = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, eb); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, d.edge, gl.STATIC_DRAW);
@@ -158,7 +163,7 @@ gl.bindRenderbuffer(gl.RENDERBUFFER, msRB); gl.renderbufferStorageMultisample(gl
 gl.bindFramebuffer(gl.FRAMEBUFFER, msFB); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msRB);
 const outFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 const tiles = new Map();   // "z/i/j" -> {tex, gen, born, used}
-const levelFor = z => { const texel = BASE / 2**z / TEX; return texel <= 1 ? 0 : texel <= 8 ? 1 : 2; };
+const levelFor = z => { const texel = BASE / 2**z / TEX; return texel <= 1 ? 0 : texel <= 4 ? 1 : texel <= 16 ? 2 : 3; };
 function renderTile(z, i, j){
   const T = BASE / 2**z, x0 = OX + i*T, y0 = OY + j*T, lvl = levelFor(z);
   const keys = piecesFor(lvl, x0, y0, x0+T, y0+T), ps = keys.map(k => piece(lvl, k));
@@ -175,13 +180,13 @@ function renderTile(z, i, j){
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
   gl.uniform3fv(u.grey, hex(css('--rule'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
   for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
-  // boundaries: about 1.5 screen points thick up close (tiles are shown at about one texel per device pixel), full
-  // strength until a typical 15 m section is under 8 texels wide, fading out by 3; none at the coarsest level
-  const texel = T / TEX, secPx = 15 / texel, ea = lvl === 2 ? 0 : Math.max(0, Math.min(1, (secPx - 3) / 5));
-  const thick = secPx >= 8 ? Math.max(1, Math.round(1.5 * dpr)) : 1, offs = [];
+  // boundaries: each fades by its own parcel's size on screen (EDGE), so a farm keeps its outline zoomed out while
+  // town sections fade
+  // about 1.5 screen points thick up close, one device pixel once a tile pixel covers more than 4 m
+  const texel = T / TEX, ea = 1, thick = texel <= 4 ? Math.max(1, Math.round(1.5 * dpr)) : 1, offs = [];
   for(let a=0; a<thick; a++) for(let c=0; c<thick; c++) offs.push([a*.75, c*.75]);
   if(ea > .03){ gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.useProgram(EDGE.p); gl.uniform2fv(EDGE.u.sc, sc); gl.uniform2fv(EDGE.u.of, of); gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), ea);
+    gl.useProgram(EDGE.p); gl.uniform2fv(EDGE.u.sc, sc); gl.uniform2fv(EDGE.u.of, of); gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), ea); gl.uniform1f(EDGE.u.texel, texel);
     const t = 2 / TEX;   // one texel in clip units
     for(const [dx, dy] of offs){ gl.uniform2f(EDGE.u.shift, dx*t, dy*t);
       for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }

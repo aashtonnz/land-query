@@ -5,7 +5,7 @@ columns only, D-12) and the national index pilot (`national-pilot`), and writes:
 
 - index.html and map.js: the page (site/map.html, site/map.js);
 - data/meta.json: council figures, the level and piece index, the coastline and the field lists;
-- data/L{level}/{key}.bin: parcel shapes and colouring values, cut into squares at three levels of detail
+- data/L{level}/{key}.bin: parcel shapes and colouring values, cut into squares at four levels of detail
   (LEVELS), so the page downloads only the pieces in view. At the simpler levels a parcel too small to keep its
   shape becomes a square of its own area at its point, so every parcel always covers its share of the land;
 - data/detail/{key}.json: each parcel's values for the side panel, in the finest level's squares;
@@ -27,8 +27,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 OUT = sys.argv[1] if len(sys.argv) > 1 else "map-site"
 ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM2000)
-# (square side m, simplification m): full detail for street level, then simpler shapes for zoomed-out views
-LEVELS = [(2048, 0.5), (16384, 4.0), (131072, 32.0)]
+# (square side m, simplification m): full detail for street level, then simpler shapes for zoomed-out views. Each
+# level is used where a tile pixel covers about 2-4 times its simplification (map.js levelFor), so simplifying never
+# shows; only parcels smaller than the simplification become squares of their own area
+LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
 MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
 COUNCILS = {"k": 0, "p": 1, "n": 2}
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y", "area_m2", "ground_mean_m", "slope_p90_deg",
@@ -95,7 +97,7 @@ def square(x, y, area):
 
 def level_shape(g, p, tol):
     """The parcel at this level: simplified, or a square of its own area if too small to keep its shape."""
-    if g is None or g.is_empty or math.sqrt(max(p.get("area_m2") or 0, 0)) < 3 * tol:
+    if g is None or g.is_empty or math.sqrt(max(p.get("area_m2") or 0, 0)) < tol:
         return square(p["rep_x"], p["rep_y"], p.get("area_m2"))
     s = g.simplify(tol, preserve_topology=True)
     return s if not s.is_empty else square(p["rep_x"], p["rep_y"], p.get("area_m2"))
