@@ -27,7 +27,7 @@ $('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Pori
 
 // ---- view
 const canvas = $('map'), over = $('over'), octx = over.getContext('2d');
-const gl = canvas.getContext('webgl2', {antialias:false, alpha:false, depth:false, stencil:false});
+const gl = canvas.getContext('webgl2', {antialias:true, alpha:false, depth:false, stencil:false});   // smoothing for the live boundaries
 if(!gl){ say('This map needs WebGL 2, which this browser does not offer. Try a current Chrome, Edge, Firefox or Safari.'); return; }
 let W = 0, H = 0, dpr = 1, touched = false;
 const view = {cx:0, cy:0, s:1};
@@ -64,8 +64,9 @@ function prog(vs, fs){ const p = gl.createProgram();
   return {p, u}; }
 const FS = 'in vec4 v; out vec4 o; void main(){ if(v.a < .01) discard; o = v; }';
 const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; uniform int m, filt, tf; uniform float lo, hi;
-  uniform vec3 c0, c1, c2, grey, ck, cp, cn; out vec4 v;
+  uniform vec3 c0, c1, c2, grey, ck, cp, cn, sea; out vec4 v;
   void main(){ gl_Position = vec4(p*sc+of, 0., 1.); int c = int(cc+.5);
+    if(c == 3){ v = vec4(sea, 1.); return; }   // rivers and lakes
     if(filt >= 0 && c != filt){ v = vec4(0.); return; }
     if(m == 4){ v = vec4(c==0 ? ck : (c==1 ? cp : cn), 1.); return; }
     float x = m==0 ? vals.x : (m==1 ? vals.y : (m==2 ? vals.z : vals.w));
@@ -73,10 +74,20 @@ const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; 
     if(tf == 1) x = sqrt(max(x, 0.)); else if(tf == 2) x = log(max(x, 1.)) / log(10.);
     float t = clamp((x-lo)/(hi-lo), 0., 1.);
     v = vec4(t < .5 ? mix(c0, c1, t*2.) : mix(c1, c2, (t-.5)*2.), 1.); }`, FS);
-// a boundary is full strength while its parcel is at least 20 tile pixels across, fading out by 6
-const EDGE = prog(`in vec2 p; in float cc; in float sz; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; uniform float texel; out vec4 v;
-  void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.);
-    v = (filt >= 0 && int(cc+.5) != filt) ? vec4(0.) : vec4(col.rgb, col.a * clamp((sz/texel - 6.)/14., 0., 1.)); }`, FS);
+// boundaries, drawn live on screen every frame: each is full strength while its parcel is at least 20 device pixels
+// across and fades out by 6, so it changes smoothly with the zoom; none for water
+const EDGE = prog(`in vec2 p; in float cc; in float sz; uniform vec2 sc, of, shift; uniform int filt; uniform vec4 col; uniform float pxm; out vec4 v;
+  void main(){ gl_Position = vec4(p*sc+of+shift, 0., 1.); int c = int(cc+.5);
+    float a = (c == 3 || (filt >= 0 && c != filt)) ? 0. : col.a * clamp((sz*pxm - 6.)/14., 0., 1.); v = vec4(a, a, a, 1.); }`,
+  'in vec4 v; out vec4 o; void main(){ o = v; }');
+// boundary coverage layer: copies of the lines are combined by keeping the strongest, not adding, then laid on once
+const COVER = prog(`out vec2 uv; void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = c; gl_Position = vec4(c*2.-1., 0., 1.); }`,
+  'in vec2 uv; uniform sampler2D tex; uniform vec3 col; out vec4 o; void main(){ o = vec4(col, texture(tex, uv).r); }');
+const edgeTex = gl.createTexture(), edgeFB = gl.createFramebuffer(); let edgeW = 0, edgeH = 0;
+function edgeTarget(){ if(edgeW === canvas.width && edgeH === canvas.height) return; edgeW = canvas.width; edgeH = canvas.height;
+  gl.bindTexture(gl.TEXTURE_2D, edgeTex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, edgeW, edgeH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, edgeTex, 0); gl.bindFramebuffer(gl.FRAMEBUFFER, null); }
 const LAND = prog(`in vec2 p; uniform vec2 sc, of; uniform vec4 col; out vec4 v; void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; }`, FS);
 const QUAD = prog(`uniform vec4 rect; uniform vec4 uvr; out vec2 uv;
   void main(){ vec2 c = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); uv = mix(uvr.xy, uvr.zw, c); gl_Position = vec4(mix(rect.xy, rect.zw, c), 0., 1.); }`,
@@ -178,19 +189,8 @@ function renderTile(z, i, j){
   gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 4 : s.m); gl.uniform1i(u.tf, s.tf);
   gl.uniform1f(u.lo, s.lo); gl.uniform1f(u.hi, s.hi); gl.uniform1i(u.filt, filt);
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
-  gl.uniform3fv(u.grey, hex(css('--rule'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
+  gl.uniform3fv(u.sea, hex(css('--sea'))); gl.uniform3fv(u.grey, hex(css('--rule'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
   for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
-  // boundaries: each fades by its own parcel's size on screen (EDGE), so a farm keeps its outline zoomed out while
-  // town sections fade
-  // about 1.5 screen points thick up close, one device pixel once a tile pixel covers more than 4 m
-  const texel = T / TEX, ea = 1, thick = texel <= 4 ? Math.max(1, Math.round(1.5 * dpr)) : 1, offs = [];
-  for(let a=0; a<thick; a++) for(let c=0; c<thick; c++) offs.push([a*.75, c*.75]);
-  if(ea > .03){ gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.useProgram(EDGE.p); gl.uniform2fv(EDGE.u.sc, sc); gl.uniform2fv(EDGE.u.of, of); gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), ea); gl.uniform1f(EDGE.u.texel, texel);
-    const t = 2 / TEX;   // one texel in clip units
-    for(const [dx, dy] of offs){ gl.uniform2f(EDGE.u.shift, dx*t, dy*t);
-      for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }
-    gl.disable(gl.BLEND); }
   gl.bindVertexArray(null);
   const key = z+'/'+i+'/'+j; let t = tiles.get(key);
   const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -238,6 +238,21 @@ function render(){
   for(const t of others){ quad(t, 1); keep.add(t.z+'/'+t.i+'/'+t.j); t.used = frame; }
   for(const [i, j] of want){ const t = tiles.get(z+'/'+i+'/'+j); if(!t) continue;
     const a = Math.min(1, (now - t.born) / 220); if(a < 1) fading = true; quad(t, a); }
+  // boundaries live, at the exact zoom, from this level's pieces in view; about 1.5 screen points thick
+  const lvl = levelFor(z), filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
+  const eps = piecesFor(lvl, vx0, vy0, vx1, vy1).map(k => piece(lvl, k)).filter(P => P.state === 'ready');
+  if(eps.length){ gl.disable(gl.BLEND); edgeTarget(); gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.viewport(0, 0, edgeW, edgeH);
+    gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendEquation(gl.MAX);
+    gl.useProgram(EDGE.p); const s = view.s;
+    gl.uniform2f(EDGE.u.sc, 2*s/W, 2*s/H); gl.uniform2f(EDGE.u.of, (OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H);
+    gl.uniform1i(EDGE.u.filt, filt); gl.uniform4f(EDGE.u.col, ...hex(css('--sheet')), 1); gl.uniform1f(EDGE.u.pxm, s*dpr);
+    const n = Math.max(1, Math.round(1.5*dpr));
+    for(let a=0; a<n; a++) for(let b=0; b<n; b++){ gl.uniform2f(EDGE.u.shift, a*.75*2/canvas.width, b*.75*2/canvas.height);
+      for(const P of eps){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.ebuf); gl.drawElements(gl.LINES, P.nedge, gl.UNSIGNED_INT, 0); } }
+    gl.bindVertexArray(null); gl.blendEquation(gl.FUNC_ADD);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(COVER.p); gl.uniform1i(COVER.u.tex, 0); gl.uniform3fv(COVER.u.col, hex(css('--sheet'))); gl.bindTexture(gl.TEXTURE_2D, edgeTex);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
   gl.disable(gl.BLEND);
   overlay();
   trimTiles(keep); trimPieces();
@@ -275,7 +290,7 @@ function insideRing(d, a, e, x, y){ let c = false; for(let v=a, w=e-1; v<e; w=v+
 async function pickAt(wx, wy, wantId){ const x = wx-OX, y = wy-OY;
   const keys = piecesFor(0, wx, wy, wx, wy); const ps = await Promise.all(keys.map(k => ensure(0, k)));
   for(const P of ps){ const d = P.cpu; if(!d) continue;
-    for(let k=0;k<d.n;k++){ if(wantId != null && d.ids[k] !== wantId) continue;
+    for(let k=0;k<d.n;k++){ if(d.ids[k] < 0 || (wantId != null && d.ids[k] !== wantId)) continue;   // -1: water
       if(wantId == null && (x<d.bb[4*k]||x>d.bb[4*k+2]||y<d.bb[4*k+1]||y>d.bb[4*k+3])) continue;
       let inside = wantId != null; if(!inside) for(let r=d.pr0[k]; r<d.pr0[k+1]; r++) if(insideRing(d, d.rs[r], d.rs[r+1], x, y)) inside = !inside;
       if(inside) return {piece:P, cpu:d, k, id:d.ids[k], x:wx, y:wy}; } }

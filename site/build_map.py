@@ -33,6 +33,7 @@ ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM
 LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
 MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
 COUNCILS = {"k": 0, "p": 1, "n": 2}
+WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y", "area_m2", "ground_mean_m", "slope_p90_deg",
                 "lidar_coverage_pct", "flow_path_m", "catchment_area_max_m2", "title_count", "easements_n"]
 KAPITI_ONLY = ["ww_pipe_dist_m", "ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dist_m"]
@@ -141,6 +142,21 @@ def coastline(bounds):
     return land
 
 
+def water(bounds):
+    """Rivers and lakes: LINZ river and stream bed parcels (not in the parcel rows) and Topo50 lake polygons, clipped."""
+    import arcgis, overlays
+    x0, y0, x1, y1 = bounds; out = []
+    svc = "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/"
+    for url, where in [(svc + "LINZ_NZ_Primary_Parcels/FeatureServer/0", "parcel_intent IN ('Hydro','Riverbed','Streambed')"),
+                       (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1")]:
+        for f in arcgis.query_all(url, dict(where=where, geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
+                                            spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193, maxAllowableOffset=0.5), workers=8):
+            if not f.get("geometry"): continue
+            g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
+            if not g.is_empty and g.area > 0: out.append(g)
+    return out
+
+
 def main():
     if os.path.exists(OUT): shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, "data", "detail"))
@@ -151,12 +167,19 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     meta = dict(origin=ORIGIN, levels=[], measures=MEASURES, councils=list(COUNCILS), detail_fields=DETAIL, stats=stats,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
+    waters = water(bounds); print(len(waters), "water polygons")
+    nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):
         os.makedirs(os.path.join(OUT, "data", f"L{li}"))
-        pieces = {}
+        pieces, wet = {}, {}
         for pid, p in P.items():
             k = (int((p["rep_x"] - ORIGIN[0]) // side), int((p["rep_y"] - ORIGIN[1]) // side))
             pieces.setdefault(k, []).append(pid)
+        for g in waters:   # water, simplified for this level; anything smaller than about a pixel there is left out
+            if g.area < 4 * tol * tol: continue
+            rp = g.representative_point(); k = (int((rp.x - ORIGIN[0]) // side), int((rp.y - ORIGIN[1]) // side))
+            sg = g.simplify(tol, preserve_topology=True)
+            if not sg.is_empty: wet.setdefault(k, []).append(sg); pieces.setdefault(k, [])
         index, total = {}, 0
         for (i, j), pids in sorted(pieces.items()):
             items, bb = [], [math.inf, math.inf, -math.inf, -math.inf]
@@ -165,10 +188,13 @@ def main():
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 v = [float(p[m]) if p.get(m) is not None else float("nan") for m in MEASURES]
                 items.append((pid, COUNCILS[p["c"]], v, g))
+            for g in wet.get((i, j), []):
+                b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
+                items.append((-1, WATER, nanv, g))
             blob = encode(items); key = f"{i}_{j}"
             open(os.path.join(OUT, "data", f"L{li}", key + ".bin"), "wb").write(blob)
             index[key] = [round(x) for x in bb] + [len(pids)]; total += len(blob)
-            if li == 0:   # the side panel's values, in the same squares as full detail
+            if li == 0 and pids:   # the side panel's values, in the same squares as full detail
                 det = {str(pid): [clean(P[pid].get(f)) for f in DETAIL] for pid in pids}
                 json.dump(det, open(os.path.join(OUT, "data", "detail", key + ".json"), "w"), separators=(",", ":"), ensure_ascii=False)
         meta["levels"].append(dict(side=side, tol=tol, pieces=index))
