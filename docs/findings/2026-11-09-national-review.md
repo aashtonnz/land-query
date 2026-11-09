@@ -168,7 +168,7 @@ and 1 serious faults. A seventh review follows (T-120), limited to T-119.
 
 | # | Finding | Seriousness | Fix (T-121) |
 | --- | --- | --- | --- |
-| 1 | Rocks LINZ's outline leaves out but lying within 50 m of it still read 100% sea: 16 parts of Section 3 Block I Kapiti SD (Kapiti Island's reefs), 0 to 36 m off the island's outline; most rocks lie near a shore, so the national fix was only partial | Serious | The 50 m rule is gone. A parcel the outline puts (almost) wholly in the sea, and not mostly lake or river, reads as water only where its highest ground is known and at most 3 m; otherwise unknown. Tested with a rock 10 m off the shore, a low seabed parcel, one with no heights, one at exactly 3 m |
+| 1 | Rocks LINZ's outline leaves out but lying within 50 m of it still read 100% sea: 16 parts of Section 3 Block I Kapiti SD (Kapiti Island's reefs), 0 to 36 m off the island's outline; most rocks lie near a shore, so the national fix was only partial | Serious | The 50 m rule is gone. T-121 kept a parcel the outline puts wholly in the sea as water where its highest ground was at most 3 m; review 23 found that does not work (below), replaced in T-123 |
 | 2 | Whether land lay "within 50 m" depended on the tile, as the outline was clipped 30 m beyond the parcels | Moderate | Gone with the 50 m rule: the new rule looks only inside the parcel |
 | 3 | Tests did not catch dropping Retry-After, short waits for a busy service, a different distance, or the map drawing sea for parcels measured as 0 | Moderate | Tests record the pauses; the map test's measured-0 parcel reaches past the outline. Each fix checked by undoing it |
 | 4 | A long Retry-After could make one wait an hour | Minor | Capped at the longest pause (10 minutes) |
@@ -177,4 +177,15 @@ and 1 serious faults. A seventh review follows (T-120), limited to T-119.
 
 Rounds 16 to 22 found 4, 3, 3, 3, 2, 1 and 1 serious faults; the last two were both about islets the land outline
 leaves out.
+
+## Twenty-third review: T-121 (T-122)
+
+| # | Finding | Seriousness | Fix (T-123) |
+| --- | --- | --- | --- |
+| 1 | The height check does not work: offshore, the elevation grid holds the sea as a flat surface near −0.6 m, so a rock blended into it reads "low" and stays sea. Five Kapiti reef parts still read 98 to 100% water, two more were under the 99% cut; 3 m is also above high water (about +0.8 m), so a dry rock could pass | Serious | Heights are no longer used. Half or more of the parcel outside the outline means water unknown, unless lakes or rivers cover most of it. Under half is measured. True seabed parcels (marinas) become unknown too: the outline cannot tell them from rocks |
+| 2 | The 99% cut left a parcel with no heights at 98.1% | Moderate | Covered by the half rule |
+| 3 | "Highest ground known" held when heights covered 11% of the parcel | Moderate | Heights no longer used |
+| 4 | Tests did not pin the lake/river exception, the cut, or max against min/mean | Serious (tests) | New test: a rock with low "heights", exactly half outside, a third outside, wholly outside under a river mouth, wholly inside. Each threshold and the exception checked by changing it |
+| 5 | The docs overstated the rule | Minor | `SOURCES.md` rewritten |
+| 6 | The map shaded the remaining reef parts as sea | Follows from 1 | Unknown water draws no sea |
 
