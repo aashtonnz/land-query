@@ -33,6 +33,7 @@ ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM
 LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
 MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
 COUNCILS = {"k": 0, "p": 1, "n": 2}
+WET = {}    # parcel id -> mostly water (national index water_pct >= 50)
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y", "area_m2", "ground_mean_m", "slope_p90_deg",
                 "lidar_coverage_pct", "flow_path_m", "catchment_area_max_m2", "title_count", "easements_n"]
@@ -68,7 +69,8 @@ def parcels():
     P, stats = {}, {}
     nd = results("national-pilot"); nf = os.path.join(nd, "index.parquet")
     for r in duckdb.sql(f"""SELECT parcel_id, appellation, parcel_intent, rep_x, rep_y, area_m2, ground_mean_m,
-            upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority FROM '{nf}'""").fetchall():
+            upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority, water_pct FROM '{nf}'""").fetchall():
+        WET[r[0]] = (r[12] or 0) >= 50   # mostly sea, lake or river: drawn as water (T-113)
         P[r[0]] = dict(c="n", appellation=r[1], parcel_intent=r[2], rep_x=r[3], rep_y=r[4], area_m2=r[5], ground_mean_m=r[6],
                        catchment_area_max_m2=r[7], title_count=r[8], building_cover_pct=r[9], address=r[10],
                        territorial_authority=r[11])
@@ -168,12 +170,13 @@ def water(bounds):
     x0, y0, x1, y1 = bounds; out = []
     svc = "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/"
     for url, where in [(svc + "LINZ_NZ_Primary_Parcels/FeatureServer/0", "parcel_intent IN ('Hydro','Riverbed','Streambed')"),
-                       (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1")]:
+                       (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1"),
+                       (svc + "LINZ_NZ_River_Name_Polygons_Pilot/FeatureServer/0", "1=1")]:
         for f in arcgis.query_all(url, dict(where=where, geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
                                             spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193, maxAllowableOffset=0.5), workers=8):
             if not f.get("geometry"): continue
             g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
-            if not g.is_empty and g.area > 0: out.append((g, "Topo" in url))
+            if not g.is_empty and g.area > 0: out.append((g, "Primary_Parcels" not in url))
     return out
 
 
@@ -187,7 +190,10 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     meta = dict(origin=ORIGIN, levels=[], measures=MEASURES, councils=list(COUNCILS), detail_fields=DETAIL, stats=stats,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
-    # Topo50 lakes (1:50k) are clipped to land outside the parcels, so a lake never covers part of a section (T-109)
+    # Topo50 lakes and LINZ's river areas are mapped at 1:50k, so their edges can stray over sections: within EDGE_M of a
+    # lake's edge, land parcels (mostly outside it) are cut out; the middle of a lake is never cut, so small lakes inside
+    # a farm parcel stay (T-109, T-113)
+    EDGE_M = 25.0
     from shapely import STRtree
     from shapely.ops import unary_union
     pg = [geoms[pid] for pid in P if pid in geoms]; tree = STRtree(pg); waters = []
@@ -196,7 +202,7 @@ def main():
             # only by parcels mostly outside the lake: a lake bed that is itself a parcel (Lake Wairarapa's is 75 km²)
             # keeps its water (T-111)
             hit = [q for q in (pg[i] for i in tree.query(g, predicate="intersects")) if q.intersection(g).area < 0.5 * q.area]
-            if hit: g = g.difference(unary_union(hit))
+            if hit: g = g.difference(unary_union(hit).intersection(g.boundary.buffer(EDGE_M)))
         if not g.is_empty and g.area > 1: waters.append(g)
     print(len(waters), "water polygons")
     nanv = [float("nan")] * len(MEASURES)
@@ -218,7 +224,7 @@ def main():
                 p = P[pid]; g = level_shape(geoms.get(pid), p, tol)
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 v = [float(p[m]) if p.get(m) is not None else float("nan") for m in MEASURES]
-                items.append((pid, COUNCILS[p["c"]], v, g))
+                items.append((pid, WATER if WET.get(pid) else COUNCILS[p["c"]], v, g))
             for g in wet.get((i, j), []):
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 items.append((-1, WATER, nanv, g))

@@ -37,14 +37,11 @@ LAYERS = dict(
     buildings=("LINZ_NZ_Building_Outlines", "building_id,use_,capture_source_to", 101290),
     addresses=("LINZ_NZ_Addresses", "address_id,full_address,address_number,suburb_locality,town_city,territorial_authority", 105689),
     coast=("LINZ_NZ_Coastline_Mean_High_Water_Springs", "id", None),            # LDS layer number to confirm
+    lakes=("NZ_Lake_Polygons_Topo_1_50k", "t50_fid", None),                     # Topo50 lakes (T-113)
+    rivers=("LINZ_NZ_River_Name_Polygons_Pilot", "river_section_id", None),     # river areas (T-113)
 )
-KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id")
+KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id", lakes="t50_fid", rivers=None)
 EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)", "Riverbed", "Streambed"}
-# older bed parcels carry the DCDB intent: known by their legal description ("Part Bed Porirua Harbour", "River Bed",
-# "Part Mangapouri Stream Bed"), but not a former bed that is now land ("Old River Bed") (T-108)
-import re as _re
-BED = _re.compile(r"\b(?<!old )(river |stream |harbour )?bed\b", _re.I)
-def is_bed(app): return bool(app) and bool(BED.search(app)) and not _re.search(r"\bold\b[^,]*\bbed\b", app, _re.I)
 # a parcel belongs to a region if its point lies within this distance of the region's boundary polygons, which follow
 # a simplified coast: shore and island parcels fell just outside (T-108)
 REGION_MARGIN = 1000.0
@@ -150,14 +147,27 @@ def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
     frontage. Longer stretches are kept, so messy surveys (a road a little off a lot's side, a thin reserve strip
     between lot and road) can lengthen a frontage but never empty it (T-111, T-112)."""
     near = [road_buf[i] for i in (road_tree.query(g) if road_tree else [])]
-    if not near: return 0.0
+    if not near: return 0.0, 0.0
     edge = g.boundary.intersection(unary_union(near))
     sides = [q for q in (nb[i][0] for i in (nb_tree.query(g.buffer(0.2)) if nb_tree else []) if nb[i][1] != own_id)]
     # each neighbour separately: one that shares only an end piece is a side; one sharing more (a strip along the
     # frontage) is not
     ends = [piece for piece in (edge.intersection(q.buffer(0.1)) for q in sides) if 0 < piece.length <= 1.5]
     if ends: edge = edge.difference(unary_union([x.buffer(0.01) for x in ends]))
-    return round(edge.length, 1)
+    # the part reached only across a strip under 1 m wide (often a reserve that bars access): reported apart (T-113)
+    thin = [q for q in sides if q.length and 2 * q.area / q.length < 1.0]
+    via = edge.intersection(unary_union([q.buffer(0.1) for q in thin])).length if thin else 0.0
+    return round(edge.length, 1), round(via, 1)
+
+
+def lake_river_shares(parcels, water):
+    """Share (%) of each parcel under lake or river polygons (T-113)."""
+    if not water: return [0.0] * len(parcels)
+    wt = STRtree([g for g, _ in water]); out = []
+    for g, _, _ in parcels:
+        near = [water[i][0] for i in wt.query(g)]
+        out.append(round(min(100.0, 100 * g.intersection(unary_union(near)).area / g.area), 1) if near and g.area else 0.0)
+    return out
 
 
 def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), neighbours=()):
@@ -204,7 +214,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), 
         ta = [tas[i][1].get("NAME") for i in (tt.query(rp, predicate="within") if tt else [])]
         r["territorial_authority"] = ta[0] if ta else (ads[0].get("territorial_authority") if ads else None)
         # road frontage: the parcel's boundary within 0.1 m of a road parcel
-        r["road_frontage_m"] = frontage(g, p.get("id"), rt, road_buf, nt, nb)
+        r["road_frontage_m"], r["road_frontage_via_strip_m"] = frontage(g, p.get("id"), rt, road_buf, nt, nb)
         if ct is not None:
             idx, dist = ct.query_nearest(g, max_distance=COAST_MAX, return_distance=True)
             d = float(dist.min()) if len(dist) else None
@@ -245,6 +255,7 @@ def elevation_columns(parcels, Z, T, lidar, acc, trunc):
                              steep_pct=round(100 * a.steep, 1), low_lying_pct=round(100 * a.low, 1),
                              lidar_pct=round(100 * a.li, 1), ground_cells=int(a.n),
                              ground_cells_pct=round(100 * a.n / max(1, allc[k]), 1),   # of the parcel's own cell centres: under 100 means some have no ground (T-108)
+                             sea_pct=round(100 * (1 - a.n / max(1, allc[k])), 1),   # its cells with no ground: the sea in this grid (T-113)
                              upslope_area_max_m2=float(round(top.loc[k, "acc"])), upslope_truncated=bool(top.loc[k, "tr"]),
                              elevation_from="cells"))
             continue
@@ -256,6 +267,7 @@ def elevation_columns(parcels, Z, T, lidar, acc, trunc):
                          slope_mean_deg=round(float(S[r, c]), 1) if ok and np.isfinite(S[r, c]) else None, slope_max_deg=None,
                          flat_pct=None, steep_pct=None, low_lying_pct=None,
                          lidar_pct=(100.0 if lidar[r, c] else 0.0) if ok else None, ground_cells=0, ground_cells_pct=0.0,
+                         sea_pct=(0.0 if ok else (100.0 if allc[k] or (0 <= r < H and 0 <= c < W) else None)),
                          upslope_area_max_m2=float(round(acc[r, c])) if ok and np.isfinite(acc[r, c]) else None,
                          upslope_truncated=bool(trunc[r, c]) if ok else None, elevation_from="point" if ok else None))
     return rows
@@ -289,22 +301,28 @@ def index_tile(tile, cache, region=None, tas=()):
     titles = current_titles(tf)
     neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
     rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas, neighbours)
-    # a bed by name only when it is an old survey record with no title and no address: reclaimed and railway land named
-    # "Part Bed Port Nicholson" has a title or a street address and is land (T-111, T-112)
-    keep = [k for k, (r, (_, p, _)) in enumerate(zip(rows, parcels)) if not (p.get("parcel_intent") == "DCDB"
-            and not (p.get("titles") or "").strip() and not r.get("address_count") and is_bed(p.get("appellation")))]
-    prov["beds_by_name"] = len(rows) - len(keep)
-    rows = [rows[k] for k in keep]; parcels = [parcels[k] for k in keep]
-    # a parcel taken in by the coastal margin whose address puts it in another district is not this region's (T-111)
+    # water is measured, never guessed from a name or a title (T-113): the share under lakes and river areas here, the
+    # sea share from the elevation grid below
+    lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
+    for r, s_ in zip(rows, lake_river_shares(parcels, lw)): r["lake_river_pct"] = s_
+    # a parcel taken in by the coastal margin is kept only if its district, from its own address or else the nearest
+    # address within 1 km, is one of the region's (T-111, T-113)
     if REGION_NAMES:
-        keep = [k for k, r in enumerate(rows) if parcels[k][2].within(REGION_CORE) or not r.get("territorial_authority")
-                or plain(r["territorial_authority"]) in REGION_NAMES]
+        adr = geoms(af); at = STRtree([g for g, _ in adr]) if adr else None
+        def district(k):
+            if rows[k].get("territorial_authority"): return rows[k]["territorial_authority"]
+            if at is None: return None
+            i_, d_ = at.query_nearest(parcels[k][2], max_distance=1000, return_distance=True)
+            return adr[int(i_[0])][1].get("territorial_authority") if len(i_) else None
+        keep = [k for k in range(len(rows)) if parcels[k][2].within(REGION_CORE) or plain(district(k)) in REGION_NAMES]
         prov["outside_region_by_address"] = len(rows) - len(keep)
         rows = [rows[k] for k in keep]; parcels = [parcels[k] for k in keep]
     if not rows: return [], dict(prov, rows=0, seconds=round(time.time() - t0, 1))
     t1 = time.time()
     Z, T, eprov, L, acc, tr = elevation_grid(tile)
-    for r, e in zip(rows, elevation_columns(parcels, Z, T, L, acc, tr)): r.update(e)
+    for r, e in zip(rows, elevation_columns(parcels, Z, T, L, acc, tr)):
+        r.update(e)
+        r["water_pct"] = round(min(100.0, r.pop("lake_river_pct", 0.0) + (e.get("sea_pct") or 0.0)), 1)
     for r, (g, _, _) in zip(rows, parcels):
         r["geometry_wkb"] = wkb.dumps(g.simplify(0.5, preserve_topology=True))
     prov.update(elevation=eprov, rows=len(rows), seconds_vector=round(t1 - t0, 1), seconds_elevation=round(time.time() - t1, 1))

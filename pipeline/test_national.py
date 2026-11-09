@@ -140,10 +140,52 @@ def test_frontage_counts_a_road_set_slightly_off_the_line_but_not_the_side_bound
     assert 19.6 <= r["road_frontage_m"] <= 20.0, r["road_frontage_m"]
 
 
-def test_titled_or_addressed_land_named_as_a_bed_is_kept():
-    import inspect
-    src = inspect.getsource(N.index_tile)
-    assert 'not r.get("address_count")' in src and "is_bed(" in src and 'not (p.get("titles")' in src
+def run_tile(monkey_layers, Z=None, region=None, core=None, names=()):
+    """index_tile on made-up LINZ data (no network): monkey_layers maps a layer name (or 'roads') to [(geometry, props)]."""
+    from shapely.geometry import box as _box
+    feat = lambda g, p: dict(geometry=g.__geo_interface__, properties=p)
+    def fake_fetch(layer, bbox, cache, where="1=1"):
+        key = "roads" if "Road" in where else layer
+        return [feat(g, p) for g, p in monkey_layers.get(key, [])], dict(features=0)
+    T = from_origin(-200, 1200, 10, 10)
+    Zg = np.full((140, 140), 5.0, np.float32) if Z is None else Z
+    keep = (N.fetch, N.elevation_grid, N.REGION_CORE, N.REGION_NAMES)
+    N.fetch = fake_fetch
+    N.elevation_grid = lambda tile: (Zg, T, [], np.ones(Zg.shape, bool), np.ones(Zg.shape, np.float32) * 100, np.zeros(Zg.shape, bool))
+    N.REGION_CORE, N.REGION_NAMES = core, set(names)
+    try: rows, prov = N.index_tile((0, 0, 1000, 1000), "/nonexistent", region)
+    finally: N.fetch, N.elevation_grid, N.REGION_CORE, N.REGION_NAMES = keep
+    return {r["parcel_id"]: r for r in rows}
+
+
+def test_water_is_measured_not_guessed_from_names_or_titles():
+    """T-113: a lake bed reads as water; reclaimed land named as a harbour bed, untitled and unaddressed, stays land."""
+    lot = box(100, 100, 140, 140); lakebed = box(300, 300, 500, 500); reclaimed = box(600, 100, 700, 200)
+    P = lambda i, app, intent="DCDB", titles=None: dict(id=i, appellation=app, parcel_intent=intent, titles=titles)
+    rows = run_tile({"parcels": [(lot, P(1, "Lot 1 DP 1", "Fee Simple Title", "T1")), (lakebed, P(2, "Section 1 SO 518213", "Legalisation", "T2")),
+                                 (reclaimed, P(3, "Part Bed Port Nicholson SO 31787"))],
+                     "lakes": [(box(280, 280, 520, 520), dict(t50_fid=1))],
+                     "titles": [(lot, dict(title_no="T1", status="LIVE", type="Freehold")), (lakebed, dict(title_no="T2", status="PRTC", type="Freehold"))]})
+    assert rows[2]["title_types"] == "Freehold" and rows[2]["titles_not_found"] == 0   # partly cancelled is current, through index_tile
+    assert set(rows) == {1, 2, 3}                                       # nothing dropped by its name or paperwork
+    assert rows[2]["water_pct"] == 100 and rows[1]["water_pct"] == 0 and rows[3]["water_pct"] == 0
+
+
+def test_sea_share_comes_from_the_grid():
+    Z = np.full((140, 140), 5.0, np.float32); Z[:, 80:] = np.nan          # the sea east of x = 600
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(700, 100, 800, 200), dict(id=2, parcel_intent="DCDB"))]}, Z=Z)
+    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] == 100
+
+
+def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():
+    core = box(0, 0, 500, 1000); grown = box(0, 0, 1000, 1000)
+    rows = run_tile({"parcels": [(box(100, 100, 150, 150), dict(id=1, parcel_intent="DCDB")),
+                                 (box(600, 100, 650, 150), dict(id=2, parcel_intent="DCDB")),     # margin, nearest address elsewhere
+                                 (box(600, 800, 650, 850), dict(id=3, parcel_intent="DCDB"))],    # margin, nearest address in the region
+                     "addresses": [(Point(640, 160), dict(full_address="1 Beach Rd", address_number=1, territorial_authority="Horowhenua District")),
+                                   (Point(640, 860), dict(full_address="2 Shore Rd", address_number=2, territorial_authority="Kāpiti Coast District"))]},
+                    region=grown, core=core, names=["kapiti coast district"])
+    assert set(rows) == {1, 3}
 
 
 def test_frontage_counts_across_a_thin_strip_to_the_road():
@@ -152,12 +194,14 @@ def test_frontage_counts_across_a_thin_strip_to_the_road():
     road = box(-50, -20, 70, -0.2)
     r = N.vector_columns([parcel(g, id=1)], [(road, {})], {}, [], [], [], neighbours=[(strip, dict(id=9)), (box(-20, 0, 0, 30), dict(id=2)), (box(20, 0, 40, 30), dict(id=3))])[0]
     assert 19.6 <= r["road_frontage_m"] <= 22.0, r["road_frontage_m"]   # never 0 across the strip
+    assert 19.6 <= r["road_frontage_via_strip_m"] <= 22.0                # and reported as reached across a strip (T-113)
+    r2 = N.vector_columns([parcel(g, id=1)], [(box(-50, -20, 70, -0.25), {})], {}, [], [], [], neighbours=[(box(-20, 0, 0, 30), dict(id=2))])[0]
+    assert r2["road_frontage_via_strip_m"] == 0
 
 
 def test_no_vesting_text_and_current_titles_in_every_fetch():
     import inspect
     assert "statutory_actions" not in N.LAYERS["parcels"][1]
-    assert "current_titles(tf)" in inspect.getsource(N.index_tile)
     assert "PRTC" in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_parcels.py")).read()
     assert N.plain("Kāpiti Coast District") == "kapiti coast district"
 
@@ -172,7 +216,6 @@ def test_surface_model_columns_cover_what_the_dsm_measures():
 def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
     f = lambda no, st: dict(properties=dict(title_no=no, status=st, type="Freehold"))
     assert set(N.current_titles([f("A", "LIVE"), f("B", "PRTC"), f("C", "CANC")])) == {"A", "B"}
-    assert N.is_bed("Part Bed Porirua Harbour") and N.is_bed("River Bed") and not N.is_bed("Old River Bed Block II")
 
 
 if __name__ == "__main__":

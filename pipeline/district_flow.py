@@ -95,7 +95,8 @@ def mosaic(bbox=None, res=None, lidar_mask=False):
         prov.append(dict(collection=BASE + coll + "/collection.json", title=c.get("title"), items=hrefs,
                          licence=c.get("license"), fetched=utc_now()))
         if lidar_mask and "contour" not in coll: L = np.isfinite(Z)
-    Z[Z <= -100] = np.nan
+    from lidar_catalogue import NO_DATA_FLOOR
+    Z[Z <= NO_DATA_FLOOR] = np.nan   # a real height can be below -100 m (T-112)
     Z[sea_mask(Z, Z8)] = np.nan
     return (Z, T, prov, L & np.isfinite(Z)) if lidar_mask else (Z, T, prov)
 

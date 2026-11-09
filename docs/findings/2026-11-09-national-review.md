@@ -88,4 +88,24 @@ Checked correct by this reviewer: the council builds are not changed by T-107 (n
 partly cancelled titles are counted once; the shore parcels are present; the map's escaping, search order and workflow
 rights.
 
-As this review had serious findings, a further fresh review follows the fixes (T-112).
+As this review had serious findings, a further fresh review followed the fixes (T-112).
+
+## Eighteenth review: the second round of fixes (T-112)
+
+| # | Finding | Seriousness | Fix (T-113) |
+| --- | --- | --- | --- |
+| 1 | Cutting lakes by every parcel mostly outside them erased small lakes lying inside farm parcels: 309 lakes over 0.5 ha lost over 80% (Lake Pounui, Boggy Pond) | Serious (map) | Lakes are cut only within 25 m of their edge (about Topo50's accuracy); their middles are never cut |
+| 2 | Lake-bed parcels (Lake Wairarapa 75 km², Ōnoke) are index rows described as flat, low-lying land | Serious | A measured `water_pct`: share under Topo50 lakes and LINZ river areas, plus the sea share of its 10 m cells. Rows are kept, and the map draws parcels mostly under water as water |
+| 3 | The bed rule still dropped 16 reclaimed harbour parcels that the DEM shows are land, and kept a parcel 98% harbour because it has an address: paperwork, not land | Serious | The name-based bed rule is removed: no row is dropped by its name, title or address; water is measured (2) |
+| 4 | Tests that read source text, or did not run the changed code: inverting the region rule or the bed rule failed no test | Moderate | Tests now run `index_tile` itself on made-up LINZ data (no network); undoing each of 11 rules fails a test |
+| 5 | A margin parcel with no address kept (Lot 2 DP 72858, Horowhenua) | Moderate | Its district from the nearest address within 1 km |
+| 6 | Frontage counted across thin reserve strips, where legal access may be barred (1.6% of lots, more than 5 m) | Moderate | Reported apart: `road_frontage_via_strip_m` |
+| 7 | River beds named as beds showed as land on the map | Minor | LINZ river areas drawn as water; with (3) such parcels are rows whose water share is measured |
+| 8 | The 10 m grid still dropped heights below −100 m | Minor | Same −1,000 m floor |
+
+Checked correct by this reviewer: frontage on 2,001 lots measured independently (no wrong zeros; corner, rear and
+offset-road lots match); partly cancelled titles; the LiDAR read path and the surface-model rule.
+
+The serious findings were all in water and parcel membership, decided until now from names and paperwork. T-113
+replaces that with measurement, and a fourth fresh review follows (T-114).
+
