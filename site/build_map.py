@@ -88,6 +88,22 @@ def parcels():
         n, lid, med = duckdb.sql(f"SELECT count(*), count(ground_mean_m), round(median(ground_mean_m), 1) FROM '{f}'").fetchall()[0]
         stats[c] = dict(parcels=n, with_lidar=lid, median_ground=med, run=open(os.path.join(d, "RUN.txt")).read().strip())
     shapes = {pid: b for pid, b in duckdb.sql(f"SELECT parcel_id, geometry_wkb FROM '{nf}'").fetchall()}
+    # council parcels the national index does not hold (outside its region, or superseded since the council build):
+    # their current shape from LINZ by id; a parcel LINZ no longer has is left off the map, never drawn as a stand-in
+    # square over the parcels that replaced it (T-109)
+    import arcgis
+    from shapely import wkb as _wkb
+    from shapely.geometry import shape as _shape
+    need = [pid for pid in P if pid not in shapes]
+    for i in range(0, len(need), 200):
+        ids = ",".join(str(x) for x in need[i:i + 200])
+        for f in arcgis.query_all("https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+                                  dict(where=f"id IN ({ids})", outFields="id", outSR=2193)):
+            if f.get("geometry"): shapes[f["properties"]["id"]] = _wkb.dumps(_shape(f["geometry"]))
+    gone = [pid for pid in need if pid not in shapes]
+    for pid in gone: P.pop(pid)
+    print(len(need), "council parcels without a national-index shape;", len(need) - len(gone), "found in LINZ,", len(gone), "superseded and left out")
+    stats["superseded_left_out"] = len(gone)
     return P, shapes, stats
 
 
@@ -157,7 +173,7 @@ def water(bounds):
                                             spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193, maxAllowableOffset=0.5), workers=8):
             if not f.get("geometry"): continue
             g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
-            if not g.is_empty and g.area > 0: out.append(g)
+            if not g.is_empty and g.area > 0: out.append((g, "Topo" in url))
     return out
 
 
@@ -171,7 +187,16 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     meta = dict(origin=ORIGIN, levels=[], measures=MEASURES, councils=list(COUNCILS), detail_fields=DETAIL, stats=stats,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
-    waters = water(bounds); print(len(waters), "water polygons")
+    # Topo50 lakes (1:50k) are clipped to land outside the parcels, so a lake never covers part of a section (T-109)
+    from shapely import STRtree
+    from shapely.ops import unary_union
+    pg = [geoms[pid] for pid in P if pid in geoms]; tree = STRtree(pg); waters = []
+    for g, topo in water(bounds):
+        if topo:
+            hit = [pg[i] for i in tree.query(g, predicate="intersects")]
+            if hit: g = g.difference(unary_union(hit))
+        if not g.is_empty and g.area > 1: waters.append(g)
+    print(len(waters), "water polygons")
     nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):
         os.makedirs(os.path.join(OUT, "data", f"L{li}"))

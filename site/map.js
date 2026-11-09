@@ -8,6 +8,8 @@
 const $ = id => document.getElementById(id);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const fmt = (v, d=0) => v==null ? '—' : Number(v).toLocaleString('en-NZ',{maximumFractionDigits:d});
+// text from the data is always escaped before it goes into the page (T-109)
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const hex = c => { c = c.replace('#',''); return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16)/255); };
 const ns = $('natstatus'), say = t => { ns.textContent = t; };
 
@@ -43,15 +45,15 @@ let mode = 'ground_mean_m', filter = 'all', gen = 0;   // gen: bumped when colou
 const SCALES = {
   ground_mean_m:{m:0, tf:1, lo:0, hi:Math.sqrt(200), label:'Mean ground height (m, square-root scale)', ends:['0','200+']},
   slope_p90_deg:{m:1, tf:0, lo:0, hi:35, label:'90th percentile slope (°)', ends:['0°','35°+']},
-  catchment_area_max_m2:{m:2, tf:2, lo:3, hi:8, label:'Upslope catchment (m², log)', ends:['1,000','100 km²']},
-  ww_pipe_year:{m:3, tf:0, lo:1950, hi:2020, label:'Nearest sewer installed (Kāpiti)', ends:['1950','2020']},
+  catchment_area_max_m2:{m:2, tf:2, lo:3, hi:8, label:'Upslope catchment (m², log)', ends:['≤1,000','≥100 km²']},
+  ww_pipe_year:{m:3, tf:0, lo:1950, hi:2020, label:'Nearest sewer installed (Kāpiti; KCDC records many as 1979 or 1980, likely placeholders)', ends:['≤1950','2020']},
 };
 function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
   const [p,q,u] = t<.5 ? [a,m,t*2] : [m,b,(t-.5)*2]; return 'rgb(' + p.map((v,i)=>Math.round((v+(q[i]-v)*u)*255)).join(',') + ')'; }
 function legend(){ const L = $('legend');
-  if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div>`; return; }
+  if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div><div class="keys"><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel</span></div>`; return; }
   const s = SCALES[mode], g = [0,.25,.5,.75,1].map(ramp).join(',');
-  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div style="color:var(--muted)">Grey: no value</div>`; }
+  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel (roads, railways)</span></div>`; }
 
 // ---- GL programs
 function prog(vs, fs){ const p = gl.createProgram();
@@ -194,7 +196,7 @@ function renderTile(z, i, j){
   gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 4 : s.m); gl.uniform1i(u.tf, s.tf);
   gl.uniform1f(u.lo, s.lo); gl.uniform1f(u.hi, s.hi); gl.uniform1i(u.filt, filt);
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
-  gl.uniform3fv(u.sea, hex(css('--sea'))); gl.uniform3fv(u.grey, hex(css('--rule'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
+  gl.uniform3fv(u.sea, hex(css('--sea'))); gl.uniform3fv(u.grey, hex(css('--novalue'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
   for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
   gl.bindVertexArray(null);
   const key = z+'/'+i+'/'+j; let t = tiles.get(key);
@@ -315,8 +317,8 @@ const ROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height','
   ['lidar_coverage_pct','LiDAR coverage','%',1],['flow_path_m','Overland flow paths','m',0],['catchment_area_max_m2','Upslope catchment','m²',0],
   ['title_count','Titles','',0],['easements_n','Easement parcels','',0],
   ['ww_pipe_dist_m','Nearest sewer','m',1],['ww_pipe_year','Sewer installed','',0],['ww_pipe_condition_grade','Sewer condition grade (1–5)','',0],['ws_pipe_dist_m','Nearest water main','m',1]];
-const NROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height (10 m grid)','m',1],
-  ['catchment_area_max_m2','Upslope catchment (10 m grid)','m²',0],['building_cover_pct','Under building outlines','%',0],['title_count','Titles','',0]];
+const NROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height (10 m grid; one point on very small parcels)','m',1],
+  ['catchment_area_max_m2','Upslope catchment (10 m grid; at least, where the catchment runs past the grid)','m²',0],['building_cover_pct','Under building outlines','%',0],['title_count','Titles','',0]];
 const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national index'};
 const details = new Map();
 async function select(hit){ selected = hit; draw(); const det = $('detail');
@@ -325,11 +327,12 @@ async function select(hit){ selected = hit; draw(); const det = $('detail');
   const row = (await details.get(key))[String(hit.id)]; if(!row || selected !== hit) return;
   const r = Object.fromEntries(meta.detail_fields.map((f,i)=>[f, row[i]]));
   const list = r.c === 'n' ? NROWS : ROWS.filter(([k]) => r.c === 'k' || !k.startsWith('w'));
-  const items = list.map(([k,l,u,d]) => `<dt>${l}</dt><dd>${r[k]==null ? '—' : fmt(r[k],d)+(u ? ' '+u : '')}</dd>`).join('');
+  const val = (k, d) => k === 'ww_pipe_year' ? String(r[k]) + ([1979, 1980].includes(r[k]) ? ' (KCDC records many pipes with this year; it may be a placeholder)' : '') : fmt(r[k], d);
+  const items = list.map(([k,l,u,d]) => `<dt>${esc(l)}</dt><dd>${r[k]==null ? '—' : esc(val(k,d))+(u ? ' '+u : '')}</dd>`).join('');
   det.className = '';
-  det.innerHTML = `<h3>${r.appellation || 'Parcel ' + hit.id}</h3>
-    <div class="mono" style="font-size:.8rem;color:var(--muted)">${r.c==='n' ? (r.territorial_authority || 'Greater Wellington') : COUNCIL[r.c]} · LINZ id ${hit.id} · ${r.parcel_intent || ''}</div>
-    ${r.address ? `<div style="margin-top:6px">${r.address}</div>` : ''}
+  det.innerHTML = `<h3>${esc(r.appellation || 'Parcel ' + hit.id)}</h3>
+    <div class="mono" style="font-size:.8rem;color:var(--muted)">${esc(r.c==='n' ? (r.territorial_authority || 'Greater Wellington') : COUNCIL[r.c])} · LINZ id ${esc(hit.id)} · ${esc(r.parcel_intent)}</div>
+    ${r.address ? `<div style="margin-top:6px">${esc(r.address)}</div>` : ''}
     <dl>${items}</dl>
     <div style="font-size:.78rem;color:var(--muted)">${r.c==='n' ? 'From the national index pilot: LINZ data only, ground on a 10 m grid. ' : ''}— means no value: not mapped, not measured, or outside the source's coverage.${r.c==='p' ? ' Porirua has no three-waters data here.' : ''}</div>`; }
 
@@ -359,12 +362,16 @@ $('search').addEventListener('input', async e => {
   if(!search){ res.hidden = false; res.innerHTML = '<div class="empty" style="padding:5px 6px">Loading the search list…</div>';
     search = fetch('data/search.json').then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); }
   const s = await search; if(e.target.value.trim().toLowerCase() !== q) return; res.innerHTML = '';
-  const hits = []; for(let i=0; i<s.id.length && hits.length<40; i++) if(s.lt[i].includes(q) || String(s.id[i]) === q) hits.push(i);
+  // exact matches first (a legal description or address equal to what was typed), then others containing it
+  const exact = [], part = [];
+  for(let i=0; i<s.id.length; i++){ const t = s.lt[i];   // the whole list, so an exact match late in it is found
+    if(String(s.id[i]) === q || t.split('|').includes(q)) exact.push(i); else if(part.length < 40 && t.includes(q)) part.push(i); }
+  const hits = exact.concat(part).slice(0, 40);
   res.hidden = false;
   if(!hits.length){ res.innerHTML = '<div class="empty" style="padding:5px 6px">No parcel matches. Try the lot and DP number, for example "Lot 2 DP 12726", or an address.</div>'; return; }
   const SHORT = {k:'Kāpiti', p:'Porirua', n:'Gtr Wellington'};
   for(const i of hits){ const b = document.createElement('button'), [app, addr] = s.t[i].split('|');
-    b.innerHTML = `<span>${app || addr}</span><span class="c">${SHORT[s.c[i]]}</span>`; if(addr) b.title = addr;
+    b.innerHTML = `<span>${esc(app || addr)}</span><span class="c">${SHORT[s.c[i]]}</span>`; if(addr) b.title = addr;
     b.onclick = async () => { touched = true; view.cx = s.x[i]; view.cy = s.y[i]; view.s = Math.max(view.s, 1); draw(); select(await pickAt(s.x[i], s.y[i], s.id[i])); };
     res.appendChild(b); } });
 
@@ -375,6 +382,4 @@ new MutationObserver(recolour).observe(document.documentElement, {attributes:tru
 canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); say('The graphics card reset the map. Reload the page to see it again.'); });
 window.landqMap = { view, tiles, pieces, get frame(){ return frame; } };   // for checking from the browser console
 legend(); resize(); say('Loading parcels…');
-// start on a real parcel so the panel shows what it does
-pickAt(1768286, 5469600).then(h => { if(h && !selected) select(h); });
 })();

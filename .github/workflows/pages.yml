@@ -9,11 +9,11 @@ on:
   push:
     branches: [main]
     paths: ["site/**", ".github/workflows/pages.yml"]
+  schedule:
+    - cron: "17 14 * * 1"   # weekly, so updated results branches reach the site (T-109)
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -35,6 +35,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:   # only the job that publishes may publish (T-109)
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

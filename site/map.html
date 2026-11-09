@@ -10,16 +10,16 @@
 <style>
 /* Layout: a survey plan sheet. Narrow reading column for the story, a full-width plan (map + schedule) in the middle. */
 :root{
-  --paper:#f3f5f2; --sheet:#ffffff; --sea:#000000; --land:#ffffff; --ink:#15211d; --muted:#5b6a64; --rule:#d5ddd8;
+  --paper:#f3f5f2; --sheet:#ffffff; --sea:#000000; --land:#ffffff; --novalue:#a9b3ae; --ink:#15211d; --muted:#5b6a64; --rule:#d5ddd8;
   --accent:#0f6b5f; --accent-soft:#d9ece7; --mark:#c2410c; --lowland:#2f6f9f; --highland:#b45309;
   --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --novalue:#7d8a84; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
   --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark } }
 :root[data-theme="dark"]{
-  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
+  --paper:#0f1513; --sheet:#151d1a; --sea:#000000; --land:#26312d; --novalue:#7d8a84; --ink:#e3ebe7; --muted:#93a39c; --rule:#2a3631;
   --accent:#4fb8a6; --accent-soft:#163430; --mark:#fb923c; --lowland:#6aaee0; --highland:#f0a650; color-scheme:dark }
 html,body{background:var(--paper);color:var(--ink)}
 body{font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
@@ -58,6 +58,8 @@ canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:
 .canvaswrap .layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .legend{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--sheet) 88%,transparent);border:1px solid var(--rule);padding:8px 10px;display:grid;gap:4px;font-size:.75rem;max-width:calc(100% - 76px)}
 .legend .bar{height:8px;width:180px;max-width:100%;border-radius:2px}
+.legend .keys{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted)}
+.legend .keys i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
 .legend .ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
 .zoomhint{position:absolute;right:10px;top:10px;font-size:.72rem;color:var(--muted);background:color-mix(in srgb,var(--sheet) 85%,transparent);padding:3px 6px}
 .zoombtns{position:absolute;right:10px;bottom:10px;display:grid;gap:4px}
@@ -97,7 +99,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 </header>
 
 <div class="hero">
-  <h1>Every parcel in New Zealand, measured from public data.</h1>
+  <h1>Every land parcel in Greater Wellington, measured from public data.</h1>
   <p class="lede">Land Query compiles the facts about each land parcel from public sources: LINZ titles and survey, 1 m LiDAR, and council planning and asset layers. Each value records its source, licence and fetch time. The aim is to answer questions across a whole district, such as "which flat, sewered residential sections are big enough to subdivide?", in seconds rather than by checking parcels one at a time. Kāpiti Coast and Porirua are compiled in full with council data; any other parcel in the country gets a report on request from national LINZ data.</p>
   <div class="councils" id="councils"></div>
 </div>
@@ -152,9 +154,9 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
   </div>
   <div class="cols">
     <div class="col"><h3>National index</h3><span class="pill">pilot done</span>
-      <ul><li>Greater Wellington: 217,326 parcels in about 25 minutes, a 34 MB file</li><li>Area, shape, titles, buildings, address, road frontage, distance to the coast</li><li>Ground height, slope and catchment from the 10 m national ground model</li><li>Matches the Kāpiti build on area and title count for all 27,227 shared parcels</li><li>Whole country next: about 2.5 million parcels, about US$3 a run</li></ul></div>
+      <ul><li>Greater Wellington: 217,326 parcels in about 25 minutes, a 34 MB file</li><li>Area, shape, titles, buildings, address, road frontage, distance to the coast</li><li>Ground height, slope and catchment from the 10 m national ground model</li><li>Matches the separately built Kāpiti results on area (within 0.5 m²) for all but 7 of 27,227 shared parcels, and on title count for all but 1</li><li>Whole country next: about 2.5 million parcels, about US$3 a run</li></ul></div>
     <div class="col"><h3>Parcel report</h3><span class="pill">working</span>
-      <ul><li>Any parcel by LINZ parcel number or address</li><li>The full 1 m analysis: slope, sun, outlook, roof, earthworks, water flow</li><li>Names the LiDAR survey used, with its dates</li><li>Tried in Paraparaumu, Christchurch and Auckland</li><li><a href="https://claude.ai/artifact/PxLFZ1SQFgHk5uqDXiNeYV">Sample report: 15 Queen Street, Northcote Point</a></li></ul></div>
+      <ul><li>Any parcel by LINZ parcel number or address</li><li>The full 1 m analysis: slope, sun, outlook, roof, earthworks, water flow</li><li>Names the LiDAR survey used, with its dates</li><li>Tried in Paraparaumu, Christchurch and Auckland</li></ul></div>
     <div class="col"><h3>Not in the national data</h3><span class="pill held">council by council</span>
       <ul><li>District plan zoning and overlays</li><li>Council flood and hazard maps</li><li>Three waters</li><li>Added per council once its licence is confirmed</li></ul></div>
   </div>
@@ -206,6 +208,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
     <tbody>
       <tr><td>LINZ: NZ Primary Parcels, titles, non-primary parcels</td><td>Parcels, titles, easements</td><td>CC BY 4.0</td></tr>
       <tr><td>LINZ: building outlines, addresses and coastline (public ArcGIS services)</td><td>National index and parcel reports</td><td>CC BY 4.0 (coastline to confirm)</td></tr>
+      <tr><td>LINZ: NZ Lake Polygons (Topo, 1:50k), and river and stream bed parcels</td><td>Water on the map</td><td>CC BY 4.0 (lakes to confirm)</td></tr>
       <tr><td>LINZ: LiDAR (Kāpiti 2021 and 2024–25, Porirua 2023) and the national 1 m DEM and DSM</td><td>Terrain, flow, catchments, sea mask</td><td>CC BY 4.0</td></tr>
       <tr><td>Kāpiti Coast District Council</td><td>Zones, overlays, flood models, three waters, building outlines</td><td>CC BY 4.0, some on the dataset, some by portal statement (to confirm)</td></tr>
       <tr><td>Porirua City Council</td><td>District Plan 2025 layers, building footprints, parcel copy</td><td>Portal statement (to confirm)</td></tr>
