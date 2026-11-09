@@ -50,6 +50,7 @@ input[type=search]{width:min(320px,100%)}
 .mapbox{position:relative;background:var(--sheet);border:1px solid var(--rule);min-width:0}
 canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:none;cursor:crosshair}
 .canvaswrap{position:relative}
+.canvaswrap .layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .legend{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--sheet) 88%,transparent);border:1px solid var(--rule);padding:8px 10px;display:grid;gap:4px;font-size:.75rem;max-width:calc(100% - 76px)}
 .legend .bar{height:8px;width:180px;max-width:100%;border-radius:2px}
 .legend .ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
@@ -122,6 +123,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
   <div class="plan">
     <div class="mapbox">
       <div class="canvaswrap"><canvas id="map" aria-label="Map of parcels, coloured by the selected measure"></canvas>
+      <canvas id="glmap" class="layer" aria-hidden="true"></canvas><canvas id="over" class="layer" aria-hidden="true"></canvas>
       <div class="legend" id="legend"></div>
       <div class="zoombtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Show everything">⤢</button></div></div>
       <div class="label" style="padding:6px 10px;border-top:1px solid var(--rule)">Drag to pan · scroll, pinch or use the buttons to zoom · select a parcel for its values</div>
@@ -227,6 +229,8 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 </div>
 
 <script id="data" type="application/json">__DATA__</script>
+<script>/* earcut 2.2.4, (c) 2016 Mapbox, ISC licence: polygon triangulation for the WebGL plan */
+__EARCUT__</script>
 <script>
 (function(){
 const D = JSON.parse(document.getElementById('data').textContent);
@@ -252,6 +256,7 @@ document.getElementById('runs').textContent = 'Kāpiti results: ' + st.k.run.spl
 
 // projection: NZTM metres -> canvas
 const canvas = document.getElementById('map'), ctx = canvas.getContext('2d');
+const over = document.getElementById('over'), octx = over.getContext('2d'), glc = document.getElementById('glmap');
 let W=0,H=0,dpr=1, view={cx:0,cy:0,s:1}, selected=-1, filter='all', mode='ground_mean_m';
 const xs=[], ys=[];
 let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity, touched=false;
@@ -261,7 +266,7 @@ place(0);
 function fit(){ const mx=(minx+maxx)/2, my=(miny+maxy)/2; view.cx=mx; view.cy=my;
   view.s = Math.min(W/(maxx-minx+2000), H/(maxy-miny+2000)); }
 function resize(){ const r=canvas.getBoundingClientRect(); dpr=Math.min(2, window.devicePixelRatio||1); W=r.width; H=r.height;   // density capped at 2: a 3x phone screen needs 2.25x the memory per image
-  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr); snapView=null; if(!view.init){fit();view.init=true} draw(); }
+  for(const c of [canvas, over, glc]){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); } snapView=null; if(!view.init){fit();view.init=true} draw(); }
 const sx = x => W/2 + (x-view.cx)*view.s, sy = y => H/2 - (y-view.cy)*view.s;
 
 // colour scales
@@ -314,9 +319,10 @@ function loadShapes(buf){
   const st = new Int32Array(buf,o,2*nr); o += 8*nr; const rper = new Uint16Array(buf,o,n); o += 2*n; if(n%2) o += 2;
   const d = new Int16Array(buf,o,2*(nv-nr));
   // vertices kept as whole half-metres (4 bytes each, exact), halved where used
-  const X = new Int32Array(nv), Y = new Int32Array(nv), rs = new Uint32Array(nr+1);
-  for(let r=0,v=0,q=0;r<nr;r++){ rs[r]=v; let x=st[2*r], y=st[2*r+1]; X[v]=x; Y[v]=y; v++;
-    for(let k=1;k<rlen[r];k++){ x+=d[q++]; y+=d[q++]; X[v]=x; Y[v]=y; v++; } rs[r+1]=v; }
+  const X = new Int32Array(nv), Y = new Int32Array(nv), rs = new Uint32Array(nr+1), hole = new Uint8Array(nr);
+  for(let r=0,v=0,q=0;r<nr;r++){ rs[r]=v; hole[r] = rlen[r]>>>31; const len = rlen[r] & 0x7FFFFFFF;
+    let x=st[2*r], y=st[2*r+1]; X[v]=x; Y[v]=y; v++;
+    for(let k=1;k<len;k++){ x+=d[q++]; y+=d[q++]; X[v]=x; Y[v]=y; v++; } rs[r+1]=v; }
   const at = new Map(); for(let i=0;i<N;i++) at.set(rows[i][I.unit_id], i);
   const ring0 = new Int32Array(N).fill(-1), nring = new Uint16Array(N), bb = new Float64Array(4*N), cls = new Uint8Array(N);
   for(let k=0,r=0;k<n;k++){ const i = at.get(ids[k]);
@@ -324,7 +330,7 @@ function loadShapes(buf){
       for(let v=rs[r]; v<rs[r+rper[k]]; v++){ if(X[v]<a)a=X[v]; if(X[v]>c)c=X[v]; if(Y[v]<b)b=Y[v]; if(Y[v]>e)e=Y[v]; }
       a/=2; b/=2; c/=2; e/=2; bb[4*i]=a; bb[4*i+1]=b; bb[4*i+2]=c; bb[4*i+3]=e; cls[i]=Math.max(0, Math.floor(Math.log2(Math.max(c-a, e-b, 1)))); }
     r += rper[k]; }
-  S = {X, Y, rs, ring0, nring, bb, cls};
+  S = {X, Y, rs, hole, ring0, nring, bb, cls};
 }
 const shown = () => !!S;
 // whether parcels of size class c are shapes at the current zoom (the smallest of the class must reach SHAPE_PX)
@@ -386,7 +392,111 @@ function drawLand(){ if(!(D.land&&D.land.length)) return false; if(!landPath) bu
   ctx.setTransform(dpr*k,0,0,dpr*k, dpr*(W/2-(view.cx-LOX)*k), dpr*(H/2-(LOY-view.cy)*k));
   ctx.fillStyle=css('--land'); ctx.fill(landPath,'evenodd'); ctx.setTransform(dpr,0,0,dpr,0,0); return true; }
 // map text with a halo, so it reads over land and sea
-function label(t,x,y){ ctx.save(); ctx.lineWidth=3; ctx.strokeStyle=css('--land'); ctx.lineJoin='round'; ctx.strokeText(t,x,y); ctx.fillStyle=css('--ink'); ctx.fillText(t,x,y); ctx.restore(); }
+function label(t,x,y){ const c=octx; c.save(); c.font='10px '+css('--mono'); c.lineWidth=3; c.strokeStyle=css('--land'); c.lineJoin='round'; c.strokeText(t,x,y); c.fillStyle=css('--ink'); c.fillText(t,x,y); c.restore(); }
+// ---- WebGL plan: parcels drawn on the graphics card. Shapes are cut into triangles once (earcut) after they load;
+// after that a frame only passes the view to the card. Without WebGL (or if the context is lost) the 2D drawing above
+// is used instead.
+function makeGL(){
+  let gl = null; try { gl = glc.getContext('webgl2', {antialias:true}) || glc.getContext('webgl', {antialias:true}); } catch(e){}
+  if(!gl || typeof earcut !== 'function') return null;
+  // a software "graphics card" (no driver, or one the browser blocks) is slower than the 2D drawing: don't use it
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const rname = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+  if(/swiftshader|llvmpipe|software|basic render/i.test(rname)) return null;
+  const v2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+  if(!v2 && !gl.getExtension('OES_element_index_uint')) return null;
+  const OX = 1600000, OY = 5300000;   // coordinates are sent relative to this point, so 32-bit floats stay precise
+  function prog(vs, fs){ const p = gl.createProgram();
+    for(const [t,src] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){ const sh = gl.createShader(t); gl.shaderSource(sh, src); gl.compileShader(sh);
+      if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); gl.attachShader(p, sh); }
+    gl.linkProgram(p); if(!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
+  const FS = 'precision mediump float; varying vec4 v; void main(){ if(v.a < 0.01) discard; gl_FragColor = v; }';
+  // shapes: hidden below the size at which they show (dots stand in); dots: hidden where their shape shows
+  const P = prog('attribute vec2 p; attribute vec4 col; attribute float cls; uniform vec2 sc, of; uniform float s, minpx; varying vec4 v;'+
+    'void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; if(exp2(cls)*s < minpx) v.a = 0.; }', FS);
+  const Q = prog('attribute vec2 p; attribute vec4 col; attribute float cls; uniform vec2 sc, of; uniform float s, minpx, size; uniform float shapes; varying vec4 v;'+
+    'void main(){ gl_Position = vec4(p*sc+of, 0., 1.); v = col; gl_PointSize = size; if(shapes > .5 && cls >= 0. && exp2(cls)*s >= minpx){ gl_PointSize = 0.; v.a = 0.; } }', FS);
+  const loc = (pr, names) => Object.fromEntries(names.map(n => [n, gl.getAttribLocation(pr, n) >= 0 ? gl.getAttribLocation(pr, n) : gl.getUniformLocation(pr, n)]));
+  const LP = loc(P, ['p','col','cls','sc','of','s','minpx']), LQ = loc(Q, ['p','col','cls','sc','of','s','minpx','size','shapes']);
+  const buf = () => gl.createBuffer();
+  const T = { pos:buf(), col:buf(), cls:buf(), tri:buf(), edge:buf(), dpos:buf(), dcol:buf(), dcls:buf() };
+  let ntri = 0, nedge = 0, ndots = 0, ready = false, lost = false, vrow = null, vcol = null, dcol = null, squares = [];
+  // runs of [start, end) for the squares in view, neighbouring runs merged into one draw
+  function runs(field0, field1, vx0, vy0, vx1, vy1){ const out = []; let cur = null;
+    for(const q of squares){ if(q.bb[0]>vx1||q.bb[2]<vx0||q.bb[1]>vy1||q.bb[3]<vy0) continue;
+      if(cur && cur[1] === q[field0]) cur[1] = q[field1]; else { cur = [q[field0], q[field1]]; out.push(cur); } }
+    return out; }
+  glc.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; draw(); });
+  function upload(b, data, target=gl.ARRAY_BUFFER, usage=gl.STATIC_DRAW){ gl.bindBuffer(target, b); gl.bufferData(target, data, usage); }
+  // dots: one per parcel row, with its size class (or -1 without a shape)
+  function setDots(){ ndots = N; const pos = new Float32Array(2*N), c = new Float32Array(N);
+    for(let i=0;i<N;i++){ pos[2*i] = xs[i]-OX; pos[2*i+1] = ys[i]-OY; c[i] = (ready && S && S.ring0[i]>=0) ? S.cls[i] : -1; }
+    upload(T.dpos, pos); upload(T.dcls, c); dcol = new Uint8Array(4*N); }
+  // shapes: vertices, a row per vertex (for colours), triangles and boundary lines, cut a slice of parcels at a time
+  function setShapes(done){
+    const nv = S.X.length, pos = new Float32Array(2*nv), cl = new Uint8Array(nv); vrow = new Int32Array(nv).fill(-1);
+    for(let v=0; v<nv; v++){ pos[2*v] = S.X[v]/2-OX; pos[2*v+1] = S.Y[v]/2-OY; }
+    let tri = new Uint32Array(3*(nv + 2*(S.rs.length))), edge = new Uint32Array(2*nv); ntri = 0; nedge = 0;
+    // parcels are cut in order of 4 km square, so each square's triangles and lines are one run the card can skip
+    const SQ = 4000, key = i => Math.floor((S.bb[4*i+1]+S.bb[4*i+3])/2/SQ)*100000 + Math.floor((S.bb[4*i]+S.bb[4*i+2])/2/SQ);
+    const order = []; for(let i=0;i<N;i++) if(S.ring0[i]>=0) order.push(i); order.sort((a,b)=>key(a)-key(b));
+    squares = []; let sq = null;
+    let j = 0; const flat = [];
+    (function slice(){ const end = Math.min(order.length, j+4000);
+      for(; j<end; j++){ const i = order[j], kk = key(i);
+        if(!sq || sq.k !== kk){ sq = {k:kk, t0:ntri, e0:nedge, t1:ntri, e1:nedge, bb:[Infinity,Infinity,-Infinity,-Infinity]}; squares.push(sq); }
+        const b = 4*i; sq.bb[0]=Math.min(sq.bb[0],S.bb[b]); sq.bb[1]=Math.min(sq.bb[1],S.bb[b+1]); sq.bb[2]=Math.max(sq.bb[2],S.bb[b+2]); sq.bb[3]=Math.max(sq.bb[3],S.bb[b+3]);
+        const r0 = S.ring0[i]; const r1 = r0 + S.nring[i];
+        for(let r=r0; r<r1; r++){ const a = S.rs[r], e = S.rs[r+1]; for(let v=a; v<e; v++){ vrow[v] = i; cl[v] = S.cls[i]; }
+          for(let v=a; v<e; v++){ edge[nedge++] = v; edge[nedge++] = v+1 < e ? v+1 : a; } }
+        // one polygon = an outer ring and the holes that follow it
+        for(let r=r0; r<r1; ){ let q = r+1; while(q < r1 && S.hole[q]) q++;
+          const base = S.rs[r], ax = S.X[base], ay = S.Y[base]; flat.length = 0; const holes = [];
+          for(let k=r; k<q; k++){ if(k > r) holes.push(flat.length/2); for(let v=S.rs[k]; v<S.rs[k+1]; v++) flat.push(S.X[v]-ax, S.Y[v]-ay); }
+          const t = earcut(flat, holes.length ? holes : null, 2);
+          if(ntri + t.length > tri.length){ const bigger = new Uint32Array(Math.ceil((ntri + t.length)*1.5)); bigger.set(tri); tri = bigger; }
+          for(let k=0;k<t.length;k++) tri[ntri++] = base + t[k];
+          r = q; }
+        sq.t1 = ntri; sq.e1 = nedge; }
+      if(j < order.length) { setTimeout(slice, 0); return; }
+      upload(T.pos, pos); upload(T.cls, new Float32Array(cl)); upload(T.tri, tri.subarray(0, ntri), gl.ELEMENT_ARRAY_BUFFER);
+      upload(T.edge, edge.subarray(0, nedge), gl.ELEMENT_ARRAY_BUFFER); vcol = new Uint8Array(4*nv);
+      ready = true; setDots(); colours(); done && done(); })();
+  }
+  // colours from the colour groups: a parcel filtered out gets alpha 0
+  function colours(){ if(!groups) return; const rc = new Uint32Array(N);
+    for(const g of groups){ const c = g.rgba; for(const i of g.idx) rc[i] = c; }
+    if(!dcol || dcol.length !== 4*N) dcol = new Uint8Array(4*N);
+    new Uint32Array(dcol.buffer).set(rc); upload(T.dcol, dcol, gl.ARRAY_BUFFER, gl.DYNAMIC_DRAW);
+    if(ready){ const vc = new Uint32Array(vcol.buffer); for(let v=0; v<vrow.length; v++) vc[v] = vrow[v] >= 0 ? rc[vrow[v]] : 0;
+      upload(T.col, vcol, gl.ARRAY_BUFFER, gl.DYNAMIC_DRAW); } }
+  function attrib(l, b, size, type=gl.FLOAT, norm=false){ gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, size, type, norm, 0, 0); }
+  // one full frame, timed; used once the shapes are ready, to fall back to 2D on a slow graphics card
+  function probe(){ const v = {cx:view.cx, cy:view.cy, s:view.s}; fit(); const t = performance.now(); frame(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));   // waits for the frame
+    const ms = performance.now() - t; view.cx = v.cx; view.cy = v.cy; view.s = v.s; return ms; }
+  function frame(){
+    if(lost) return false;
+    gl.viewport(0, 0, glc.width, glc.height); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    const s = view.s, sc = [2*s/W, 2*s/H], of = [(OX-view.cx)*2*s/W, (OY-view.cy)*2*s/H];
+    if(ready){ gl.useProgram(P); gl.uniform2fv(LP.sc, sc); gl.uniform2fv(LP.of, of); gl.uniform1f(LP.s, s); gl.uniform1f(LP.minpx, SHAPE_PX);
+      attrib(LP.p, T.pos, 2); attrib(LP.cls, T.cls, 1); attrib(LP.col, T.col, 4, gl.UNSIGNED_BYTE, true);
+      const vx0 = view.cx-W/2/s, vx1 = view.cx+W/2/s, vy0 = view.cy-H/2/s, vy1 = view.cy+H/2/s;
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, T.tri);
+      for(const [a,b] of runs('t0','t1',vx0,vy0,vx1,vy1)) gl.drawElements(gl.TRIANGLES, b-a, gl.UNSIGNED_INT, 4*a);
+      // boundaries in the sheet colour, fading out as parcels shrink
+      const [r,g,b] = hex(css('--sheet')).map(x=>x/255); gl.disableVertexAttribArray(LP.col); gl.vertexAttrib4f(LP.col, r, g, b, Math.max(0.25, Math.min(1, s*4)));
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, T.edge);
+      for(const [a,b] of runs('e0','e1',vx0,vy0,vx1,vy1)) gl.drawElements(gl.LINES, b-a, gl.UNSIGNED_INT, 4*a); }
+    gl.useProgram(Q); gl.uniform2fv(LQ.sc, sc); gl.uniform2fv(LQ.of, of); gl.uniform1f(LQ.s, s); gl.uniform1f(LQ.minpx, SHAPE_PX);
+    gl.uniform1f(LQ.size, Math.max(1, Math.round(Math.max(1.2, Math.min(5, s*25))*dpr))); gl.uniform1f(LQ.shapes, ready ? 1 : 0);
+    attrib(LQ.p, T.dpos, 2); attrib(LQ.cls, T.dcls, 1); attrib(LQ.col, T.dcol, 4, gl.UNSIGNED_BYTE, true);
+    gl.drawArrays(gl.POINTS, 0, ndots);
+    return true; }
+  return { setDots, setShapes, colours, frame, probe, slow(){ lost = true; }, get ready(){ return ready; }, get lost(){ return lost; } };
+}
+let G = null; try { G = makeGL(); } catch(e){ G = null; }
+window.landqMapState = () => ({ webgl: !!G && !G.lost, shapesReady: !!G && G.ready });   // for checking which drawing is in use   // any WebGL trouble: the 2D drawing is used
 let pending = false;
 let drawError = null;
 function safeRender(){ try { render(); drawError = null; }
@@ -403,8 +513,13 @@ function render(){
   for(let x=x0;x<view.cx+W/2/view.s;x+=step){const X=sx(x); ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke();}
   for(let y=y0;y<view.cy+H/2/view.s;y+=step){const Y=sy(y); ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke();}
   ctx.globalAlpha = 1;
+  octx.setTransform(1,0,0,1,0,0); octx.clearRect(0,0,over.width,over.height); octx.setTransform(dpr,0,0,dpr,0,0);
   if(view.s*step>60){ for(let x=x0;x<view.cx+W/2/view.s;x+=step) label((x/1000).toFixed(0)+' kE',sx(x)+3,H-4);
     for(let y=y0;y<view.cy+H/2/view.s;y+=step) label((y/1000).toFixed(0)+' kN',3,sy(y)-3); }
+  const useGL = G && !G.lost;
+  glc.style.display = useGL ? '' : 'none';
+  if(useGL){ if(dotsFor !== N){ G.setDots(); dotsFor = N; colourFor = null; } if(colourFor !== groups){ G.colours(); colourFor = groups; }
+    G.frame(); overlay(G.ready); return; }
   const poly = shown(); if(poly) shapesLayer();
   const BW = Math.max(1, Math.round(W)), BH = Math.max(1, Math.round(H));   // dots at screen points, not device pixels
   if(!img || img.width!==BW || img.height!==BH){ dots.width=BW; dots.height=BH; img = dctx.createImageData(BW, BH); pix = new Uint32Array(img.data.buffer); }
@@ -419,13 +534,16 @@ function render(){
       for(let y = Y<0?0:Y; y<y1; y++){ const row = y*BW; for(let x=x0; x<x1; x++) pix[row+x] = c; } } }
   dctx.putImageData(img, 0, 0);
   ctx.imageSmoothingEnabled = false; ctx.drawImage(dots, 0, 0, W, H); ctx.imageSmoothingEnabled = true;
-  if(selected>=0){ ctx.strokeStyle=css('--mark'); ctx.lineWidth=2.5;
-    if(poly && S.ring0[selected]>=0 && asShape(S.cls[selected])){ const path=new Path2D(); ringsPath(path, selected); ctx.stroke(path); }
-    else { const X=sx(xs[selected]),Y=sy(ys[selected]); ctx.beginPath(); ctx.arc(X,Y,9,0,Math.PI*2); ctx.stroke(); } }
-  // scale bar
-  const m=niceLen(120/view.s), px=m*view.s; ctx.fillStyle=css('--land'); ctx.fillRect(W-px-20,8,px+12,28);
-  ctx.fillStyle=css('--ink'); ctx.fillRect(W-px-14,14,px,3); ctx.fillText(m>=1000?(m/1000)+' km':m+' m', W-px-14, 30);
+  overlay(poly);
 }
+let dotsFor = -1, colourFor = null;
+// the selected parcel and the scale bar, on the top layer
+function overlay(poly){ const c = octx;
+  if(selected>=0){ c.strokeStyle=css('--mark'); c.lineWidth=2.5;
+    if(poly && S && S.ring0[selected]>=0 && asShape(S.cls[selected])){ const path=new Path2D(); ringsPath(path, selected); c.stroke(path); }
+    else { const X=sx(xs[selected]),Y=sy(ys[selected]); c.beginPath(); c.arc(X,Y,9,0,Math.PI*2); c.stroke(); } }
+  const m=niceLen(120/view.s), px=m*view.s; c.fillStyle=css('--land'); c.fillRect(W-px-20,8,px+12,28);
+  c.font='10px '+css('--mono'); c.fillStyle=css('--ink'); c.fillRect(W-px-14,14,px,3); c.fillText(m>=1000?(m/1000)+' km':m+' m', W-px-14, 30); }
 function niceLen(m){const p=Math.pow(10,Math.floor(Math.log10(m)));for(const k of[1,2,5,10]) if(k*p>=m) return k*p;return 10*p}
 
 // selection and detail
@@ -518,7 +636,8 @@ fetch('national-1.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r
       const pad = t.endsWith('==') ? 2 : t.endsWith('=') ? 1 : 0, u = new Uint8Array(t.length/4*3 - pad), C = 1<<20;   // 1 MB of text at a time
       for(let o=0, w=0; o<t.length; o+=C){ const bin = atob(t.slice(o, o+C)); for(let j=0;j<bin.length;j++) u[w++] = bin.charCodeAt(j); }
       return u.buffer; })
-    .then(b=>{ loadShapes(b); tiles = null; draw(); hint = ' Parcels too small to see at this zoom show as dots.'; ns.textContent += hint; })
+    .then(b=>{ loadShapes(b); tiles = null; hint = ' Parcels too small to see at this zoom show as dots.'; ns.textContent += hint;
+      if(G) G.setShapes(()=>{ dotsFor = -1; G.colours(); colourFor = groups; if(G.probe() > 40) G.slow(); draw(); }); else draw(); })
     .catch(()=>{});
   return fetch('national-2.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(t=>{
     const pl = decode(t.place);

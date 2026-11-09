@@ -93,7 +93,7 @@ for name, obj in (("national-1.json", core), ("national-2.json", text)):
 # parcel shapes for the plan when zoomed in (all of Greater Wellington, councils included), as a compact binary
 # layout (base64-encoded below):
 # header (parcels, rings, vertices: uint32), ids (int32), ring vertex counts (uint32), each ring's first vertex in
-# half-metres (int32 x, y), rings per parcel (uint16), then each later vertex as a step from the one before (int16
+# half-metres (int32 x, y; a hole's count has its top bit set, and follows its outer ring), rings per parcel (uint16), then each later vertex as a step from the one before (int16
 # x, y, half-metres). Shapes are simplified to 0.5 m; a step too long for int16 is split.
 import struct
 import numpy as np
@@ -101,9 +101,9 @@ from shapely import wkb
 ids, rper, rlen, starts, steps = [], [], [], [], []
 for pid, b in duckdb.sql(f"SELECT parcel_id, geometry_wkb FROM '{nf}' ORDER BY parcel_id").fetchall():
     g = wkb.loads(b).simplify(0.5, preserve_topology=True)
-    rings = [r for p in getattr(g, "geoms", [g]) for r in [p.exterior, *p.interiors]]
+    rings = [(r, k > 0) for p in getattr(g, "geoms", [g]) for k, r in enumerate([p.exterior, *p.interiors])]   # (ring, is a hole)
     ids.append(pid); rper.append(len(rings))
-    for r in rings:
+    for r, hole in rings:
         c = np.round(np.asarray(r.coords)[:-1] * 2).astype(np.int64)
         pts = [c[0]]
         for v in c[1:]:
@@ -111,10 +111,10 @@ for pid, b in duckdb.sql(f"SELECT parcel_id, geometry_wkb FROM '{nf}' ORDER BY p
             base = pts[-1]
             for j in range(1, k + 1): pts.append(base + np.round(d * j / k).astype(np.int64))
         pts = np.array(pts)
-        rlen.append(len(pts)); starts.append(pts[0]); steps.append(np.diff(pts, axis=0))
+        rlen.append(len(pts) | (0x80000000 if hole else 0)); starts.append(pts[0]); steps.append(np.diff(pts, axis=0))
 st = np.concatenate([x for x in steps if len(x)]) if steps else np.zeros((0, 2))
 assert np.abs(st).max() <= 32767
-blob = (struct.pack("<3I", len(ids), len(rlen), int(sum(rlen))) + np.array(ids, "<i4").tobytes()
+blob = (struct.pack("<3I", len(ids), len(rlen), int(sum(n & 0x7FFFFFFF for n in rlen))) + np.array(ids, "<i4").tobytes()
         + np.array(rlen, "<u4").tobytes() + np.array(starts, "<i4").tobytes() + np.array(rper, "<u2").tobytes()
         + (b"\0\0" if len(rper) % 2 else b"") + st.astype("<i2").tobytes())
 # published as base64 text: the page host serves text and images, not raw binary files
@@ -143,5 +143,7 @@ n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM
 data["stats"]["n"] = dict(parcels=n_all, extra=len(q), median_ground=nmed,
                           run="national index pilot, built from " + open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
 html = open(os.path.join(ROOT, "site", "template.html"), encoding="utf-8").read()
+# earcut (polygon triangulation for the WebGL plan; ISC licence, Mapbox), inlined: it is 7 KB
+html = html.replace("__EARCUT__", open(os.path.join(ROOT, "site", "vendor", "earcut-2.2.4.min.js"), encoding="utf-8").read().replace("</", "<\\/"))
 open(OUT, "w", encoding="utf-8").write(html.replace("__DATA__", json.dumps(data, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")))
 print("wrote", OUT, len(data["rows"]), "parcels")
