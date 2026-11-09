@@ -173,6 +173,20 @@ def test_downloads_refuse_a_page_of_repeats_that_a_count_check_would_pass(monkey
         arcgis._get = keep
 
 
+def test_a_rate_limit_is_waited_out_whether_as_http_429_or_in_the_reply():
+    import arcgis
+    class R:
+        def __init__(self, code, body): self.status_code, self.body = code, body
+        def raise_for_status(self): pass
+        def json(self): return self.body
+    for first in (R(429, {}), R(200, {"error": {"code": 429}})):
+        replies = [first, R(200, {"ok": 1})]
+        keep = (arcgis.requests.get, arcgis.RATE_LIMIT_WAITS)
+        arcgis.requests.get = lambda *a, **k: replies.pop(0); arcgis.RATE_LIMIT_WAITS = (0, 0)
+        try: assert arcgis._get("u", {}) == {"ok": 1}
+        finally: arcgis.requests.get, arcgis.RATE_LIMIT_WAITS = keep
+
+
 def test_heritage_point_just_outside_the_parcel_is_not_counted():
     from shapely.geometry import Point, box
     from overlays import points_on

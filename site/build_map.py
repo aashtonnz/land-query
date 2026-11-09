@@ -151,6 +151,18 @@ def encode(items):
             + pad(np.array(cc, "u1").tobytes()) + st.astype("<i2").tobytes())
 
 
+def land_outline(bounds):
+    """LINZ's NZ Coastline land polygons at 5 m over bounds, clipped (the national index's sea is outside these)."""
+    import arcgis, overlays
+    x0, y0, x1, y1 = bounds; out = []
+    for f in arcgis.query_all("https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+                              dict(where="1=1", geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
+                                   spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=5)):
+        g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
+        if not g.is_empty: out.append(g)
+    return out
+
+
 def coastline(bounds):
     import arcgis, overlays
     x0, y0, x1, y1 = bounds; land = []
@@ -196,6 +208,19 @@ def main():
     # approximate. Each parcel's own water share is measured separately (national index water_pct) (T-109 to T-116)
     waters = [g for g, _ in water(bounds) if not g.is_empty and g.area > 1]
     print(len(waters), "water polygons, drawn whole")
+    # the sea inside parcels (seabed and marina parcels, tidal flats) is drawn as water too: each parcel's part outside
+    # LINZ's land outline (at 5 m, as the national index measures it) (T-117)
+    land = land_outline(bounds)
+    from shapely import STRtree as _T
+    from shapely.ops import unary_union as _U
+    lt = _T(land); n_sea = 0
+    for pid, p in P.items():
+        g = geoms.get(pid)
+        if g is None: continue
+        near = [land[i] for i in lt.query(g)]
+        sea = g.difference(_U(near)) if near else g
+        if not sea.is_empty and sea.area > 1: waters.append(sea); n_sea += 1
+    print(n_sea, "parcels with sea drawn over them")
     nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):
         os.makedirs(os.path.join(OUT, "data", f"L{li}"))

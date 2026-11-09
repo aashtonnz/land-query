@@ -19,7 +19,7 @@ Standing priorities:
 - T-102: Build the national index out to the whole country, monthly: about 6–7 hours of work, so on GitHub split over several jobs (about US$3 a run, estimate from T-100); the index (about 400 MB) as a release file. Needs a national district boundary source, and easements from the LINZ Data Service with the key. Raised 2026-11-09.
 - T-106: Before the project is announced anywhere (D-24): rebuild the results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) without `titles` and `title_types`, history included, and make every build publish only public-mode columns. Ask the owner before rewriting the branches. Raised 2026-11-09.
 - T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
-- T-116: Fifth fresh-eyes review, of T-115 (water by area of sea, lakes and rivers; islands; map slivers). Raised 2026-11-09.
+- T-118: Sixth fresh-eyes review, of T-117. Raised 2026-11-09.
 - T-110: Parcel-report findings left open by the sixteenth and seventeenth reviews: sun and horizon next to a surface-model gap; warn where ground and surface surveys differ; tall structures without outlines read as open ground; the 10 m catchment against the Kāpiti build; title references in report.json; page limits (500 m horizon, 300 m shadows); addresses over several parcels. [Review](docs/findings/2026-11-09-national-review.md) Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
 - T-85: Two oddities the eleventh review saw but did not investigate: 25 "Fee Simple Title" parcels with `title_count` 0, and parcel 7760250 with `area_m2` 0 but `open_ground_m2` 1. Check before the next full rebuild (T-83). Raised 2026-11-09.
@@ -39,6 +39,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-116: Twentieth fresh-eyes review: sea inside parcels drawn as land on the map; the national run would stop at the Chatham islets; a cache mixing outline detail; fixed in T-117. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-114: Nineteenth fresh-eyes review: islands dropped, lake and sea counted twice, no-data as sea, tidal flats as land, lakes erased on the map; fixed in T-115 by measuring water as the area of sea, lakes and rivers together. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-112: Eighteenth fresh-eyes review: three serious findings, all from deciding water by name and paperwork; T-113 replaces that with a measured `water_pct`, lakes cut only at their edges, districts from the nearest address, frontage across strips reported apart, and tests that run the tile builder. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-111: Seventeenth fresh-eyes review, of the T-107 to T-109 fixes: three serious faults in them (bed rule dropping titled land, frontage missing offset roads, Lake Wairarapa erased) and a region-margin overreach; fixed with tests that fail when each fix is undone. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.

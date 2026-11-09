@@ -141,8 +141,8 @@ def test_frontage_counts_a_road_set_slightly_off_the_line_but_not_the_side_bound
 
 
 def run_tile(monkey_layers, Z=None, region=None, core=None, names=()):
-    monkey_layers.setdefault("land", [(box(-1e6, -1e6, 1e6, 1e6), dict(id=0))])
     """index_tile on made-up LINZ data (no network): monkey_layers maps a layer name (or 'roads') to [(geometry, props)]."""
+    monkey_layers.setdefault("land", [(box(-1e6, -1e6, 1e6, 1e6), dict(id=0))])
     from shapely.geometry import box as _box
     feat = lambda g, p: dict(geometry=g.__geo_interface__, properties=p)
     def fake_fetch(layer, bbox, cache, where="1=1"):
@@ -188,6 +188,17 @@ def test_water_is_the_area_of_sea_lakes_and_rivers_together_never_from_the_grid(
     assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] == 100 and rows[3]["water_pct"] == 50
     assert rows[4]["water_pct"] == 83.3                                     # 450-700 once: 250 of 300 (counted twice it would be 100)
     assert rows[5]["water_pct"] == 100 and rows[1]["ground_mean_m"] is None
+
+
+def test_no_land_outline_means_water_unknown_not_sea():
+    """T-117: where LINZ's land outline has nothing (the Chatham islets), water is empty, and the run does not stop."""
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB"))], "land": []})
+    assert rows[1]["water_pct"] is None
+
+
+def test_the_cache_key_includes_the_fetch_detail():
+    import inspect
+    assert "FETCH_OPTS.get(layer" in inspect.getsource(N.fetch).split("key =")[1].split("\n")[0]
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():

@@ -82,7 +82,8 @@ FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=5))
 def fetch(layer, bbox, cache, where="1=1"):
     """GeoJSON features of a LINZ layer intersecting bbox, cached gzipped; (features, provenance entry)."""
     svc, fields, lds = LAYERS[layer]
-    key = hashlib.sha256(json.dumps([layer, [round(v) for v in bbox], where]).encode()).hexdigest()[:16]
+    # the fetch options (detail) are part of the key, so a cached download is never reused at another detail (T-117)
+    key = hashlib.sha256(json.dumps([layer, [round(v) for v in bbox], where, FETCH_OPTS.get(layer, {})], sort_keys=True).encode()).hexdigest()[:16]
     path = os.path.join(cache, f"{layer}-{key}.json.gz")
     if os.path.exists(path):
         d = json.load(gzip.open(path, "rt"))
@@ -316,10 +317,17 @@ def index_tile(tile, cache, region=None, tas=()):
     # water is measured, never guessed from a name or a title (T-113, T-115)
     lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
     lf, prov["land"] = fetch("land", win, cache)
-    if not lf: raise RuntimeError("no land outline returned for this window: water cannot be measured")
+    prov["land"]["max_allowable_offset_m"] = FETCH_OPTS["land"]["maxAllowableOffset"]
+    prov["lakes_rivers"] = len(lw)
+    # no land outline here (LINZ's has nothing east of 2,480,000 E, e.g. the Chatham islets): the sea share is unknown, so
+    # water_pct is empty, not 100 (T-117)
+    if not lf:
+        prov["land"]["missing"] = True
+        for r in rows: r["water_pct"] = None
     from shapely import clip_by_rect
     land = [(clip_by_rect(g, *win), p) for g, p in geoms(lf)]   # only this tile's part of the North Island outline
-    for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
+    if lf:
+        for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
     # a parcel taken in by the coastal margin is left out only on positive evidence that it is another district's: its
     # own address, or else the nearest address within 1 km. With no address near (islands), it stays (T-111, T-115)
     if REGION_NAMES:

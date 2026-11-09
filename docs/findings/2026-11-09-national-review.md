@@ -127,3 +127,23 @@ Measured on the rebuilt pilot: Lot 43 DP 12843 reads 45.1% water (reviewer: 45),
 
 Each round has found fewer and narrower faults, but four rounds running have found serious ones, all in rules I wrote
 to guess something the data does not say directly. T-115 replaces the last of them with plain area measurement.
+
+## Twentieth review: water by area (T-116)
+
+| # | Finding | Seriousness | Fix (T-117) |
+| --- | --- | --- | --- |
+| 1 | Sea inside parcels was drawn as land on the map (Evans Bay, Oriental Bay, the Seaview marina: 102 parcels at least half sea) | Serious (map) | Each parcel's part outside LINZ's land outline is drawn as water |
+| 2 | LINZ's land outline has nothing east of 2,480,000 E: the national run would stop at two Chatham tiles, and without the stop those islets would read 100% sea | Serious (national) | No land outline: `water_pct` is empty (unknown) and the run goes on; tested |
+| 3 | The download cache ignored the fetch detail: 4 of 11 pilot tiles used a land outline fetched at another detail | Moderate | Fetch options are part of the cache key and the detail is recorded; the pilot rebuilt with a clean land cache |
+| 4 | The 5 m simplification moves a few small shore parcels by tens of points | Minor | Stated in SOURCES |
+| 5 | The rate-limit retry could give up too soon, and missed an HTTP 429 | Suspected | Waits of up to about 35 minutes in all, for either form; tested |
+| 6 | Lake and river counts not in provenance; a misplaced docstring | Minor | Fixed |
+
+Checked correct by this reviewer: `water_pct` re-measured independently for every pilot parcel (median difference 0;
+differences only from the 5 m simplification); clipping to the tile window never turns land into sea; lake beds,
+reclaimed land and tidal flats read as they should; residential lots with water are under real ponds; the margin
+rule keeps the islands and nothing from Horowhenua or Tararua; tests fail when the main water and margin rules are
+broken.
+
+Findings 1 and 2 were serious, though narrow (one about the picture, one about two outlying tiles). A sixth review
+follows (T-118).

@@ -3,21 +3,31 @@ import time
 import requests
 
 
+RATE_LIMIT_WAITS = (65, 120, 240, 480, 600, 600)   # seconds; the limit may be shared with other users of LINZ's service
+
+
 def _get(url, params, timeout=300, post=False):
-    for attempt in range(4):
+    limited = 0
+    for attempt in range(4 + len(RATE_LIMIT_WAITS)):
         try:
             r = (requests.post(url, data=params, timeout=timeout) if post else requests.get(url, params=params, timeout=timeout))
+            if r.status_code == 429: raise _RateLimited()
             r.raise_for_status()
             j = r.json()
             if "error" in j:
-                # a rate limit ("too many requests", 429) is waited out, not treated as a failure (T-115)
-                if (j["error"] or {}).get("code") == 429 and attempt < 3:
-                    time.sleep(65); continue
+                if (j["error"] or {}).get("code") == 429: raise _RateLimited()
                 raise RuntimeError(j["error"])
             return j
+        except _RateLimited:
+            # a rate limit, as an HTTP status or in the reply, is waited out with longer and longer pauses (T-115, T-117)
+            if limited >= len(RATE_LIMIT_WAITS): raise RuntimeError("rate limited: gave up after waiting about 35 minutes")
+            time.sleep(RATE_LIMIT_WAITS[limited]); limited += 1
         except (requests.exceptions.RequestException, ValueError):
-            if attempt == 3: raise
-            time.sleep(5 * (attempt + 1))
+            if attempt - limited >= 3: raise
+            time.sleep(5 * (attempt - limited + 1))
+
+
+class _RateLimited(Exception): pass
 
 
 def exceeded(j):
