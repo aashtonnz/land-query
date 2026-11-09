@@ -70,7 +70,7 @@ def parcels():
     nd = results("national-pilot"); nf = os.path.join(nd, "index.parquet")
     for r in duckdb.sql(f"""SELECT parcel_id, appellation, parcel_intent, rep_x, rep_y, area_m2, ground_mean_m,
             upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority, water_pct FROM '{nf}'""").fetchall():
-        WATER_PCT[r[0]] = r[12] or 0   # measured water share; parcels above 0 get their sea part drawn (T-117)
+        WATER_PCT[r[0]] = r[12]   # measured water share (None: unknown); parcels above 0 get their sea part drawn (T-117)
         P[r[0]] = dict(c="n", appellation=r[1], parcel_intent=r[2], rep_x=r[3], rep_y=r[4], area_m2=r[5], ground_mean_m=r[6],
                        catchment_area_max_m2=r[7], title_count=r[8], building_cover_pct=r[9], address=r[10],
                        territorial_authority=r[11])
@@ -151,6 +151,21 @@ def encode(items):
             + pad(np.array(cc, "u1").tobytes()) + st.astype("<i2").tobytes())
 
 
+def sea_parts(P, geoms, water_pct, land):
+    """Each parcel's part outside the land outline, for parcels the national index measured as part water (unknown
+    water, None, draws nothing). The outline is clipped to each parcel first (T-117, T-119)."""
+    from shapely import STRtree, clip_by_rect
+    from shapely.ops import unary_union
+    lt = STRtree(land) if land else None; out = []
+    for pid in P:
+        g = geoms.get(pid)
+        if g is None or not water_pct.get(pid) or lt is None: continue
+        near = [c for c in (clip_by_rect(land[i], *g.bounds) for i in lt.query(g)) if not c.is_empty]
+        sea = g.difference(unary_union(near)) if near else g
+        if not sea.is_empty and sea.area > 1: out.append(sea)
+    return out
+
+
 def land_outline(bounds):
     """LINZ's NZ Coastline land polygons at 5 m over bounds, clipped (the national index's sea is outside these)."""
     import arcgis, overlays
@@ -213,15 +228,7 @@ def main():
     land = land_outline(bounds)
     from shapely import STRtree as _T
     from shapely.ops import unary_union as _U
-    # only parcels the national index measured as part water need it; the outline is clipped to each parcel first
-    from shapely import clip_by_rect as _clip
-    lt = _T(land); n_sea = 0
-    for pid, p in P.items():
-        g = geoms.get(pid)
-        if g is None or not WATER_PCT.get(pid): continue
-        near = [c for c in (_clip(land[i], *g.bounds) for i in lt.query(g)) if not c.is_empty]
-        sea = g.difference(_U(near)) if near else g
-        if not sea.is_empty and sea.area > 1: waters.append(sea); n_sea += 1
+    seas = sea_parts(P, geoms, WATER_PCT, land); waters += seas; n_sea = len(seas)
     print(n_sea, "parcels with sea drawn over them")
     nanv = [float("nan")] * len(MEASURES)
     for li, (side, tol) in enumerate(LEVELS):

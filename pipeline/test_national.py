@@ -178,7 +178,7 @@ def test_water_is_the_area_of_sea_lakes_and_rivers_together_never_from_the_grid(
     Z = np.full((140, 140), np.nan, np.float32)                           # no elevation data at all
     land = box(-500, -500, 600, 1500)                                       # sea east of x = 600
     P = lambda i: dict(id=i, parcel_intent="DCDB")
-    rows = run_tile({"parcels": [(box(100, 100, 200, 200), P(1)), (box(700, 100, 800, 200), P(2)),
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), P(1)), (box(620, 100, 720, 200), P(2)),   # 20 m offshore
                                  (box(550, 300, 650, 400), P(3)),           # half sea
                                  (box(400, 500, 700, 600), P(4)),           # under a lake (450-650) that runs over the sea edge (600)
                                  (box(100, 700, 200, 800), P(5))],          # half under a lake, half under a river
@@ -196,9 +196,28 @@ def test_no_land_outline_means_water_unknown_not_sea():
     assert rows[1]["water_pct"] is None
 
 
-def test_the_cache_key_includes_the_fetch_detail():
-    import inspect
-    assert "FETCH_OPTS.get(layer" in inspect.getsource(N.fetch).split("key =")[1].split("\n")[0]
+def test_the_cache_key_includes_the_fetch_detail_and_the_window():
+    """T-117: the same layer and window at another detail, or another window, is a new download, never a cached one."""
+    import tempfile, arcgis
+    calls = []
+    keep = (arcgis.query_all, dict(N.FETCH_OPTS))
+    arcgis.query_all = lambda url, q, workers=1: calls.append(q.get("maxAllowableOffset")) or []
+    try:
+        d = tempfile.mkdtemp()
+        N.fetch("land", (0, 0, 10, 10), d); N.fetch("land", (0, 0, 10, 10), d)          # cached the second time
+        N.FETCH_OPTS["land"] = dict(workers=1, maxAllowableOffset=50); N.fetch("land", (0, 0, 10, 10), d)
+        N.fetch("land", (0, 0, 20, 10), d)
+    finally: arcgis.query_all, N.FETCH_OPTS = keep[0], keep[1]
+    assert calls == [5, 50, 50], calls
+
+
+def test_an_islet_missing_from_the_land_outline_is_unknown_not_sea():
+    """T-119: mainland outline in the window, an islet 500 m offshore that the outline leaves out."""
+    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(800, 800, 820, 820), dict(id=2, parcel_intent="DCDB")),
+                                 (box(330, 100, 360, 130), dict(id=3, parcel_intent="DCDB"))],
+                     "land": [(box(0, 0, 300, 300), dict(id=1))]})
+    assert rows[1]["water_pct"] == 0 and rows[2]["water_pct"] is None
+    assert rows[3]["water_pct"] == 100                                       # 30 m offshore, outline near: measured as sea
 
 
 def test_region_margin_keeps_only_parcels_whose_district_is_the_regions():

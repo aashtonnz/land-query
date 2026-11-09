@@ -11,17 +11,20 @@ def _get(url, params, timeout=300, post=False):
     for attempt in range(4 + len(RATE_LIMIT_WAITS)):
         try:
             r = (requests.post(url, data=params, timeout=timeout) if post else requests.get(url, params=params, timeout=timeout))
-            if r.status_code == 429: raise _RateLimited()
+            if r.status_code == 429: raise _RateLimited(r.headers.get("Retry-After"))
+            if r.status_code >= 500: raise _RateLimited(None)   # a busy service: the same long waits (T-119)
             r.raise_for_status()
             j = r.json()
             if "error" in j:
                 if (j["error"] or {}).get("code") == 429: raise _RateLimited()
                 raise RuntimeError(j["error"])
             return j
-        except _RateLimited:
-            # a rate limit, as an HTTP status or in the reply, is waited out with longer and longer pauses (T-115, T-117)
-            if limited >= len(RATE_LIMIT_WAITS): raise RuntimeError("rate limited: gave up after waiting about 35 minutes")
-            time.sleep(RATE_LIMIT_WAITS[limited]); limited += 1
+        except _RateLimited as e:
+            # a rate limit or busy service is waited out with longer and longer pauses, or as long as the service asks
+            # (Retry-After), up to about 35 minutes in all (T-115, T-117, T-119)
+            if limited >= len(RATE_LIMIT_WAITS): raise RuntimeError("rate limited or busy: gave up after waiting about 35 minutes")
+            ask = e.args[0] if e.args else None
+            time.sleep(max(RATE_LIMIT_WAITS[limited], float(ask)) if ask and str(ask).isdigit() else RATE_LIMIT_WAITS[limited]); limited += 1
         except (requests.exceptions.RequestException, ValueError):
             if attempt - limited >= 3: raise
             time.sleep(5 * (attempt - limited + 1))

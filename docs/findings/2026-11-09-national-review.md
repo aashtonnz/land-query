@@ -147,3 +147,19 @@ broken.
 
 Findings 1 and 2 were serious, though narrow (one about the picture, one about two outlying tiles). A sixth review
 follows (T-118).
+
+## Twenty-first review: T-117 (T-118)
+
+| # | Finding | Seriousness | Fix (T-119) |
+| --- | --- | --- | --- |
+| 1 | Islets missing from LINZ's land outline read 100% water whenever the tile also holds mainland (at least 296 island-named parcels nationally: Tarahiki Island, Karewa, the Snares, the Sisters); the T-117 fix covered only a whole window with no outline | Serious (national) | Per parcel: no land outline within 50 m means water unknown (empty); tested with an islet 500 m off a mainland outline |
+| 2 | The cache test only read source text; the whole-window test missed finding 1; nothing tested the map's sea step | Moderate | The cache test calls `fetch` with a fake service; a sea-step test (`site/test_site.py`) runs in the site workflow |
+| 3 | `Retry-After` ignored; a busy service (5xx) gave up after 3 short retries | Minor | Both waited out with the long pauses |
+| 4 | Provenance `commit` empty for a local build | Minor | Taken from git when not on GitHub |
+
+Checked correct by this reviewer: the published pilot is byte-identical to a rebuild with the current code; every
+land-cache tile at 5 m; parcels with sea but measured 0 hold 1.1 ha in all; council parcels get their sea drawn;
+only wharves among built-on parcels read 20% water or more; the map's sea step is fast enough nationally.
+
+This round found one serious fault, at national scale only and in a single rule. Rounds 16 to 21 found 4, 3, 3, 3, 2
+and 1 serious faults. A seventh review follows (T-120), limited to T-119.

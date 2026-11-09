@@ -168,15 +168,21 @@ def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
     return round(edge.length, 1), round(via, 1)
 
 
+LAND_NEAR_M = 50.0
+
+
 def water_shares(parcels, water, land):
     """Share (%) of each parcel under water, measured by area: the union of lake and river polygons and the sea, which
     is everything outside the land outline. A part both lake and sea counts once; no elevation grid is involved, so
-    missing elevation data can never read as water (T-115)."""
+    missing elevation data can never read as water (T-115). A parcel with no land outline within LAND_NEAR_M is unknown
+    (None), not sea: LINZ's outline leaves out many islets and rocks (Tarahiki Island, the Snares), which would otherwise
+    read 100 (T-119)."""
     wt = STRtree([g for g, _ in water]) if water else None
     lt = STRtree([g for g, _ in land]) if land else None
     out = []
     for g, _, _ in parcels:
         if not g.area: out.append(None); continue
+        if lt is None or not len(lt.query(g.buffer(LAND_NEAR_M))): out.append(None); continue
         on_land = unary_union([land[i][0] for i in lt.query(g)]) if lt is not None else None
         sea = g.difference(on_land) if on_land is not None and not on_land.is_empty else g
         wet = [water[i][0] for i in wt.query(g)] if wt is not None else []
@@ -390,7 +396,10 @@ if __name__ == "__main__":
     df = pd.DataFrame(rows)
     path = os.path.join(out, "index.parquet")
     df.to_parquet(path, index=False, compression="zstd")
-    json.dump(dict(region=rprov, tiles=tprov, built=utc_now(), commit=os.environ.get("GITHUB_SHA")),
+    import subprocess
+    commit = os.environ.get("GITHUB_SHA") or subprocess.run(["git", "rev-parse", "HEAD"], cwd=os.path.dirname(os.path.abspath(__file__)),
+                                                             capture_output=True, text=True).stdout.strip() or None   # T-119
+    json.dump(dict(region=rprov, tiles=tprov, built=utc_now(), commit=commit),
               open(os.path.join(out, "provenance.json"), "w"), indent=1)
     run = dict(region=key, parcels=len(df), tiles=len(tiles), seconds=round(time.time() - t0),
                index_mb=round(os.path.getsize(path) / 1e6, 1),
