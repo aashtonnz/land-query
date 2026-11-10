@@ -52,6 +52,7 @@ section > .read{display:grid;gap:12px}
 .controls label{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
 select,input[type=search]{font:inherit;font-size:.95rem;color:var(--ink);background:var(--sheet);border:1px solid var(--rule);padding:7px 10px;border-radius:4px;min-width:0}
 input[type=search]{width:min(320px,100%)}
+select#colour{max-width:min(440px,100%)}
 .mapbox{position:relative;background:var(--sheet);border:1px solid var(--rule);min-width:0}
 canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:none;cursor:crosshair}
 .canvaswrap{position:relative}
@@ -71,9 +72,11 @@ canvas#map{display:block;width:100%;height:clamp(420px,70vh,720px);touch-action:
 .canvaswrap:fullscreen .legend,.canvaswrap.full .legend{left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px))}
 body.mapfull{overflow:hidden}
 .panel{background:var(--sheet);border:1px solid var(--rule);padding:16px 18px;display:grid;gap:12px;align-content:start;min-width:0}
-.panel dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.9rem}
+.panel dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;margin:0;font-size:.9rem}
 .panel dt{color:var(--muted)}
-.panel dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;overflow-wrap:anywhere}
+.panel dt.grp{grid-column:1/-1;margin-top:8px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.panel dt.grp + dd{display:none}
+.panel dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;max-width:14ch;overflow-wrap:anywhere}
 .panel .empty{color:var(--muted);font-size:.9rem}
 .results{display:grid;gap:2px;max-height:220px;overflow:auto;border-top:1px solid var(--rule);padding-top:8px}
 .results button{all:unset;cursor:pointer;padding:5px 6px;border-radius:3px;font-size:.88rem;display:flex;justify-content:space-between;gap:8px}
@@ -120,17 +123,7 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
     <label for="search">Search legal description or address
       <input id="search" type="search" placeholder="Lot 3 DP 337497" autocomplete="off"></label>
     <label for="colour">Colour by
-      <select id="colour">
-        <option value="ground_mean_m">Mean ground height</option>
-        <option value="slope_p90_deg">Steepness (90th percentile slope)</option>
-        <option value="catchment_area_max_m2">Upslope catchment</option>
-        <option value="building_cover_pct">Building cover</option>
-        <option value="area_m2">Parcel area</option>
-        <option value="road_frontage_m">Road frontage</option>
-        <option value="coast_distance_m">Distance to the coast</option>
-        <option value="ww_pipe_year">Nearest sewer's install year (Kāpiti)</option>
-        <option value="c">Council</option>
-      </select></label>
+      <select id="colour"><option value="ground_mean_m">Mean ground height</option></select></label>
     <label for="council">Show
       <select id="council">
         <option value="all">Everything</option>
