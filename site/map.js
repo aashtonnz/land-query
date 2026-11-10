@@ -46,6 +46,10 @@ const SCALES = {
   ground_mean_m:{m:0, tf:1, lo:0, hi:Math.sqrt(200), label:'Mean ground height (m, square-root scale)', ends:['0','200+']},
   slope_p90_deg:{m:1, tf:0, lo:0, hi:35, label:'90th percentile slope (°)', ends:['0°','35°+']},
   catchment_area_max_m2:{m:2, tf:2, lo:3, hi:8, label:'Upslope catchment (m², log)', ends:['≤1,000','≥100 km²']},
+  building_cover_pct:{m:4, tf:1, lo:0, hi:Math.sqrt(60), label:'Building cover (% under LINZ building outlines, square-root scale)', ends:['0%','60%+']},
+  area_m2:{m:5, tf:2, lo:2, hi:6, label:'Parcel area (m², log)', ends:['≤100','≥100 ha']},
+  road_frontage_m:{m:6, tf:1, lo:0, hi:Math.sqrt(100), label:'Road frontage (m, square-root scale)', ends:['0','100+']},
+  coast_distance_m:{m:7, tf:1, lo:0, hi:Math.sqrt(10000), label:'Distance to the coast (m, square-root scale; none beyond 10 km)', ends:['0','10 km']},
   ww_pipe_year:{m:3, tf:0, lo:1950, hi:2020, label:'Nearest sewer installed (Kāpiti; KCDC records many as 1979 or 1980, likely placeholders)', ends:['≤1950','2020']},
 };
 function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
@@ -59,19 +63,20 @@ function legend(){ const L = $('legend');
 function prog(vs, fs){ const p = gl.createProgram();
   for(const [t,src] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){ const sh = gl.createShader(t); gl.shaderSource(sh, '#version 300 es\nprecision highp float;\n'+src); gl.compileShader(sh);
     if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); gl.attachShader(p, sh); }
-  gl.bindAttribLocation(p, 0, 'p'); gl.bindAttribLocation(p, 1, 'vals'); gl.bindAttribLocation(p, 2, 'cc'); gl.bindAttribLocation(p, 3, 'sz');
+  gl.bindAttribLocation(p, 0, 'p'); gl.bindAttribLocation(p, 1, 'vals'); gl.bindAttribLocation(p, 2, 'cc'); gl.bindAttribLocation(p, 3, 'sz'); gl.bindAttribLocation(p, 4, 'vals2');
   gl.linkProgram(p); if(!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
   const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
   for(let i=0;i<n;i++){ const a = gl.getActiveUniform(p, i); u[a.name] = gl.getUniformLocation(p, a.name); }
   return {p, u}; }
 const FS = 'in vec4 v; out vec4 o; void main(){ if(v.a < .01) discard; o = v; }';
-const PARCEL = prog(`in vec2 p; in vec4 vals; in float cc; uniform vec2 sc, of; uniform int m, filt, tf; uniform float lo, hi;
+const PARCEL = prog(`in vec2 p; in vec4 vals; in vec4 vals2; in float cc; uniform vec2 sc, of; uniform int m, filt, tf; uniform float lo, hi;
   uniform vec3 c0, c1, c2, grey, ck, cp, cn, sea; out vec4 v;
   void main(){ gl_Position = vec4(p*sc+of, 0., 1.); int c = int(cc+.5);
     if(c == 3){ v = vec4(sea, 1.); return; }   // rivers and lakes
     if(filt >= 0 && c != filt){ v = vec4(0.); return; }
-    if(m == 4){ v = vec4(c==0 ? ck : (c==1 ? cp : cn), 1.); return; }
-    float x = m==0 ? vals.x : (m==1 ? vals.y : (m==2 ? vals.z : vals.w));
+    if(m == 8){ v = vec4(c==0 ? ck : (c==1 ? cp : cn), 1.); return; }
+    vec4 q = m < 4 ? vals : vals2; int k = m < 4 ? m : m-4;
+    float x = k==0 ? q.x : (k==1 ? q.y : (k==2 ? q.z : q.w));
     if(x < -1e29){ v = vec4(grey, 1.); return; }
     if(tf == 1) x = sqrt(max(x, 0.)); else if(tf == 2) x = log(max(x, 1.)) / log(10.);
     float t = clamp((x-lo)/(hi-lo), 0., 1.);
@@ -118,7 +123,7 @@ function work({key, buf, M, OX, OY}){ const dv = new DataView(buf);
   const rlen = new Uint32Array(buf, o, nr); o += 4*nr; const st = new Int32Array(buf, o, 2*nr); o += 8*nr;
   const rper = new Uint16Array(buf, o, n); o += Math.ceil(2*n/4)*4; const cc = new Uint8Array(buf, o, n); o += Math.ceil(n/4)*4;
   const d = new Int16Array(buf, o, 2*(nv-nr));
-  const pos = new Float32Array(2*nv), pv = new Float32Array(4*nv), pc = new Uint8Array(nv), psz = new Float32Array(nv), edge = new Uint32Array(2*nv);
+  const pos = new Float32Array(2*nv), pv = new Float32Array(4*nv), pv2 = new Float32Array(4*nv), pc = new Uint8Array(nv), psz = new Float32Array(nv), edge = new Uint32Array(2*nv);
   const rs = new Uint32Array(nr+1), hole = new Uint8Array(nr), hx = new Int32Array(nv), hy = new Int32Array(nv);
   for(let r=0, v=0, q=0; r<nr; r++){ rs[r] = v; hole[r] = rlen[r]>>>31; const len = rlen[r] & 0x7FFFFFFF;
     let x = st[2*r], y = st[2*r+1]; hx[v] = x; hy[v] = y; v++;
@@ -128,7 +133,7 @@ function work({key, buf, M, OX, OY}){ const dv = new DataView(buf);
   for(let i=0, r=0; i<n; i++){ pr0[i] = r; const r1 = r + rper[i]; let a0=Infinity,b0=Infinity,a1=-Infinity,b1=-Infinity;
     for(let k=r; k<r1; k++) for(let v=rs[k]; v<rs[k+1]; v++){
       const x = hx[v]/2 - OX, y = hy[v]/2 - OY; pos[2*v] = x; pos[2*v+1] = y; pc[v] = cc[i];
-      for(let m=0;m<4;m++){ const z = m < M ? vals[i*M+m] : NaN; pv[4*v+m] = z === z ? z : -1e30; }
+      for(let m=0;m<8;m++){ const z = m < M ? vals[i*M+m] : NaN; (m<4 ? pv : pv2)[4*v+(m&3)] = z === z ? z : -1e30; }
       if(x<a0)a0=x; if(x>a1)a1=x; if(y<b0)b0=y; if(y>b1)b1=y;
       edge[ne++] = v; edge[ne++] = v+1 < rs[k+1] ? v+1 : rs[k]; }
     bb[4*i]=a0; bb[4*i+1]=b0; bb[4*i+2]=a1; bb[4*i+3]=b1;
@@ -141,8 +146,8 @@ function work({key, buf, M, OX, OY}){ const dv = new DataView(buf);
       for(let j=0;j<t.length;j++) tri[nt++] = base + t[j]; k = q; }
     r = r1; }
   pr0[n] = nr; tri = tri.slice(0, nt);
-  postMessage({key, n, ids: ids.slice(), pos, pv, pc, psz, tri, edge, rs, pr0, bb},
-    [pos.buffer, pv.buffer, pc.buffer, psz.buffer, tri.buffer, edge.buffer, rs.buffer, pr0.buffer, bb.buffer]); }`;
+  postMessage({key, n, ids: ids.slice(), pos, pv, pv2, pc, psz, tri, edge, rs, pr0, bb},
+    [pos.buffer, pv.buffer, pv2.buffer, pc.buffer, psz.buffer, tri.buffer, edge.buffer, rs.buffer, pr0.buffer, bb.buffer]); }`;
 const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], {type:'text/javascript'})));
 const pieces = new Map();   // "L/key" -> {state, vao, ntri, nedge, cpu (level 0, for picking), used}
 let pieceWaiters = [];
@@ -151,7 +156,7 @@ worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return
   const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
   const ab = (data, loc, size, type, norm=false) => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, size, type, norm, 0, 0); return b; };
-  P.bufs = [ab(d.pos, 0, 2, gl.FLOAT), ab(d.pv, 1, 4, gl.FLOAT), ab(d.pc, 2, 1, gl.UNSIGNED_BYTE), ab(d.psz, 3, 1, gl.FLOAT)];
+  P.bufs = [ab(d.pos, 0, 2, gl.FLOAT), ab(d.pv, 1, 4, gl.FLOAT), ab(d.pc, 2, 1, gl.UNSIGNED_BYTE), ab(d.psz, 3, 1, gl.FLOAT), ab(d.pv2, 4, 4, gl.FLOAT)];
   const t = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, t); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, d.tri, gl.STATIC_DRAW);
   gl.bindVertexArray(null);
   const eb = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, eb); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, d.edge, gl.STATIC_DRAW);
@@ -191,9 +196,9 @@ function renderTile(z, i, j){
   const sc = [2/T, 2/T], of = [-(x0-OX)*2/T - 1, -(y0-OY)*2/T - 1];
   gl.useProgram(LAND.p); gl.uniform2fv(LAND.u.sc, sc); gl.uniform2fv(LAND.u.of, of); gl.uniform4f(LAND.u.col, ...hex(css('--land')), 1);
   gl.bindVertexArray(land.vao); gl.drawElements(gl.TRIANGLES, land.n, gl.UNSIGNED_INT, 0);
-  const s = SCALES[mode] || {m:4, tf:0, lo:0, hi:1}, filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
+  const s = SCALES[mode] || {m:8, tf:0, lo:0, hi:1}, filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
   gl.useProgram(PARCEL.p); const u = PARCEL.u;
-  gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 4 : s.m); gl.uniform1i(u.tf, s.tf);
+  gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 8 : s.m); gl.uniform1i(u.tf, s.tf);
   gl.uniform1f(u.lo, s.lo); gl.uniform1f(u.hi, s.hi); gl.uniform1i(u.filt, filt);
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
   gl.uniform3fv(u.sea, hex(css('--sea'))); gl.uniform3fv(u.grey, hex(css('--novalue'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
@@ -316,9 +321,11 @@ async function pickAt(wx, wy, wantId){ const x = wx-OX, y = wy-OY;
 const ROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height','m',1],['slope_p90_deg','Slope, 90th percentile','°',1],
   ['lidar_coverage_pct','LiDAR coverage','%',1],['flow_path_m','Overland flow paths','m',0],['catchment_area_max_m2','Upslope catchment','m²',0],
   ['title_count','Titles','',0],['easements_n','Easement parcels','',0],
-  ['ww_pipe_dist_m','Nearest sewer','m',1],['ww_pipe_year','Sewer installed','',0],['ww_pipe_condition_grade','Sewer condition grade (1–5)','',0],['ws_pipe_dist_m','Nearest water main','m',1]];
+  ['ww_pipe_dist_m','Nearest sewer','m',1],['ww_pipe_year','Sewer installed','',0],['ww_pipe_condition_grade','Sewer condition grade (1–5)','',0],['ws_pipe_dist_m','Nearest water main','m',1],
+  ['road_frontage_m','Road frontage (from LINZ)','m',1],['coast_distance_m','Distance to the coast (from LINZ)','m',0]];
 const NROWS = [['area_m2','Area','m²',0],['ground_mean_m','Mean ground height (10 m grid; one point on very small parcels)','m',1],
-  ['catchment_area_max_m2','Upslope catchment (10 m grid; at least, where the catchment runs past the grid)','m²',0],['building_cover_pct','Under building outlines','%',0],['title_count','Titles','',0]];
+  ['catchment_area_max_m2','Upslope catchment (10 m grid; at least, where the catchment runs past the grid)','m²',0],['building_cover_pct','Under building outlines','%',0],['title_count','Titles','',0],
+  ['road_frontage_m','Road frontage','m',1],['coast_distance_m','Distance to the coast','m',0]];
 const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national index'};
 const details = new Map();
 async function select(hit){ selected = hit; draw(); const det = $('detail');

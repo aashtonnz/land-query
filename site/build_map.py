@@ -31,7 +31,8 @@ ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM
 # level is used once a tile pixel covers at least twice its simplification (map.js levelFor), so simplifying never
 # shows; only parcels smaller than the simplification become squares of their own area
 LEVELS = [(2048, 0.5), (16384, 2.0), (65536, 8.0), (262144, 24.0)]
-MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year"]
+MEASURES = ["ground_mean_m", "slope_p90_deg", "catchment_area_max_m2", "ww_pipe_year",
+            "building_cover_pct", "area_m2", "road_frontage_m", "coast_distance_m"]   # at most 8 (two vec4s in map.js)
 COUNCILS = {"k": 0, "p": 1, "n": 2}
 WATER_PCT = {}   # parcel id -> national index water_pct
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
@@ -40,7 +41,8 @@ COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y", "ar
 KAPITI_ONLY = ["ww_pipe_dist_m", "ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dist_m"]
 DETAIL = ["c", "appellation", "parcel_intent", "area_m2", "ground_mean_m", "slope_p90_deg", "lidar_coverage_pct",
           "flow_path_m", "catchment_area_max_m2", "title_count", "easements_n", "building_cover_pct",
-          "ww_pipe_dist_m", "ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dist_m", "address", "territorial_authority"]
+          "ww_pipe_dist_m", "ww_pipe_year", "ww_pipe_condition_grade", "ws_pipe_dist_m", "address", "territorial_authority",
+          "road_frontage_m", "coast_distance_m"]
 
 
 def results(branch):
@@ -69,11 +71,12 @@ def parcels():
     P, stats = {}, {}
     nd = results("national-pilot"); nf = os.path.join(nd, "index.parquet")
     for r in duckdb.sql(f"""SELECT parcel_id, appellation, parcel_intent, rep_x, rep_y, area_m2, ground_mean_m,
-            upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority, water_pct FROM '{nf}'""").fetchall():
+            upslope_area_max_m2, title_count, building_cover_pct, address, territorial_authority, water_pct,
+            road_frontage_m, coast_distance_m FROM '{nf}'""").fetchall():
         WATER_PCT[r[0]] = r[12]   # measured water share (None: unknown); parcels above 0 get their sea part drawn (T-117)
         P[r[0]] = dict(c="n", appellation=r[1], parcel_intent=r[2], rep_x=r[3], rep_y=r[4], area_m2=r[5], ground_mean_m=r[6],
                        catchment_area_max_m2=r[7], title_count=r[8], building_cover_pct=r[9], address=r[10],
-                       territorial_authority=r[11])
+                       territorial_authority=r[11], road_frontage_m=r[13], coast_distance_m=r[14])
     n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
     stats["n"] = dict(parcels=n_all, median_ground=nmed, run="national index pilot, built from " +
                       open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
@@ -84,6 +87,9 @@ def parcels():
         for r in duckdb.sql(f"SELECT {', '.join(cols)} FROM '{f}'").fetchall():
             row = dict(zip(cols, r)); old = P.get(row["unit_id"], {})
             row.update(c=c, address=old.get("address"), territorial_authority=old.get("territorial_authority"))
+            # measures the council builds do not hold come from the national index, for the same LINZ parcel
+            for k in ("building_cover_pct", "road_frontage_m", "coast_distance_m"):
+                if row.get(k) is None: row[k] = old.get(k)
             for k in ("rep_x", "rep_y", "area_m2"):
                 if row.get(k) is None: row[k] = old.get(k)
             P[row.pop("unit_id")] = row
