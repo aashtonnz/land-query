@@ -327,6 +327,22 @@ def test_no_stage_grows_faster_than_the_data():
         assert k < scaling.MAX_SLOPE, f"{stage} grows as parcels^{k:.2f} ({ns}): too steep for the densest tiles"
 
 
+def test_bulk_reads_geopackage_geometry_and_only_the_fields_named():
+    """T-102: a GeoPackage geometry blob (header, envelope, WKB) gives the shape back; owner fields are never read."""
+    import sqlite3, struct, tempfile, shapely, bulk
+    g = shapely.Polygon([(0, 0), (10, 0), (10, 10)])
+    blob = b"GP" + bytes([0, 1 << 1 | 1]) + struct.pack("<i", 2193) + struct.pack("<4d", 0, 10, 0, 10) + shapely.to_wkb(g)
+    assert shapely.from_wkb(bulk.gpkg_wkb(blob)).equals(g)
+    d = tempfile.mkdtemp(); con = sqlite3.connect(f"{d}/t.gpkg")
+    con.execute("CREATE TABLE gpkg_geometry_columns (table_name, column_name)"); con.execute("INSERT INTO gpkg_geometry_columns VALUES ('t', 'shape')")
+    con.execute("CREATE TABLE t (title_no, status, type, number_owners, estate_description, shape)")
+    con.execute("INSERT INTO t VALUES ('WN1/1', 'LIVE', 'Freehold', 2, 'Fee Simple, 1/2 share', ?)", (blob,)); con.commit()
+    cols, wkbs = bulk.read_gpkg(f"{d}/t.gpkg", bulk.LDS_LAYERS["titles"][1])
+    assert set(cols) == {"title_no", "status", "type"} and cols["title_no"] == ["WN1/1"] and len(wkbs) == 1
+    try: bulk.read_gpkg(f"{d}/t.gpkg", dict(x="missing_field")); assert False
+    except RuntimeError: pass
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

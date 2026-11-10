@@ -18,7 +18,7 @@ Usage: see the end of this file (one region, or New Zealand in shares for GitHub
 OUT_DIR/provenance.json and OUT_DIR/run.json (time and size); raw downloads are cached under OUT_DIR/cache.
 """
 import datetime as dt, gzip, hashlib, json, math, os, sys, time
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd, shapely
 from shapely import STRtree, wkb
 from shapely.geometry import shape, box
 from shapely.ops import unary_union
@@ -80,8 +80,30 @@ def in_tile(pt, t):
 FETCH_OPTS = dict(land=dict(workers=1, maxAllowableOffset=5), localities=dict(workers=2, maxAllowableOffset=1))
 
 
+BULK = os.environ.get("NI_BULK")   # a folder from bulk.py: read layers from it, never from LINZ's services (T-102)
+
+
+def fetch_bulk(layer, bbox, where="1=1"):
+    """Features of a layer intersecting bbox from the bulk folder: (features, provenance entry). The only `where` the
+    index uses picks road parcels."""
+    import pyarrow.dataset as ds
+    x0, y0, x1, y1 = bbox
+    f = (ds.field("xmin") <= x1) & (ds.field("xmax") >= x0) & (ds.field("ymin") <= y1) & (ds.field("ymax") >= y0)
+    if where == "parcel_intent='Road'": f = f & (ds.field("parcel_intent") == "Road")
+    elif where != "1=1": raise ValueError(f"bulk fetch cannot apply where={where!r}")
+    t = ds.dataset(os.path.join(BULK, layer + ".parquet")).to_table(filter=f)
+    cols = [c for c in t.column_names if c not in ("wkb", "xmin", "ymin", "xmax", "ymax")]
+    props = t.select(cols).to_pylist(); gs = shapely.from_wkb(t.column("wkb").to_numpy(zero_copy_only=False))
+    feats = [dict(geometry=g, properties=p) for g, p in zip(gs, props)]
+    m = json.load(open(os.path.join(BULK, "manifest.json")))[layer]
+    feats, repeats, differ = once_each(feats, KEYS[layer])
+    return feats, dict(url=m["url"], source=m["source"], features=len(feats), repeated_records=repeats,
+                       repeated_with_other_values=differ, fetched=m["fetched"], licence=LICENCE)
+
+
 def fetch(layer, bbox, cache, where="1=1"):
     """GeoJSON features of a LINZ layer intersecting bbox, cached gzipped; (features, provenance entry)."""
+    if BULK: return fetch_bulk(layer, bbox, where)
     svc, fields, lds = LAYERS[layer]
     # the fetch options (detail) are part of the key, so a cached download is never reused at another detail (T-117)
     key = hashlib.sha256(json.dumps([layer, [round(v) for v in bbox], where, FETCH_OPTS.get(layer, {})], sort_keys=True).encode()).hexdigest()[:16]
@@ -123,7 +145,7 @@ def geoms(feats):
     out = []
     for f in feats:
         if not f.get("geometry"): continue
-        g = shape(f["geometry"])
+        g = f["geometry"] if isinstance(f["geometry"], shapely.Geometry) else shape(f["geometry"])   # bulk: already a shape
         out.append((ov.repaired(g) if g.geom_type in ("Polygon", "MultiPolygon") else g, f["properties"]))
     return out
 
