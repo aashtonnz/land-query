@@ -318,6 +318,15 @@ def test_published_results_hold_no_title_references_or_types():
     assert public_strip.strip_json(rep) == dict(values=dict(title_count=1), provenance=dict(titles=dict(url="u")))   # the parcel report
 
 
+def test_no_stage_grows_faster_than_the_data():
+    """T-102: each stage timed on made-up suburbs of about 1,000, 2,000 and 4,000 parcels on a detailed coast; the growth
+    (slope of log time against log parcels) must stay under scaling.MAX_SLOPE. The per-parcel water share that took hours
+    on Auckland's coast measured 1.4 to 1.6 here; the fixed one about 1.0."""
+    import scaling
+    for stage, (k, t, ns) in scaling.slopes(1000, repeats=2).items():
+        assert k < scaling.MAX_SLOPE, f"{stage} grows as parcels^{k:.2f} ({ns}): too steep for the densest tiles"
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
