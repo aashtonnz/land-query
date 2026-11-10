@@ -69,7 +69,7 @@ function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(c
 function legend(){ const L = $('legend');
   if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div><div class="keys"><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel</span></div>`; return; }
   const s = SCALES[mode], g = [0,.25,.5,.75,1].map(ramp).join(',');
-  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers (edges approximate, from 1:50,000 maps)</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel (mostly roads)</span></div>`; }
+  L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers (edges approximate, from 1:50,000 maps)</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Roads, railways and other land without a parcel</span></div>`; }
 
 // ---- GL programs
 function prog(vs, fs){ const p = gl.createProgram();
@@ -323,7 +323,7 @@ function overlay(){ const c = octx; c.setTransform(1,0,0,1,0,0); c.clearRect(0,0
       c.moveTo(sx(d.pos[2*a]+OX), sy(d.pos[2*a+1]+OY)); for(let v=a+1; v<e; v++) c.lineTo(sx(d.pos[2*v]+OX), sy(d.pos[2*v+1]+OY)); c.closePath(); }
     c.stroke();
     const b = selected.cpu.bb, k = selected.k; if((b[4*k+2]-b[4*k])*view.s < 6){ c.beginPath(); c.arc(sx(selected.x), sy(selected.y), 9, 0, Math.PI*2); c.stroke(); } }
-  const m = niceLen(120/view.s), px = m*view.s; c.fillStyle = css('--land'); c.fillRect(W-px-20, 8, px+12, 28);
+  const m = niceLen(120/view.s), px = m*view.s; c.fillStyle = css('--sheet'); c.fillRect(W-px-20, 8, px+12, 28);
   c.font = '10px ' + css('--mono'); c.fillStyle = css('--ink'); c.fillRect(W-px-14, 14, px, 3); c.fillText(m >= 1000 ? (m/1000)+' km' : m+' m', W-px-14, 30); }
 
 // ---- selecting a parcel: the full-detail shapes under the point, then its values
