@@ -176,13 +176,23 @@ def water_shares(parcels, water, land):
     lake or river polygon covers: LINZ's 1:50,000 outline leaves out many islets and rocks, near the shore as well as far out
     (Kapiti Island's reefs, Tarahiki Island, the Snares), and neither it nor the elevation grid, which holds a flat sea
     surface offshore, can tell such a rock from the sea (T-121, T-123)."""
+    import shapely
+    from shapely import clip_by_rect
     wt = STRtree([g for g, _ in water]) if water else None
-    lt = STRtree([g for g, _ in land]) if land else None
+    # the land merged once per tile; a parcel wholly inside it (nearly all) has no sea, found in one prepared test, and
+    # only the rest are cut, against the land clipped to their own box: per-parcel merging of a detailed coast (Auckland's
+    # harbours) took hours (T-102)
+    L = unary_union([g for g, _ in land]) if land else None
+    if L is not None and L.is_empty: L = None
+    if L is not None: shapely.prepare(L)
+    inside = shapely.contains(L, np.array([g for g, _, _ in parcels], dtype=object)) if L is not None and parcels else np.zeros(len(parcels), bool)
     out = []
-    for g, _, _ in parcels:
+    for k, (g, _, _) in enumerate(parcels):
         if not g.area: out.append(None); continue
-        on_land = unary_union([land[i][0] for i in lt.query(g)]) if lt is not None else None
-        sea = g.difference(on_land) if on_land is not None and not on_land.is_empty else g
+        if inside[k]: sea = shapely.Polygon()
+        else:
+            near = clip_by_rect(L, *g.bounds) if L is not None else None
+            sea = g.difference(near) if near is not None and not near.is_empty else g
         wet = unary_union([g.intersection(water[i][0]) for i in wt.query(g)]) if wt is not None else None
         unproven = sea.difference(wet) if wet is not None and not wet.is_empty else sea   # sea no lake or river confirms
         if unproven.area >= 0.5 * g.area: out.append(None); continue
