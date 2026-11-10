@@ -86,6 +86,17 @@ FIXED = {"ground_mean_m": (0, 200), "slope_p90_deg": (0, 35), "ww_pipe_year": (1
 MKEYS = [m[0] for m in MEASURES]
 NATIONAL_AS = {"upslope_area_max_m2": "catchment_area_max_m2", "lidar_pct": "lidar_coverage_pct"}   # national name -> map name
 COUNCILS = {"k": 0, "p": 1, "n": 2}
+# Whole-country mode (T-102): LQ_NATIONAL is a folder holding the national index (index.parquet, provenance.json).
+# Then every parcel in the country is drawn, and to keep the site within GitHub Pages' 1 GB and a browser's reach:
+# - full detail (level 0), the side panel and search cover only the councils and the Greater Wellington pilot (DETAIL_IDS);
+#   other parcels are drawn from level 1 shapes when zoomed right in (a separate set of pieces, "LR");
+# - at levels 3 to 5, parcels smaller than a cell (CELLS, metres) are blended into one square per cell, of their summed
+#   area, holding their area-weighted mean of each measure, so a zoomed-out view is some hundred thousand shapes.
+NATIONAL = os.environ.get("LQ_NATIONAL")
+if NATIONAL: LEVELS = LEVELS + [(262144, 75.0), (524288, 300.0)]
+CELLS = {3: 48.0, 4: 150.0, 5: 600.0} if NATIONAL else {}
+DETAIL_IDS = None   # None: every parcel has full detail
+NATVALS = {}        # national mode: measure -> (parcel ids, values) for every parcel in the country
 WATER_PCT = {}   # parcel id -> national index water_pct
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y"]
@@ -118,18 +129,38 @@ def parcels():
     """{id: dict of values} for every parcel: the councils' results where they exist, else the national index."""
     P, stats = {}, {}
     nd = results("national-pilot"); nf = os.path.join(nd, "index.parquet")
+    global DETAIL_IDS
+    pilot = None
+    if NATIONAL:   # the whole country; full rows only for the pilot region (the rest keep what drawing needs)
+        pilot = os.path.join(nd, "index.parquet"); nd_run = "the Greater Wellington pilot"; nf = os.path.join(NATIONAL, "index.parquet")
     con = duckdb.connect(); rel = con.sql(f"SELECT * FROM '{nf}'"); cols = rel.columns
     want = set(MKEYS) | set(NATIONAL_AS) | {"parcel_id", "appellation", "parcel_intent", "rep_x", "rep_y", "address", "territorial_authority", "water_pct"}
     keep = [c for c in cols if c in want]
-    for r in con.sql(f"SELECT {', '.join(keep)} FROM '{nf}'").fetchall():
+    where = f"WHERE parcel_id IN (SELECT parcel_id FROM '{pilot}')" if pilot else ""
+    for r in con.sql(f"SELECT {', '.join(keep)} FROM '{nf}' {where}").fetchall():
         row = dict(zip(keep, r)); pid = row.pop("parcel_id")
         WATER_PCT[pid] = row.get("water_pct")   # measured water share (None: unknown); parcels above 0 get their sea part drawn (T-117)
         for a, b in NATIONAL_AS.items():
             if a in row: row[b] = row.pop(a)
         row["c"] = "n"; P[pid] = row
+    if pilot:
+        for pid, x, y, a, w in con.sql(f"SELECT parcel_id, rep_x, rep_y, area_m2, water_pct FROM '{nf}' WHERE parcel_id NOT IN (SELECT parcel_id FROM '{pilot}')").fetchall():
+            P[pid] = dict(c="n", rep_x=x, rep_y=y, area_m2=a)
+            if w: WATER_PCT[pid] = w
+        for c in keep:
+            k = NATIONAL_AS.get(c, c)
+            if k in MKEYS:
+                d = con.sql(f"SELECT parcel_id, CAST({c} AS DOUBLE) v FROM '{nf}'").fetchnumpy()
+                NATVALS[k] = (d["parcel_id"], np.ma.filled(d["v"].astype("f8"), np.nan) if hasattr(d["v"], "mask") else d["v"])
+        DETAIL_IDS = set(con.sql(f"SELECT parcel_id FROM '{pilot}'").fetchnumpy()["parcel_id"].tolist())
     n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
-    stats["n"] = dict(parcels=n_all, median_ground=nmed, run="national index pilot, built from " +
-                      open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
+    if NATIONAL:
+        prov = json.load(open(os.path.join(NATIONAL, "provenance.json")))
+        stats["n"] = dict(parcels=n_all, median_ground=nmed, national=True,
+                          run=f"national index, first whole-country build of {prov['built'][:10]} (commit {str(prov.get('commit'))[:7]}): a preview, not yet reviewed")
+    else:
+        stats["n"] = dict(parcels=n_all, median_ground=nmed, run="national index pilot, built from " +
+                          open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
     for c, council, branch, extra in [("k", "kapiti", "kapiti-results", KAPITI_ONLY), ("p", "porirua", "porirua-results", [])]:
         d = results(branch); pub = public_columns(council, d)
         cols = ["unit_id"] + [x for x in dict.fromkeys(COUNCIL_COLS + MKEYS) if x in pub and x != "unit_id"]
@@ -140,6 +171,7 @@ def parcels():
             # measures the council build does not hold (or does not publish) come from the national index, same LINZ parcel
             for k in MKEYS + ["rep_x", "rep_y"]:
                 if row.get(k) is None and old.get(k) is not None: row[k] = old[k]
+            if DETAIL_IDS is not None: DETAIL_IDS.add(row["unit_id"])
             P[row.pop("unit_id")] = row
         n, lid, med = duckdb.sql(f"SELECT count(*), count(ground_mean_m), round(median(ground_mean_m), 1) FROM '{f}'").fetchall()[0]
         stats[c] = dict(parcels=n, with_lidar=lid, median_ground=med, run=open(os.path.join(d, "RUN.txt")).read().strip())
@@ -180,15 +212,47 @@ def level_shape(g, p, tol):
     return g
 
 
-def colour_files(P, order):
-    """Write data/v/{measure}.bin (float32 per parcel in `order`, NaN for none) for each measure with values, and return
-    the list the page builds its menu and scales from."""
+def colour_arrays(P, order, idx):
+    """{measure: float32 array, one value per parcel in `order` (NaN for none)}."""
+    out = {}
+    det = [pid for pid in order if DETAIL_IDS is None or pid in DETAIL_IDS]
+    for key, *_ in MEASURES:
+        a = np.full(len(order), np.nan, "f4")
+        if key in NATVALS:   # the whole country in one go, then the detailed parcels (council values come first there)
+            ids, v = NATVALS[key]; a[np.fromiter((idx[i] for i in ids.tolist()), "i8", len(ids))] = v
+        for pid in det:
+            v = P[pid].get(key)
+            if v is not None: a[idx[pid]] = float(v)
+        out[key] = a
+    return out
+
+
+def blend_cells(P, order, V, cell):
+    """Parcels smaller than a cell, blended per cell: (is_small per parcel, cells) where cells holds x, y, area and
+    council code per cell and {measure: area-weighted mean}. A cell's square has the summed area of its parcels."""
+    x = np.array([P[i]["rep_x"] for i in order]); y = np.array([P[i]["rep_y"] for i in order])
+    area = np.array([max(P[i].get("area_m2") or 0.0, 0.0) for i in order]); cc = np.array([COUNCILS[P[i]["c"]] for i in order])
+    small = (area < cell * cell) & (area > 0)
+    key = np.floor(x[small] / cell).astype("i8") * 1_000_000 + np.floor(y[small] / cell).astype("i8")
+    _, inv = np.unique(key, return_inverse=True); n = int(inv.max()) + 1 if len(inv) else 0
+    w = area[small]; tot = np.bincount(inv, w, n)
+    cells = dict(x=np.bincount(inv, w * x[small], n) / tot, y=np.bincount(inv, w * y[small], n) / tot, area=tot, vals={},
+                 c=np.argmax(np.stack([np.bincount(inv, w * (cc[small] == k), n) for k in range(3)]), axis=0))
+    for k, a in V.items():
+        v = a[small].astype("f8"); ok = np.isfinite(v); den = np.bincount(inv, w * ok, n)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            cells["vals"][k] = np.where(den > 0, np.bincount(inv, np.where(ok, w * v, 0.0), n) / den, np.nan).astype("f4")
+    return small, cells
+
+
+def colour_files(V):
+    """Write data/v/{measure}.bin (float32 per place, NaN for none, cut after its last value) for each measure with
+    values, and return the list the page builds its menu and scales from."""
     os.makedirs(os.path.join(OUT, "data", "v"), exist_ok=True); out = []
     for key, label, unit, group, scale in MEASURES:
-        a = np.array([np.nan if P[pid].get(key) is None else float(P[pid][key]) for pid in order], "<f4")
-        ok = a[np.isfinite(a)]
+        a = V[key].astype("<f4"); fin = np.isfinite(a); ok = a[fin]
         if len(ok) == 0 or ok.min() == ok.max(): continue   # nothing to show
-        a.tofile(os.path.join(OUT, "data", "v", key + ".bin"))
+        a[:int(np.flatnonzero(fin)[-1]) + 1].tofile(os.path.join(OUT, "data", "v", key + ".bin"))
         lo, hi = FIXED.get(key, (float(np.percentile(ok, 2)), float(np.percentile(ok, 98))))
         if hi <= lo: lo, hi = float(ok.min()), float(ok.max())
         if scale == "log": lo, hi = max(lo, 1.0), max(hi, 10.0)
@@ -245,7 +309,7 @@ def land_outline(bounds):
     x0, y0, x1, y1 = bounds; out = []
     for f in arcgis.query_all("https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
                               dict(where="1=1", geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
-                                   spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=5)):
+                                   spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=5), workers=1):
         g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
         if not g.is_empty: out.append(g)
     return out
@@ -256,7 +320,7 @@ def coastline(bounds):
     x0, y0, x1, y1 = bounds; land = []
     for f in arcgis.query_all("https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
                               dict(where="1=1", geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
-                                   spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=15)):
+                                   spatialRel="esriSpatialRelIntersects", outFields="id", outSR=2193, maxAllowableOffset=30 if NATIONAL else 15), workers=1):
         g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
         for poly in getattr(g, "geoms", [g]):
             if poly.geom_type != "Polygon" or poly.area < 2000: continue
@@ -273,7 +337,8 @@ def water(bounds):
                        (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1"),
                        (svc + "LINZ_NZ_River_Name_Polygons_Pilot/FeatureServer/0", "1=1")]:
         for f in arcgis.query_all(url, dict(where=where, geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
-                                            spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193, maxAllowableOffset=0.5), workers=8):
+                                            spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193,
+                                            maxAllowableOffset=2 if NATIONAL else 0.5), workers=8 if "Primary_Parcels" in url else 2):
             if not f.get("geometry"): continue
             g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
             if not g.is_empty and g.area > 0: out.append((g, "Primary_Parcels" not in url))
@@ -288,10 +353,31 @@ def main():
     geoms = {pid: wkb.loads(b) for pid, b in shapes.items()}
     xs = [p["rep_x"] for p in P.values()]; ys = [p["rep_y"] for p in P.values()]
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
-    order = sorted(P); idx = {pid: i for i, pid in enumerate(order)}
-    meta = dict(origin=ORIGIN, levels=[], measures=["index"], colours=colour_files(P, order), councils=list(COUNCILS),
-                detail_fields=DETAIL, stats=stats,
+    # places in the value files: detailed parcels, then the blended cells (those holding council parcels first), then
+    # the other parcels; so a measure only the councils have is a short file
+    isdet = (lambda pid: True) if DETAIL_IDS is None else DETAIL_IDS.__contains__
+    order = sorted(pid for pid in P if isdet(pid)); nd = len(order); order += sorted(pid for pid in P if not isdet(pid))
+    idx = {pid: i for i, pid in enumerate(order)}
+    V = colour_arrays(P, order, idx); NATVALS.clear()
+    blends, ncell = {}, 0
+    for li, cell in CELLS.items():
+        small, cells = blend_cells(P, order, V, cell)
+        cells["rank"] = np.argsort(np.argsort(-(cells["c"] != COUNCILS["n"]).astype("i8"), kind="stable"), kind="stable")
+        blends[li] = (set(np.array(order)[small].tolist()), cells); print(f"level {li}: {int(small.sum())} parcels blended into {len(cells['area'])} cells of {cell:.0f} m")
+    # cell places: all levels' council cells first, then the rest
+    for want_council in (True, False):
+        for li, (_, cells) in blends.items():
+            m = (cells["c"] != COUNCILS["n"]) == want_council; cells.setdefault("place", np.zeros(len(m), "i8"))[m] = nd + ncell + np.arange(int(m.sum())); ncell += int(m.sum())
+    place = lambda pid: idx[pid] if idx[pid] < nd else idx[pid] + ncell
+    if ncell:
+        for k in V:
+            c = np.full(ncell, np.nan, "f4")
+            for li, (_, cells) in blends.items(): c[cells["place"] - nd] = cells["vals"][k]
+            V[k] = np.concatenate([V[k][:nd], c, V[k][nd:]])
+    meta = dict(origin=ORIGIN, levels=[], measures=["index"], colours=colour_files(V), councils=list(COUNCILS),
+                detail_fields=DETAIL, stats=stats, national=bool(NATIONAL),
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
+    del V
     # Topo50 lakes and LINZ's river areas (1:50k) are drawn whole, over the parcels. Three rules that cut them where
     # they overlap land parcels each erased real water (small lakes in farm parcels, rivers whose banks are parcel
     # boundaries), so none is used: an edge can stray a few metres over a section, and the legend says edges are
@@ -306,13 +392,17 @@ def main():
     seas = sea_parts(P, geoms, WATER_PCT, land); waters += seas; n_sea = len(seas)
     print(n_sea, "parcels with sea drawn over them")
     nanv = [-1.0]   # water: no parcel
-    for li, (side, tol) in enumerate(LEVELS):
-        os.makedirs(os.path.join(OUT, "data", f"L{li}"))
-        pieces, wet = {}, {}
-        for pid, p in P.items():
-            k = (int((p["rep_x"] - ORIGIN[0]) // side), int((p["rep_y"] - ORIGIN[1]) // side))
+    def write_level(name, side, tol, pids_in, with_water, cells=None, detail=False):
+        os.makedirs(os.path.join(OUT, "data", f"L{name}"))
+        pieces, wet, blended = {}, {}, {}
+        for pid in pids_in:
+            p = P[pid]; k = (int((p["rep_x"] - ORIGIN[0]) // side), int((p["rep_y"] - ORIGIN[1]) // side))
             pieces.setdefault(k, []).append(pid)
-        for g in waters:   # water, simplified for this level; anything smaller than about a pixel there is left out
+        if cells is not None:
+            for q in range(len(cells["area"])):
+                k = (int((cells["x"][q] - ORIGIN[0]) // side), int((cells["y"][q] - ORIGIN[1]) // side))
+                blended.setdefault(k, []).append(q); pieces.setdefault(k, [])
+        for g in (waters if with_water else []):   # water, simplified for this level; anything smaller than about a pixel there is left out
             if g.area < 4 * tol * tol: continue
             rp = g.representative_point(); k = (int((rp.x - ORIGIN[0]) // side), int((rp.y - ORIGIN[1]) // side))
             sg = g.simplify(tol, preserve_topology=True)
@@ -323,21 +413,37 @@ def main():
             for pid in pids:
                 p = P[pid]; g = level_shape(geoms.get(pid), p, tol)
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
-                v = [float(idx[pid])]   # the parcel's place in the value files (exact in float32 up to 16.7 million)
+                v = [float(place(pid))]   # the parcel's place in the value files (exact in float32 up to 16.7 million)
                 items.append((pid, COUNCILS[p["c"]], v, g))   # water is drawn over parcels from the water layers, not by parcel
+            for q in blended.get((i, j), []):   # a blended cell: never selected (id -2)
+                g = square(cells["x"][q], cells["y"][q], cells["area"][q])
+                b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
+                items.append((-2, int(cells["c"][q]), [float(cells["place"][q])], g))
             for g in wet.get((i, j), []):
                 b = g.bounds; bb = [min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3])]
                 items.append((-1, WATER, nanv, g))
             blob = encode(items); key = f"{i}_{j}"
-            open(os.path.join(OUT, "data", f"L{li}", key + ".bin"), "wb").write(blob)
+            open(os.path.join(OUT, "data", f"L{name}", key + ".bin"), "wb").write(blob)
             index[key] = [round(x) for x in bb] + [len(pids)]; total += len(blob)
-            if li == 0 and pids:   # the side panel's values, in the same squares as full detail
+            if detail and pids:   # the side panel's values, in the same squares as full detail
                 det = {str(pid): [clean(P[pid].get(f)) for f in DETAIL] for pid in pids}
                 json.dump(det, open(os.path.join(OUT, "data", "detail", key + ".json"), "w"), separators=(",", ":"), ensure_ascii=False)
-        meta["levels"].append(dict(side=side, tol=tol, pieces=index))
-        print(f"level {li}: {len(index)} pieces, {total / 1e6:.1f} MB")
+        print(f"level {name}: {len(index)} pieces, {total / 1e6:.1f} MB", flush=True)
+        return dict(side=side, tol=tol, pieces=index)
+
+    detailed = [pid for pid in P if isdet(pid)]; others = [pid for pid in P if not isdet(pid)]
+    for li, (side, tol) in enumerate(LEVELS):
+        if li == 0: meta["levels"].append(write_level(0, side, tol, detailed, not NATIONAL, detail=True))
+        elif li == 1 and NATIONAL:   # the parcels without full detail apart, so level 0 views can draw them too; water with them
+            meta["levels"].append(write_level(1, side, tol, detailed, False))
+            meta["rest"] = write_level("R", side, tol, others, True)
+        elif li in blends:
+            gone, cells = blends[li]
+            meta["levels"].append(write_level(li, side, tol, [pid for pid in P if pid not in gone], True, cells))
+        else: meta["levels"].append(write_level(li, side, tol, list(P), True))
     srch = dict(id=[], x=[], y=[], t=[], c=[])
     for pid, p in P.items():
+        if not isdet(pid): continue
         srch["id"].append(pid); srch["x"].append(round(p["rep_x"])); srch["y"].append(round(p["rep_y"])); srch["c"].append(p["c"])
         srch["t"].append((p.get("appellation") or "") + ("|" + p["address"] if p.get("address") else ""))
     json.dump(srch, open(os.path.join(OUT, "data", "search.json"), "w"), separators=(",", ":"), ensure_ascii=False)

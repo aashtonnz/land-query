@@ -20,14 +20,14 @@ const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
 // council cards and run line
 const st = meta.stats, cc = $('councils');
-[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n','Greater Wellington','National index pilot']].forEach(([c,name,kind])=>{
+[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · preview, not yet reviewed' : 'National index pilot']].forEach(([c,name,kind])=>{
   const s = st[c]; if(!s) return; const div = document.createElement('div'); div.className='council';
   div.innerHTML = `<div class="label">${kind}</div><h3>${name}</h3>
     <div class="figs"><div class="fig"><b>${fmt(s.parcels)}</b><span>parcels</span></div>
     ${c==='n' ? `<div class="fig"><b>LINZ</b><span>data only, 10 m ground</span></div>` : `<div class="fig"><b>${fmt(s.with_lidar)}</b><span>with LiDAR terrain</span></div>`}
     <div class="fig"><b>${s.median_ground.toFixed(1)} m</b><span>median ground height</span></div></div>`;
   cc.appendChild(div); });
-$('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Porirua results: ' + st.p.run.split(';')[0] + ' · Greater Wellington: ' + st.n.run;
+$('runs').textContent = 'Kāpiti results: ' + st.k.run.split(';')[0] + ' · Porirua results: ' + st.p.run.split(';')[0] + ' · ' + (meta.national ? 'New Zealand: ' : 'Greater Wellington: ') + st.n.run;
 
 // ---- view
 const canvas = $('map'), over = $('over'), octx = over.getContext('2d');
@@ -170,7 +170,7 @@ worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return
   pieceWaiters = pieceWaiters.filter(w => !w(P)); draw(); };
 // each vertex's value for the chosen measure; -1e30 for none (drawn grey)
 function fillArray(pidx){ const a = new Float32Array(pidx.length);
-  for(let v=0; v<pidx.length; v++){ const i = pidx[v], z = cur && i >= 0 ? cur[i] : NaN; a[v] = z === z ? z : -1e30; } return a; }
+  for(let v=0; v<pidx.length; v++){ const i = pidx[v], z = cur && i >= 0 && i < cur.length ? cur[i] : NaN; a[v] = z === z ? z : -1e30; } return a; }
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
@@ -178,7 +178,7 @@ function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id)
       .then(buf => worker.postMessage({key:id, buf, M, OX, OY}, [buf])).catch(()=>{ P.state = 'failed'; }); }
   P.used = frame; return P; }
 function piecesFor(level, x0, y0, x1, y1){ const out = [];
-  for(const [key, b] of Object.entries(LV[level].pieces)) if(!(b[0]>x1||b[2]<x0||b[1]>y1||b[3]<y0)) out.push(key);
+  for(const [key, b] of Object.entries((level === 'R' ? meta.rest : LV[level]).pieces)) if(!(b[0]>x1||b[2]<x0||b[1]>y1||b[3]<y0)) out.push(key);
   return out; }
 function trimPieces(){ const l0 = [...pieces.values()].filter(P => P.level===0 && P.state==='ready');
   if(l0.length <= 80) return; l0.sort((a,b)=>a.used-b.used);
@@ -195,10 +195,14 @@ const outFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 const tiles = new Map();   // "z/i/j" -> {tex, gen, born, used}
 // the level whose simplification (0.5, 2, 8, 24 m) stays at or under about half a tile pixel, so switching levels
 // moves nothing visibly
-const levelFor = z => { const texel = BASE / 2**z / TEX; return texel < 4 ? 0 : texel < 16 ? 1 : texel < 48 ? 2 : 3; };
+const levelFor = z => { const texel = BASE / 2**z / TEX; const l = texel < 4 ? 0 : texel < 16 ? 1 : texel < 48 ? 2 : texel < 150 ? 3 : texel < 600 ? 4 : 5;
+  return Math.min(l, LV.length - 1); };
+// whole-country build: parcels without full detail are a set of their own ("R", level 1 shapes), drawn at levels 0 and 1
+const setsFor = l => meta.rest && l <= 1 ? [l, 'R'] : [l];
+const allFor = (l, x0, y0, x1, y1) => setsFor(l).flatMap(s => piecesFor(s, x0, y0, x1, y1).map(k => piece(s, k)));
 function renderTile(z, i, j){
   const T = BASE / 2**z, x0 = OX + i*T, y0 = OY + j*T, lvl = levelFor(z);
-  const keys = piecesFor(lvl, x0, y0, x0+T, y0+T), ps = keys.map(k => piece(lvl, k));
+  const ps = allFor(lvl, x0, y0, x0+T, y0+T);
   if(ps.some(P => P.state === 'loading')) return false;
   gl.bindFramebuffer(gl.FRAMEBUFFER, msFB); gl.viewport(0, 0, TEX, TEX);
   const [sr,sg,sb] = hex(css('--sea')); gl.clearColor(sr, sg, sb, 1); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -269,7 +273,7 @@ function render(){
   // boundaries and water from both levels' pieces into one coverage layer (red, green: boundaries of a and b; blue,
   // alpha: water of a and b), combined by keeping the strongest, then laid on blended by t
   const la = levelFor(za), lb = levelFor(zb), filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
-  const ready = l => piecesFor(l, vx0, vy0, vx1, vy1).map(k => piece(l, k)).filter(P => P.state === 'ready');
+  const ready = l => allFor(l, vx0, vy0, vx1, vy1).filter(P => P.state === 'ready');
   const pa = ready(la), pb = lb === la ? pa : ready(lb);
   if(pa.length || pb.length){ gl.disable(gl.BLEND); edgeTarget(); gl.bindFramebuffer(gl.FRAMEBUFFER, edgeFB); gl.viewport(0, 0, edgeW, edgeH);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendEquation(gl.MAX);
@@ -300,7 +304,8 @@ function render(){
   if(waiting && !loadedOnce) say('Loading parcels for this area…'); else if(!waiting && !loadedOnce){ loadedOnce = true; say(status()); }
 }
 let loadedOnce = false;
-const status = () => `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
+const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.`
+  : `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
 
 // ---- overlay: selected parcel, scale bar
 function niceLen(m){ const p = 10**Math.floor(Math.log10(m)); for(const k of [1,2,5,10]) if(k*p >= m) return k*p; return 10*p; }
