@@ -1,0 +1,1179 @@
+{
+ "region": {
+  "url": "https://mapping.gw.govt.nz/arcgis/rest/services/Region_basemap_P/MapServer/1",
+  "features": 8,
+  "licence": "Stats NZ district polygons, CC BY 4.0, via GWRC",
+  "fetched": "2026-11-09T18:38:43+00:00",
+  "name": "Greater Wellington (its eight districts and cities; the small part of Tararua District in the region is left out)",
+  "grown": "by up to 1000 m within 300 m of the coast"
+ },
+ "tiles": [
+  {
+   "tile": [
+    1720000.0,
+    5380000.0,
+    1760000.0,
+    5420000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 151,
+    "repeated_records": 1,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:40+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 12,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:43+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 103,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:46+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 250,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:48+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 67,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:50+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 214,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:10:53+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 6,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:11:05+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 15,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:39:12+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:39:30+00:00"
+    }
+   ],
+   "rows": 109,
+   "seconds_vector": 7.6,
+   "seconds_elevation": 41.8
+  },
+  {
+   "tile": [
+    1760000.0,
+    5380000.0,
+    1800000.0,
+    5420000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 1137,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:11:57+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 146,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:00+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 1035,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:03+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 2053,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:06+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 720,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:08+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 221,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:11+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 9,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:12:28+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 229,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BR33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BR34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:40:13+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BR33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BR34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:40:41+00:00"
+    }
+   ],
+   "rows": 943,
+   "seconds_vector": 11.9,
+   "seconds_elevation": 64.9
+  },
+  {
+   "tile": [
+    1800000.0,
+    5380000.0,
+    1840000.0,
+    5420000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 652,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:43+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 90,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:46+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 340,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:49+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 663,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:52+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 191,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:54+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 109,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:13:56+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 62,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:14:11+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 366,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BR33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BR34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:41:18+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BR33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BR34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:41:34+00:00"
+    }
+   ],
+   "rows": 534,
+   "seconds_vector": 10.7,
+   "seconds_elevation": 41.5
+  },
+  {
+   "tile": [
+    1720000.0,
+    5420000.0,
+    1760000.0,
+    5460000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 112025,
+    "repeated_records": 1368,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:15:15+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 10755,
+    "repeated_records": 115,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:15:50+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 132107,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:16:40+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 127651,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:17:45+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 147200,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:18:18+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 379,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:18:24+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 234,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:22:18+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 103,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:57:11+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T18:57:34+00:00"
+    }
+   ],
+   "rows": 101695,
+   "seconds_vector": 902.8,
+   "seconds_elevation": 75.2
+  },
+  {
+   "tile": [
+    1760000.0,
+    5420000.0,
+    1800000.0,
+    5460000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 60430,
+    "repeated_records": 19,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:34:41+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 5872,
+    "repeated_records": 2,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:35:04+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 63506,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:35:15+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 85162,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:35:34+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 64325,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:35:45+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 330,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:35:49+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 17,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:38:04+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 358,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:03:14+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:03:49+00:00"
+    }
+   ],
+   "rows": 54811,
+   "seconds_vector": 282.1,
+   "seconds_elevation": 99.4
+  },
+  {
+   "tile": [
+    1800000.0,
+    5420000.0,
+    1840000.0,
+    5460000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 14927,
+    "repeated_records": 4,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:19+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 1633,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:29+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 11572,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:33+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 20926,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:40+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 9920,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:44+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 66,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:42:46+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 5,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:43:45+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 1875,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:05:50+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:06:13+00:00"
+    }
+   ],
+   "rows": 12998,
+   "seconds_vector": 62.9,
+   "seconds_elevation": 71.6
+  },
+  {
+   "tile": [
+    1840000.0,
+    5420000.0,
+    1880000.0,
+    5460000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 1574,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:45:51+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 201,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:45:57+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 1299,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:47:37+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 1750,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:47:58+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 744,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:48:04+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 92,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:48:19+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 30,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:48:42+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 562,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP36.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ36.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:07:11+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP36.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ36.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:07:29+00:00"
+    }
+   ],
+   "rows": 1347,
+   "seconds_vector": 13.6,
+   "seconds_elevation": 46.5
+  },
+  {
+   "tile": [
+    1720000.0,
+    5460000.0,
+    1760000.0,
+    5500000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 40,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:49:41+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 0,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:49:43+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 4,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:49:55+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 0,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:49:56+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 0,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:49:58+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 55,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:50:02+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 12,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:50:22+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 0,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:07:53+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP30.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP32.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:08:05+00:00"
+    }
+   ],
+   "rows": 26,
+   "seconds_vector": 0.1,
+   "seconds_elevation": 29.6
+  },
+  {
+   "tile": [
+    1760000.0,
+    5460000.0,
+    1800000.0,
+    5500000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 36977,
+    "repeated_records": 11,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:50:59+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 3018,
+    "repeated_records": 2,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:51:13+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 29320,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:51:22+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 40966,
+    "repeated_records": 16,
+    "repeated_with_other_values": 16,
+    "fetched": "2026-11-09T13:51:31+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 29390,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:51:41+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 179,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:51:50+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 24,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:53:09+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 301,
+   "outside_region_by_address": 11,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:10:06+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP34.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:10:38+00:00"
+    }
+   ],
+   "rows": 27340,
+   "seconds_vector": 91.6,
+   "seconds_elevation": 77.3
+  },
+  {
+   "tile": [
+    1800000.0,
+    5460000.0,
+    1840000.0,
+    5500000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 19812,
+    "repeated_records": 15,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:54:55+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 5531,
+    "repeated_records": 1,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:55:04+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 40688,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:55:19+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 68033,
+    "repeated_records": 416,
+    "repeated_with_other_values": 416,
+    "fetched": "2026-11-09T13:55:48+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 38187,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:56:06+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 49,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:56:09+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 1,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:57:42+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 1643,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:12:57+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:13:26+00:00"
+    }
+   ],
+   "rows": 15610,
+   "seconds_vector": 97.5,
+   "seconds_elevation": 76.3
+  },
+  {
+   "tile": [
+    1840000.0,
+    5460000.0,
+    1880000.0,
+    5500000.0
+   ],
+   "parcels": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 3530,
+    "repeated_records": 3,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:21+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "roads": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Primary_Parcels/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50823",
+    "features": 394,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:26+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "titles": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Property_Titles/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/50804",
+    "features": 1560,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:29+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "buildings": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Building_Outlines/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/101290",
+    "features": 2528,
+    "repeated_records": 1,
+    "repeated_with_other_values": 1,
+    "fetched": "2026-11-09T13:59:34+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "addresses": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Addresses/FeatureServer/0",
+    "same_as": "https://data.linz.govt.nz/layer/105689",
+    "features": 753,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:36+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "coast": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline_Mean_High_Water_Springs/FeatureServer/0",
+    "same_as": null,
+    "features": 54,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:38+00:00",
+    "licence": "LINZ, CC BY 4.0"
+   },
+   "land": {
+    "url": "https://services.arcgis.com/xdsHIIxuCWByZiCB/arcgis/rest/services/LINZ_NZ_Coastline/FeatureServer/0",
+    "same_as": null,
+    "features": 12,
+    "repeated_records": 0,
+    "repeated_with_other_values": 0,
+    "fetched": "2026-11-09T13:59:57+00:00",
+    "licence": "LINZ, CC BY 4.0",
+    "max_allowable_offset_m": 5
+   },
+   "lakes_rivers": 1075,
+   "outside_region_by_address": 0,
+   "elevation": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN36.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN37.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP36.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:14:31+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN36.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN37.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP36.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-09T19:14:59+00:00"
+    }
+   ],
+   "rows": 1996,
+   "seconds_vector": 15.8,
+   "seconds_elevation": 70.8
+  }
+ ],
+ "built": "2026-11-09T19:15:19+00:00",
+ "commit": "7496907b5ef90180bb0e51e054c58a6d70e77d3b"
+}
