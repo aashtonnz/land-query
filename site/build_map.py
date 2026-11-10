@@ -19,7 +19,7 @@ ring); each ring's first vertex (int32 x, y in half-metres); rings per parcel (u
 council (uint8 × n, padded to 4 bytes); then each later vertex as a step from the one before (int16 x, y, half-metres;
 a longer step is split).
 """
-import json, math, os, shutil, struct, subprocess, sys, tempfile
+import json, math, os, shutil, struct, subprocess, sys, tempfile, time
 import duckdb, numpy as np
 from shapely import wkb
 from shapely.geometry import box, shape
@@ -343,7 +343,12 @@ def main():
     json.dump(srch, open(os.path.join(OUT, "data", "search.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     json.dump(meta, open(os.path.join(OUT, "data", "meta.json"), "w"), separators=(",", ":"))
     here = os.path.dirname(os.path.abspath(__file__))
-    shutil.copy(os.path.join(here, "map.html"), os.path.join(OUT, "index.html"))
+    # a stamp per build on the script and every data file (map.js adds it), so browsers fetch the new ones after an update
+    build = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    page = open(os.path.join(here, "map.html")).read()
+    assert '<script src="map.js"></script>' in page
+    page = page.replace('<script src="map.js"></script>', f'<script>window.LQ_BUILD = "{build}";</script>\n<script src="map.js?v={build}"></script>')
+    open(os.path.join(OUT, "index.html"), "w").write(page)
     shutil.copy(os.path.join(here, "map.js"), os.path.join(OUT, "map.js"))
     shutil.copy(os.path.join(here, "vendor", "earcut-2.2.4.min.js"), os.path.join(OUT, "earcut.min.js"))
     open(os.path.join(OUT, ".nojekyll"), "w").write("")

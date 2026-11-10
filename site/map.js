@@ -13,7 +13,9 @@ const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const hex = c => { c = c.replace('#',''); return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16)/255); };
 const ns = $('natstatus'), say = t => { ns.textContent = t; };
 
-const meta = await fetch('data/meta.json').then(r=>r.json());
+// every data file carries this build's stamp, so a browser never mixes an older saved copy with a new page
+const V = '?v=' + encodeURIComponent(window.LQ_BUILD || '');
+const meta = await fetch('data/meta.json' + V).then(r=>r.json());
 const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
 // council cards and run line
@@ -53,7 +55,7 @@ const SCALES = Object.fromEntries(meta.colours.map(c => { const f = TF[c.scale];
     ends:[(c.clipped_lo ? '≤' : '') + unitFmt(c.lo, c.unit), unitFmt(c.hi, c.unit) + (c.clipped_hi ? '+' : '')], n:c.n}]; }));
 const values = new Map();   // measure -> Promise of Float32Array (one value per parcel)
 let cur = null, curKey = null;   // the measure drawn now and its values (the last chosen, once loaded)
-function loadValues(key){ if(!values.has(key)) values.set(key, fetch(`data/v/${key}.bin`).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Float32Array(b)));
+function loadValues(key){ if(!values.has(key)) values.set(key, fetch(`data/v/${key}.bin` + V).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Float32Array(b)));
   return values.get(key); }
 function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
   const [p,q,u] = t<.5 ? [a,m,t*2] : [m,b,(t-.5)*2]; return 'rgb(' + p.map((v,i)=>Math.round((v+(q[i]-v)*u)*255)).join(',') + ')'; }
@@ -172,7 +174,7 @@ function fillArray(pidx){ const a = new Float32Array(pidx.length);
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
-    fetch(`data/L${level}/${key}.bin`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    fetch(`data/L${level}/${key}.bin` + V).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
       .then(buf => worker.postMessage({key:id, buf, M, OX, OY}, [buf])).catch(()=>{ P.state = 'failed'; }); }
   P.used = frame; return P; }
 function piecesFor(level, x0, y0, x1, y1){ const out = [];
@@ -329,7 +331,7 @@ const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national
 const details = new Map();
 async function select(hit){ selected = hit; draw(); const det = $('detail');
   if(!hit){ det.className = 'empty'; det.textContent = 'Select a parcel on the plan, or search for a legal description or address.'; return; }
-  const key = hit.piece.key; if(!details.has(key)) details.set(key, fetch(`data/detail/${key}.json`).then(r=>r.json()));
+  const key = hit.piece.key; if(!details.has(key)) details.set(key, fetch(`data/detail/${key}.json` + V).then(r=>r.json()));
   const row = (await details.get(key))[String(hit.id)]; if(!row || selected !== hit) return;
   const r = Object.fromEntries(meta.detail_fields.map((f,i)=>[f, row[i]]));
   // every measure this parcel has, grouped as in the menu; measures it lacks are left out
@@ -390,7 +392,7 @@ const res = $('results'); let search = null;
 $('search').addEventListener('input', async e => {
   const q = e.target.value.trim().toLowerCase(); res.innerHTML = ''; if(q.length < 3){ res.hidden = true; return; }
   if(!search){ res.hidden = false; res.innerHTML = '<div class="empty" style="padding:5px 6px">Loading the search list…</div>';
-    search = fetch('data/search.json').then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); }
+    search = fetch('data/search.json' + V).then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); }
   const s = await search; if(e.target.value.trim().toLowerCase() !== q) return; res.innerHTML = '';
   // exact matches first (a legal description or address equal to what was typed), then others containing it
   const exact = [], part = [];
