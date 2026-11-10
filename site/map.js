@@ -55,7 +55,7 @@ const SCALES = Object.fromEntries(meta.colours.map(c => { const f = TF[c.scale];
     ends:[(c.clipped_lo ? '≤' : '') + unitFmt(c.lo, c.unit), unitFmt(c.hi, c.unit) + (c.clipped_hi ? '+' : '')], n:c.n}]; }));
 const values = new Map();   // measure -> Promise of Float32Array (one value per parcel)
 let cur = null, curKey = null;   // the measure drawn now and its values (the last chosen, once loaded)
-function loadValues(key){ if(!values.has(key)) values.set(key, fetch(`data/v/${key}.bin` + V).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Float32Array(b)));
+function loadValues(key){ if(!values.has(key)) values.set(key, fetch(`data/v/${key}.bin` + V).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Uint16Array(b.byteLength % 2 ? b.slice(0, b.byteLength - 1) : b)));
   return values.get(key); }
 function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
   const [p,q,u] = t<.5 ? [a,m,t*2] : [m,b,(t-.5)*2]; return 'rgb(' + p.map((v,i)=>Math.round((v+(q[i]-v)*u)*255)).join(',') + ')'; }
@@ -170,7 +170,7 @@ worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return
   pieceWaiters = pieceWaiters.filter(w => !w(P)); draw(); };
 // each vertex's value for the chosen measure; -1e30 for none (drawn grey)
 function fillArray(pidx){ const a = new Float32Array(pidx.length);
-  for(let v=0; v<pidx.length; v++){ const i = pidx[v], z = cur && i >= 0 && i < cur.length ? cur[i] : NaN; a[v] = z === z ? z : -1e30; } return a; }
+  for(let v=0; v<pidx.length; v++){ const i = pidx[v], q = cur && i >= 0 && i < cur.length ? cur[i] : 0; a[v] = q ? (q - 1) / 65534 : -1e30; }   // 0: no value return a; }
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
@@ -209,7 +209,8 @@ function renderTile(z, i, j){
   const sc = [2/T, 2/T], of = [-(x0-OX)*2/T - 1, -(y0-OY)*2/T - 1];
   gl.useProgram(LAND.p); gl.uniform2fv(LAND.u.sc, sc); gl.uniform2fv(LAND.u.of, of); gl.uniform4f(LAND.u.col, ...hex(css('--land')), 1);
   gl.bindVertexArray(land.vao); gl.drawElements(gl.TRIANGLES, land.n, gl.UNSIGNED_INT, 0);
-  const s = (cur && SCALES[curKey]) || {tf:0, lo:0, hi:1}, filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
+  const s = {tf:3, lo:0, hi:1},   // values arrive already placed on the colour scale (0 to 1)
+   filt = filter==='all' ? -1 : meta.councils.indexOf(filter);
   gl.useProgram(PARCEL.p); const u = PARCEL.u;
   gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 8 : 0); gl.uniform1i(u.tf, s.tf);
   gl.uniform1f(u.lo, s.lo); gl.uniform1f(u.hi, s.hi); gl.uniform1i(u.filt, filt);

@@ -5,7 +5,7 @@ columns only, D-12) and the national index pilot (`national-pilot`), and writes:
 
 - index.html and map.js: the page (site/map.html, site/map.js);
 - data/meta.json: council figures, the level and piece index, the coastline and the field lists;
-- data/v/{measure}.bin: one measure for every parcel (float32, NaN for none), in the order of meta.json's parcels,
+- data/v/{measure}.bin: one measure for every parcel (uint16: its position on the colour scale, 0 for none),
   fetched only when chosen;
 - data/L{level}/{key}.bin: parcel shapes, each with its place in the value files, cut into squares at four levels of detail
   (LEVELS), so the page downloads only the pieces in view. At the simpler levels a parcel too small to keep its
@@ -246,17 +246,23 @@ def blend_cells(P, order, V, cell):
 
 
 def colour_files(V):
-    """Write data/v/{measure}.bin (float32 per place, NaN for none, cut after its last value) for each measure with
+    """Write data/v/{measure}.bin (uint16 per place: its position on the colour scale, 0 for none; cut after its last value) for each measure with
     values, and return the list the page builds its menu and scales from."""
     os.makedirs(os.path.join(OUT, "data", "v"), exist_ok=True); out = []
     for key, label, unit, group, scale in MEASURES:
         a = V[key].astype("<f4"); fin = np.isfinite(a); ok = a[fin]
         if len(ok) == 0 or ok.min() == ok.max(): continue   # nothing to show
-        a[:int(np.flatnonzero(fin)[-1]) + 1].tofile(os.path.join(OUT, "data", "v", key + ".bin"))
         lo, hi = FIXED.get(key, (float(np.percentile(ok, 2)), float(np.percentile(ok, 98))))
         if hi <= lo: lo, hi = float(ok.min()), float(ok.max())
         if scale == "log": lo, hi = max(lo, 1.0), max(hi, 10.0)
         if scale == "sqrt": lo = max(lo, 0.0)
+        # stored as the place on the colour scale: 0 for no value, 1 to 65535 from lo to hi (in the scale's own
+        # terms: square root or log), half the size of the numbers themselves; the panel's exact values are in data/detail
+        tf = dict(lin=lambda v: v, sqrt=lambda v: np.sqrt(np.maximum(v, 0)), log=lambda v: np.log10(np.maximum(v, 1)))[scale]
+        with np.errstate(invalid="ignore"):
+            t = np.clip((tf(a.astype("f8")) - tf(lo)) / (tf(hi) - tf(lo)), 0, 1)
+        q = np.where(fin, 1 + np.round(np.nan_to_num(t) * 65534), 0).astype("<u2")
+        q[:int(np.flatnonzero(fin)[-1]) + 1].tofile(os.path.join(OUT, "data", "v", key + ".bin"))
         out.append(dict(key=key, label=label, unit=unit, group=group, scale=scale, lo=lo, hi=hi, n=int(len(ok)),
                         clipped_lo=bool(ok.min() < lo), clipped_hi=bool(ok.max() > hi)))
     print(len(out), "measures to colour by")
