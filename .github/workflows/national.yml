@@ -22,6 +22,15 @@ on:
         description: "Only download the bulk layers and check them (a test of the download)"
         type: boolean
         default: false
+      reuse_run:
+        description: "Build faster on an earlier run's saved work (its run id, kept 5 days): the half not chosen under redo is taken from it"
+        required: false
+        default: ""
+      redo:
+        description: "With reuse_run: which half to work out again (the other is taken as saved)"
+        type: choice
+        options: ["vector,elevation", "vector", "elevation"]
+        default: "vector,elevation"
       merge_run:
         description: "Instead of building: merge the shares an earlier run built (its run id; shares are kept 3 days)"
         required: false
@@ -82,19 +91,29 @@ jobs:
       - uses: actions/download-artifact@v4
         if: inputs.source == 'bulk'
         with: { name: bulk, path: bulk }
+      # an earlier run's work for this share: its saved halves (in share-K, under stages/)
+      - uses: actions/download-artifact@v4
+        if: inputs.reuse_run != ''
+        with: { name: "share-${{ matrix.k }}", path: share, run-id: "${{ inputs.reuse_run }}", github-token: "${{ github.token }}" }
       - name: Build this share
         working-directory: pipeline
-        env: { N: "${{ inputs.shares }}", K: "${{ matrix.k }}", NI_BULK: "${{ inputs.source == 'bulk' && '../bulk' || '' }}" }
+        env:
+          N: "${{ inputs.shares }}"
+          K: "${{ matrix.k }}"
+          NI_BULK: "${{ inputs.source == 'bulk' && '../bulk' || '' }}"
+          NI_STAGES: ../share/stages
+          NI_REDO: "${{ inputs.reuse_run != '' && inputs.redo || 'vector,elevation' }}"
         run: |
           python3 test_national.py
+          rm -f ../share/index.parquet ../share/provenance.json ../share/run.json
           /usr/bin/time -v -o time.txt python3 national_index.py ../share nz nz_tiles.json "$K" "$N"   # errors stay in the log
           grep -h -E "Elapsed|Maximum resident" time.txt
-          rm -rf ../share/cache
+          rm -rf ../share/cache   # raw downloads hold title references: never uploaded (T-106)
       - uses: actions/upload-artifact@v4
         with:
           name: share-${{ matrix.k }}
           path: share/
-          retention-days: 3
+          retention-days: 5
 
   merge:
     needs: share

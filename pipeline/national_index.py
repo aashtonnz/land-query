@@ -87,6 +87,8 @@ def fetch_bulk(layer, bbox, where="1=1"):
     """Features of a layer intersecting bbox from the bulk folder: (features, provenance entry). The only `where` the
     index uses picks road parcels."""
     import pyarrow.dataset as ds
+    if layer == "titles":   # bulk.py counted each parcel's titles and kept no title reference (T-106)
+        return [], dict(source="counted in the bulk download; no title references kept", features=0, licence=LICENCE)
     x0, y0, x1, y1 = bbox
     f = (ds.field("xmin") <= x1) & (ds.field("xmax") >= x0) & (ds.field("ymin") <= y1) & (ds.field("ymax") >= y0)
     if where == "parcel_intent='Road'": f = f & (ds.field("parcel_intent") == "Road")
@@ -282,6 +284,8 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), 
                  title_count=len(tnos), title_types=", ".join(ttypes) or None,
                  titles_not_found=sum(t not in titles for t in tnos),
                  rep_x=round(rp.x, 1), rep_y=round(rp.y, 1))
+        if p.get("title_count") is not None:   # counted in the bulk download, which keeps no title references
+            r.update(title_count=int(p["title_count"]), titles_not_found=int(p.get("titles_not_found") or 0))
         # buildings: area of outlines inside the parcel; a building is counted where at least half of it is inside
         bm2, n, big, cap = 0.0, 0, 0.0, None
         for i in (bt.query(g) if bt else []):
@@ -371,6 +375,29 @@ def elevation_grid(tile):
     return Z, T, prov, L, acc, tr
 
 
+STAGES = os.environ.get("NI_STAGES")
+REDO = {x.strip() for x in os.environ.get("NI_REDO", "vector,elevation").split(",") if x.strip()}
+
+
+def save_stage(path, rows):
+    # saved halves are uploaded with the share, where anyone signed in to GitHub can fetch them: never title
+    # references or types (D-15, D-17, T-106)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    pd.DataFrame(rows).drop(columns=["titles", "title_types"], errors="ignore").to_parquet(path + ".tmp", index=False, compression="zstd")
+    os.replace(path + ".tmp", path)
+
+
+def load_stage(path, parcels):
+    """The saved rows for exactly these parcels, in their order, or None if the file is missing or holds other parcels
+    (then the half is worked out again)."""
+    if not os.path.exists(path): return None
+    df = pd.read_parquet(path)
+    ids = [p.get("id") for _, p, _ in parcels]
+    if len(df) != len(ids) or set(df.parcel_id.tolist()) != set(ids): return None
+    recs = df.astype(object).where(df.notna(), None).set_index("parcel_id", drop=False).to_dict("index")
+    return [dict(recs[i]) for i in ids]
+
+
 def index_tile(tile, cache, region=None, tas=None):
     """(rows, provenance) for one tile. tas: district polygons [(geometry, {"NAME": ...})]; None takes them from LINZ's
     suburbs and localities, each of which names its district (the national build, T-102)."""
@@ -382,35 +409,49 @@ def index_tile(tile, cache, region=None, tas=None):
     bs = np.array([g.bounds for g, _, _ in parcels])
     win = (bs[:, 0].min() - 30, bs[:, 1].min() - 30, bs[:, 2].max() + 30, bs[:, 3].max() + 30)
     national = tas is None
-    if national:
-        lf_, prov["localities"] = fetch("localities", win, cache)
-        loc = [(g, p.get("territorial_authority")) for g, p in geoms(lf_) if p.get("territorial_authority")]
-        tas = ()
-    rf, prov["roads"] = fetch("parcels", win, cache, where="parcel_intent='Road'")
-    tf, prov["titles"] = fetch("titles", win, cache)
-    bf, prov["buildings"] = fetch("buildings", win, cache)
-    af, prov["addresses"] = fetch("addresses", win, cache)
-    cf, prov["coast"] = fetch("coast", (win[0] - COAST_MAX, win[1] - COAST_MAX, win[2] + COAST_MAX, win[3] + COAST_MAX), cache)
-    # partly cancelled titles (PRTC) are still current for the land that remains (T-108)
-    titles = current_titles(tf)
-    neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
-    rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas, neighbours)
-    if national:
-        for r, d in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"] = d
-    # water is measured, never guessed from a name or a title (T-113, T-115)
-    lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
-    lf, prov["land"] = fetch("land", win, cache)
-    prov["land"]["max_allowable_offset_m"] = FETCH_OPTS["land"]["maxAllowableOffset"]
-    prov["lakes_rivers"] = len(lw)
-    # no land outline here (LINZ's has nothing east of 2,480,000 E, e.g. the Chatham islets): the sea share is unknown, so
-    # water_pct is empty, not 100 (T-117)
-    if not lf:
-        prov["land"]["missing"] = True
-        for r in rows: r["water_pct"] = None
-    from shapely import clip_by_rect
-    land = [(clip_by_rect(g, *win), p) for g, p in geoms(lf)]   # only this tile's part of the North Island outline
-    if lf:
-        for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
+    # stages (T-102): with NI_STAGES set, a national tile's two halves are saved there (vector-X_Y.parquet: everything
+    # from the vector layers; elev-X_Y.parquet: the elevation columns), and a half not named in NI_REDO is read back
+    # instead of worked out again, so a fix to one half does not redo the other
+    stage = bool(STAGES) and national and region is None
+    sfile = lambda half: os.path.join(STAGES, f"{half}-{int(tile[0])}_{int(tile[1])}.parquet")
+    af = None
+
+    def vector_stage():
+        if national:
+            lf_, prov["localities"] = fetch("localities", win, cache)
+            loc = [(g, p.get("territorial_authority")) for g, p in geoms(lf_) if p.get("territorial_authority")]
+        rf, prov["roads"] = fetch("parcels", win, cache, where="parcel_intent='Road'")
+        tf, prov["titles"] = fetch("titles", win, cache)
+        bf, prov["buildings"] = fetch("buildings", win, cache)
+        af, prov["addresses"] = fetch("addresses", win, cache)
+        cf, prov["coast"] = fetch("coast", (win[0] - COAST_MAX, win[1] - COAST_MAX, win[2] + COAST_MAX, win[3] + COAST_MAX), cache)
+        # partly cancelled titles (PRTC) are still current for the land that remains (T-108)
+        titles = current_titles(tf)
+        neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
+        rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), () if national else tas, neighbours)
+        if national:
+            for r, d in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"] = d
+        # water is measured, never guessed from a name or a title (T-113, T-115)
+        lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
+        lf, prov["land"] = fetch("land", win, cache)
+        prov["land"]["max_allowable_offset_m"] = FETCH_OPTS["land"]["maxAllowableOffset"]
+        prov["lakes_rivers"] = len(lw)
+        # no land outline here (LINZ's has nothing east of 2,480,000 E, e.g. the Chatham islets): the sea share is unknown, so
+        # water_pct is empty, not 100 (T-117)
+        if not lf:
+            prov["land"]["missing"] = True
+            for r in rows: r["water_pct"] = None
+        from shapely import clip_by_rect
+        land = [(clip_by_rect(g, *win), p) for g, p in geoms(lf)]   # only this tile's part of the North Island outline
+        if lf:
+            for r, s_ in zip(rows, water_shares(parcels, lw, [(g, p) for g, p in land if not g.is_empty])): r["water_pct"] = s_
+        return rows, af
+
+    rows = load_stage(sfile("vector"), parcels) if stage and "vector" not in REDO else None
+    if rows is None:
+        rows, af = vector_stage()
+        if stage: save_stage(sfile("vector"), rows)
+    else: prov["vector_reused"] = True
     # a parcel taken in by the coastal margin is left out only on positive evidence that it is another district's: its
     # own address, or else the nearest address within 1 km. With no address near (islands), it stays (T-111, T-115)
     if REGION_NAMES:
@@ -425,8 +466,15 @@ def index_tile(tile, cache, region=None, tas=None):
         rows = [rows[k] for k in keep]; parcels = [parcels[k] for k in keep]
     if not rows: return [], dict(prov, rows=0, seconds=round(time.time() - t0, 1))
     t1 = time.time()
-    Z, T, eprov, L, acc, tr = elevation_grid(tile)
-    for r, e in zip(rows, elevation_columns(parcels, Z, T, L, acc, tr)): r.update(e)
+    erows = load_stage(sfile("elev"), parcels) if stage and "elevation" not in REDO else None
+    if erows is None:
+        Z, T, eprov, L, acc, tr = elevation_grid(tile)
+        erows = elevation_columns(parcels, Z, T, L, acc, tr)
+        if stage: save_stage(sfile("elev"), [dict(e, parcel_id=p.get("id")) for e, (_, p, _) in zip(erows, parcels)])
+    else:
+        eprov = dict(reused=True)
+        for e in erows: e.pop("parcel_id", None)
+    for r, e in zip(rows, erows): r.update(e)
     for r, (g, _, _) in zip(rows, parcels):
         r["geometry_wkb"] = wkb.dumps(g.simplify(0.5, preserve_topology=True))
     prov.update(elevation=eprov, rows=len(rows), seconds_vector=round(t1 - t0, 1), seconds_elevation=round(time.time() - t1, 1))

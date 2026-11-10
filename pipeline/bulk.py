@@ -105,6 +105,15 @@ def write_layer(path, cols, geoms_wkb):
     return int(ok.sum())
 
 
+def count_titles(titles, current):
+    """(titles listed per parcel, how many of them are not current) from each parcel's comma-separated title list."""
+    n, missing = [], []
+    for t in titles:
+        tnos = [x.strip() for x in (t or "").split(",") if x.strip()]
+        n.append(len(tnos)); missing.append(sum(x not in current for x in tnos))
+    return n, missing
+
+
 def service_count(layer):
     svc = N.LAYERS[layer][0]
     return arcgis._get(N.SVC + svc + "/FeatureServer/0/query", dict(where="1=1", returnCountOnly="true", f="json"))["count"]
@@ -112,14 +121,28 @@ def service_count(layer):
 
 def main(out):
     os.makedirs(out, exist_ok=True); manifest = {}
-    for layer, (lds, fields) in LDS_LAYERS.items():
+    current = None
+    for layer in ["titles", "parcels", "buildings", "addresses"]:
+        lds, fields = LDS_LAYERS[layer]
         t0 = time.time()
         with tempfile.TemporaryDirectory(dir=out) as tmp:
             cols, wkbs = read_gpkg(lds_export(lds, tmp), fields)
+        # the bulk files are passed to the tile jobs as an artifact, which anyone signed in to GitHub can fetch from a
+        # public repository: so no title reference is written. Each parcel's titles are counted here, against the
+        # current titles (live or partly cancelled), and only the two counts go on (D-15, T-106)
+        if layer == "titles":
+            current = {t for t, st in zip(cols["title_no"], cols["status"]) if st in ("LIVE", "PRTC")}
+            manifest[layer] = dict(source=f"LINZ Data Service layer {lds} (whole-layer export); counted per parcel, not kept",
+                                   url=N.LDS + str(lds), fetched=utc_now(), records=len(cols["title_no"]),
+                                   service_records=service_count(layer), seconds=round(time.time() - t0))
+            print(layer, manifest[layer], flush=True); del cols, wkbs; continue
+        if layer == "parcels":
+            cols["title_count"], cols["titles_not_found"] = count_titles(cols.pop("titles"), current); current = None
         n = write_layer(os.path.join(out, layer + ".parquet"), cols, wkbs); del cols, wkbs
         manifest[layer] = dict(source=f"LINZ Data Service layer {lds} (whole-layer export)", url=N.LDS + str(lds),
                                fetched=utc_now(), records=n, service_records=service_count(layer), seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
+    assert not os.path.exists(os.path.join(out, "titles.parquet")) and "titles" not in pq.read_schema(os.path.join(out, "parcels.parquet")).names
     for layer in SERVICE_LAYERS:
         t0 = time.time(); svc, fields, lds = N.LAYERS[layer]; opts = N.FETCH_OPTS.get(layer, {})
         feats = arcgis.query_all(N.SVC + svc + "/FeatureServer/0", dict(where="1=1", outFields=fields, outSR=2193,
