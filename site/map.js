@@ -18,6 +18,10 @@ const V = '?v=' + encodeURIComponent(window.LQ_BUILD || '');
 const meta = await fetch('data/meta.json' + V).then(r=>r.json());
 const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
+if(meta.national){ const h = document.querySelector('.hero h1'); if(h) h.textContent = 'Every land parcel in New Zealand, measured from public data.';
+  const pv = document.createElement('p'); pv.className = 'label'; pv.style.color = 'var(--mark)';
+  pv.textContent = 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
+  document.querySelector('.hero').insertBefore(pv, $('councils')); }
 // council cards and run line
 const st = meta.stats, cc = $('councils');
 [['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · preview, not yet reviewed' : 'National index pilot']].forEach(([c,name,kind])=>{
@@ -36,7 +40,10 @@ if(!gl){ say('This map needs WebGL 2, which this browser does not offer. Try a c
 let W = 0, H = 0, dpr = 1, touched = false;
 const view = {cx:0, cy:0, s:1};
 const [bx0, by0, bx1, by1] = meta.bounds;
-function fit(){ view.cx = (bx0+bx1)/2; view.cy = (by0+by1)/2; view.s = Math.min(W/(bx1-bx0-30000), H/(by1-by0-30000)); }
+// the first view: everything, or in the whole-country build the main islands (the Kermadecs, Chathams and
+// subantarctic islands are there to pan to, but framing them all leaves the country a small shape in the sea)
+function fit(){ const [fx0, fy0, fx1, fy1] = meta.fit || [bx0+15000, by0+15000, bx1-15000, by1-15000];
+  view.cx = (fx0+fx1)/2; view.cy = (fy0+fy1)/2; view.s = Math.min(W/(fx1-fx0), H/(fy1-fy0)); }
 const sx = x => W/2 + (x-view.cx)*view.s, sy = y => H/2 - (y-view.cy)*view.s;
 function resize(){ const r = canvas.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio||1); W = r.width; H = r.height;
   for(const c of [canvas, over]){ c.width = Math.round(W*dpr); c.height = Math.round(H*dpr); }
@@ -170,7 +177,7 @@ worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return
   pieceWaiters = pieceWaiters.filter(w => !w(P)); draw(); };
 // each vertex's value for the chosen measure; -1e30 for none (drawn grey)
 function fillArray(pidx){ const a = new Float32Array(pidx.length);
-  for(let v=0; v<pidx.length; v++){ const i = pidx[v], q = cur && i >= 0 && i < cur.length ? cur[i] : 0; a[v] = q ? (q - 1) / 65534 : -1e30; }   // 0: no value return a; }
+  for(let v=0; v<pidx.length; v++){ const i = pidx[v], q = cur && i >= 0 && i < cur.length ? cur[i] : 0; a[v] = q ? (q - 1) / 65534 : -1e30; /* 0: no value */ } return a; }
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
@@ -186,7 +193,7 @@ function trimPieces(){ const l0 = [...pieces.values()].filter(P => P.level===0 &
     gl.deleteVertexArray(P.vao); for(const b of P.bufs) gl.deleteBuffer(b); gl.deleteBuffer(P.tri); gl.deleteBuffer(P.ebuf); pieces.delete(P.id); } }
 
 // ---- tiles: rendered at TEX x TEX with 4x edge smoothing, then mipmapped
-const TEX = 512, BASE = 262144, ZMAX = 13;
+const TEX = 512, BASE = 1048576, ZMAX = 15;   // the coarsest tile is 1,049 km across, so the whole country is a few tiles
 const SAMPLES = Math.min(4, gl.getParameter(gl.MAX_SAMPLES));
 const msFB = gl.createFramebuffer(), msRB = gl.createRenderbuffer();
 gl.bindRenderbuffer(gl.RENDERBUFFER, msRB); gl.renderbufferStorageMultisample(gl.RENDERBUFFER, SAMPLES, gl.RGBA8, TEX, TEX);
@@ -195,7 +202,7 @@ const outFB = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 const tiles = new Map();   // "z/i/j" -> {tex, gen, born, used}
 // the level whose simplification (0.5, 2, 8, 24 m) stays at or under about half a tile pixel, so switching levels
 // moves nothing visibly
-const levelFor = z => { const texel = BASE / 2**z / TEX; const l = texel < 4 ? 0 : texel < 16 ? 1 : texel < 48 ? 2 : texel < 150 ? 3 : texel < 600 ? 4 : 5;
+const levelFor = z => { const texel = BASE / 2**z / TEX; const l = texel < 4 ? 0 : texel < 16 ? 1 : texel < 48 ? 2 : texel < 128 ? 3 : texel < 400 ? 4 : 5;
   return Math.min(l, LV.length - 1); };
 // whole-country build: parcels without full detail are a set of their own ("R", level 1 shapes), drawn at levels 0 and 1
 const setsFor = l => meta.rest && l <= 1 ? [l, 'R'] : [l];

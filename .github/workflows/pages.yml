@@ -14,6 +14,12 @@ on:
 
 permissions:
   contents: read
+  actions: read   # to fetch the national index a National index run built
+
+env:
+  # the National index run whose index the whole-country map is drawn from (an unreviewed preview, asked for by the
+  # owner on 10 Nov 2026; kept 30 days). Empty: the Greater Wellington pilot only
+  NATIONAL_RUN: "42746250658"
 
 concurrency:
   group: pages
@@ -22,16 +28,21 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -q duckdb pandas pyarrow shapely numpy requests "mcp==2.3.0"
+      - uses: actions/download-artifact@v4
+        if: env.NATIONAL_RUN != ''
+        with: { name: national-index, path: national, run-id: "${{ env.NATIONAL_RUN }}", github-token: "${{ github.token }}" }
       - name: Test and build the site
         run: |
           python3 site/test_site.py
+          if [ -n "$NATIONAL_RUN" ]; then export LQ_NATIONAL=national; fi
           python3 site/build_map.py _site
+          du -sm _site
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }
   deploy:

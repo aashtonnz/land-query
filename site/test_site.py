@@ -15,6 +15,12 @@ def test_only_the_sea_part_of_a_part_water_parcel_is_drawn_as_water():
     assert len(out) == 1 and abs(out[0].area - 5000) < 1 and out[0].bounds[0] == 100   # half of parcel 1; nothing for 2 (measured 0) or 3 (unknown)
 
 
+def test_the_page_script_parses():
+    """A syntax error in map.js leaves the page stuck on "Loading the map" (10 Nov 2026: a comment swallowed a line's end)."""
+    import shutil, subprocess
+    if shutil.which("node"): subprocess.run(["node", "--check", os.path.join(HERE, "map.js")], check=True)
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

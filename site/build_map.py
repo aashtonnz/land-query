@@ -383,6 +383,7 @@ def main():
     meta = dict(origin=ORIGIN, levels=[], measures=["index"], colours=colour_files(V), councils=list(COUNCILS),
                 detail_fields=DETAIL, stats=stats, national=bool(NATIONAL),
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
+    if NATIONAL: meta["fit"] = [1060000, 4730000, 2100000, 6200000]   # the North, South and Stewart islands
     del V
     # Topo50 lakes and LINZ's river areas (1:50k) are drawn whole, over the parcels. Three rules that cut them where
     # they overlap land parcels each erased real water (small lakes in farm parcels, rivers whose banks are parcel
