@@ -306,8 +306,11 @@ def test_ground_share_is_of_the_whole_parcel_not_only_the_part_in_the_window():
     not 100."""
     Z = np.full((140, 70), 5.0, np.float32)                                 # the grid covers only x -200..500
     rows = run_tile({"parcels": [(box(0, 0, 400, 400), dict(id=1, parcel_intent="DCDB")),
-                                 (box(0, 500, 1000, 900), dict(id=2, parcel_intent="DCDB"))]}, Z=Z)
+                                 (box(0, 500, 1000, 900), dict(id=2, parcel_intent="DCDB")),
+                                 (box(6, 456, 24, 474), dict(id=3, parcel_intent="DCDB")),      # 324 m² holding 1 cell centre: never judged by area
+                                 (box(203, 453, 248, 498), dict(id=4, parcel_intent="DCDB"))]}, Z=Z)   # 2,025 m², 16 centres
     assert rows[1]["ground_cells_pct"] == 100 and 49 <= rows[2]["ground_cells_pct"] <= 51, rows[2]["ground_cells_pct"]
+    assert rows[3]["ground_cells_pct"] == 100 and rows[4]["ground_cells_pct"] == 100, (rows[3]["ground_cells_pct"], rows[4]["ground_cells_pct"])
 
 
 def test_the_national_merge_writes_nothing_unless_every_share_and_tile_is_there_once():

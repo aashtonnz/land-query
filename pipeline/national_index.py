@@ -223,6 +223,7 @@ def water_shares(parcels, water, land):
     return out
 
 
+BIG_M2 = 100_000.0   # from this area a parcel can reach past the elevation window (tile plus 5 km)
 NO_DISTRICT = "Area outside Territorial Authority"   # LINZ's name for land in no district (offshore islands)
 ADDRESS_NEAR_M = 1000.0
 
@@ -340,9 +341,10 @@ def elevation_columns(parcels, Z, T, lidar, acc, trunc):
                              slope_mean_deg=round(a.sm, 1), slope_max_deg=round(a.s1, 1), flat_pct=round(100 * a.flat, 1),
                              steep_pct=round(100 * a.steep, 1), low_lying_pct=round(100 * a.low, 1),
                              lidar_pct=round(100 * a.li, 1), ground_cells=int(a.n),
-                             # of the whole parcel: its cells with ground against the cells its area would hold, so a parcel reaching past
-                             # the elevation window (a national park) no longer reads 100 (T-108, review 25)
-                             ground_cells_pct=round(min(100.0, 100 * a.n / max(1, allc[k] if allc[k] >= 0.9 * geom.area / (RES * RES) else geom.area / (RES * RES))), 1),
+                             # of the parcel's own cell centres; for a parcel of 10 ha or more with over a tenth of its area outside the
+                             # elevation window (a national park), of the cells its area would hold. Small parcels are never
+                             # judged by area: a 600 m² section holds 5 to 7 cell centres by chance (T-108, review 25)
+                             ground_cells_pct=round(min(100.0, 100 * a.n / max(1, geom.area / (RES * RES) if geom.area >= BIG_M2 and allc[k] < 0.9 * geom.area / (RES * RES) else allc[k])), 1),
                              upslope_area_max_m2=float(round(top.loc[k, "acc"])), upslope_truncated=bool(top.loc[k, "tr"]),
                              elevation_from="cells"))
             continue

@@ -213,7 +213,7 @@ share. Not published.
 | --- | --- | --- | --- |
 | 1 | 137,453 parcels (5.6%) carry a combined district name ("Tauranga City, Western Bay of Plenty District", 23,616): LINZ's localities name every district a locality touches, and the address, which names one, was used only where the locality gave nothing. Any count by district was wrong | Serious | The address first; a locality only where it names one district; else the nearest address within 1 km among the names; else empty. Tested; on the Pukekohe tile 14,371 combined names became 12,671 Auckland, 1,569 Waikato District and 131 empty |
 | 2 | About 650 mainland harbour-edge parcels read "Area outside Territorial Authority" or empty (10 Herd Street, Wellington) | Moderate | The same rule: an address within 1 km decides |
-| 3 | `ground_cells_pct` read 100 on parcels reaching past the elevation window (Fiordland National Park: 7.7% covered) | Moderate | Now the share of the whole parcel; documented |
+| 3 | `ground_cells_pct` read 100 on parcels reaching past the elevation window (Fiordland National Park: 7.7% covered) | Moderate | For parcels of 10 ha or more with over a tenth of their area outside the window, the share of the whole parcel; documented. The first version applied this to every parcel and lowered the figure on about 380,000 small sections (a 600 m² section holds 5 to 7 cell centres by chance); caught comparing the rebuild with the first build, before any review or publication |
 | 4 | Ten offshore rocks read as over 10 km from the coast (the coastline layer omits them) | Minor | Left; noted here |
 | 5 | `SOURCES.md` listed `title_types`, said the Chathams have no water share, and did not describe the district names | Minor | Corrected |
 
