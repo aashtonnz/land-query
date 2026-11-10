@@ -1,0 +1,636 @@
+{
+ "database": "tile.duckdb",
+ "blocks": 1,
+ "universe": 177,
+ "queries": [
+  {
+   "id": "Q1",
+   "name": "Gravity-serviceable infill candidates",
+   "question": "High or General Residential parcels of at least 800 m\u00b2 (not stacked with another zone over 10% of the parcel), under 25% covered by 2021 buildings, 90th-percentile slope under 10\u00b0, outside every KCDC flood layer (the 2021 District Plan overlay and the newer modelled extents), and a wastewater manhole with a recorded invert within 30 m that sits at least 1 m below the parcel's lowest ground (where manholes tie as nearest, the deepest invert counts). Title type and easement count returned (cross-lease and unit titles complicate subdivision); freehold first.",
+   "sql": "SELECT unit_id, appellation, title_types, easements_n, area_m2, building_2021_m2, slope_p90_deg, zones, ww_mh_id, ww_mh_dist_m, ww_head_ground_min_minus_invert_m FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND lidar_coverage_pct >= 99 AND (json_extract(zones,'$.\"High Density Residential Zone\"')::DOUBLE >= 90 OR json_extract(zones,'$.\"General Residential Zone\"')::DOUBLE >= 90) AND zones_total_pct - greatest(coalesce(json_extract(zones,'$.\"High Density Residential Zone\"')::DOUBLE, 0), coalesce(json_extract(zones,'$.\"General Residential Zone\"')::DOUBLE, 0)) < 10 AND area_m2 >= 800 AND building_2021_m2 < 0.25*area_m2 AND slope_p90_deg < 10 AND ovl_flood_hazard IS NULL AND flood_river_corridor IS NULL AND flood_stream_corridor IS NULL AND flood_overflow_path IS NULL AND flood_residual_overflow IS NULL AND flood_fill_control IS NULL AND flood_storage IS NULL AND flood_ponding IS NULL AND flood_residual_ponding IS NULL AND flood_shallow_surface IS NULL AND ww_mh_dist_m <= 30 AND ww_head_ground_min_minus_invert_m >= 1 ORDER BY (title_types = 'Freehold') DESC, area_m2 DESC",
+   "count": 0,
+   "provenance": {
+    "parcels": {
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)",
+     "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+     "fetched": "2026-11-07T08:32:20+00:00",
+     "features": 179,
+     "url": "https://data.linz.govt.nz/layer/50823/"
+    },
+    "titles": {
+     "licence": "LINZ CC BY 4.0",
+     "sha256": "f87dcb2b85896b48be2a4a1487857a485bf9aa92400554423ecc5c18a8713a2e",
+     "fetched": "2026-11-07T08:35:05+00:00",
+     "features": 391,
+     "url": "https://data.linz.govt.nz/layer/50804/"
+    },
+    "nonprimary_parcels": {
+     "licence": "LINZ CC BY 4.0",
+     "sha256": "b40734cfd3fcf3f37dd2aaf207ee8fd53f1ec8f1925aa8110140b103edd1070b",
+     "fetched": "2026-11-07T08:35:06+00:00",
+     "features": 121,
+     "url": "https://data.linz.govt.nz/layer/50782/"
+    },
+    "zones": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "e4c6861f62f5141044ebd43bad2ac0adc0caa9c501bbad5e6064114632878243",
+     "fetched": "2026-11-07T08:32:25+00:00",
+     "features": 7,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0"
+    },
+    "buildings_2021": {
+     "licence": "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)",
+     "sha256": "f6256264a3dd0caa447f6a07fda16d395806d950c53616f7b998a03561ac91a7",
+     "fetched": "2026-11-07T08:33:43+00:00",
+     "features": 225,
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0"
+    },
+    "dem_2025": {
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "sha256": "f1698f8730ed5c7cb5c22bd024badb0acadddfb8e31a20adf4a28c6f3d1c49e4",
+     "fetched": "2026-11-07T08:34:10+00:00",
+     "features": null,
+     "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json"
+    },
+    "ovl_flood_hazard": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "4f038e69c5d2a165cea5f3d4babf8c19ac4a89f37015e9c4105d03ef29a66a82",
+     "fetched": "2026-11-07T08:32:36+00:00",
+     "features": 2,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11"
+    },
+    "flood_river_corridor": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:32:52+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/0"
+    },
+    "flood_stream_corridor": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "c39633e2b35a537449157df21c88700eb889318c646d173cfc064a753148fcf2",
+     "fetched": "2026-11-07T08:32:55+00:00",
+     "features": 2,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/1"
+    },
+    "flood_overflow_path": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:32:57+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/2"
+    },
+    "flood_residual_overflow": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:00+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/3"
+    },
+    "flood_fill_control": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:02+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/4"
+    },
+    "flood_storage": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:04+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/5"
+    },
+    "flood_ponding": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "462c835347c4ef673f0322dd4934505569c054f43b58b56c19cfea47fe69c621",
+     "fetched": "2026-11-07T08:33:06+00:00",
+     "features": 2,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/6"
+    },
+    "flood_residual_ponding": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:08+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/7"
+    },
+    "flood_shallow_surface": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:10+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/8"
+    },
+    "ww_node": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:14+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9"
+    }
+   },
+   "rows": []
+  },
+  {
+   "id": "Q2",
+   "name": "Recommended floor level well above ground",
+   "question": "Built-on parcels where the highest KCDC recommended building level (a minimum floor level, NZVD2016, including freeboard) inside the parcel is more than 1 m above the parcel's mean LiDAR ground. A floor-height requirement for rebuilding, not a flood depth.",
+   "sql": "SELECT unit_id, appellation, building_2021_m2, ground_mean_m, rbl_in_parcel_n, rbl_in_parcel_max_nzvd2016, rbl_in_parcel_max_minus_ground_mean_m, ovl_flood_hazard FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND lidar_coverage_pct >= 99 AND building_2021_m2 > 0 AND rbl_in_parcel_max_minus_ground_mean_m > 1 ORDER BY rbl_in_parcel_max_minus_ground_mean_m DESC",
+   "count": 0,
+   "provenance": {
+    "parcels": {
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)",
+     "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+     "fetched": "2026-11-07T08:32:20+00:00",
+     "features": 179,
+     "url": "https://data.linz.govt.nz/layer/50823/"
+    },
+    "buildings_2021": {
+     "licence": "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)",
+     "sha256": "f6256264a3dd0caa447f6a07fda16d395806d950c53616f7b998a03561ac91a7",
+     "fetched": "2026-11-07T08:33:43+00:00",
+     "features": 225,
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0"
+    },
+    "dem_2025": {
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "sha256": "f1698f8730ed5c7cb5c22bd024badb0acadddfb8e31a20adf4a28c6f3d1c49e4",
+     "fetched": "2026-11-07T08:34:10+00:00",
+     "features": null,
+     "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json"
+    },
+    "flood_rbl_nzvd2016": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:12+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/10"
+    },
+    "ovl_flood_hazard": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "4f038e69c5d2a165cea5f3d4babf8c19ac4a89f37015e9c4105d03ef29a66a82",
+     "fetched": "2026-11-07T08:32:36+00:00",
+     "features": 2,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11"
+    }
+   },
+   "rows": []
+  },
+  {
+   "id": "Q3",
+   "name": "Nearest sewer is old and in poor condition",
+   "question": "Parcels whose nearest wastewater pipe (within 20 m) was installed before 1980 and has KCDC condition grade 4 or 5 (grade 0 treated as not assessed). Where pipes tie as nearest, the worst grade counts. Caution: KCDC records far more pipes as installed in 1979 and 1980 than in any other year, so many 1979 dates may be placeholders.",
+   "sql": "SELECT unit_id, appellation, ww_pipe_id, ww_pipe_dist_m, ww_pipe_material, ww_pipe_year, ww_pipe_condition_grade FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND ww_pipe_dist_m <= 20 AND ww_pipe_year < 1980 AND ww_pipe_condition_grade >= 4 ORDER BY ww_pipe_condition_grade DESC, ww_pipe_year",
+   "count": 0,
+   "provenance": {
+    "parcels": {
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)",
+     "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+     "fetched": "2026-11-07T08:32:20+00:00",
+     "features": 179,
+     "url": "https://data.linz.govt.nz/layer/50823/"
+    },
+    "ww_pipe": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+     "fetched": "2026-11-07T08:33:17+00:00",
+     "features": 0,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/10"
+    }
+   },
+   "rows": []
+  },
+  {
+   "id": "Q4",
+   "name": "Ground level changed since 2021",
+   "question": "Parcels where some 1 m cell of LiDAR ground changed by more than 1 m between the 2021 and 2024\u201325 surveys, and the parcel's mean ground changed by more than 0.3 m after removing its block's epoch offset (the median change on flat, open, unbuilt ground in the block). Ground surfaces exclude buildings, so this is mostly earthworks, but it may also be vegetation classed as ground or a survey artefact (unverified, see T-29).",
+   "sql": "SELECT unit_id, appellation, area_m2, building_2021_m2, dz_2021_2025_mean_m, coalesce(lidar_epoch_offset_block_m, 0.08) AS epoch_offset_m, round(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, 0.08), 3) AS dz_mean_corrected_m, dz_2021_2025_absmax_m FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND lidar_coverage_pct >= 99 AND dz_2021_2025_absmax_m > 1 AND abs(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, 0.08)) > 0.3 ORDER BY abs(dz_2021_2025_mean_m - coalesce(lidar_epoch_offset_block_m, 0.08)) DESC",
+   "count": 1,
+   "provenance": {
+    "parcels": {
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)",
+     "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+     "fetched": "2026-11-07T08:32:20+00:00",
+     "features": 179,
+     "url": "https://data.linz.govt.nz/layer/50823/"
+    },
+    "dem_2025": {
+     "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+     "sha256": "f1698f8730ed5c7cb5c22bd024badb0acadddfb8e31a20adf4a28c6f3d1c49e4",
+     "fetched": "2026-11-07T08:34:10+00:00",
+     "features": null,
+     "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json"
+    },
+    "dem_2021": {
+     "licence": "CC-BY-4.0 [\"AAM NZ\", \"K\\u0101piti Coast District Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+     "sha256": "9f397d99c0b2652573cadc5105f279776925784d4c7e22ae698e5adb3615e2eb",
+     "fetched": "2026-11-07T08:35:03+00:00",
+     "features": null,
+     "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/collection.json"
+    },
+    "buildings_2021": {
+     "licence": "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)",
+     "sha256": "f6256264a3dd0caa447f6a07fda16d395806d950c53616f7b998a03561ac91a7",
+     "fetched": "2026-11-07T08:33:43+00:00",
+     "features": 225,
+     "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0"
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 3796519,
+     "appellation": "Lot 1 DP 73944",
+     "area_m2": 283334.9,
+     "building_2021_m2": 277,
+     "dz_2021_2025_mean_m": -1.434,
+     "epoch_offset_m": 0.066,
+     "dz_mean_corrected_m": -1.5,
+     "dz_2021_2025_absmax_m": 29.78,
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "dem_2025": {
+       "sha256": "f1698f8730ed5c7cb5c22bd024badb0acadddfb8e31a20adf4a28c6f3d1c49e4",
+       "fetched": "2026-11-07T08:34:10+00:00"
+      },
+      "dem_2021": {
+       "sha256": "9f397d99c0b2652573cadc5105f279776925784d4c7e22ae698e5adb3615e2eb",
+       "fetched": "2026-11-07T08:35:03+00:00"
+      },
+      "buildings_2021": {
+       "sha256": "f6256264a3dd0caa447f6a07fda16d395806d950c53616f7b998a03561ac91a7",
+       "fetched": "2026-11-07T08:33:43+00:00"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "Q5",
+   "name": "Heritage, notable tree or ecological site on the parcel",
+   "question": "Parcels with a KCDC heritage place or notable tree point inside or on their boundary (with the feature id), or overlapping an ecological site.",
+   "sql": "SELECT unit_id, appellation, area_m2, ovl_heritage_places, ovl_notable_trees, ovl_ecological_sites FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND (ovl_heritage_places <> '[]' OR ovl_notable_trees <> '[]' OR ovl_ecological_sites IS NOT NULL)",
+   "count": 12,
+   "provenance": {
+    "parcels": {
+     "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)",
+     "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+     "fetched": "2026-11-07T08:32:20+00:00",
+     "features": 179,
+     "url": "https://data.linz.govt.nz/layer/50823/"
+    },
+    "ovl_heritage_places": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+     "fetched": "2026-11-07T08:32:39+00:00",
+     "features": 1,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/14"
+    },
+    "ovl_notable_trees": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+     "fetched": "2026-11-07T08:32:42+00:00",
+     "features": 2,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16"
+    },
+    "ovl_ecological_sites": {
+     "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+     "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+     "fetched": "2026-11-07T08:32:46+00:00",
+     "features": 5,
+     "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/19"
+    }
+   },
+   "rows": [
+    {
+     "unit_id": 3843615,
+     "appellation": "Part Lot 6 DP 13993",
+     "area_m2": 549464.9,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Tararua Ranges\": 18.3}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 4043915,
+     "appellation": "Part Lot 1 DP 13837",
+     "area_m2": 958776.2,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Tararua Ranges\": 26.6}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3763002,
+     "appellation": "Part Lot 1 DP 11854",
+     "area_m2": 513673.5,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Tararua Ranges\": 19.2}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3910525,
+     "appellation": "Section 80 Block X Waitohu SD",
+     "area_m2": 57145.8,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Tararua Ranges\": 100.0}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3797320,
+     "appellation": "Part Lot 2 DP 11854",
+     "area_m2": 1644522.1,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Tararua Ranges\": 24.8}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3796325,
+     "appellation": "Lot 1 DP 50640",
+     "area_m2": 84802.6,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Staples Bush\": 15.1}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3808020,
+     "appellation": "Lot 1 DP 19820",
+     "area_m2": 33279.0,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[{\"id\": \"T100\", \"significance\": \"Norfolk Island Pine  Araucaria heterophylla, planted 1880\"}]",
+     "ovl_ecological_sites": null,
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3975648,
+     "appellation": "Lot 2 DP 52162",
+     "area_m2": 10806.0,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"K209\": 3.7}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 3812217,
+     "appellation": "Lot 1 DP 52162",
+     "area_m2": 5747.0,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"K209\": 100.0}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 4020624,
+     "appellation": "Lot 2 DP 87747",
+     "area_m2": 197443.2,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Pukehou Bush\": 0.0}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 4020685,
+     "appellation": "Lot 1 DP 87746",
+     "area_m2": 154331.5,
+     "ovl_heritage_places": "[]",
+     "ovl_notable_trees": "[]",
+     "ovl_ecological_sites": "{\"Pukehou Bush\": 8.3}",
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    },
+    {
+     "unit_id": 8793821,
+     "appellation": "Lot 1 DP 615700",
+     "area_m2": 4074.3,
+     "ovl_heritage_places": "[{\"id\": \"B40\", \"significance\": \"Historic residence, built from Totara bush, 1885\"}]",
+     "ovl_notable_trees": "[{\"id\": \"T63\", \"significance\": \"Kauri tree Agathis australis Planted 1937 (request of Mr P Atkins)\"}]",
+     "ovl_ecological_sites": null,
+     "block_id": "1785000_5485000_5000",
+     "sources": {
+      "parcels": {
+       "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+       "fetched": "2026-11-07T08:32:20+00:00"
+      },
+      "ovl_heritage_places": {
+       "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+       "fetched": "2026-11-07T08:32:39+00:00"
+      },
+      "ovl_notable_trees": {
+       "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+       "fetched": "2026-11-07T08:32:42+00:00"
+      },
+      "ovl_ecological_sites": {
+       "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+       "fetched": "2026-11-07T08:32:46+00:00"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

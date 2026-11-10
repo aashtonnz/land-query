@@ -1,0 +1,567 @@
+{
+ "sources": {
+  "parcels": {
+   "url": "https://data.linz.govt.nz/layer/50823/",
+   "ok": true,
+   "features": 179,
+   "from_linz": 179,
+   "from_mirror": 0,
+   "linz_error": null,
+   "membership": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+   "sha256": "48afebcbedbfb85758ce623ed2d034b0f463bd090a72edf2117a68a4128d0581",
+   "seconds": 4.9,
+   "fetched": "2026-11-07T08:32:20+00:00",
+   "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from KCDC's public mirror)"
+  },
+  "kcdc_parcels": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0",
+   "ok": true,
+   "features": 179,
+   "sha256": "b386c757cff846eee625a578dfa3b29e4221662e9129186c7f8d24a87ccd9c6c",
+   "fetched": "2026-11-07T08:32:20+00:00",
+   "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via KCDC public mirror"
+  },
+  "zones": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Zones/MapServer/0",
+   "ok": true,
+   "features": 7,
+   "bytes": 2228711,
+   "sha256": "e4c6861f62f5141044ebd43bad2ac0adc0caa9c501bbad5e6064114632878243",
+   "seconds": 4.73,
+   "fetched": "2026-11-07T08:32:25+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Zones",
+   "copyright": ""
+  },
+  "district_boundary": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/1",
+   "ok": true,
+   "features": 2,
+   "bytes": 21307,
+   "sha256": "b973a5112008b277ae6615c960405e97155f39274b4b8778e85c8a12bd2e672a",
+   "seconds": 2.65,
+   "fetched": "2026-11-07T08:32:28+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "District Boundary",
+   "copyright": ""
+  },
+  "ovl_fault_avoidance": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/10",
+   "ok": true,
+   "features": 4,
+   "bytes": 11990,
+   "sha256": "ced5c22abc9845466f38ea349bfe4b22b5e7516497b0db7f759714457eeace24",
+   "seconds": 3.06,
+   "fetched": "2026-11-07T08:32:31+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Fault Avoidance Areas",
+   "copyright": ""
+  },
+  "ovl_flood_hazard": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/11",
+   "ok": true,
+   "features": 2,
+   "bytes": 12647081,
+   "sha256": "4f038e69c5d2a165cea5f3d4babf8c19ac4a89f37015e9c4105d03ef29a66a82",
+   "seconds": 5.81,
+   "fetched": "2026-11-07T08:32:36+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Flood Hazard",
+   "copyright": ""
+  },
+  "ovl_heritage_places": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/14",
+   "ok": true,
+   "features": 1,
+   "bytes": 522,
+   "sha256": "eb4afdd161e71a78dfb2576074dcff32ba6d92e51eea0f807093c7d49550c632",
+   "seconds": 2.3,
+   "fetched": "2026-11-07T08:32:39+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Historic Heritage Places",
+   "copyright": ""
+  },
+  "ovl_notable_trees": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/16",
+   "ok": true,
+   "features": 2,
+   "bytes": 1033,
+   "sha256": "f6a5cbd1d9d9cb2aa824ada746ce72a82d82beef7ddf9e127677beb8604e6cac",
+   "seconds": 3.51,
+   "fetched": "2026-11-07T08:32:42+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Notable Trees",
+   "copyright": ""
+  },
+  "ovl_ecological_sites": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/19",
+   "ok": true,
+   "features": 5,
+   "bytes": 598886,
+   "sha256": "06ba232d2af25f64deb8cd7a9ddd3d048d4f57438e783c049d38ec5401faeee9",
+   "seconds": 3.32,
+   "fetched": "2026-11-07T08:32:46+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Ecological Sites",
+   "copyright": ""
+  },
+  "ovl_noise_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/28",
+   "ok": true,
+   "features": 1,
+   "bytes": 97658,
+   "sha256": "c38cbe6494044f55ffa53826a021124c3c6da5df3d71206f8be589fa734c07d4",
+   "seconds": 2.61,
+   "fetched": "2026-11-07T08:32:48+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Noise Corridor",
+   "copyright": ""
+  },
+  "ovl_coastal_env": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/District_Plan_Overlays/MapServer/30",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.01,
+   "fetched": "2026-11-07T08:32:50+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Coastal Environment",
+   "copyright": ""
+  },
+  "flood_river_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/0",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.12,
+   "fetched": "2026-11-07T08:32:52+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "River Corridor",
+   "copyright": ""
+  },
+  "flood_stream_corridor": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/1",
+   "ok": true,
+   "features": 2,
+   "bytes": 502979,
+   "sha256": "c39633e2b35a537449157df21c88700eb889318c646d173cfc064a753148fcf2",
+   "seconds": 3.12,
+   "fetched": "2026-11-07T08:32:55+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Stream Corridor",
+   "copyright": ""
+  },
+  "flood_overflow_path": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/2",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.03,
+   "fetched": "2026-11-07T08:32:57+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Overflow Path",
+   "copyright": ""
+  },
+  "flood_residual_overflow": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/3",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:00+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Residual Overflow",
+   "copyright": ""
+  },
+  "flood_fill_control": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/4",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.28,
+   "fetched": "2026-11-07T08:33:02+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Fill Control",
+   "copyright": ""
+  },
+  "flood_storage": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/5",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.06,
+   "fetched": "2026-11-07T08:33:04+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Storage",
+   "copyright": ""
+  },
+  "flood_ponding": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/6",
+   "ok": true,
+   "features": 2,
+   "bytes": 175577,
+   "sha256": "462c835347c4ef673f0322dd4934505569c054f43b58b56c19cfea47fe69c621",
+   "seconds": 2.23,
+   "fetched": "2026-11-07T08:33:06+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Ponding",
+   "copyright": ""
+  },
+  "flood_residual_ponding": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/7",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.06,
+   "fetched": "2026-11-07T08:33:08+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Residual Ponding",
+   "copyright": ""
+  },
+  "flood_shallow_surface": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/8",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:10+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Shallow Surface Flow",
+   "copyright": ""
+  },
+  "flood_rbl_nzvd2016": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Latest_Flood_Hazards/MapServer/10",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.04,
+   "fetched": "2026-11-07T08:33:12+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "RBLs (NZVD2016 vertical datum)",
+   "copyright": "[withheld: names a person]"
+  },
+  "ww_node": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.13,
+   "fetched": "2026-11-07T08:33:14+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "WW Point",
+   "copyright": ""
+  },
+  "ww_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/10",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.3,
+   "fetched": "2026-11-07T08:33:17+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "WW Pipe",
+   "copyright": ""
+  },
+  "ww_lateral": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/11",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.14,
+   "fetched": "2026-11-07T08:33:19+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "WW Lateral",
+   "copyright": ""
+  },
+  "sw_point": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/4",
+   "ok": true,
+   "features": 13,
+   "bytes": 8420,
+   "sha256": "81b01f099c8b3db34196fb2bd4d17c101e63add3ae0d5aa793bc7cbdbaae9a34",
+   "seconds": 2.04,
+   "fetched": "2026-11-07T08:33:21+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "SW Point",
+   "copyright": ""
+  },
+  "sw_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/5",
+   "ok": true,
+   "features": 12,
+   "bytes": 10731,
+   "sha256": "17a87ab6c2d99b481830b208498794b80c2a416bed6d2680e36594678e1398c9",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:23+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "SW Pipe",
+   "copyright": ""
+  },
+  "ws_pipe": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/2",
+   "ok": true,
+   "features": 54,
+   "bytes": 45362,
+   "sha256": "13fe8e2ae770fab60fd41d0b84c8257d91a9488097e8c16d643587d8070781af",
+   "seconds": 2.06,
+   "fetched": "2026-11-07T08:33:25+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "WS Pipe",
+   "copyright": ""
+  },
+  "wind_stainless": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/1",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:27+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Stainless Zone",
+   "copyright": ""
+  },
+  "wind_very_high": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/2",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.03,
+   "fetched": "2026-11-07T08:33:29+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Very High Wind Zone",
+   "copyright": ""
+  },
+  "tsunami_zones": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Tsunami/MapServer/3",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:31+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Tsunami Evacuation Zones",
+   "copyright": ""
+  },
+  "earthworks": {
+   "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Earthworks/MapServer/1",
+   "ok": true,
+   "features": 0,
+   "bytes": 45,
+   "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+   "seconds": 2.05,
+   "fetched": "2026-11-07T08:33:33+00:00",
+   "licence": "KCDC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+   "layer_name": "Earthworks",
+   "copyright": ""
+  },
+  "gw_liquefaction": {
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10",
+   "ok": true,
+   "features": 2,
+   "bytes": 52035,
+   "sha256": "7f2d30ac65cf50c243c3c12ff1eccc20f9c2e9698ca08756c8b6d00a14f85cc2",
+   "seconds": 4.43,
+   "fetched": "2026-11-07T08:33:38+00:00",
+   "licence": "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)",
+   "layer_name": "Liquefaction",
+   "copyright": "GWRC"
+  },
+  "gw_eq_slope_failure": {
+   "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/11",
+   "ok": true,
+   "features": 27,
+   "bytes": 345821,
+   "sha256": "474af819acff8585a1a360404f4eef18d0265b9309821137d09ff606854c373f",
+   "seconds": 4.79,
+   "fetched": "2026-11-07T08:33:42+00:00",
+   "licence": "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)",
+   "layer_name": "Slope failure",
+   "copyright": "GWRC"
+  },
+  "buildings_2021": {
+   "url": "https://services2.arcgis.com/quz2eeKTvR4p12uf/arcgis/rest/services/Building_Outlines_2021/FeatureServer/0",
+   "ok": true,
+   "features": 225,
+   "bytes": 143204,
+   "sha256": "f6256264a3dd0caa447f6a07fda16d395806d950c53616f7b998a03561ac91a7",
+   "seconds": 0.8,
+   "fetched": "2026-11-07T08:33:43+00:00",
+   "licence": "KCDC Building Outlines 2021, CC BY 4.0 (portal statement; see SOURCES.md)",
+   "layer_name": "Building Outlines 2021",
+   "copyright": ""
+  },
+  "dem_2025": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/BN33_10000_0401.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/BN33_10000_0402.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/BN33_10000_0501.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dem_1m/2193/BN33_10000_0502.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DEM (2024-2025)",
+   "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+   "shape": [
+    6076,
+    7002
+   ],
+   "valid_frac": 0.4593043951140453,
+   "sha256": "f1698f8730ed5c7cb5c22bd024badb0acadddfb8e31a20adf4a28c6f3d1c49e4",
+   "seconds": 26.5,
+   "fetched": "2026-11-07T08:34:10+00:00"
+  },
+  "dsm_2025": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/BN33_10000_0401.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/BN33_10000_0402.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/BN33_10000_0501.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2024-2025/dsm_1m/2193/BN33_10000_0502.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DSM (2024-2025)",
+   "licence": "CC-BY-4.0 [\"Toit\\u016b Te Whenua Land Information New Zealand\", \"Aerial Surveys\", \"K\\u0101piti Coast District Council\"]",
+   "shape": [
+    6076,
+    7002
+   ],
+   "valid_frac": 0.4593043951140453,
+   "sha256": "ded9b2ee0ae2c36a82b137d4969387a8097c009e6d86ffe218f59f406c29fc1a",
+   "seconds": 27.1,
+   "fetched": "2026-11-07T08:34:37+00:00"
+  },
+  "dem_2021": {
+   "ok": true,
+   "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/collection.json",
+   "items": [
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/BN33_10000_0401.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/BN33_10000_0402.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/BN33_10000_0501.tiff",
+    "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/kapiti-coast_2021/dem_1m/2193/BN33_10000_0502.tiff"
+   ],
+   "title": "Wellington - K\u0101piti Coast LiDAR 1m DEM (2021)",
+   "licence": "CC-BY-4.0 [\"AAM NZ\", \"K\\u0101piti Coast District Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+   "shape": [
+    6076,
+    7002
+   ],
+   "valid_frac": 0.4192631692365146,
+   "sha256": "9f397d99c0b2652573cadc5105f279776925784d4c7e22ae698e5adb3615e2eb",
+   "seconds": 26.0,
+   "fetched": "2026-11-07T08:35:03+00:00"
+  },
+  "titles": {
+   "url": "https://data.linz.govt.nz/layer/50804/",
+   "ok": true,
+   "features": 391,
+   "sha256": "f87dcb2b85896b48be2a4a1487857a485bf9aa92400554423ecc5c18a8713a2e",
+   "seconds": 1.8,
+   "fetched": "2026-11-07T08:35:05+00:00",
+   "licence": "LINZ CC BY 4.0"
+  },
+  "nonprimary_parcels": {
+   "url": "https://data.linz.govt.nz/layer/50782/",
+   "ok": true,
+   "features": 121,
+   "sha256": "b40734cfd3fcf3f37dd2aaf207ee8fd53f1ec8f1925aa8110140b103edd1070b",
+   "seconds": 0.9,
+   "fetched": "2026-11-07T08:35:06+00:00",
+   "licence": "LINZ CC BY 4.0"
+  },
+  "district_flow": {
+   "ok": true,
+   "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+   "sha256": "07b2b1fbfaca7cb37ce6b47622f55e552567854ba8d52ced5fdcc463dc5c6f76",
+   "fetched": "2026-11-07T07:45:06+00:00",
+   "licence": "LINZ CC BY 4.0 (national 1 m DEM; gaps from the contour-interpolated 8 m DEM)",
+   "res_m": 10.0,
+   "bbox": [
+    1745000,
+    5440000,
+    1835000,
+    5510000
+   ],
+   "inputs": [
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+     "title": "New Zealand LiDAR 1m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/BQ35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-07T07:43:12+00:00"
+    },
+    {
+     "collection": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/collection.json",
+     "title": "New Zealand Contour-Interpolated 8m DEM",
+     "items": [
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BN35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BP35.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ31.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ32.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ33.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ34.tiff",
+      "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand-contour/dem_8m/2193/BQ35.tiff"
+     ],
+     "licence": "CC-BY-4.0",
+     "fetched": "2026-11-07T07:44:32+00:00"
+    }
+   ]
+  }
+ },
+ "block": [
+  1785000,
+  5485000,
+  1790000,
+  5490000
+ ],
+ "block_id": "1785000_5485000_5000",
+ "fetch_bbox": [
+  1784599,
+  5484727,
+  1791001,
+  5490203
+ ],
+ "tile_nztm": {
+  "xmin": 1784599,
+  "ymin": 5484727,
+  "xmax": 1791001,
+  "ymax": 5490203
+ },
+ "fetched_at": "2026-11-07T08:32:20+00:00"
+}

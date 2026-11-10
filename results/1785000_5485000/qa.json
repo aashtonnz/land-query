@@ -1,0 +1,81 @@
+{
+ "kcdc_mirror_area_minus_linz_m2": {
+  "n": 179,
+  "units_without_linz_geometry": 0,
+  "clipped_at_district_boundary": 4,
+  "mirror_differs_gt_1": 39,
+  "max_abs": 4420135.72,
+  "worst": [
+   [
+    3782568,
+    -4420135.72
+   ],
+   [
+    3943438,
+    -595807.67
+   ],
+   [
+    7447774,
+    -261017.89
+   ],
+   [
+    3763424,
+    -251963.48
+   ],
+   [
+    8200012,
+    -234722.56
+   ]
+  ]
+ },
+ "ww_manhole_cover_minus_lidar_m": {
+  "n": 0
+ },
+ "sw_manhole_cover_minus_lidar_m": {
+  "n": 0
+ },
+ "building_ground_minus_lidar_m": {
+  "n": 225,
+  "median": -0.072,
+  "iqr": [
+   -0.132,
+   -0.02
+  ],
+  "p5_p95": [
+   -0.248,
+   0.111
+  ],
+  "share_abs_gt_0_5m": 0.018
+ },
+ "lidar_2025_minus_2021_flat_m": {
+  "n": 200000,
+  "median": 0.066,
+  "iqr": [
+   0.04,
+   0.097
+  ],
+  "p5_p95": [
+   -0.016,
+   0.199
+  ],
+  "share_abs_gt_0_5m": 0.013
+ },
+ "roof_dsm_minus_kcdc_bld_ave_m": {
+  "n": 199,
+  "median": -0.508,
+  "iqr": [
+   -0.901,
+   -0.187
+  ],
+  "p5_p95": [
+   -3.309,
+   0.104
+  ],
+  "share_abs_gt_0_5m": 0.543
+ },
+ "parcels": {
+  "n": 179,
+  "no_lidar": 27,
+  "coverage_lt_99pct": 0
+ }
+}
