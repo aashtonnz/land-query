@@ -22,6 +22,10 @@ on:
         description: "Only download the bulk layers and check them (a test of the download)"
         type: boolean
         default: false
+      merge_run:
+        description: "Instead of building: merge the shares an earlier run built (its run id; shares are kept 3 days)"
+        required: false
+        default: ""
       publish_run:
         description: "Instead of building: publish the index an earlier run built (its run id), once it has been reviewed"
         required: false
@@ -33,7 +37,7 @@ permissions:
 
 jobs:
   plan:
-    if: inputs.publish_run == ''
+    if: inputs.publish_run == '' && inputs.merge_run == ''
     runs-on: ubuntu-latest
     outputs:
       shares: ${{ steps.s.outputs.shares }}
@@ -43,7 +47,7 @@ jobs:
         run: python3 -c "import json, os; print('shares=' + json.dumps(list(range(int(os.environ['N'])))))" >> "$GITHUB_OUTPUT"
 
   bulk:
-    if: inputs.publish_run == '' && inputs.source == 'bulk'
+    if: inputs.publish_run == '' && inputs.merge_run == '' && inputs.source == 'bulk'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -94,6 +98,9 @@ jobs:
 
   merge:
     needs: share
+    # runs after the shares whether or not the bulk job before them was skipped (a skipped job upstream would skip this
+    # one too: run 42774512412 built every share and merged nothing), or alone on an earlier run's shares (merge_run)
+    if: always() && inputs.publish_run == '' && (needs.share.result == 'success' || inputs.merge_run != '')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +108,11 @@ jobs:
         with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
       - run: pip install -r pipeline/requirements.txt
       - uses: actions/download-artifact@v4
+        if: inputs.merge_run == ''
         with: { pattern: "share-*", path: shares }
+      - uses: actions/download-artifact@v4
+        if: inputs.merge_run != ''
+        with: { pattern: "share-*", path: shares, run-id: "${{ inputs.merge_run }}", github-token: "${{ github.token }}" }
       - name: Merge and check
         run: python3 pipeline/national_merge.py shares nz "${{ inputs.shares }}"
       - uses: actions/upload-artifact@v4
