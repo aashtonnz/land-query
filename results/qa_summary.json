@@ -1,0 +1,47 @@
+{
+ "blocks": 17,
+ "blocks_with_failed_sources": 0,
+ "linz_not_in_mirror": 10,
+ "outside_district_dropped": 2,
+ "blocks_outside_lidar": 0,
+ "parcels": 21954,
+ "duplicates_removed": 0,
+ "parcels_without_lidar": 0,
+ "parcels_partly_outside_window": 5,
+ "ww_manhole_cover_minus_lidar_m": {
+  "n": 0,
+  "blocks": 0,
+  "median_of_block_medians": null,
+  "worst_block_median": null
+ },
+ "sw_manhole_cover_minus_lidar_m": {
+  "n": 0,
+  "blocks": 0,
+  "median_of_block_medians": null,
+  "worst_block_median": null
+ },
+ "building_ground_minus_lidar_m": {
+  "n": 0,
+  "blocks": 0,
+  "median_of_block_medians": null,
+  "worst_block_median": null
+ },
+ "lidar_2025_minus_2021_flat_m": {
+  "n": 0,
+  "blocks": 0,
+  "median_of_block_medians": null,
+  "worst_block_median": null
+ },
+ "roof_dsm_minus_kcdc_bld_ave_m": {
+  "n": 0,
+  "blocks": 0,
+  "median_of_block_medians": null,
+  "worst_block_median": null
+ },
+ "kcdc_mirror_vs_linz": {
+  "n": 21948,
+  "units_without_linz_geometry": 6,
+  "clipped_at_district_boundary": 0,
+  "mirror_differs_gt_1": 3
+ }
+}

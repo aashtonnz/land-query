@@ -1,0 +1,4566 @@
+{
+ "parcels": {
+  "url": "https://data.linz.govt.nz/layer/50823/",
+  "licence": "LINZ NZ Primary Parcels, CC BY 4.0 (district membership from PCC's public mirror)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:45+00:00",
+  "fetched_last": "2026-11-08T20:08:42+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "155ffa2409970af745e408b8fe6acc7236d72e45c92cf00772f74d99db19af05",
+    "fetched": "2026-11-08T19:58:48+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "217658bae2d277a4767ad2fe42d9601094696ee3b66a099708669baf6f7e2c56",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 3
+   },
+   "1750000_5440000_5000": {
+    "sha256": "beea9d7540c45396fde5c3267e2a33c922cf6530e7059b03d94f5602b028507c",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 1337
+   },
+   "1750000_5445000_5000": {
+    "sha256": "469cf453e1c9375e6baa4114cb9acd8e07b359ad8be9e0eb126a6984e73956d5",
+    "fetched": "2026-11-08T19:59:00+00:00",
+    "features": 3215
+   },
+   "1750000_5450000_5000": {
+    "sha256": "cb7d190f7baa504e6fee3db78c70b5aa4299cc61e392368c4e5c20c19225f67a",
+    "fetched": "2026-11-08T19:58:45+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "776aad3bcc13a92404e78553352703b9d2faa84ca0f0987e71e3ef355a5629e6",
+    "fetched": "2026-11-08T19:58:58+00:00",
+    "features": 3860
+   },
+   "1755000_5445000_5000": {
+    "sha256": "f5f1f7c4b547221f5562b68fe0e5ec272db108f79e36241ebd9d6f70e52a2e6f",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 9913
+   },
+   "1755000_5450000_5000": {
+    "sha256": "d3344d69f1acfb8cc40571c52a57b1723cb3f5c7bf8f22233cd259c63136e31e",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 1319
+   },
+   "1755000_5455000_5000": {
+    "sha256": "75ee026f4d247363d680add3b795f9f79d0013481d70633592965071ce4e8613",
+    "fetched": "2026-11-08T20:02:12+00:00",
+    "features": 808
+   },
+   "1760000_5440000_5000": {
+    "sha256": "919de32d30812a4a99c9a415ddb013d099c45bd8850ff100c4b0e5386f3e2027",
+    "fetched": "2026-11-08T20:03:27+00:00",
+    "features": 60
+   },
+   "1760000_5445000_5000": {
+    "sha256": "e7b7e6f04953ed12bce601957c18418e9389b36db077dc188e569cee75e303b4",
+    "fetched": "2026-11-08T20:04:22+00:00",
+    "features": 1165
+   },
+   "1760000_5450000_5000": {
+    "sha256": "72ddb72224601f481324243926cc9a82054a4cdac888a9dfd5fed24ecf4ddb78",
+    "fetched": "2026-11-08T20:05:12+00:00",
+    "features": 155
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c5dd16e68fd9b0f7bb170440f22bcb0d44d71509127f7fb58a94607951a1b67b",
+    "fetched": "2026-11-08T20:06:30+00:00",
+    "features": 65
+   },
+   "1765000_5440000_5000": {
+    "sha256": "655f00b68cb196b934b4f5320c9946b6d853521bc1332a03feabc95e42c1c5a3",
+    "fetched": "2026-11-08T20:07:21+00:00",
+    "features": 6
+   },
+   "1765000_5445000_5000": {
+    "sha256": "c7af80303c4fd6234504093d5b0ef8bb5103d3f9a11dfd71ee02d1027886f3da",
+    "fetched": "2026-11-08T20:08:07+00:00",
+    "features": 37
+   },
+   "1765000_5450000_5000": {
+    "sha256": "39df27dc5ff282b208578ee88e67754cca44d6aa07c69b3f44f79f18c946cf26",
+    "fetched": "2026-11-08T20:08:31+00:00",
+    "features": 7
+   },
+   "1765000_5455000_5000": {
+    "sha256": "6bdfc9122f91b0385ff81e6ec246715a4133ffe908180d90d4cc742af64539f9",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 2
+   }
+  }
+ },
+ "district_outline": {
+  "url": [
+   "https://maps.poriruacity.govt.nz/server/rest/services/Property/PropertyAdminExternal/MapServer/4",
+   "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Ward/FeatureServer/3",
+   "https://mapping.gw.govt.nz/arcgis/rest/services/Region_basemap_P/MapServer/1"
+  ],
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md); Stats NZ district polygon, CC BY 4.0, via GWRC",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:45+00:00",
+  "fetched_last": "2026-11-08T20:08:42+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:48+00:00",
+    "features": 4
+   },
+   "1745000_5445000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 4
+   },
+   "1750000_5440000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 4
+   },
+   "1750000_5445000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:59:00+00:00",
+    "features": 4
+   },
+   "1750000_5450000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:45+00:00",
+    "features": 4
+   },
+   "1755000_5440000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:58+00:00",
+    "features": 4
+   },
+   "1755000_5445000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 4
+   },
+   "1755000_5450000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 4
+   },
+   "1755000_5455000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:02:12+00:00",
+    "features": 4
+   },
+   "1760000_5440000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:03:27+00:00",
+    "features": 4
+   },
+   "1760000_5445000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:04:22+00:00",
+    "features": 4
+   },
+   "1760000_5450000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:05:12+00:00",
+    "features": 4
+   },
+   "1760000_5455000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:06:30+00:00",
+    "features": 4
+   },
+   "1765000_5440000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:07:21+00:00",
+    "features": 4
+   },
+   "1765000_5445000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:08:07+00:00",
+    "features": 4
+   },
+   "1765000_5450000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:08:31+00:00",
+    "features": 4
+   },
+   "1765000_5455000_5000": {
+    "sha256": "a3515f072c7f4c1cdd1e28a66f04d7109a27789371a3274e2fc0b7709ef80fc2",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 4
+   }
+  }
+ },
+ "pcc_parcels": {
+  "url": "https://maps.poriruacity.govt.nz/server/rest/services/Property/Parcel/MapServer/2",
+  "licence": "LINZ NZ Primary Parcels, CC BY 4.0, via PCC public mirror",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:45+00:00",
+  "fetched_last": "2026-11-08T20:08:42+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "678faded5a81bb074047e1feb8187da5be152a3eb96aec814d19617177882212",
+    "fetched": "2026-11-08T19:58:48+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "13201ea983f4e9ccf225b86ab4c16173061ee8150b3a5cb6daf205e00f75e91d",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 3
+   },
+   "1750000_5440000_5000": {
+    "sha256": "8f963374ca315cff196e229e6c09085e881a87884581a01b930b35b6ab79d12d",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 1337
+   },
+   "1750000_5445000_5000": {
+    "sha256": "a7288704a78f4fec87ee1140e7b97b3921cb65b2855c65b25c7ea8b81d6eae0b",
+    "fetched": "2026-11-08T19:59:00+00:00",
+    "features": 3215
+   },
+   "1750000_5450000_5000": {
+    "sha256": "4124b76fe5af130adb7a1ba483c5189f04ad436110bf100ad1cc006ec165dd3a",
+    "fetched": "2026-11-08T19:58:45+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "4366562eee275586a88f95fc6dd938ec1dab6d18da1029a693d0f1d3f5dd89ae",
+    "fetched": "2026-11-08T19:58:58+00:00",
+    "features": 3860
+   },
+   "1755000_5445000_5000": {
+    "sha256": "89854d6f08f7f3f11aee593df7e84aaf1585f1c27d0f135e60f41ecb703aca1e",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 9913
+   },
+   "1755000_5450000_5000": {
+    "sha256": "d7f7a328261e1ed77636e72491a751e04c97e428e957188a654dbc0e410a0bf2",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 1319
+   },
+   "1755000_5455000_5000": {
+    "sha256": "3b60a1772ef1eaf793a88f06af90251f692922d02624bdc47f2ce349c4a5dd81",
+    "fetched": "2026-11-08T20:02:12+00:00",
+    "features": 808
+   },
+   "1760000_5440000_5000": {
+    "sha256": "1ed4f5d04d0b420b9964fc5fe6ab61fb2694b04c7a19dd2285b1703221a6b4c8",
+    "fetched": "2026-11-08T20:03:27+00:00",
+    "features": 61
+   },
+   "1760000_5445000_5000": {
+    "sha256": "5b729530700e5c9c9792faf70deba7843083632cd6492aad9aa8b6954f8f58b3",
+    "fetched": "2026-11-08T20:04:22+00:00",
+    "features": 1165
+   },
+   "1760000_5450000_5000": {
+    "sha256": "86e96742cde4ec1cfdf97418d6e94e8c06f69509654b120f87138522d574422f",
+    "fetched": "2026-11-08T20:05:12+00:00",
+    "features": 155
+   },
+   "1760000_5455000_5000": {
+    "sha256": "20f18b34fe39efe21c8c8145ce7548fa589f7f0838e8ea06253cbefab00999ce",
+    "fetched": "2026-11-08T20:06:30+00:00",
+    "features": 65
+   },
+   "1765000_5440000_5000": {
+    "sha256": "2f4e69cb2d1b22e104887aebd6c358f66698a0579f7ae6edc62e9b888da1eb05",
+    "fetched": "2026-11-08T20:07:21+00:00",
+    "features": 6
+   },
+   "1765000_5445000_5000": {
+    "sha256": "1aa8f8cdccade545dea6cd30d5c5e72ccf64baa8f27b8524d01d6b6ebe885317",
+    "fetched": "2026-11-08T20:08:07+00:00",
+    "features": 37
+   },
+   "1765000_5450000_5000": {
+    "sha256": "941ad91f9ae9ee35b0c5f184a6a802b62d25e2d94bfc62361b84e6664007784d",
+    "fetched": "2026-11-08T20:08:31+00:00",
+    "features": 8
+   },
+   "1765000_5455000_5000": {
+    "sha256": "3803bd0d5a439b74c48afedd22ca4fb3623146b0308436c12dad02cfee8bbede",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 2
+   }
+  }
+ },
+ "zones": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Zone_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:48+00:00",
+  "fetched_last": "2026-11-08T20:08:43+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "3b7f5ff08d9add96d8244b01dd396f481a9ca3db125798f24e1fbd1fbd789b6f",
+    "fetched": "2026-11-08T19:58:49+00:00",
+    "features": 2
+   },
+   "1745000_5445000_5000": {
+    "sha256": "5205fcf774167f7c3b3419d4b6bec02a3c4d24d518c704f88f37af754a16c260",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "15b4ba7b617f5cf45eecfd08955d065245ed6dd4e61b4c77b1e198766919766a",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 50
+   },
+   "1750000_5445000_5000": {
+    "sha256": "5b3bc4ac58ecbadca599d9d3e74d318b13ee30a694c98450ab7bbe36b4d72850",
+    "fetched": "2026-11-08T19:59:01+00:00",
+    "features": 65
+   },
+   "1750000_5450000_5000": {
+    "sha256": "4530d02373da5800bf9950d3634ac7bd5216605570d9471770af5346f921db4b",
+    "fetched": "2026-11-08T19:58:48+00:00",
+    "features": 3
+   },
+   "1755000_5440000_5000": {
+    "sha256": "2073a93526d196f814a6029713464667bd8d97b0e8d36c917bae27fcf5d4b79e",
+    "fetched": "2026-11-08T19:58:59+00:00",
+    "features": 58
+   },
+   "1755000_5445000_5000": {
+    "sha256": "486d9c427f1e4cd71b77cdbb1017fa655efb913062d9ca3abd4ccacba6a3b8c3",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 141
+   },
+   "1755000_5450000_5000": {
+    "sha256": "76ac1406b2705c3203656f6b20b2025fed7fb7986546549ab415876d13e12ff0",
+    "fetched": "2026-11-08T19:58:53+00:00",
+    "features": 67
+   },
+   "1755000_5455000_5000": {
+    "sha256": "28fe0413acde81d9e0dd568640d9b34ee5b747ce47b26bd59c8e5168ea1426a4",
+    "fetched": "2026-11-08T20:02:13+00:00",
+    "features": 24
+   },
+   "1760000_5440000_5000": {
+    "sha256": "76505c5d2bef2a5d9d076592536a3e108dc3b7814abe5e352c8a403faa71a4c1",
+    "fetched": "2026-11-08T20:03:27+00:00",
+    "features": 7
+   },
+   "1760000_5445000_5000": {
+    "sha256": "82e10eae1ccfe527829683ee85eeaf898864faa66d0698c0198de5cca98f722a",
+    "fetched": "2026-11-08T20:04:23+00:00",
+    "features": 28
+   },
+   "1760000_5450000_5000": {
+    "sha256": "c94a5b1377086e04ed157100dd56dd39d7d301ba3c47bd4ab093d173ba268a9a",
+    "fetched": "2026-11-08T20:05:13+00:00",
+    "features": 9
+   },
+   "1760000_5455000_5000": {
+    "sha256": "0789749deb277320832b3bd96dc8cf7b626b04416115b9df0e1f1ebbc91f3f44",
+    "fetched": "2026-11-08T20:06:31+00:00",
+    "features": 8
+   },
+   "1765000_5440000_5000": {
+    "sha256": "a28224a10b34bcc52af513cb30977555bf4a7053f9aeb0d4a54d7792c86bdfdf",
+    "fetched": "2026-11-08T20:07:22+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "a28224a10b34bcc52af513cb30977555bf4a7053f9aeb0d4a54d7792c86bdfdf",
+    "fetched": "2026-11-08T20:08:07+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "a28224a10b34bcc52af513cb30977555bf4a7053f9aeb0d4a54d7792c86bdfdf",
+    "fetched": "2026-11-08T20:08:33+00:00",
+    "features": 1
+   },
+   "1765000_5455000_5000": {
+    "sha256": "a28224a10b34bcc52af513cb30977555bf4a7053f9aeb0d4a54d7792c86bdfdf",
+    "fetched": "2026-11-08T20:08:43+00:00",
+    "features": 1
+   }
+  }
+ },
+ "pdp_flood_overland_flow": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Flood_Hazard_Overland_Flow_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:49+00:00",
+  "fetched_last": "2026-11-08T20:08:43+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:49+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:59:03+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:58:50+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:59:01+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:59:11+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T20:02:15+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:28+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T20:04:25+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T20:05:14+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "720a5e2e2cec6c92e721223fb873e399175ffbeac8320ddae0ab059625ba5ca4",
+    "fetched": "2026-11-08T20:06:33+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:22+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:08+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:33+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:43+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_flood_stream_corridor": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Flood_Hazard_Stream_Corridor_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:50+00:00",
+  "fetched_last": "2026-11-08T20:08:43+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:50+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:59:01+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T19:59:00+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:02:19+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:03:32+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:04:29+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:05:18+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:06:37+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:07:27+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:08:12+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "c48ecb85b817e5be9f603de211c9c57db6a1d11c671f3013fd49fa95212a7c22",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 1
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:43+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_flood_inundation": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Flood_Hazard_Inundation_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:50+00:00",
+  "fetched_last": "2026-11-08T20:08:44+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:50+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:11+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:03+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:02:30+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:03:43+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:04:39+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:05:28+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:06:48+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:07:37+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "cc1c65b628e04e4b35ceab5090812a813efcb5d25c1ca60ab96e8de3053c7870",
+    "fetched": "2026-11-08T20:08:23+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:44+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_erosion_current": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Coastal_Erosion_Hazard_Current_Erosion_Risk_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:51+00:00",
+  "fetched_last": "2026-11-08T20:08:44+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:11+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "225c679b7177ca2090e3614d75641f954eae6b782bb6164b23ffae407530f8da",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:04+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "a87f0c57ee5263feda454edc5c2345fc7666d07d2519c629d237dc4f5edd6801",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 6
+   },
+   "1755000_5450000_5000": {
+    "sha256": "9c7e53facf65dcda8c780138d93eb2455b95ab5f77194e662a13dd9b0dddb10a",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 5
+   },
+   "1755000_5455000_5000": {
+    "sha256": "70c0a3818c472240f916d03c4afb0754b882214a686d8d2d3e4fde2283d12ab5",
+    "fetched": "2026-11-08T20:02:30+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:43+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:39+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:29+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "70c0a3818c472240f916d03c4afb0754b882214a686d8d2d3e4fde2283d12ab5",
+    "fetched": "2026-11-08T20:06:48+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:37+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:23+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:44+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_erosion_1m_slr": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Coastal_Erosion_Hazard_Future_Erosion_with_1m_SLR_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:51+00:00",
+  "fetched_last": "2026-11-08T20:08:44+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:51+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:11+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "8f0681b0d51fab851558c722675b0daab88d4b56229d952802c5ff20d4d1cbe1",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:04+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "71100c313e4bdb1db1128bce77479c425d2a00fb3240ad559c804f28a76441f4",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 6
+   },
+   "1755000_5450000_5000": {
+    "sha256": "826e5deb2e0d83664579f8d93a227e6bfc29944bc8e8f710c2485f26c50e79ed",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 3
+   },
+   "1755000_5455000_5000": {
+    "sha256": "72585263615b8bbcbb6adb118146948beab4b2f495cb003869883924fa54e8cf",
+    "fetched": "2026-11-08T20:02:31+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:44+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:40+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:29+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "72585263615b8bbcbb6adb118146948beab4b2f495cb003869883924fa54e8cf",
+    "fetched": "2026-11-08T20:06:49+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:38+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:24+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:44+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_inundation_current": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Coastal_Flood_Hazard_Current_Inundation_Risk_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:52+00:00",
+  "fetched_last": "2026-11-08T20:08:45+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:53+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "0afc3dc7f6ba4614429821324715a3817610033a83bed010ae742cd1895c8c09",
+    "fetched": "2026-11-08T19:59:12+00:00",
+    "features": 11
+   },
+   "1750000_5445000_5000": {
+    "sha256": "8f59abd77bca90c66e4caa3faad0e5a0884627721a20e96ee1a9fd5cd7944993",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 28
+   },
+   "1750000_5450000_5000": {
+    "sha256": "66a5bcb1372d8b5e2b9d8a953ce1cbef357092c139ec6c70f63efc55bdcbf1fc",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "85b27655104500f6a51929f6648ee7eccc387e4eed687d0c23bde6bbcc248a21",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 4
+   },
+   "1755000_5445000_5000": {
+    "sha256": "1bbfd50172170e2ca0c7ba09682e12b58933e4aeede8e72a8ae63d1a0545449d",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 52
+   },
+   "1755000_5450000_5000": {
+    "sha256": "499e16aa1459b6b32d657e9afed84cf151a55377f56409f49d219d38f17458bd",
+    "fetched": "2026-11-08T19:59:12+00:00",
+    "features": 20
+   },
+   "1755000_5455000_5000": {
+    "sha256": "0c50dc160ee73a5263a3b1ffb3f7bfec1dac8fb501bc3bb9beb7447338740ba8",
+    "fetched": "2026-11-08T20:02:31+00:00",
+    "features": 4
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:45+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "2261f36e1fb06b095f8b772e1cffae5ce99f4a41e01a552006172fe76ad0d5e6",
+    "fetched": "2026-11-08T20:04:41+00:00",
+    "features": 26
+   },
+   "1760000_5450000_5000": {
+    "sha256": "a8bcb75f183cfa08792beb62330cc993530f1d0ca8cc2ed1e728ec3902007311",
+    "fetched": "2026-11-08T20:05:29+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "db117202cb6a4c9f1a7f6cf388bcf260c3a43aa17c72607aa23a3b79e3458fcf",
+    "fetched": "2026-11-08T20:06:49+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:38+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:24+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:45+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_inundation_1m_slr": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Coastal_Flood_Hazard_1in100yr_Storm_Surge_with_1m_SLR_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:52+00:00",
+  "fetched_last": "2026-11-08T20:08:45+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:52+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:53+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "acc3935cfb8f80dfc8b45160a1261fcf723c67c240ab9d5ac0d29feddc4527d7",
+    "fetched": "2026-11-08T19:59:13+00:00",
+    "features": 37
+   },
+   "1750000_5445000_5000": {
+    "sha256": "259ff2b11f8759f11c2fd49e985b5347173100a6f54395417571286c47c37da5",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 49
+   },
+   "1750000_5450000_5000": {
+    "sha256": "572e72be39da38d10c1e13807564d90804542520b5afbc650a2b325d72192585",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 3
+   },
+   "1755000_5440000_5000": {
+    "sha256": "af3dbc03eb67c9641580495e7c41370f0ecb0d2b0eb28fefc7c23f445b8db6d4",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 6
+   },
+   "1755000_5445000_5000": {
+    "sha256": "154733553196fc5a4f842de95ffb7c6f60b8d639a2b1b374c11d5de2152479a7",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 64
+   },
+   "1755000_5450000_5000": {
+    "sha256": "537afe5dab6f109f3d9c5f75d68f42feb76af595103a8f33b7f42dc7d4fb74de",
+    "fetched": "2026-11-08T19:59:13+00:00",
+    "features": 26
+   },
+   "1755000_5455000_5000": {
+    "sha256": "19fea28c3e23f5e24a955c97366393ac346adc7bfa1f080fe34fd1d074171806",
+    "fetched": "2026-11-08T20:02:32+00:00",
+    "features": 3
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:45+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "86d737b26b13ec05ab2fcf7875a61f3191bb7b90c81b8baebe8eb8674bdd14f4",
+    "fetched": "2026-11-08T20:04:42+00:00",
+    "features": 8
+   },
+   "1760000_5450000_5000": {
+    "sha256": "9eabc059366a1fdeac0fe818a7b1d66de9f2add834e7805966e6e58a0c27f4c0",
+    "fetched": "2026-11-08T20:05:30+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "10e971b98d86aa89d0e2a1e43b97866aac767dcc4d9d15163320e33ea43a4b94",
+    "fetched": "2026-11-08T20:06:49+00:00",
+    "features": 2
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:39+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:25+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:45+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_tsunami_100yr": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Tsunami_Hazard_1in100yr_Inundation_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:53+00:00",
+  "fetched_last": "2026-11-08T20:08:45+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "0889b9cb48eb0187358ebe75fd9bb8e7ff5b8341bb7e650eb0b2e70df02b9cfa",
+    "fetched": "2026-11-08T19:58:53+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "cd922fa1cc97345b53d291ec9f6f43193e58e309c5494209cf140fbc193aeeda",
+    "fetched": "2026-11-08T19:58:53+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "b98bdd8e8cc65f387c6ccf8f51859ea3bdb9e72ed9844262c807348a3855cadf",
+    "fetched": "2026-11-08T19:59:13+00:00",
+    "features": 2
+   },
+   "1750000_5445000_5000": {
+    "sha256": "423d7fdb21be3c04edd9a17eae2d979245af65e3fe65f10fcf0f5df46303e776",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 11
+   },
+   "1750000_5450000_5000": {
+    "sha256": "cd922fa1cc97345b53d291ec9f6f43193e58e309c5494209cf140fbc193aeeda",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "b98bdd8e8cc65f387c6ccf8f51859ea3bdb9e72ed9844262c807348a3855cadf",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 2
+   },
+   "1755000_5445000_5000": {
+    "sha256": "7fe031c41da794d825723937c1b68cb043c94cdefcbef6704a44238c1d9ed45d",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 22
+   },
+   "1755000_5450000_5000": {
+    "sha256": "57f0378d16ff409b431bfe475074a583c9767ed8e5cd9a620f94d38724cccc6c",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 3
+   },
+   "1755000_5455000_5000": {
+    "sha256": "f0065ab80a83c2f722fd7997b2585292be428a5d307ffe7db47130a925f3eb16",
+    "fetched": "2026-11-08T20:02:33+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:45+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "eaf548a9a20703ac6168860d40644c554605c71c01bb380e0bf8c3af526df576",
+    "fetched": "2026-11-08T20:04:43+00:00",
+    "features": 4
+   },
+   "1760000_5450000_5000": {
+    "sha256": "0889b9cb48eb0187358ebe75fd9bb8e7ff5b8341bb7e650eb0b2e70df02b9cfa",
+    "fetched": "2026-11-08T20:05:30+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c2993141d3e4382f3dcd145b75ececfbaf25a5837d8de99251bacb1f1599f8e5",
+    "fetched": "2026-11-08T20:06:50+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:40+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:25+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:45+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_tsunami_500yr": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Tsunami_Hazard_1in500yr_Inundation_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:54+00:00",
+  "fetched_last": "2026-11-08T20:08:46+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "ee4a21d5ddac3c29c045f7ce46454af867b27b269bc1189a689abccef65a8973",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "e24fa35e752c65e9fe16522dd05e0b26eeeffb599f21a68e53d5ec3dba7e7922",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 6
+   },
+   "1750000_5450000_5000": {
+    "sha256": "ee4a21d5ddac3c29c045f7ce46454af867b27b269bc1189a689abccef65a8973",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "7b86e23bc8c8f20be5e45873ca1b93c25ffb354b5c400abad214b2caf6ed3ff5",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 7
+   },
+   "1755000_5450000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "c39b7225c3f4880cc43097c3472072f08f57e8acea52e8f8d30fdf28c51941f3",
+    "fetched": "2026-11-08T20:02:33+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:46+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T20:04:43+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "ae1455ed16c870a6e55e81d74ad81c4ca7fc2da69194329253b2a529e4edf9d1",
+    "fetched": "2026-11-08T20:05:31+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "e89e0f4fefe5b0caed2b8fb0547a0acce1f955e5228a16a3940ff0bc6f981ab7",
+    "fetched": "2026-11-08T20:06:50+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:41+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:25+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:46+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_tsunami_1000yr": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Tsunami_Hazard_1in1000yr_Inundation_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:54+00:00",
+  "fetched_last": "2026-11-08T20:08:46+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "8f142b2da524ca231331c506edfd4436efed5b91c4393702fb2425c53886ff44",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "8f142b2da524ca231331c506edfd4436efed5b91c4393702fb2425c53886ff44",
+    "fetched": "2026-11-08T19:59:22+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "8f142b2da524ca231331c506edfd4436efed5b91c4393702fb2425c53886ff44",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "ddc92de9e2d6a092a33d1aefb1cecb95bbc3f5af5576c079abe4eda7d4f4d9f4",
+    "fetched": "2026-11-08T20:02:33+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:46+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T20:04:44+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "3f8c34a4819216423ebdbf789a6520b021026738034bb362dea87a663550ff5d",
+    "fetched": "2026-11-08T20:05:31+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "ddc92de9e2d6a092a33d1aefb1cecb95bbc3f5af5576c079abe4eda7d4f4d9f4",
+    "fetched": "2026-11-08T20:06:51+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:42+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:26+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:46+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_fault_rupture": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Fault_Rupture_Zone_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:54+00:00",
+  "fetched_last": "2026-11-08T20:08:46+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:54+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "4847cde05804112af5a01edf07df7783edf42bf33c19cc1c74bccfbe702f94b9",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 2
+   },
+   "1750000_5445000_5000": {
+    "sha256": "bb5b09524a186a14288c0825594acff5a3b0608a81e41015fa8b316c34dd8d2d",
+    "fetched": "2026-11-08T19:59:22+00:00",
+    "features": 3
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "5ea271fad8f7dc667d0d0ff248758348a532dcda56b3d28ccbb37ac48024524b",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 5
+   },
+   "1755000_5445000_5000": {
+    "sha256": "e184bda374ace646ec6fcbbe96c34a84e65acb8b92249f79ac8dc1ed6fa7eb95",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 5
+   },
+   "1755000_5450000_5000": {
+    "sha256": "653bb13a2beb47235bc77427e39ffd8d349a3227ae3521fdd5aa7f4674b333f3",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 7
+   },
+   "1755000_5455000_5000": {
+    "sha256": "88e87b25acdc97afba40d64e0ee5cf317180a9fe06286b6f91017fda2f8bcf1c",
+    "fetched": "2026-11-08T20:02:33+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "a1b71768e1bd50586ab95c865541ee49cdcf4dca69a95101d3d32ed3bc4ae2bb",
+    "fetched": "2026-11-08T20:03:46+00:00",
+    "features": 2
+   },
+   "1760000_5445000_5000": {
+    "sha256": "3693efb29198cea890d362e1809afa5c2ccaea40210ca768a93380650ae797d7",
+    "fetched": "2026-11-08T20:04:44+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7f5c072faffe4af8e1d45f40c9136c4160f88fb713078ba70f74a8492b89d48e",
+    "fetched": "2026-11-08T20:05:31+00:00",
+    "features": 5
+   },
+   "1760000_5455000_5000": {
+    "sha256": "0acccf816025adcb7196d4dd690b94d316ee0c433a92686c401f76a6792386cc",
+    "fetched": "2026-11-08T20:06:51+00:00",
+    "features": 8
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:43+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "3693efb29198cea890d362e1809afa5c2ccaea40210ca768a93380650ae797d7",
+    "fetched": "2026-11-08T20:08:26+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:46+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_heritage_items": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Heritage_Item_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:55+00:00",
+  "fetched_last": "2026-11-08T20:08:47+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "46edfbe5057b2137ede0cd9470cc889284eab1f60189c2d13ddca2b92dd11eef",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "dcc41cfaacc9d5999fdd09fd4717f3449a2adf02e7aed891b1a97b48f490fd99",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 9
+   },
+   "1750000_5445000_5000": {
+    "sha256": "ff09ed8f52cb04c38b68517b4b7d75af86d3b291acac91eb23eba93228fa9d91",
+    "fetched": "2026-11-08T19:59:23+00:00",
+    "features": 14
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7f8b6da8d165cb7e77f58c64637a1c3b314775a42d4f6025095e5fe078fccba4",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 4
+   },
+   "1755000_5445000_5000": {
+    "sha256": "5b28b3b264f43a29da5a9f3807ce9dc27a09270403ad9f4a23364d96edf8c480",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 16
+   },
+   "1755000_5450000_5000": {
+    "sha256": "043dd05e1f331c1898cf86a0915fd6ef79175a4b2fe1e60c9d88689a80834998",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 13
+   },
+   "1755000_5455000_5000": {
+    "sha256": "b5908de4314efbe1881f95ca93abfcf17b7b7f7ba03d77d3080bae1a9ab86d49",
+    "fetched": "2026-11-08T20:02:34+00:00",
+    "features": 5
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:47+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "f3da713c5aa92ce8e98747eee696a2fa4fe6b49082ac18ce6b3b4d283f23d4db",
+    "fetched": "2026-11-08T20:04:44+00:00",
+    "features": 9
+   },
+   "1760000_5450000_5000": {
+    "sha256": "c13ff3a0fb79515eb3f8a8de839f992073c778a1c7d576083a7ff8704e536bff",
+    "fetched": "2026-11-08T20:05:32+00:00",
+    "features": 2
+   },
+   "1760000_5455000_5000": {
+    "sha256": "b46417a47f7b1f9974e270286efc88f0ecea4702fb33dc41714147836c7b9dd6",
+    "fetched": "2026-11-08T20:06:51+00:00",
+    "features": 3
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:44+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:27+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:47+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_heritage_sites": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Historic_Heritage_Site_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:55+00:00",
+  "fetched_last": "2026-11-08T20:08:47+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:56+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "5d445242c79ba90f90b4aad8e3f355889ff4ebaa8340a79e8a6a2dda8da9fdf5",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "5d445242c79ba90f90b4aad8e3f355889ff4ebaa8340a79e8a6a2dda8da9fdf5",
+    "fetched": "2026-11-08T19:59:23+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "5d445242c79ba90f90b4aad8e3f355889ff4ebaa8340a79e8a6a2dda8da9fdf5",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "8eb97467aee7c6d4c4b23104cca071be34dcdb2a167fc1e835cff28619d6d924",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 3
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 0
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:34+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "fea771d4b347a601e03d89ab6fb25e7b834ac7fcc8139118593291a5f58c093d",
+    "fetched": "2026-11-08T20:03:47+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "a8e0ac1e05b7ce2431c1090bfe9d64ca3d7c7daea3d27d98a17b6244d94510e0",
+    "fetched": "2026-11-08T20:04:45+00:00",
+    "features": 3
+   },
+   "1760000_5450000_5000": {
+    "sha256": "a1a1d3706c284d0756b7295dd879771fcd9fc88a707f8ca6caabbc002cc84048",
+    "fetched": "2026-11-08T20:05:32+00:00",
+    "features": 2
+   },
+   "1760000_5455000_5000": {
+    "sha256": "a1a1d3706c284d0756b7295dd879771fcd9fc88a707f8ca6caabbc002cc84048",
+    "fetched": "2026-11-08T20:06:52+00:00",
+    "features": 2
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:45+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:27+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:47+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_notable_trees": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Notable_Tree_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:55+00:00",
+  "fetched_last": "2026-11-08T20:08:47+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:56+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:55+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "45de810c805ccfbcfd7a47eb416a1a182ede2e85b85f76700fec194c0306d9ac",
+    "fetched": "2026-11-08T19:59:15+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "983564218c50b37780087263cb3e254961727a49c729e6f4c74d072cdbe9a6a3",
+    "fetched": "2026-11-08T19:59:23+00:00",
+    "features": 8
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "03f07c867ca14b92f271d5dd0b80a463a3f0fe78a039326e53ba384f38696cd5",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 3
+   },
+   "1755000_5445000_5000": {
+    "sha256": "e02ee78206c2bcb934257da9e9739f67a6027bd6fc5397f09afad1df5eb11738",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 13
+   },
+   "1755000_5450000_5000": {
+    "sha256": "5234b4e0dff3b8de12fef67f7b2feed1e954db47aa3a10d3e16e9fd660aa17f9",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:34+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:47+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "77082b801c6938f1b3296ba3b1775c430520f3a54b8accb2735502444859706c",
+    "fetched": "2026-11-08T20:04:45+00:00",
+    "features": 7
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:32+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:06:52+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:46+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:27+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:47+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_significant_natural_areas": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Significant_Natural_Areas_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:56+00:00",
+  "fetched_last": "2026-11-08T20:08:48+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "e5ea0b021c1ab748222a8e025e24535a35c0d48d36c7fa125e098fed18b2aabe",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "ae33a235470f8986fdc8d20f9afa01412d2395767d2bccd01f46e392b574ce54",
+    "fetched": "2026-11-08T19:58:56+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "6e5b16bd1e3326b6847a61d92ce4e00556442f2f8644d18d91ea02123730d13a",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 12
+   },
+   "1750000_5445000_5000": {
+    "sha256": "de3f38bf6738854d72615e626533341d37b3f1cbd52586abb73c579a3b560cae",
+    "fetched": "2026-11-08T19:59:24+00:00",
+    "features": 25
+   },
+   "1750000_5450000_5000": {
+    "sha256": "0b5a967ba2c3339937d7d6e6d98cada99c7ce84df8e3f68abb8762b792b73ead",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 3
+   },
+   "1755000_5440000_5000": {
+    "sha256": "4dc980d62bbe63c3d030dbd3d69563dae066a524866e5fe4c06128e8e61dfb1e",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 18
+   },
+   "1755000_5445000_5000": {
+    "sha256": "ed51782c80eed71fce6e6dc0a9f68b6d3bc8618d47987a63f54eedd6ed5176bd",
+    "fetched": "2026-11-08T19:59:32+00:00",
+    "features": 66
+   },
+   "1755000_5450000_5000": {
+    "sha256": "22a36dadab8d78ffe3e4b12b0df803d013ba9aceb460d3c29725e9ccfbea2716",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 62
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7c034e47ede7acd6738b1520e25d26ff53ce7ed78d6be01d1910ae7f48e369c3",
+    "fetched": "2026-11-08T20:02:35+00:00",
+    "features": 30
+   },
+   "1760000_5440000_5000": {
+    "sha256": "87165acb70861f31b5155e1b1decc3463385f1660c605cd6978d2ba3df62e1ca",
+    "fetched": "2026-11-08T20:03:48+00:00",
+    "features": 10
+   },
+   "1760000_5445000_5000": {
+    "sha256": "aa67913fa44726b7dda5778b7543bdf1e377ab95d9a9a792796321e476204605",
+    "fetched": "2026-11-08T20:04:46+00:00",
+    "features": 44
+   },
+   "1760000_5450000_5000": {
+    "sha256": "23590d43ae7ca2ddab554888cad2b182d63687ec9e6a07cfdde7b1631d44cdce",
+    "fetched": "2026-11-08T20:05:32+00:00",
+    "features": 43
+   },
+   "1760000_5455000_5000": {
+    "sha256": "e373ce5eb49c8e26ba75120ad8dc4f529c5c34b445e89c6539821397f8d53043",
+    "fetched": "2026-11-08T20:06:53+00:00",
+    "features": 28
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7f6d25b058435f846ab46c153d86e537636dc04110de1d42c4885b811fe63786",
+    "fetched": "2026-11-08T20:07:47+00:00",
+    "features": 5
+   },
+   "1765000_5445000_5000": {
+    "sha256": "95180beaffc35733ffe3c7b149cfd8601cd2dd1b32b400cb3b46c9dae1acc47d",
+    "fetched": "2026-11-08T20:08:28+00:00",
+    "features": 14
+   },
+   "1765000_5450000_5000": {
+    "sha256": "4a2777aa744c9c069a2dddfd00a71ac0222e092fcab02bfe1ec1e2e73e238425",
+    "fetched": "2026-11-08T20:08:41+00:00",
+    "features": 5
+   },
+   "1765000_5455000_5000": {
+    "sha256": "0e9d5b598ab84b797ef689c219711d77ef61d065aa84d81d428307571322d42d",
+    "fetched": "2026-11-08T20:08:48+00:00",
+    "features": 4
+   }
+  }
+ },
+ "pdp_noise_rail": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Rail_Noise_Corridor_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:56+00:00",
+  "fetched_last": "2026-11-08T20:08:48+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:56+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T19:59:16+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T19:59:32+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T20:02:35+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:48+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:46+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T20:05:33+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "e3a902a4374e284d29fa22fdd499956d3e90c1c549f9a53878297cc4f97216bb",
+    "fetched": "2026-11-08T20:06:53+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:47+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:28+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:48+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_noise_state_highway": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/State_Highway_Noise_Control_Boundary_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:57+00:00",
+  "fetched_last": "2026-11-08T20:08:49+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T19:59:33+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:02:36+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:03:48+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:04:47+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:05:33+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:06:54+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:07:48+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "0c3ccd6a2edd6b131fabe3100f83fdb7ff9f5107bf4a071d786cb95ec478cf4a",
+    "fetched": "2026-11-08T20:08:29+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:49+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_environment": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Landward_Extent_Coastal_Environment_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:57+00:00",
+  "fetched_last": "2026-11-08T20:08:49+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "d5af15484c3d82c2eebb720ad2a5e2ee036ece9633ead86bc0116bedb85a7915",
+    "fetched": "2026-11-08T19:58:59+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "d5af15484c3d82c2eebb720ad2a5e2ee036ece9633ead86bc0116bedb85a7915",
+    "fetched": "2026-11-08T19:58:57+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "73e593ef4e6816785dfebce0b1d547215f36cdba162143d577c33814179a5fc0",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 2
+   },
+   "1750000_5445000_5000": {
+    "sha256": "73e593ef4e6816785dfebce0b1d547215f36cdba162143d577c33814179a5fc0",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "fec44bdf5d6bd1d010bf847843666b969a26ffeab563c23a8851457a123dc7cf",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "013ec145cf9a3a953df880bc0eae7e8e0791c17e3f6c5cec3f649da0e5dd3fb4",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "10eccfb256d4e4772e118804a0d0f942a02955e075fdd3dfd8cd2319bce22cda",
+    "fetched": "2026-11-08T19:59:35+00:00",
+    "features": 4
+   },
+   "1755000_5450000_5000": {
+    "sha256": "5cd191b0b46e7e15898611115458b129da0ed64890ecc9c9ce0a4a9efa22a57d",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 4
+   },
+   "1755000_5455000_5000": {
+    "sha256": "dcb7dcb1fe98b707fc8f92e5c3e937b3b1d8bc3eed37b957f32f0b2de453d120",
+    "fetched": "2026-11-08T20:02:37+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:49+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "59e4394a0c3275774fa8a3c1b1252751bc4df7c8cafa85eb9c4d16f02cb1f876",
+    "fetched": "2026-11-08T20:04:48+00:00",
+    "features": 2
+   },
+   "1760000_5450000_5000": {
+    "sha256": "25f38f38a08f02ee91ca693babe817420294aca8cc32cfc98076265e9c9722ba",
+    "fetched": "2026-11-08T20:05:33+00:00",
+    "features": 2
+   },
+   "1760000_5455000_5000": {
+    "sha256": "24bffb3fe978308bc617399e038a6a846c4d03c3cd9ec5d16a557ad206ba4124",
+    "fetched": "2026-11-08T20:06:54+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:48+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:29+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:49+00:00",
+    "features": 0
+   }
+  }
+ },
+ "plan_1999_plimmerton_farm": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Porirua_City_District_Plan_1999_Plimmerton_Farm_Zone/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:58:58+00:00",
+  "fetched_last": "2026-11-08T20:08:49+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:59+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:58:58+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 0
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "b1ed379de96205613e734de8a9699cae320b7618d8be0ebd37abf1861fdf1eaa",
+    "fetched": "2026-11-08T19:59:35+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "b1ed379de96205613e734de8a9699cae320b7618d8be0ebd37abf1861fdf1eaa",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:37+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:49+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:49+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "b1ed379de96205613e734de8a9699cae320b7618d8be0ebd37abf1861fdf1eaa",
+    "fetched": "2026-11-08T20:05:34+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:06:55+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:48+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:30+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:42+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:49+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pcc_flood_unmapped": {
+  "url": "https://maps.poriruacity.govt.nz/server/rest/services/Hazards/Flood_Hazards/MapServer/3",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:01+00:00",
+  "fetched_last": "2026-11-08T20:08:52+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:02+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:01+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 0
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:14+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:23+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "addaec65e4c6af3447a80958e2c5647e6e5b20479f842b2cc370d9732a0aeb54",
+    "fetched": "2026-11-08T19:59:39+00:00",
+    "features": 8
+   },
+   "1755000_5450000_5000": {
+    "sha256": "a4e6a4cbd9e66ddd108de1408deb4fa0f6c9380ca6696fcc6d17040a87c02386",
+    "fetched": "2026-11-08T19:59:23+00:00",
+    "features": 17
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:40+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:53+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "166d38c9251a42fa02c2c01dc15f2092bf00f8865ed7d8611164859dfa582a8a",
+    "fetched": "2026-11-08T20:04:52+00:00",
+    "features": 15
+   },
+   "1760000_5450000_5000": {
+    "sha256": "e54e5bb1f551f55cc9b3efc6b238b3b0f2554dc34fbb77869a233547ddf0c41d",
+    "fetched": "2026-11-08T20:05:38+00:00",
+    "features": 129
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c0b71c9ee84539804b8c2ad2efd8d062a16991e2ab41022f1dd991dfc9693bdb",
+    "fetched": "2026-11-08T20:06:58+00:00",
+    "features": 87
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:51+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:32+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "663a321bc9959067e4d3ba7ec751185682e911594f47d9d5bba23d820d4f4a64",
+    "fetched": "2026-11-08T20:08:46+00:00",
+    "features": 26
+   },
+   "1765000_5455000_5000": {
+    "sha256": "d55b9176828c157846bb25f787410a428288eccf6d7d0fbf651109294c6be59c",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 12
+   }
+  }
+ },
+ "pcc_flood_model_catchments": {
+  "url": "https://maps.poriruacity.govt.nz/server/rest/services/Hazards/Flood_Hazards/MapServer/90",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:05+00:00",
+  "fetched_last": "2026-11-08T20:08:55+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "5fa3bd6ce76e1fa5a3b1ff70b05ef63b013007a74a316d8497739e7ec2085ae9",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 3
+   },
+   "1750000_5445000_5000": {
+    "sha256": "d68b9a13cfb2abac30c0a8be47d191165c7dcc201236a51df1eb4ac43653e410",
+    "fetched": "2026-11-08T19:59:33+00:00",
+    "features": 4
+   },
+   "1750000_5450000_5000": {
+    "sha256": "c14508701bd3cc92f6e9726244c9f09e3db330b21a9d55590c9dc1decfff2dab",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "07cab28a5ef0c6aea4264da14bdd5e70e6c9606b58263302fc7b05af4fda2772",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 4
+   },
+   "1755000_5445000_5000": {
+    "sha256": "9b4994007198b5803517baf6e0611f4259872debfb7fb3ff517eca4bcac886a9",
+    "fetched": "2026-11-08T19:59:43+00:00",
+    "features": 9
+   },
+   "1755000_5450000_5000": {
+    "sha256": "0725cc2949bf1d024e4ed19dc94f22553a63ff12cf290573b1bd447033522740",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 5
+   },
+   "1755000_5455000_5000": {
+    "sha256": "177c580916dc9666845c0dd0bc93af70e431a71a360659ec6cdbb66598494cbb",
+    "fetched": "2026-11-08T20:02:44+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "99e78871d16a5dce00f52b4bdccf323671dee44297a26227eb6fa91bf46b1ff5",
+    "fetched": "2026-11-08T20:03:57+00:00",
+    "features": 2
+   },
+   "1760000_5445000_5000": {
+    "sha256": "d049cd31f07908f1d3c474746bbd7c444f100e46d40ff2684fbf336d6fce249d",
+    "fetched": "2026-11-08T20:04:56+00:00",
+    "features": 3
+   },
+   "1760000_5450000_5000": {
+    "sha256": "15c61dbfdb1849d9a398a6aafd2033ed1ceeb4a449531c7e4a05b935473e6dbc",
+    "fetched": "2026-11-08T20:05:42+00:00",
+    "features": 3
+   },
+   "1760000_5455000_5000": {
+    "sha256": "fa5ecda590bc1663c9aef02d28f3e4d875fa0cb30c7d197266d668e1ddfe15f9",
+    "fetched": "2026-11-08T20:07:01+00:00",
+    "features": 2
+   },
+   "1765000_5440000_5000": {
+    "sha256": "182bf04dae8e3cd8c91784826307b6f2a00cb2a7d93c0c3942441f2da706f2ed",
+    "fetched": "2026-11-08T20:07:55+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "32220986d2e1c6e78a6a0e33a2f760ece9c1f7e4650706c58e96662530f342bd",
+    "fetched": "2026-11-08T20:08:36+00:00",
+    "features": 2
+   },
+   "1765000_5450000_5000": {
+    "sha256": "32220986d2e1c6e78a6a0e33a2f760ece9c1f7e4650706c58e96662530f342bd",
+    "fetched": "2026-11-08T20:08:50+00:00",
+    "features": 2
+   },
+   "1765000_5455000_5000": {
+    "sha256": "e096715c6f80a5e978d3a33e69f7084762525299f2e073becadd21c1d80f10f3",
+    "fetched": "2026-11-08T20:08:55+00:00",
+    "features": 1
+   }
+  }
+ },
+ "pdp_notable_tree_groups": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Notable_Tree_Group_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:05+00:00",
+  "fetched_last": "2026-11-08T20:08:56+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:25+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "17357e374ba3055d08c044882c6e0c9345d8766065695ca6127888b8559501d1",
+    "fetched": "2026-11-08T19:59:33+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "4b36d4c00409038eda31444ab0e22c3bdb016aa2bd4c0da520f2cb0f6bb30f1d",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "ec175ebcc78e6fb16082592ad13eed33d80e868a214544a0f14ca4cb15028552",
+    "fetched": "2026-11-08T19:59:43+00:00",
+    "features": 5
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 0
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:44+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:57+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "29ad47b9779eacce0e61f4a3699238d81151d67169d80b56e09be9e1b0633e97",
+    "fetched": "2026-11-08T20:04:56+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:43+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:01+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:55+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:37+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:50+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:56+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_heritage_settings": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Heritage_Setting_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:05+00:00",
+  "fetched_last": "2026-11-08T20:08:56+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "5627dc1a49d31c60ab30496a33256241fe526a9f28ecfc5932cee9faaf5b3ab7",
+    "fetched": "2026-11-08T19:59:05+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "8a3d6c462d70e7dbca379963e1e92c39e02ea8e0fddd3c91882f855eb4087a97",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 9
+   },
+   "1750000_5445000_5000": {
+    "sha256": "1bbc4038beb726b6c27bace47e312b31bea535bc00380013de00e6fedf334f5d",
+    "fetched": "2026-11-08T19:59:34+00:00",
+    "features": 11
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "56d95d0695f7de070fbcd18b4580dfa4b6509b872fea47f796cf59a6fe8c8fab",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 4
+   },
+   "1755000_5445000_5000": {
+    "sha256": "dcae0bad497a8ca6283c11b78e384aa9506df36a992451c2e9c92fe0f48f94a7",
+    "fetched": "2026-11-08T19:59:44+00:00",
+    "features": 12
+   },
+   "1755000_5450000_5000": {
+    "sha256": "40247152fc754243d1928f30e26f8aab7533bb26545da4b562307bfcd4cbecc7",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 9
+   },
+   "1755000_5455000_5000": {
+    "sha256": "a12693650108c1f802dfa5b6d58992700f72c8a6352338574d729c3a124e80cd",
+    "fetched": "2026-11-08T20:02:44+00:00",
+    "features": 3
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:57+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "bedafb08f8a04731a00b2125999140c7d9ad1b494bdd74d0d8a6bd5efa610b68",
+    "fetched": "2026-11-08T20:04:57+00:00",
+    "features": 9
+   },
+   "1760000_5450000_5000": {
+    "sha256": "67eca4e1352c6cd3aed3b6079e8b253858cc617ecf25dc3fe0bca2910a500743",
+    "fetched": "2026-11-08T20:05:43+00:00",
+    "features": 2
+   },
+   "1760000_5455000_5000": {
+    "sha256": "f225e255d4a6fd47b77cef6e3235ddc9d2a50364ba73dace8bb16fe78e20fc2b",
+    "fetched": "2026-11-08T20:07:02+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:55+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:37+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:56+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_heritage_item_extents": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Heritage_Item_Extent_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:06+00:00",
+  "fetched_last": "2026-11-08T20:08:56+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "c3fdf8ea70ace6947b55fe49c413831ed62b211583c26e99170189b6f08a30e1",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "5e09c10f88804109b8baf55756f2d8ef19632838d5f352334c3b952e387306ac",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 2
+   },
+   "1750000_5445000_5000": {
+    "sha256": "921cf14ad436b95f25d7789ce5222ccaad26a13965b1ef3b300b10d8cf9f3501",
+    "fetched": "2026-11-08T19:59:34+00:00",
+    "features": 7
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "e9915f132cf439be3fa7925c2ced03e39de9a079a932ffdf105cddd78429ae9c",
+    "fetched": "2026-11-08T19:59:44+00:00",
+    "features": 7
+   },
+   "1755000_5450000_5000": {
+    "sha256": "c25c1edab5b5f0b362484c6d4d0d56c8261d400ca8aa2fc6799941a62f16e62b",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 4
+   },
+   "1755000_5455000_5000": {
+    "sha256": "f9aa89ef3725b8d68109f473dd8277c763f8cf8e5997cd29b20dca860169cba9",
+    "fetched": "2026-11-08T20:02:44+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:58+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "3a427021aa2ad9b68602a4bfb8819d61880bd318990498e9ec57943d5f4aeb05",
+    "fetched": "2026-11-08T20:04:57+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "10cf32d8e89bdfdde7383cacb13ac7b1a6140c2d674c2e59aa12c8c73eae22ab",
+    "fetched": "2026-11-08T20:05:43+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c973e4ef5c30cd21ceb9c907e0ab18469e428f6ac4c78e93448fa1f5fa3a4cf8",
+    "fetched": "2026-11-08T20:07:02+00:00",
+    "features": 2
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:56+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:37+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:56+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_precincts": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Precinct_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:06+00:00",
+  "fetched_last": "2026-11-08T20:08:57+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "c2b975db4ae4ebefaed163fbd79b969a1ad21b6fd714c8e1f64a00b7069bbb46",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 2
+   },
+   "1750000_5445000_5000": {
+    "sha256": "27330a75e7571e726c7dcd8e91883206895ad1df44e92022db76a1910b1243ab",
+    "fetched": "2026-11-08T19:59:35+00:00",
+    "features": 5
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "ec64a1950aba8eecdd54e3e68c9d0c12c25e694463a1f9a5e0bb5aa954cf2819",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "7a231cab34e3b6e6ca4c0d2af05e119b9f1a6429dd4ab2e38ea76a461dd9c101",
+    "fetched": "2026-11-08T19:59:44+00:00",
+    "features": 7
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 0
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:45+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:58+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:57+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:43+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:02+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:56+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:57+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_height_controls": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Height_Controls_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:06+00:00",
+  "fetched_last": "2026-11-08T20:08:57+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:06+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "244b6859e91aa20a78a2c3382969ccd1c9107e52b1b01b51dc3ccc6ef7b7ed26",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 50
+   },
+   "1750000_5445000_5000": {
+    "sha256": "d2221ef1ba4fab1449363aef852187726dc77a2fefcd067c125e67b068da9a58",
+    "fetched": "2026-11-08T19:59:36+00:00",
+    "features": 104
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:18+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "b899f9e1e80b36f3f6864f7b7dd58d4796964f41197d53dbbe7dd1560139a433",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 53
+   },
+   "1755000_5445000_5000": {
+    "sha256": "20d6b1512aa034e21d1d51637d9330e0c7c32dd513dec22d3da91689b9e066e9",
+    "fetched": "2026-11-08T19:59:44+00:00",
+    "features": 209
+   },
+   "1755000_5450000_5000": {
+    "sha256": "2ef3198a09c305f4d4d4b01042cfbfae5b637987eee6940fc99eb6ebd5d94b6b",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 55
+   },
+   "1755000_5455000_5000": {
+    "sha256": "cddf61c721ca8cf5184d117846d265830b319a4f38948cd3919fc5379af045aa",
+    "fetched": "2026-11-08T20:02:46+00:00",
+    "features": 16
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:58+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "1292b8e9b8a3cbb59702d97b8da04abeba18bef26536d11d88ec9e5ad8598504",
+    "fetched": "2026-11-08T20:04:58+00:00",
+    "features": 15
+   },
+   "1760000_5450000_5000": {
+    "sha256": "b30b890ffb962c52d15b9a57861e5812cabfecc2001ea5c21eb88464cdc8dbe5",
+    "fetched": "2026-11-08T20:05:43+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "65aed428ae154b3a68d7d584085b258c43313bcaade7a955388bedd69152f078",
+    "fetched": "2026-11-08T20:07:03+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:57+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:57+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_designations": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Designation_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:07+00:00",
+  "fetched_last": "2026-11-08T20:08:57+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "c5523fb8dca472a3352b791d68890aaf555fee59bbbac0e708887e0402a03635",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 17
+   },
+   "1750000_5445000_5000": {
+    "sha256": "5dcb922f637148a3a57e551f6ca2c7b742d013e46a5e9de69097b226e2444217",
+    "fetched": "2026-11-08T19:59:36+00:00",
+    "features": 24
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "65d3f44085f2072bdd41f2edb54c4a272f23f5756a2eb02d0bfddb4f60a74deb",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 23
+   },
+   "1755000_5445000_5000": {
+    "sha256": "9f8087641c4d9200949ec53059ea60f6cef1b4c42e0d8caa612f8c6f7265f14c",
+    "fetched": "2026-11-08T19:59:45+00:00",
+    "features": 44
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7e53077443e293a02c0944471a5c4c7250098459923b76b5f074a5be5e8ecd59",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 17
+   },
+   "1755000_5455000_5000": {
+    "sha256": "42d2ecb0395fadb1eac681bf747635ffb32e8111aea166b61c6f601ad230cb55",
+    "fetched": "2026-11-08T20:02:46+00:00",
+    "features": 5
+   },
+   "1760000_5440000_5000": {
+    "sha256": "ef540af70bab9105b5e4a2d4817161228db26bb1c9a1af4d41b8f09c94228539",
+    "fetched": "2026-11-08T20:03:59+00:00",
+    "features": 4
+   },
+   "1760000_5445000_5000": {
+    "sha256": "aed4dd12cd5e34abeebf39403aa8c4b4a6c5b2d727f91772bec41b23dc717626",
+    "fetched": "2026-11-08T20:04:58+00:00",
+    "features": 7
+   },
+   "1760000_5450000_5000": {
+    "sha256": "07209f94dee49902331de45ec9d779a3241b656697f72765ec3342978945d8aa",
+    "fetched": "2026-11-08T20:05:44+00:00",
+    "features": 7
+   },
+   "1760000_5455000_5000": {
+    "sha256": "d41313432fa0b518799a32a9ab0b1cd96db9355fc4fbd226340aeae588875a31",
+    "fetched": "2026-11-08T20:07:03+00:00",
+    "features": 6
+   },
+   "1765000_5440000_5000": {
+    "sha256": "9870a2e7873390fd0cb0dfe54b96132ca644aa1a04875eab2608fc593e7b6838",
+    "fetched": "2026-11-08T20:07:57+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "9870a2e7873390fd0cb0dfe54b96132ca644aa1a04875eab2608fc593e7b6838",
+    "fetched": "2026-11-08T20:08:38+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "312626ae7f229dfeeb6a93a137c903fa8f116ef32888e15e27d96189acde5fca",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 3
+   },
+   "1765000_5455000_5000": {
+    "sha256": "d474e1ef48da62a7072e3919e89422a99b3b2554f90ece1ef559d71c28586411",
+    "fetched": "2026-11-08T20:08:57+00:00",
+    "features": 1
+   }
+  }
+ },
+ "pdp_special_amenity_landscapes": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Special_Amenity_Landscapes_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:07+00:00",
+  "fetched_last": "2026-11-08T20:08:58+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "d980694d9b050e620abf8e3c7c89d9058c95d97c0d3ffa0082c80af57b49f41a",
+    "fetched": "2026-11-08T19:59:27+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "767c896477417a6e173ca2cce218e9c5f6cf41866f4cac5b26019a9090b9ff93",
+    "fetched": "2026-11-08T19:59:37+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "50c8020edf09d17746de99475478da27ac7e9a8f3929b027c0cc55fbff6b1226",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 1
+   },
+   "1755000_5440000_5000": {
+    "sha256": "58a3f92655b39c2914bc333f52989a99ab20acffb8abe895a7d1817c866e3681",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 2
+   },
+   "1755000_5445000_5000": {
+    "sha256": "0e9664fdecbbf634e6a6f722a3ef77ae9e7dab9e1905b1651b9c28889d1efd1a",
+    "fetched": "2026-11-08T19:59:45+00:00",
+    "features": 4
+   },
+   "1755000_5450000_5000": {
+    "sha256": "70341591d7d843d9bdaf08d5e35c4927e9290b61e2209e443ac61a28257e6188",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 3
+   },
+   "1755000_5455000_5000": {
+    "sha256": "50c8020edf09d17746de99475478da27ac7e9a8f3929b027c0cc55fbff6b1226",
+    "fetched": "2026-11-08T20:02:47+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "2ba6a5fd09fd87c52500a7ff12ae558d6b229dafda074f818c191f7854618b81",
+    "fetched": "2026-11-08T20:03:59+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "8c4666022af6510db408f6de17d73f2a9b5953bd18da13485317cdc8932f7301",
+    "fetched": "2026-11-08T20:04:59+00:00",
+    "features": 3
+   },
+   "1760000_5450000_5000": {
+    "sha256": "756d11b4f96aa549a65d15948ff295e3e9e19f8f07c21710c4ec50d99636b30e",
+    "fetched": "2026-11-08T20:05:44+00:00",
+    "features": 2
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:04+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "2ba6a5fd09fd87c52500a7ff12ae558d6b229dafda074f818c191f7854618b81",
+    "fetched": "2026-11-08T20:07:57+00:00",
+    "features": 1
+   },
+   "1765000_5445000_5000": {
+    "sha256": "2ba6a5fd09fd87c52500a7ff12ae558d6b229dafda074f818c191f7854618b81",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 1
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:58+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_outstanding_natural_landscapes": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Outstanding_Natural_Features_and_Landscapes_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:07+00:00",
+  "fetched_last": "2026-11-08T20:08:58+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "65a1ca79cf25dfc980b3b0789607a74c4d1db6ab78a8f64637b27c219d2cc5aa",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "32f7bdd03c98fb766e060cb9b7cf438c701343c5a4a4501960cb099939dc16b2",
+    "fetched": "2026-11-08T19:59:07+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "65a1ca79cf25dfc980b3b0789607a74c4d1db6ab78a8f64637b27c219d2cc5aa",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "9cfa05b497012b7ea63fe25303a40fb3677703390703b175b3fcf1a4d8bf614e",
+    "fetched": "2026-11-08T19:59:37+00:00",
+    "features": 3
+   },
+   "1750000_5450000_5000": {
+    "sha256": "a57290d4d6f12187441fc02b6736ad3b065060194b695bb422d28a2c27c706ec",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "ebec311fd04ca4deb99c23130e1a85facb303950826b29a9822ea94965a4e986",
+    "fetched": "2026-11-08T19:59:45+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "85a5a8ac65d4499ab5042080538f23e6cecf7caeda16fa9cd722add014102947",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 4
+   },
+   "1755000_5455000_5000": {
+    "sha256": "711341af61a4db8a648770e93a9db61637f408b9fd0256214637f7ef2b0bbb5f",
+    "fetched": "2026-11-08T20:02:47+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:03:59+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:59+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "ce585666fc8bca8026f2dd048b4c0291e6a6f097cd945a188665e6a13566c88f",
+    "fetched": "2026-11-08T20:05:44+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "ce585666fc8bca8026f2dd048b4c0291e6a6f097cd945a188665e6a13566c88f",
+    "fetched": "2026-11-08T20:07:04+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:58+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:58+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_coastal_high_natural_character": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Coastal_High_Natural_Character_Areas_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:08+00:00",
+  "fetched_last": "2026-11-08T20:08:58+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "217c20652851601e717e7a5df33471e0f28c66411b8a249ffd50632f693ee5eb",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 1
+   },
+   "1745000_5445000_5000": {
+    "sha256": "947cc054ca2c8f21f31fc03c9b2c2f46a6517fc9d26465fa7dbdbd7c97604d30",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "26293602ac47ab3be2b993ea51db8436a62afe07b0acd7028a3053c4aa832a56",
+    "fetched": "2026-11-08T19:59:38+00:00",
+    "features": 7
+   },
+   "1750000_5450000_5000": {
+    "sha256": "8fdb0a0f0d98adb1b73a1d2081be5cd81b5258390170b68ea172acdeb85e6825",
+    "fetched": "2026-11-08T19:59:19+00:00",
+    "features": 3
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "685c4d3698bf6901e0a42b2610c41128d111499199700a63c9613c08d1443344",
+    "fetched": "2026-11-08T19:59:46+00:00",
+    "features": 8
+   },
+   "1755000_5450000_5000": {
+    "sha256": "03c64499f04ec8649312c3036766e75f8c64e1c8c1d2854d546dc7f1934632d2",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 7
+   },
+   "1755000_5455000_5000": {
+    "sha256": "c681e85d595d679d75d24086edf8b0a52586901706b1256092641a2d1dc863f8",
+    "fetched": "2026-11-08T20:02:47+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:00+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "28859f7099445e1e6f72fefff216717b74139d1d2a0936cb18bb078fe8de65ee",
+    "fetched": "2026-11-08T20:04:59+00:00",
+    "features": 2
+   },
+   "1760000_5450000_5000": {
+    "sha256": "d25d847ca852d672640ff061ae716a8397cc926e447b06723808a2b1a8e8dad9",
+    "fetched": "2026-11-08T20:05:45+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:04+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:58+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:39+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:58+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_sites_significance_maori": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Sites_and_Areas_of_Significance_to_M\u0101ori_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:08+00:00",
+  "fetched_last": "2026-11-08T20:08:59+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "977bc205d9407c88a38d57190aa9afe8db32fe299e3d0abcaeb5997d5688741e",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "4a3df53ff5fa3ef1af81a0f3a93054042e1b6d005cba8a1900ebdc12215a0ef4",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "3d3305d86c5152ee26d87db863dc7ff049d1e9c2e9139fedf570e0b5460bbf4f",
+    "fetched": "2026-11-08T19:59:38+00:00",
+    "features": 8
+   },
+   "1750000_5450000_5000": {
+    "sha256": "5c9b7f0d75f7fc98f6898e14380b2d2eb5e207a7cbde09417559233fde22b056",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 2
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "8da061a4bc9f1bd377e25d4e951da4c94290aedc097c5587d2e675ef8cc63628",
+    "fetched": "2026-11-08T19:59:46+00:00",
+    "features": 5
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7fb49c212290b5b22bebbd8e216372ef885ddca1120bbb35d7ad6b60777274a9",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 8
+   },
+   "1755000_5455000_5000": {
+    "sha256": "79ab6ae99c31c4d738cf7ca2190245371c6e2f1c1c0267e3056e54c53de95973",
+    "fetched": "2026-11-08T20:02:48+00:00",
+    "features": 2
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:00+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "19e4e0e84ba894d0f0f2db65c3fd88fd337bd323b5624d0261fb939c7d9fffd6",
+    "fetched": "2026-11-08T20:05:00+00:00",
+    "features": 3
+   },
+   "1760000_5450000_5000": {
+    "sha256": "5635ce489be8cfde576e40fb771f89510141f0d45d665bc6bb59fe060e9d6e4a",
+    "fetched": "2026-11-08T20:05:45+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "49f543e12448eeac2c94a5e21b49f97f8a038daf3bf7b886492bc2d71460b772",
+    "fetched": "2026-11-08T20:07:05+00:00",
+    "features": 2
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:58+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "5635ce489be8cfde576e40fb771f89510141f0d45d665bc6bb59fe060e9d6e4a",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 1
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:59+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_gas_pipeline_corridor": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Gas_Transmission_Pipeline_Corridor_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:08+00:00",
+  "fetched_last": "2026-11-08T20:08:59+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:28+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:39+00:00",
+    "features": 0
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T19:59:46+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:48+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T20:04:01+00:00",
+    "features": 1
+   },
+   "1760000_5445000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T20:05:00+00:00",
+    "features": 1
+   },
+   "1760000_5450000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T20:05:45+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "e675da682622a93705ce784ed8acb3b77b48d92188eda07d9895881947846040",
+    "fetched": "2026-11-08T20:07:05+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:59+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:59+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_rail_vibration": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Rail_Vibration_Alert_Layer_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:08+00:00",
+  "fetched_last": "2026-11-08T20:08:59+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:08+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T19:59:39+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T19:59:47+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T20:02:49+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:01+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:00+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T20:05:45+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c3e9c13c477aee23a71dd4b8937c8c43dd6b38b4951e32cd73b61a69fef75ed7",
+    "fetched": "2026-11-08T20:07:05+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:59+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:41+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:52+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:59+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_radio_height_control": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Radio_Transmission_Height_Control_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:09+00:00",
+  "fetched_last": "2026-11-08T20:09:00+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "f3d11f63fff71f72aa7ae39d7d27e7d3069fccd3032a2af4f4348fd9e0980687",
+    "fetched": "2026-11-08T19:59:40+00:00",
+    "features": 2
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "f3d11f63fff71f72aa7ae39d7d27e7d3069fccd3032a2af4f4348fd9e0980687",
+    "fetched": "2026-11-08T19:59:47+00:00",
+    "features": 2
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:32+00:00",
+    "features": 0
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:49+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:01+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:01+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:45+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:06+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:59+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:41+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:53+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:09:00+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_eastern_porirua": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Eastern_Porirua_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:09+00:00",
+  "fetched_last": "2026-11-08T20:09:00+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "fc665ef33ba6141c0ceecf7362318d9c8178387d826e801ea40d5146da630c34",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 1
+   },
+   "1750000_5445000_5000": {
+    "sha256": "fc665ef33ba6141c0ceecf7362318d9c8178387d826e801ea40d5146da630c34",
+    "fetched": "2026-11-08T19:59:40+00:00",
+    "features": 1
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "fc665ef33ba6141c0ceecf7362318d9c8178387d826e801ea40d5146da630c34",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 1
+   },
+   "1755000_5445000_5000": {
+    "sha256": "fc665ef33ba6141c0ceecf7362318d9c8178387d826e801ea40d5146da630c34",
+    "fetched": "2026-11-08T19:59:47+00:00",
+    "features": 1
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:32+00:00",
+    "features": 0
+   },
+   "1755000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:02:50+00:00",
+    "features": 0
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:02+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:01+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:46+00:00",
+    "features": 0
+   },
+   "1760000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:07:06+00:00",
+    "features": 0
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:00+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:41+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:53+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:09:00+00:00",
+    "features": 0
+   }
+  }
+ },
+ "pdp_northern_growth_area": {
+  "url": "https://services1.arcgis.com/kIwRm3UCyRHYbM8a/arcgis/rest/services/Northern_Growth_Development_Area_PDP2025/FeatureServer/0",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:09+00:00",
+  "fetched_last": "2026-11-08T20:09:00+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:10+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:09+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:29+00:00",
+    "features": 0
+   },
+   "1750000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:41+00:00",
+    "features": 0
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:22+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:31+00:00",
+    "features": 0
+   },
+   "1755000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:47+00:00",
+    "features": 0
+   },
+   "1755000_5450000_5000": {
+    "sha256": "9f93c02574985dce591cf1c5f84343963dadc960983b287a9100321c4c4f7e44",
+    "fetched": "2026-11-08T19:59:32+00:00",
+    "features": 1
+   },
+   "1755000_5455000_5000": {
+    "sha256": "9f93c02574985dce591cf1c5f84343963dadc960983b287a9100321c4c4f7e44",
+    "fetched": "2026-11-08T20:02:50+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:04:02+00:00",
+    "features": 0
+   },
+   "1760000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:05:01+00:00",
+    "features": 0
+   },
+   "1760000_5450000_5000": {
+    "sha256": "9f93c02574985dce591cf1c5f84343963dadc960983b287a9100321c4c4f7e44",
+    "fetched": "2026-11-08T20:05:46+00:00",
+    "features": 1
+   },
+   "1760000_5455000_5000": {
+    "sha256": "9f93c02574985dce591cf1c5f84343963dadc960983b287a9100321c4c4f7e44",
+    "fetched": "2026-11-08T20:07:06+00:00",
+    "features": 1
+   },
+   "1765000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:00+00:00",
+    "features": 0
+   },
+   "1765000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:41+00:00",
+    "features": 0
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:08:53+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:09:00+00:00",
+    "features": 0
+   }
+  }
+ },
+ "gw_liquefaction": {
+  "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/10",
+  "licence": "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:13+00:00",
+  "fetched_last": "2026-11-08T20:09:03+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "11d66364247844c16abf442b60ca8c6dba768becc2ac2b0cb0f9ee00b2edd1d9",
+    "fetched": "2026-11-08T19:59:13+00:00",
+    "features": 3
+   },
+   "1745000_5445000_5000": {
+    "sha256": "ee75bec5a1eea1662b6b0fc15d0ed43812e3170d30a81bb8e1fc911f9e369ed0",
+    "fetched": "2026-11-08T19:59:13+00:00",
+    "features": 1
+   },
+   "1750000_5440000_5000": {
+    "sha256": "da0a4d58d7b174fa1242739117120930471ec472658d02f00506b1739bd58268",
+    "fetched": "2026-11-08T19:59:34+00:00",
+    "features": 7
+   },
+   "1750000_5445000_5000": {
+    "sha256": "ce82a9eb58ead56273fdf4e8ed319f07f0221d7c7c71787451c60c4897d4f06a",
+    "fetched": "2026-11-08T19:59:44+00:00",
+    "features": 11
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:26+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "53bed0adb72292961db3f36f114439608f8d09afb8852fe0122430c002f1aa21",
+    "fetched": "2026-11-08T19:59:35+00:00",
+    "features": 3
+   },
+   "1755000_5445000_5000": {
+    "sha256": "5822b74d0591a002bf3f4c8e3dab30b57352ef11855ee210c3e002c5626eb7b7",
+    "fetched": "2026-11-08T19:59:52+00:00",
+    "features": 18
+   },
+   "1755000_5450000_5000": {
+    "sha256": "f3aa23c4611d1becfaf507fb6632e25868f3bf247d7bd0b5cf9cfdb9ab04f9d9",
+    "fetched": "2026-11-08T19:59:35+00:00",
+    "features": 6
+   },
+   "1755000_5455000_5000": {
+    "sha256": "156599019efea07a0152ca59c1d9ecdfd73c678600a36e9eda41f0ffed4aaee6",
+    "fetched": "2026-11-08T20:02:54+00:00",
+    "features": 1
+   },
+   "1760000_5440000_5000": {
+    "sha256": "28b7d891ee24a6c97555664b2e6aa0a16a683fdaac69b8c0aab3f92a12376a12",
+    "fetched": "2026-11-08T20:04:05+00:00",
+    "features": 4
+   },
+   "1760000_5445000_5000": {
+    "sha256": "11665ef6da2235040ce0bf4974ad78ac455eb2bea3f4688d4b45404c369ffe6f",
+    "fetched": "2026-11-08T20:05:05+00:00",
+    "features": 8
+   },
+   "1760000_5450000_5000": {
+    "sha256": "1a7e470e3f63ddee1a0c185f1b8ffe24b885c0c6552b870e2de4c79e1a416bc1",
+    "fetched": "2026-11-08T20:05:50+00:00",
+    "features": 5
+   },
+   "1760000_5455000_5000": {
+    "sha256": "584d68d0f6d127fe38d21a136a609263581c6b29527f8c5430dbc26fcc6d4b59",
+    "fetched": "2026-11-08T20:07:10+00:00",
+    "features": 3
+   },
+   "1765000_5440000_5000": {
+    "sha256": "6b09c49d740c554aaf6183c5ddd6f0e344a4b54e8ef5c0bc4cf7c1f471d9a59f",
+    "fetched": "2026-11-08T20:08:03+00:00",
+    "features": 6
+   },
+   "1765000_5445000_5000": {
+    "sha256": "8292194c72ceaf79f3940accf888e083100d20f2e7861f1b6599c661a093b689",
+    "fetched": "2026-11-08T20:08:45+00:00",
+    "features": 6
+   },
+   "1765000_5450000_5000": {
+    "sha256": "00f8b71597baef07229deeacc2cf9b98ddbd68b3695dbbe492fde8ab53b748ac",
+    "fetched": "2026-11-08T20:08:57+00:00",
+    "features": 2
+   },
+   "1765000_5455000_5000": {
+    "sha256": "ef20cf323432951f3f83f77d370d51a5c2041d533003efdee1483f0e6752763d",
+    "fetched": "2026-11-08T20:09:03+00:00",
+    "features": 3
+   }
+  }
+ },
+ "gw_eq_slope_failure": {
+  "url": "https://mapping.gw.govt.nz/arcgis/rest/services/GW/Emergencies_P/MapServer/11",
+  "licence": "GWRC, CC BY 4.0 unless stated (regional statement; see SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:17+00:00",
+  "fetched_last": "2026-11-08T20:09:06+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "f6c6651c8195d46e73ab9b9759381dcaa2cd7d97d757132dcd3ea59330814481",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 16
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:17+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "2f193ce41e912618f78161e491d8cf2db869787aa8641a1015ccd2267f5794e0",
+    "fetched": "2026-11-08T19:59:38+00:00",
+    "features": 117
+   },
+   "1750000_5445000_5000": {
+    "sha256": "6851634dc66112d0577b9a5367609f61f520c086a5756639bb87f4e54836ba87",
+    "fetched": "2026-11-08T19:59:48+00:00",
+    "features": 92
+   },
+   "1750000_5450000_5000": {
+    "sha256": "6a4d63d29f3413e282b18626904e90fa6b9e5cfab5f8db7f805140cec7e08359",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": 10
+   },
+   "1755000_5440000_5000": {
+    "sha256": "9cb7f61f8d7382c041b55c7a01761ec6422231cc9dc7f4bc508be2559887ab53",
+    "fetched": "2026-11-08T19:59:41+00:00",
+    "features": 93
+   },
+   "1755000_5445000_5000": {
+    "sha256": "717570c0d4cff97691ff56cf967352748fcf1a1655aff1c6659972d09d941709",
+    "fetched": "2026-11-08T19:59:57+00:00",
+    "features": 124
+   },
+   "1755000_5450000_5000": {
+    "sha256": "f512ea5fc1df04be1b32c72ffd5cbb651f7c68f6faf45b7ceffa8c0fba81ebb4",
+    "fetched": "2026-11-08T19:59:43+00:00",
+    "features": 192
+   },
+   "1755000_5455000_5000": {
+    "sha256": "2681033468b212f14e3e6359114deb9707cc5fcc83be36c8405d05fc2c115c7a",
+    "fetched": "2026-11-08T20:02:59+00:00",
+    "features": 50
+   },
+   "1760000_5440000_5000": {
+    "sha256": "ffb713d4712838c20bf8363c28cc9d88c5a8629a21d01daa25877ec94a190db0",
+    "fetched": "2026-11-08T20:04:09+00:00",
+    "features": 135
+   },
+   "1760000_5445000_5000": {
+    "sha256": "c2f70551ed33c2baadb6622d4eb397eb7498053f8906b55e13a5b2361dbcb444",
+    "fetched": "2026-11-08T20:05:09+00:00",
+    "features": 133
+   },
+   "1760000_5450000_5000": {
+    "sha256": "4a3603f7434b4576e91f3d23fa7967dbb9fa5ad2efcece54fa327784970945f3",
+    "fetched": "2026-11-08T20:05:55+00:00",
+    "features": 160
+   },
+   "1760000_5455000_5000": {
+    "sha256": "31f528894c787f88597cee5988a35fb385d865ab3552b37850a72329a3917e4b",
+    "fetched": "2026-11-08T20:07:14+00:00",
+    "features": 222
+   },
+   "1765000_5440000_5000": {
+    "sha256": "1de7856c415a210be656f1b86dacfea373b90d1ee282dd0e75dd32eac979fd14",
+    "fetched": "2026-11-08T20:08:07+00:00",
+    "features": 183
+   },
+   "1765000_5445000_5000": {
+    "sha256": "e89253fd178570da0c6ca706c0bb9a4ec0047de897b861428c59dce42dd9d5c4",
+    "fetched": "2026-11-08T20:08:48+00:00",
+    "features": 95
+   },
+   "1765000_5450000_5000": {
+    "sha256": "02adb98625f7c8b2aad4b13bcd5f0db13a4270f55d3f31ff3c40607660d85d3e",
+    "fetched": "2026-11-08T20:09:02+00:00",
+    "features": 1
+   },
+   "1765000_5455000_5000": {
+    "sha256": "e421b4981587db715bbf2d0ebea70a6065a523cd09205964a64339e0df473430",
+    "fetched": "2026-11-08T20:09:06+00:00",
+    "features": 53
+   }
+  }
+ },
+ "pcc_buildings": {
+  "url": "https://maps.poriruacity.govt.nz/server/rest/services/Property/PropertyAdminExternal/MapServer/2",
+  "licence": "PCC, CC BY 4.0 (open data portal statement; per-layer status in SOURCES.md)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:20+00:00",
+  "fetched_last": "2026-11-08T20:09:09+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:20+00:00",
+    "features": 0
+   },
+   "1745000_5445000_5000": {
+    "sha256": "837f3d2813b56ca659e3891c3995de2262368c06782c4a3688e74e7381b4091f",
+    "fetched": "2026-11-08T19:59:21+00:00",
+    "features": 10
+   },
+   "1750000_5440000_5000": {
+    "sha256": "03322b9533b3d2d73434d97c4c3acde6578ee9203b0ff61158ee9335b8d53d94",
+    "fetched": "2026-11-08T19:59:46+00:00",
+    "features": 3748
+   },
+   "1750000_5445000_5000": {
+    "sha256": "d032238922d7be47bb847db00efdb6175ed87e257c1eb369b31eb595b9ea3672",
+    "fetched": "2026-11-08T19:59:59+00:00",
+    "features": 7047
+   },
+   "1750000_5450000_5000": {
+    "sha256": "67256363873215f9107199a07c5689787bb6b790ddff1aed5d5c942c7d6b9c20",
+    "fetched": "2026-11-08T19:59:33+00:00",
+    "features": 8
+   },
+   "1755000_5440000_5000": {
+    "sha256": "787f8c1d3fa1eb6057a51ac3fb8d8cf3f4db43bcb980627a47467f129d336bdc",
+    "fetched": "2026-11-08T19:59:53+00:00",
+    "features": 7549
+   },
+   "1755000_5445000_5000": {
+    "sha256": "4b808e1e40712aa504f84aa3f1279d2f19cd0a9e2444668c1436d444ead4fabc",
+    "fetched": "2026-11-08T20:00:20+00:00",
+    "features": 15706
+   },
+   "1755000_5450000_5000": {
+    "sha256": "a24501d8ce203f383333fb2fb3aaed40ea5bc596b9af7435ada7fbb0abfcda06",
+    "fetched": "2026-11-08T19:59:50+00:00",
+    "features": 3271
+   },
+   "1755000_5455000_5000": {
+    "sha256": "e49587e0e7e46ebba441e080e456fe799db679a7dd6e72aeb9f8c28ad45aaeee",
+    "fetched": "2026-11-08T20:03:03+00:00",
+    "features": 1315
+   },
+   "1760000_5440000_5000": {
+    "sha256": "daf0231abbe00fc591b659251c70aff3b164ea66b75cf6adaa3a8e1fde26667f",
+    "fetched": "2026-11-08T20:04:13+00:00",
+    "features": 175
+   },
+   "1760000_5445000_5000": {
+    "sha256": "f3856e9b619fa3a3fb6b71dd37388ac0ce7c2c7dc82e926dce9b909f455f7503",
+    "fetched": "2026-11-08T20:05:14+00:00",
+    "features": 2470
+   },
+   "1760000_5450000_5000": {
+    "sha256": "e5759b3ec7c4a648ca56e3e87a698e16ed88f31e1a1544f04bda0a40e03011d8",
+    "fetched": "2026-11-08T20:06:08+00:00",
+    "features": 368
+   },
+   "1760000_5455000_5000": {
+    "sha256": "c124c81996e51077fcd04912c1f4f578cb0956c26519ddfd724e044c9aa91aa8",
+    "fetched": "2026-11-08T20:07:17+00:00",
+    "features": 136
+   },
+   "1765000_5440000_5000": {
+    "sha256": "bdcd7db13107f95147a076f847ec7c34372103fb23606280d094015548d1aee6",
+    "fetched": "2026-11-08T20:08:10+00:00",
+    "features": 73
+   },
+   "1765000_5445000_5000": {
+    "sha256": "fc038a9b248466639f411a8e2b85dd1c031eff594bd8000805a479d2a69df152",
+    "fetched": "2026-11-08T20:08:51+00:00",
+    "features": 100
+   },
+   "1765000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:09:05+00:00",
+    "features": 0
+   },
+   "1765000_5455000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:09:09+00:00",
+    "features": 0
+   }
+  }
+ },
+ "dem_2023": {
+  "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/porirua_2023/dem_1m/2193/collection.json",
+  "licence": "CC-BY-4.0 [\"Landpro\", \"Porirua City Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:30+00:00",
+  "fetched_last": "2026-11-08T20:09:26+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "b40d65e28db66cd48add6e9739be7a01a8fb66ffa16e0075c48b777c0a709c2e",
+    "fetched": "2026-11-08T19:59:30+00:00",
+    "features": null
+   },
+   "1745000_5445000_5000": {
+    "sha256": "04a67a14cee2fcedec193e297d6d69ff8dd6d35c85e0cc8315146c4b13805415",
+    "fetched": "2026-11-08T19:59:36+00:00",
+    "features": null
+   },
+   "1750000_5440000_5000": {
+    "sha256": "e9c3084e4895aca600dc55f735a352f95c5abccde9e495d1bc742a999625f211",
+    "fetched": "2026-11-08T20:00:05+00:00",
+    "features": null
+   },
+   "1750000_5445000_5000": {
+    "sha256": "5532a6f7fe154024211b4f0c0b238328749e5fc7ba9bb106a3bf4657ec1ff2c9",
+    "fetched": "2026-11-08T20:00:20+00:00",
+    "features": null
+   },
+   "1750000_5450000_5000": {
+    "sha256": "dd5ba82d9c89301f67c2fa77b12aa71c8ce983b8196255d415d0c032ae7a7ffb",
+    "fetched": "2026-11-08T19:59:47+00:00",
+    "features": null
+   },
+   "1755000_5440000_5000": {
+    "sha256": "4311fc28e911968ca83eab228772e10c4486c07f4a901ec63c8da88ab19ee744",
+    "fetched": "2026-11-08T20:00:19+00:00",
+    "features": null
+   },
+   "1755000_5445000_5000": {
+    "sha256": "47b5d90b937552880cd1feb94cda095a2ecda67dc72c50b084cab0a35c0a21b1",
+    "fetched": "2026-11-08T20:00:49+00:00",
+    "features": null
+   },
+   "1755000_5450000_5000": {
+    "sha256": "6ed644cb5ed2a877afce4741a029b52e8d928c9a2dfa22ab6d44f45d4ac67980",
+    "fetched": "2026-11-08T20:00:20+00:00",
+    "features": null
+   },
+   "1755000_5455000_5000": {
+    "sha256": "07d6ba392f72a10955595a918f3dba0796de21caa1cde395992fa6ecbdac0bb5",
+    "fetched": "2026-11-08T20:03:25+00:00",
+    "features": null
+   },
+   "1760000_5440000_5000": {
+    "sha256": "e24edfbe33f7a56309f0c9c60c13ef552ff9e237da7521794e3856a6c70601ef",
+    "fetched": "2026-11-08T20:04:32+00:00",
+    "features": null
+   },
+   "1760000_5445000_5000": {
+    "sha256": "30ac29320f3fbfb9edede2ef376e04613ef9e2a19381e36f85722bc163ce890c",
+    "fetched": "2026-11-08T20:05:44+00:00",
+    "features": null
+   },
+   "1760000_5450000_5000": {
+    "sha256": "1abab9b0e2d51d98aa066d25187d65bc672b802cc67fedf19f4b161ef993babf",
+    "fetched": "2026-11-08T20:06:54+00:00",
+    "features": null
+   },
+   "1760000_5455000_5000": {
+    "sha256": "302918c2f179fef7824fef76add9350c2cd6703122858e6f49eef30c3668ac44",
+    "fetched": "2026-11-08T20:07:42+00:00",
+    "features": null
+   },
+   "1765000_5440000_5000": {
+    "sha256": "b9a8be7ff7b68bd912012eac925b62efc3d8ac0721a8cdb16d435ee75206a994",
+    "fetched": "2026-11-08T20:08:25+00:00",
+    "features": null
+   },
+   "1765000_5445000_5000": {
+    "sha256": "e163ca079fc316b66153e9f042d24c9d9709f4173bebafaa092f09e45606348e",
+    "fetched": "2026-11-08T20:09:13+00:00",
+    "features": null
+   },
+   "1765000_5450000_5000": {
+    "sha256": "e2187f011e42b2f9acc996a00174cbead5581bc5d6d8f32774eb4a3905ff39f2",
+    "fetched": "2026-11-08T20:09:25+00:00",
+    "features": null
+   },
+   "1765000_5455000_5000": {
+    "sha256": "30ae6051bcaea50de40e84aa8027c2be96390b65d1650c74388d937052e07d42",
+    "fetched": "2026-11-08T20:09:26+00:00",
+    "features": null
+   }
+  }
+ },
+ "dsm_2023": {
+  "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/wellington/porirua_2023/dsm_1m/2193/collection.json",
+  "licence": "CC-BY-4.0 [\"Landpro\", \"Porirua City Council\", \"Toit\\u016b Te Whenua Land Information New Zealand\"]",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:40+00:00",
+  "fetched_last": "2026-11-08T20:09:44+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "efe49e2fcdb555b72f974d87653d52c4a7833971555c139db591b1f45724b900",
+    "fetched": "2026-11-08T19:59:40+00:00",
+    "features": null
+   },
+   "1745000_5445000_5000": {
+    "sha256": "916b01e439bde0276868a2869f4193667d52bb8d720e9f9c51df790c72fca364",
+    "fetched": "2026-11-08T19:59:51+00:00",
+    "features": null
+   },
+   "1750000_5440000_5000": {
+    "sha256": "f60dda764353080f11fb9ca906409e468c3026f9277f44827ca344df6fefd243",
+    "fetched": "2026-11-08T20:00:24+00:00",
+    "features": null
+   },
+   "1750000_5445000_5000": {
+    "sha256": "cb1e23956758ae932818a344a854e0d708e1181feab2ddb71c80be920cf038ed",
+    "fetched": "2026-11-08T20:00:42+00:00",
+    "features": null
+   },
+   "1750000_5450000_5000": {
+    "sha256": "b54e5c6fc05bfd70052c46fb718452ce4753cc2ac9cfd481befd461b01b13ffa",
+    "fetched": "2026-11-08T20:00:00+00:00",
+    "features": null
+   },
+   "1755000_5440000_5000": {
+    "sha256": "e2ae07b4210055ee0cfedd03c0e915dbc459790e17e0ae8b4b2fcf9507254fd0",
+    "fetched": "2026-11-08T20:00:46+00:00",
+    "features": null
+   },
+   "1755000_5445000_5000": {
+    "sha256": "c7674772387247f6ced7d64eadd5eb59932b3c2dac88fad28f48535b97331459",
+    "fetched": "2026-11-08T20:01:18+00:00",
+    "features": null
+   },
+   "1755000_5450000_5000": {
+    "sha256": "7aac96173a0684a3dfa320e4fb22e594a63db4b17c242f61ec5434d4670ace31",
+    "fetched": "2026-11-08T20:00:50+00:00",
+    "features": null
+   },
+   "1755000_5455000_5000": {
+    "sha256": "71327afb2769c31e588a0f26a62cd66a47ae40dabff586bc071a374573bc3dd1",
+    "fetched": "2026-11-08T20:03:46+00:00",
+    "features": null
+   },
+   "1760000_5440000_5000": {
+    "sha256": "7d9f94c1617b89f7d020127e565c10099a5512476be74b67e63b46cf0a1ea00c",
+    "fetched": "2026-11-08T20:04:51+00:00",
+    "features": null
+   },
+   "1760000_5445000_5000": {
+    "sha256": "fefb2c6dc035ad2146b63f29f441db9aa22034b4293084bab4f506cd724f7c1f",
+    "fetched": "2026-11-08T20:06:14+00:00",
+    "features": null
+   },
+   "1760000_5450000_5000": {
+    "sha256": "6bace7d30a8458012b047b979aee39c4b923c509037b9c448aeeb3a42d43cc84",
+    "fetched": "2026-11-08T20:07:41+00:00",
+    "features": null
+   },
+   "1760000_5455000_5000": {
+    "sha256": "0f1b5ad9edd2cc1c620a8181ce781286c2ff65c2efb111019e3ace29e283ecdd",
+    "fetched": "2026-11-08T20:08:08+00:00",
+    "features": null
+   },
+   "1765000_5440000_5000": {
+    "sha256": "ffd886591924709d4bec1f415da5db635ec87711f7fd74cc96c8bef3cd2869e2",
+    "fetched": "2026-11-08T20:08:40+00:00",
+    "features": null
+   },
+   "1765000_5445000_5000": {
+    "sha256": "00f47318ab84685ff3024ca41c936419a8dcb002e485cc289cd07a1f2ff490ea",
+    "fetched": "2026-11-08T20:09:34+00:00",
+    "features": null
+   },
+   "1765000_5450000_5000": {
+    "sha256": "9f7250e51d7efb90cda9dcd59fdceee8e68d869eeea6b857f67e48e415439ab5",
+    "fetched": "2026-11-08T20:09:44+00:00",
+    "features": null
+   },
+   "1765000_5455000_5000": {
+    "sha256": "d66a9309dab8dd238ebf42b68f6468a04740907cfc8708675903750b1c70fe3f",
+    "fetched": "2026-11-08T20:09:42+00:00",
+    "features": null
+   }
+  }
+ },
+ "titles": {
+  "url": "https://data.linz.govt.nz/layer/50804/",
+  "licence": "LINZ CC BY 4.0",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:41+00:00",
+  "fetched_last": "2026-11-08T20:09:46+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "2e25c447f050aae09ef7f63ca52414dead985a23b3a063bf1ee98de82f8c1f1d",
+    "fetched": "2026-11-08T19:59:41+00:00",
+    "features": 23
+   },
+   "1745000_5445000_5000": {
+    "sha256": "1191448ed4bc547c37801ecf37991860ce4a07747f108e3d2bf871416caefe29",
+    "fetched": "2026-11-08T19:59:53+00:00",
+    "features": 2
+   },
+   "1750000_5440000_5000": {
+    "sha256": "112c5e78ab7f30468e93533b43783947034ea144df6b9b8d30e8a2db21b9ea06",
+    "fetched": "2026-11-08T20:00:28+00:00",
+    "features": 7089
+   },
+   "1750000_5445000_5000": {
+    "sha256": "85d1a534d9fddbc1ab6b59faa485f1cd925867abfa68ab84bd9c8c7230c455de",
+    "fetched": "2026-11-08T20:00:45+00:00",
+    "features": 5322
+   },
+   "1750000_5450000_5000": {
+    "sha256": "d87a580fbf9f89028a53d9519a115c3c7d93b203722e1e0cf8a97a9431b58ac7",
+    "fetched": "2026-11-08T20:00:02+00:00",
+    "features": 8
+   },
+   "1755000_5440000_5000": {
+    "sha256": "a383f4d0b5dc81eeca5599d39c54c0e2ad8bbcaa9f852cbdd673d6a48d4b19de",
+    "fetched": "2026-11-08T20:00:49+00:00",
+    "features": 5824
+   },
+   "1755000_5445000_5000": {
+    "sha256": "5dd3b27e8054c7a1519010ccb89ac96e9e3fecec84a6306d85dd57f0aafd01e6",
+    "fetched": "2026-11-08T20:01:23+00:00",
+    "features": 13382
+   },
+   "1755000_5450000_5000": {
+    "sha256": "d194bb1bd4b8cf27185735430f2e50da221f73f140e072adceb27544dd7bc702",
+    "fetched": "2026-11-08T20:00:53+00:00",
+    "features": 2470
+   },
+   "1755000_5455000_5000": {
+    "sha256": "975b1adc791bd730a7e6fbc91020348aa6cf28a099bdc742c4d41c99cce2d32d",
+    "fetched": "2026-11-08T20:03:48+00:00",
+    "features": 814
+   },
+   "1760000_5440000_5000": {
+    "sha256": "6a74138b03ade77d7bd5a10bd69f5d56442e0f43cf930df8805690b1abad4e71",
+    "fetched": "2026-11-08T20:04:53+00:00",
+    "features": 1539
+   },
+   "1760000_5445000_5000": {
+    "sha256": "3ad640b9aba84968ac5f2b115205d0f6622e0fb2363191eaaebba6f128935cb9",
+    "fetched": "2026-11-08T20:06:17+00:00",
+    "features": 1969
+   },
+   "1760000_5450000_5000": {
+    "sha256": "fcc435f03c4130c6bea89c981167a426f5ebb8951d54f753fafb33ee9b12377b",
+    "fetched": "2026-11-08T20:07:43+00:00",
+    "features": 265
+   },
+   "1760000_5455000_5000": {
+    "sha256": "cd61b87fb04eb4f60b1f3d256cdc8da5a84eb997726c6542800ee50d43b57db7",
+    "fetched": "2026-11-08T20:08:09+00:00",
+    "features": 286
+   },
+   "1765000_5440000_5000": {
+    "sha256": "3dc9974e8a9c343e48467563a1d52522c64f7509d9486dd5e9417eff779a6342",
+    "fetched": "2026-11-08T20:08:44+00:00",
+    "features": 5998
+   },
+   "1765000_5445000_5000": {
+    "sha256": "a11608a004139b443499249585f2ec6637b3ef8220fd1e272fb188581f874edc",
+    "fetched": "2026-11-08T20:09:36+00:00",
+    "features": 134
+   },
+   "1765000_5450000_5000": {
+    "sha256": "16b27afb76e7c3cab7845a5193da93b5f74d759d6d52c2f9041dec76e93f486e",
+    "fetched": "2026-11-08T20:09:46+00:00",
+    "features": 36
+   },
+   "1765000_5455000_5000": {
+    "sha256": "2042365505efe97eb6762f4e3928ee4e24a2b6fcdf8b81c41b0d5dbec86ff9d7",
+    "fetched": "2026-11-08T20:09:43+00:00",
+    "features": 22
+   }
+  }
+ },
+ "nonprimary_parcels": {
+  "url": "https://data.linz.govt.nz/layer/50782/",
+  "licence": "LINZ CC BY 4.0",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:59:41+00:00",
+  "fetched_last": "2026-11-08T20:09:46+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "74bf3a0a2e54cb20ddbb62dc68ea2499f84cfedfc264b2e90aa4f2af41d999b9",
+    "fetched": "2026-11-08T19:59:41+00:00",
+    "features": 44
+   },
+   "1745000_5445000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T19:59:53+00:00",
+    "features": 0
+   },
+   "1750000_5440000_5000": {
+    "sha256": "68dda94019ed4448ca40687fc70781a6908dbed1576e32c8309068f7ccf76702",
+    "fetched": "2026-11-08T20:00:30+00:00",
+    "features": 3110
+   },
+   "1750000_5445000_5000": {
+    "sha256": "ec7407d62942e86a7ea0ba11cd008bc5aee78ec44796250b935e87a27101a715",
+    "fetched": "2026-11-08T20:00:46+00:00",
+    "features": 2734
+   },
+   "1750000_5450000_5000": {
+    "sha256": "7d09e532fc380630caac6b4b1b5174a7a9f7a308f6544bcb79eefb97b1e12306",
+    "fetched": "2026-11-08T20:00:02+00:00",
+    "features": 0
+   },
+   "1755000_5440000_5000": {
+    "sha256": "427c1b30e61353ac5e53dacc239c0cc68805d03f34d92ca05b19868d8433f4d2",
+    "fetched": "2026-11-08T20:00:50+00:00",
+    "features": 3301
+   },
+   "1755000_5445000_5000": {
+    "sha256": "492209581a8a406771ae42f82033b8d5973fb9127c6b8e7b4935565dc3035752",
+    "fetched": "2026-11-08T20:01:25+00:00",
+    "features": 6912
+   },
+   "1755000_5450000_5000": {
+    "sha256": "1ffd1b9141b1bc85e90160ad4ca552e7e3d865769db40f6de4da674a3e314487",
+    "fetched": "2026-11-08T20:00:54+00:00",
+    "features": 695
+   },
+   "1755000_5455000_5000": {
+    "sha256": "065255b34f36af1ba44ac9e4f197b41117fdb6f211f751711244206be18ead28",
+    "fetched": "2026-11-08T20:03:49+00:00",
+    "features": 189
+   },
+   "1760000_5440000_5000": {
+    "sha256": "d73cdaceda0892d6f6f8851d87943da18325d4480507097217dcbe8f18f6ce37",
+    "fetched": "2026-11-08T20:04:54+00:00",
+    "features": 1080
+   },
+   "1760000_5445000_5000": {
+    "sha256": "93ebbc0061ca10d8a2a2b94976d734696234cb55a9f08153c4f3c59c2473e02d",
+    "fetched": "2026-11-08T20:06:18+00:00",
+    "features": 1713
+   },
+   "1760000_5450000_5000": {
+    "sha256": "d88704960da384d2f0a0d2b7d96bbcb8ad1652c352e246990497462eef2e8a12",
+    "fetched": "2026-11-08T20:07:44+00:00",
+    "features": 251
+   },
+   "1760000_5455000_5000": {
+    "sha256": "ca790a6e63ea0c11242c3955ed3716956ce119dac3a45692d79e8500c042c309",
+    "fetched": "2026-11-08T20:08:10+00:00",
+    "features": 86
+   },
+   "1765000_5440000_5000": {
+    "sha256": "acdfbc283a6654d763449c9ff195c492f743c07d43773e86951d5be1f7604b3a",
+    "fetched": "2026-11-08T20:08:45+00:00",
+    "features": 1905
+   },
+   "1765000_5445000_5000": {
+    "sha256": "3fe64b4b3ef431f7d42abc7510a9516b4eaa3c208be1cd4c40be3cb372b77402",
+    "fetched": "2026-11-08T20:09:37+00:00",
+    "features": 65
+   },
+   "1765000_5450000_5000": {
+    "sha256": "928918153988f8840bbd72eefd94928eb7f1c87cd56c0ee403fe199705620487",
+    "fetched": "2026-11-08T20:09:46+00:00",
+    "features": 25
+   },
+   "1765000_5455000_5000": {
+    "sha256": "4176eff28cc0ba0b7c41f05980680f9c4600b767a775dccded27b5c7c23497d9",
+    "fetched": "2026-11-08T20:09:44+00:00",
+    "features": 7
+   }
+  }
+ },
+ "district_flow": {
+  "url": "https://nz-elevation.s3.ap-southeast-2.amazonaws.com/new-zealand/new-zealand/dem_1m/2193/collection.json",
+  "licence": "LINZ CC BY 4.0 (national 1 m DEM; gaps from the contour-interpolated 8 m DEM)",
+  "blocks": 17,
+  "failed_blocks": 0,
+  "fetched_first": "2026-11-08T19:57:48+00:00",
+  "fetched_last": "2026-11-08T19:57:48+00:00",
+  "by_block": {
+   "1745000_5440000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1745000_5445000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1750000_5440000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1750000_5445000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1750000_5450000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1755000_5440000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1755000_5445000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1755000_5450000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1755000_5455000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1760000_5440000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1760000_5445000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1760000_5450000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1760000_5455000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1765000_5440000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1765000_5445000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1765000_5450000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   },
+   "1765000_5455000_5000": {
+    "sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+    "fetched": "2026-11-08T19:57:48+00:00",
+    "features": null
+   }
+  }
+ }
+}

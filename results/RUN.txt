@@ -1,0 +1,1 @@
+Run 42517549416 on 2026-11-08T20:13:37Z merged at commit 11dfb3d119eda6b32e353a9d5673ddfe461c28f1; blocks compiled at commit 11dfb3d119eda6b32e353a9d5673ddfe461c28f1; finished by run 42523659672 on 2026-11-08T21:08:49Z at commit 0fd29bbec7f03fe89a5ced9b118b776f0d8f1366 (row rules only, finish.py). Rules applied to published results; not a rebuild.

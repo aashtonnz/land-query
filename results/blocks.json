@@ -1,0 +1,980 @@
+[
+ {
+  "block": [
+   1745000,
+   5440000,
+   1750000,
+   5445000
+  ],
+  "fetch_bbox": [
+   1745000,
+   5440000,
+   1750419,
+   5445001
+  ],
+  "parcels": 1,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 1,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1745000,
+   5445000,
+   1750000,
+   5450000
+  ],
+  "fetch_bbox": [
+   1745000,
+   5445000,
+   1750399,
+   5451001
+  ],
+  "parcels": 3,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 3,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 3,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1750000,
+   5440000,
+   1755000,
+   5445000
+  ],
+  "fetch_bbox": [
+   1749763,
+   5440000,
+   1755284,
+   5445374
+  ],
+  "parcels": 1337,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 1,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 8952320,
+    "appellation": "Section 4 SO 628630",
+    "intent": "Legalisation"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1337,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.12,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 1337,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1750000,
+   5445000,
+   1755000,
+   5450000
+  ],
+  "fetch_bbox": [
+   1750000,
+   5444000,
+   1755582,
+   5450001
+  ],
+  "parcels": 3215,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 5,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 8717745,
+    "appellation": "Section 1 SO 560043",
+    "intent": "Fee Simple Title"
+   },
+   {
+    "id": 8717746,
+    "appellation": "Section 2 SO 560043",
+    "intent": "Legalisation"
+   },
+   {
+    "id": 8717747,
+    "appellation": "Section 3 SO 560043",
+    "intent": "Legalisation"
+   },
+   {
+    "id": 8717748,
+    "appellation": "Section 4 SO 560043",
+    "intent": "Legalisation"
+   },
+   {
+    "id": 8717750,
+    "appellation": "Section 5 SO 560043",
+    "intent": "Fee Simple Title"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 3213,
+    "units_without_linz_geometry": 2,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.02,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 3215,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1750000,
+   5450000,
+   1755000,
+   5455000
+  ],
+  "fetch_bbox": [
+   1750000,
+   5450000,
+   1755253,
+   5455001
+  ],
+  "parcels": 1,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.0,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 1,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1755000,
+   5440000,
+   1760000,
+   5445000
+  ],
+  "fetch_bbox": [
+   1754814,
+   5440000,
+   1760379,
+   5445500
+  ],
+  "parcels": 3860,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 3860,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.58,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 3860,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1755000,
+   5445000,
+   1760000,
+   5450000
+  ],
+  "fetch_bbox": [
+   1754157,
+   5444724,
+   1760242,
+   5450506
+  ],
+  "parcels": 9913,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 3,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 7353257,
+    "appellation": "Section 1 SO 446636",
+    "intent": "Fee Simple Title"
+   },
+   {
+    "id": 8966178,
+    "appellation": "Lot 1 DP 627730",
+    "intent": "Fee Simple Title"
+   },
+   {
+    "id": 8966179,
+    "appellation": "Lot 2 DP 627730",
+    "intent": "Fee Simple Title"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 9912,
+    "units_without_linz_geometry": 1,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.11,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 9913,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1755000,
+   5450000,
+   1760000,
+   5455000
+  ],
+  "fetch_bbox": [
+   1754632,
+   5449619,
+   1761001,
+   5456001
+  ],
+  "parcels": 1319,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1318,
+    "units_without_linz_geometry": 1,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 1319,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 2
+   }
+  }
+ },
+ {
+  "block": [
+   1755000,
+   5455000,
+   1760000,
+   5460000
+  ],
+  "fetch_bbox": [
+   1755000,
+   5454582,
+   1760322,
+   5460001
+  ],
+  "parcels": 808,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 808,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.03,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 808,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5440000,
+   1765000,
+   5445000
+  ],
+  "fetch_bbox": [
+   1759627,
+   5440000,
+   1765009,
+   5445723
+  ],
+  "parcels": 60,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 1,
+  "outside_district_examples": [
+   {
+    "id": 3907535,
+    "appellation": "Section 1 SO 18087"
+   }
+  ],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 60,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 60,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5445000,
+   1765000,
+   5450000
+  ],
+  "fetch_bbox": [
+   1759650,
+   5444606,
+   1765709,
+   5450209
+  ],
+  "parcels": 1165,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 1,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4021246,
+    "appellation": "Section 1 Block IX Paekakariki SD",
+    "intent": "DCDB"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1164,
+    "units_without_linz_geometry": 1,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 3,
+    "max_abs": 4.68,
+    "worst": [
+     [
+      4048188,
+      -4.68
+     ],
+     [
+      3897521,
+      4.18
+     ],
+     [
+      3849127,
+      1.09
+     ]
+    ]
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 1165,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5450000,
+   1765000,
+   5455000
+  ],
+  "fetch_bbox": [
+   1759406,
+   5449413,
+   1765739,
+   5456001
+  ],
+  "parcels": 155,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 154,
+    "units_without_linz_geometry": 1,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.03,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 155,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5455000,
+   1765000,
+   5460000
+  ],
+  "fetch_bbox": [
+   1759478,
+   5454206,
+   1765317,
+   5460709
+  ],
+  "parcels": 65,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 65,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.03,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 65,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5440000,
+   1770000,
+   5445000
+  ],
+  "fetch_bbox": [
+   1764392,
+   5440000,
+   1770001,
+   5445615
+  ],
+  "parcels": 6,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 6,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 6,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5445000,
+   1770000,
+   5450000
+  ],
+  "fetch_bbox": [
+   1764758,
+   5444827,
+   1770001,
+   5450230
+  ],
+  "parcels": 37,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 37,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 37,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5450000,
+   1770000,
+   5455000
+  ],
+  "fetch_bbox": [
+   1764447,
+   5449849,
+   1770001,
+   5455001
+  ],
+  "parcels": 7,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 1,
+  "outside_district_examples": [
+   {
+    "id": 3886191,
+    "appellation": "Lot 5 DP 77892"
+   }
+  ],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 7,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.02,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 7,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5455000,
+   1770000,
+   5460000
+  ],
+  "fetch_bbox": [
+   1765000,
+   5454474,
+   1770001,
+   5460001
+  ],
+  "parcels": 2,
+  "commit": "11dfb3d119eda6b32e353a9d5673ddfe461c28f1",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "255f9a27b5520cf89f8b64d5f21e3d38bfa5b471c80a99a3b9228b67da6d27c3",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 2,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 2,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ }
+]

@@ -1,0 +1,11 @@
+{
+ "overland_flow_path_vs_pcc_flood_overlays": {
+  "parcels": 21689,
+  "flagged": 6069,
+  "in_reference": 5696,
+  "both": 3040,
+  "share_of_flagged_in_reference": 0.501,
+  "share_of_all_in_reference": 0.263,
+  "lift": 1.91
+ }
+}
