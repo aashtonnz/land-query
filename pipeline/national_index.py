@@ -223,6 +223,39 @@ def water_shares(parcels, water, land):
     return out
 
 
+NO_DISTRICT = "Area outside Territorial Authority"   # LINZ's name for land in no district (offshore islands)
+ADDRESS_NEAR_M = 1000.0
+
+
+def national_districts(parcels, rows, localities, addresses):
+    """One district name per parcel for the national build, or None where it cannot be told (review 25). LINZ's
+    localities name every district a locality touches ("Auckland, Waikato District" for Pukekohe), so they decide
+    only where they name one. In order: the parcel's own address; a locality naming a single district; where the
+    locality names several, the nearest address within 1 km naming one of them; LINZ's "outside" name only where no
+    address within 1 km says otherwise (harbour-edge parcels in a city)."""
+    lt = STRtree([g for g, _ in localities]) if localities else None
+    at = STRtree([g for g, _ in addresses]) if addresses else None
+    def near(rp, among=None):
+        if at is None: return None
+        best = None
+        for i in at.query(rp.buffer(ADDRESS_NEAR_M)):
+            d = addresses[int(i)][1].get("territorial_authority")
+            if not d or d == NO_DISTRICT or (among is not None and d not in among): continue
+            dist = addresses[int(i)][0].distance(rp)
+            if dist <= ADDRESS_NEAR_M and (best is None or dist < best[0]): best = (dist, d)
+        return best[1] if best else None
+    out = []
+    for (g, _, rp), r in zip(parcels, rows):
+        own = r.get("territorial_authority")   # from vector_columns: the parcel's lowest-numbered address
+        if own and own != NO_DISTRICT: out.append(own); continue
+        names = [localities[int(i)][1] for i in lt.query(rp, predicate="within")] if lt is not None else []
+        name = names[0] if names else None
+        if name and "," in name: out.append(near(rp, {n.strip() for n in name.split(",")}))
+        elif name and name != NO_DISTRICT: out.append(name)
+        else: out.append(near(rp) or name)
+    return out
+
+
 def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), neighbours=()):
     """One dict per parcel. parcels: [(geometry, properties, representative point)]; roads, buildings, addresses, coast,
     tas: [(geometry, properties)]; titles: {title_no: properties}."""
@@ -307,7 +340,9 @@ def elevation_columns(parcels, Z, T, lidar, acc, trunc):
                              slope_mean_deg=round(a.sm, 1), slope_max_deg=round(a.s1, 1), flat_pct=round(100 * a.flat, 1),
                              steep_pct=round(100 * a.steep, 1), low_lying_pct=round(100 * a.low, 1),
                              lidar_pct=round(100 * a.li, 1), ground_cells=int(a.n),
-                             ground_cells_pct=round(100 * a.n / max(1, allc[k]), 1),   # of the parcel's own cell centres: under 100 means some have no ground (T-108)
+                             # of the whole parcel: its cells with ground against the cells its area would hold, so a parcel reaching past
+                             # the elevation window (a national park) no longer reads 100 (T-108, review 25)
+                             ground_cells_pct=round(min(100.0, 100 * a.n / max(1, allc[k] if allc[k] >= 0.9 * geom.area / (RES * RES) else geom.area / (RES * RES))), 1),
                              upslope_area_max_m2=float(round(top.loc[k, "acc"])), upslope_truncated=bool(top.loc[k, "tr"]),
                              elevation_from="cells"))
             continue
@@ -344,9 +379,11 @@ def index_tile(tile, cache, region=None, tas=None):
     if not parcels: return [], dict(prov, rows=0, seconds=round(time.time() - t0, 1))
     bs = np.array([g.bounds for g, _, _ in parcels])
     win = (bs[:, 0].min() - 30, bs[:, 1].min() - 30, bs[:, 2].max() + 30, bs[:, 3].max() + 30)
-    if tas is None:
+    national = tas is None
+    if national:
         lf_, prov["localities"] = fetch("localities", win, cache)
-        tas = [(g, dict(NAME=p.get("territorial_authority"))) for g, p in geoms(lf_) if p.get("territorial_authority")]
+        loc = [(g, p.get("territorial_authority")) for g, p in geoms(lf_) if p.get("territorial_authority")]
+        tas = ()
     rf, prov["roads"] = fetch("parcels", win, cache, where="parcel_intent='Road'")
     tf, prov["titles"] = fetch("titles", win, cache)
     bf, prov["buildings"] = fetch("buildings", win, cache)
@@ -356,6 +393,8 @@ def index_tile(tile, cache, region=None, tas=None):
     titles = current_titles(tf)
     neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
     rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), tas, neighbours)
+    if national:
+        for r, d in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"] = d
     # water is measured, never guessed from a name or a title (T-113, T-115)
     lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
     lf, prov["land"] = fetch("land", win, cache)

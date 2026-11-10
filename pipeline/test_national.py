@@ -278,12 +278,36 @@ def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
     assert set(N.current_titles([f("A", "LIVE"), f("B", "PRTC"), f("C", "CANC")])) == {"A", "B"}
 
 
-def test_national_districts_come_from_linz_localities():
-    """T-102: with no district polygons given, a parcel's district is that of the LINZ locality holding its point."""
-    rows = run_tile({"parcels": [(box(100, 100, 200, 200), dict(id=1, parcel_intent="DCDB")), (box(600, 100, 700, 200), dict(id=2, parcel_intent="DCDB"))],
-                     "localities": [(box(0, 0, 500, 1000), dict(id=1, territorial_authority="Kāpiti Coast District")),
-                                    (box(500, 0, 1000, 1000), dict(id=2, territorial_authority="Porirua City"))]})
-    assert rows[1]["territorial_authority"] == "Kāpiti Coast District" and rows[2]["territorial_authority"] == "Porirua City"
+def test_national_district_is_one_name_from_the_address_or_an_unambiguous_locality():
+    """T-102, review 25: LINZ localities name every district they touch, so the parcel's address decides first, then a
+    locality naming one district, then the nearest address within 1 km among the names; never the combined string."""
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    A = lambda x, y, ta, i: (Point(x, y), dict(address_id=i, full_address=f"{i} Road", address_number=i, territorial_authority=ta))
+    keep = N.ADDRESS_NEAR_M; N.ADDRESS_NEAR_M = 100.0
+    try:
+        rows = run_tile({"parcels": [(box(100, 100, 150, 150), P(1)),    # own address says Tasman, in a two-district locality
+                                     (box(160, 100, 210, 150), P(2)),    # no address; the nearest naming one of the two is parcel 1's (a nearer one names neither)
+                                     (box(100, 800, 150, 850), P(3)),    # two-district locality, no address near: unknown
+                                     (box(500, 100, 550, 150), P(4)),    # single-district locality
+                                     (box(800, 100, 850, 150), P(5)),    # "outside" by the locality, an address 45 m away in a city
+                                     (box(800, 800, 850, 850), P(6)),    # "outside", nothing near: stays outside
+                                     (box(500, 800, 550, 850), P(7))],   # its own address says another district than its locality: the address wins
+                         "addresses": [A(125, 125, "Tasman District", 1), A(870, 125, "Napier City", 2), A(190, 160, "Buller District", 3), A(525, 825, "Wellington City", 4)],
+                         "localities": [(box(0, 0, 400, 1000), dict(id=1, territorial_authority="Nelson City, Tasman District")),
+                                        (box(400, 0, 700, 1000), dict(id=2, territorial_authority="Porirua City")),
+                                        (box(700, 0, 1000, 1000), dict(id=3, territorial_authority=N.NO_DISTRICT))]})
+    finally: N.ADDRESS_NEAR_M = keep
+    d = {k: r["territorial_authority"] for k, r in rows.items()}
+    assert d == {1: "Tasman District", 2: "Tasman District", 3: None, 4: "Porirua City", 5: "Napier City", 6: N.NO_DISTRICT, 7: "Wellington City"}, d
+
+
+def test_ground_share_is_of_the_whole_parcel_not_only_the_part_in_the_window():
+    """Review 25: a parcel reaching past the elevation grid (a national park) reads the share of its area with ground,
+    not 100."""
+    Z = np.full((140, 70), 5.0, np.float32)                                 # the grid covers only x -200..500
+    rows = run_tile({"parcels": [(box(0, 0, 400, 400), dict(id=1, parcel_intent="DCDB")),
+                                 (box(0, 500, 1000, 900), dict(id=2, parcel_intent="DCDB"))]}, Z=Z)
+    assert rows[1]["ground_cells_pct"] == 100 and 49 <= rows[2]["ground_cells_pct"] <= 51, rows[2]["ground_cells_pct"]
 
 
 def test_the_national_merge_writes_nothing_unless_every_share_and_tile_is_there_once():

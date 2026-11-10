@@ -204,3 +204,22 @@ No serious findings.
 Rounds 16 to 24 found 4, 3, 3, 3, 2, 1, 1, 1 and 0 serious faults. With a round that found none, the review cycle on
 the national index ends here, as the practice says.
 
+## Twenty-fifth review: the first whole-country build (T-102)
+
+The build of 10 Nov 2026 (run 42746250658, commit 33a1423): 2,467,530 parcels in 370 tiles, 2 h 50 min, no failed
+share. Not published.
+
+| # | Finding | Seriousness | Fix |
+| --- | --- | --- | --- |
+| 1 | 137,453 parcels (5.6%) carry a combined district name ("Tauranga City, Western Bay of Plenty District", 23,616): LINZ's localities name every district a locality touches, and the address, which names one, was used only where the locality gave nothing. Any count by district was wrong | Serious | The address first; a locality only where it names one district; else the nearest address within 1 km among the names; else empty. Tested; on the Pukekohe tile 14,371 combined names became 12,671 Auckland, 1,569 Waikato District and 131 empty |
+| 2 | About 650 mainland harbour-edge parcels read "Area outside Territorial Authority" or empty (10 Herd Street, Wellington) | Moderate | The same rule: an address within 1 km decides |
+| 3 | `ground_cells_pct` read 100 on parcels reaching past the elevation window (Fiordland National Park: 7.7% covered) | Moderate | Now the share of the whole parcel; documented |
+| 4 | Ten offshore rocks read as over 10 km from the coast (the coastline layer omits them) | Minor | Left; noted here |
+| 5 | `SOURCES.md` listed `title_types`, said the Chathams have no water share, and did not describe the district names | Minor | Corrected |
+
+Found correct: the row count equals LINZ's count of distinct parcels outside the excluded intents exactly; no duplicates;
+tile edges; Stewart Island, the Chathams and the subantarctic islands present; every shared column but the district
+identical to the reviewed Wellington build on all 217,409 parcels; no title or owner data; value ranges; the catchment
+flag on the Shotover. Not checked: building and address counts against the source layers outside Wellington; the bulk
+download path. A rebuild and a second review follow before anything is published.
+
