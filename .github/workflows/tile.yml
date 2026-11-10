@@ -54,6 +54,8 @@ jobs:
           python3 inverse_queries.py data | tee summary.md
           cat qa.txt >> summary.md
           grep -h -E "Elapsed|Maximum resident" time_*.txt | tee -a summary.md
+      - name: Strip title references and types before keeping the block (T-106; artifacts of a public repository can be downloaded)
+        run: python3 pipeline/public_strip.py pipeline/data
       - uses: actions/upload-artifact@v4
         with:
           name: tile-${{ inputs.xmin }}-${{ inputs.ymin }}

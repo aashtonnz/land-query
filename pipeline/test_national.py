@@ -314,6 +314,8 @@ def test_published_results_hold_no_title_references_or_types():
     public_strip.strip(d)
     assert list(pd.read_parquet(f"{d}/units.parquet").columns) == ["unit_id", "title_count"]
     assert "Life Estate" not in open(f"{d}/q.json").read() and json.load(open(f"{d}/q.json"))["provenance"]["titles"] == dict(url="u")
+    rep = dict(values=dict(titles="WN1/1", title_types="Life Estate", title_count=1), provenance=dict(titles=dict(url="u")))
+    assert public_strip.strip_json(rep) == dict(values=dict(title_count=1), provenance=dict(titles=dict(url="u")))   # the parcel report
 
 
 if __name__ == "__main__":

@@ -107,6 +107,8 @@ jobs:
           /usr/bin/time -v python3 compile_tile.py data 2> time_compile.txt
           python3 qa.py data
           grep -h -E "Elapsed|Maximum resident" time_compile.txt
+      - name: Strip title references and types before keeping the block (T-106; artifacts of a public repository can be downloaded)
+        run: python3 pipeline/public_strip.py pipeline/data
       - uses: actions/upload-artifact@v4
         with:
           name: block-${{ matrix.block.xmin }}_${{ matrix.block.ymin }}

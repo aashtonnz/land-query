@@ -14,7 +14,6 @@ GROUPS = [
         ("survey_area_m2", "Surveyed area", "m²", 0, "The area on the survey plan."),
         ("parcel_intent", "Parcel type", "", None, "LINZ's parcel intent (DCDB is an older survey record)."),
         ("title_count", "Titles", "", 0, "Records of title on the parcel."),
-        ("title_types", "Title types", "", None, "Freehold, cross lease, unit title and so on."),
         ("easements_n", "Easements", "", 0, "Easement parcels over this parcel (existence only)."),
         ("land_covenants_n", "Land covenants", "", 0, "Land covenant parcels over this parcel (existence only)."),
     ]),
@@ -175,7 +174,7 @@ dd {{ margin: 0 }}
   <div>
     <div class="eyebrow">Site screen · LINZ data only</div>
     <h1>{E(title)}</h1>
-    <div class="id"><b>{E(v.get("appellation") or "")}</b><br>Parcel {rep["parcel_id"]} · {E(v.get("title_types") or "no live title found")}<br>
+    <div class="id"><b>{E(v.get("appellation") or "")}</b><br>Parcel {rep["parcel_id"]} · {E(str(v["title_count"]) + (" title" if v["title_count"] == 1 else " titles") if v.get("title_count") else "no live title found")}<br>
       NZTM {v.get("rep_x", 0):,.0f} E · {v.get("rep_y", 0):,.0f} N</div>
     <p class="lede">What the national data says about this land: its shape, ground, buildings, sun, earthworks and water flow,
       each with what it means. Council zoning and hazard maps are not included.</p>

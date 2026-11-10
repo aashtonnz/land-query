@@ -2,7 +2,8 @@
 
 Usage: public_strip.py DIR. In every .parquet file under DIR the columns `titles` (LINZ title references, a direct key
 to owner records) and `title_types` (a Life Estate says a living person holds an interest) are dropped; in every .json
-file, the same keys are dropped from each row (any object holding `unit_id` or `parcel_id`). The title count stays.
+file, the same keys are dropped from each row (any object holding `unit_id` or `parcel_id`) and wherever else they hold
+a value rather than a source description (the parcel report). The title count stays.
 Fails if either column is still present afterwards.
 """
 import json, os, sys
@@ -13,8 +14,9 @@ WITHHELD = ("titles", "title_types")
 
 def strip_json(x):
     if isinstance(x, dict):
+        # a row's values, or any value of these keys that is not a source description (a dict, as in provenance)
         is_row = "unit_id" in x or "parcel_id" in x
-        return {k: strip_json(v) for k, v in x.items() if not (is_row and k in WITHHELD)}
+        return {k: strip_json(v) for k, v in x.items() if not (k in WITHHELD and (is_row or not isinstance(v, dict)))}
     if isinstance(x, list): return [strip_json(v) for v in x]
     return x
 

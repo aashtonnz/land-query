@@ -34,6 +34,7 @@ jobs:
         run: |
           if [ -n "$PARCEL_ID" ]; then python3 parcel_report.py ../report --id "$PARCEL_ID"
           else python3 parcel_report.py ../report --address "$ADDRESS"; fi
+          python3 public_strip.py ../report   # no title references or types (T-106)
           python3 report_page.py ../report/report.json ../report/report.html
       - uses: actions/upload-artifact@v4
         with:
