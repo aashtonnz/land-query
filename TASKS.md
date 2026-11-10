@@ -17,7 +17,6 @@ Standing priorities:
 
 ## Next (in order, at most about 10)
 - T-102: Build the national index out to the whole country: code and workflow done (districts from LINZ localities, 370 tiles in 40 shares, a merge that refuses partial results; a build is published as a release only after review). Next: the first build, a fresh-eyes review of it, then publish and set it monthly. Easements (needs the key) and the map's national hosting follow. Raised 2026-11-09.
-- T-106: Before the project is announced anywhere (D-24): rebuild the results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) without `titles` and `title_types`, history included, and make every build publish only public-mode columns. Ask the owner before rewriting the branches. Raised 2026-11-09.
 - T-104: Confirm the LINZ Data Service layer number and licence of the Mean High Water Springs coastline the national index uses (assumed CC BY 4.0). Raised 2026-11-09.
 - T-110: Parcel-report findings left open by the sixteenth and seventeenth reviews: sun and horizon next to a surface-model gap; warn where ground and surface surveys differ; tall structures without outlines read as open ground; the 10 m catchment against the Kāpiti build; title references in report.json; page limits (500 m horizon, 300 m shadows); addresses over several parcels. [Review](docs/findings/2026-11-09-national-review.md) Raised 2026-11-09.
 - T-95: Porirua's QA summary still uses Kāpiti's names and checks (n = 0); give each council its own vertical checks, and explain the measure check's parcel universe. Raised 2026-11-09.
@@ -38,6 +37,7 @@ Phase 2 — Greater Wellington:
 - GNS strong-motion and GeoNet shake-map ingestion after M4.5+ earthquakes.
 
 ## Done (last two weeks, newest first)
+- T-106: Results branches (`kapiti-results`, `porirua-results`, `national-pilot`, `tile-results`) rebuilt as one commit each without `titles` and `title_types`, earlier history removed (owner's OK, 10 Nov). Every publishing workflow and the national index now strip them (`pipeline/public_strip.py`). Left: copies GitHub may keep of old commits by their ids, and block artifacts kept one day during a council build. 2026-11-10.
 - T-124: Twenty-fourth fresh-eyes review: no serious findings, so the cycle ends; moderate points fixed in T-125 (one rule for unconfirmed sea; thresholds pinned by tests). [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-122: Twenty-third fresh-eyes review: the height check let rocks read as sea (the grid holds a flat sea surface); fixed in T-123: half or more outside the land outline reads unknown. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.
 - T-120: Twenty-second fresh-eyes review: rocks near the shore still read as sea; fixed in T-121 (open-sea parcels read as water only where the heights are low), with tighter retry and map tests. [Review](docs/findings/2026-11-09-national-review.md) 2026-11-09.

@@ -409,7 +409,8 @@ def run(out, tiles, region=None, tas=None, rprov=None, key="nz"):
         rows += r; tprov.append(p)
         print(f"tile {i + 1}/{len(tiles)} {t}: {len(r)} parcels, {p.get('seconds_vector', p.get('seconds'))}s vector, "
               f"{p.get('seconds_elevation', 0)}s elevation", flush=True)
-    df = pd.DataFrame(rows)
+    # title types are used inside the build only: the published index never holds them (D-17, T-106)
+    df = pd.DataFrame(rows).drop(columns=["title_types"], errors="ignore")
     path = os.path.join(out, "index.parquet")
     df.to_parquet(path, index=False, compression="zstd")
     import subprocess

@@ -81,6 +81,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with: { name: national-index, path: nz, run-id: "${{ inputs.publish_run }}", github-token: "${{ github.token }}" }
+      - uses: actions/checkout@v4
+        with: { path: code }
+      - run: pip install -q pyarrow && python3 code/pipeline/public_strip.py nz   # never title references or types (T-106), whatever code built it
       - env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           commit=$(python3 -c "import json; print(json.load(open('nz/provenance.json'))['commit'])")

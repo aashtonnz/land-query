@@ -305,6 +305,17 @@ def test_the_national_merge_writes_nothing_unless_every_share_and_tile_is_there_
     assert len(pd.read_parquet(f"{d}/out/index.parquet")) == 3
 
 
+def test_published_results_hold_no_title_references_or_types():
+    """T-106: public_strip drops titles and title_types from tables and from query rows, and keeps the count."""
+    import tempfile, json, pandas as pd, public_strip
+    d = tempfile.mkdtemp()
+    pd.DataFrame(dict(unit_id=[1], titles=["WN1/1"], title_types=["Life Estate"], title_count=[1])).to_parquet(f"{d}/units.parquet")
+    json.dump(dict(provenance=dict(titles=dict(url="u")), rows=[dict(unit_id=1, title_types="Life Estate", area_m2=5)]), open(f"{d}/q.json", "w"))
+    public_strip.strip(d)
+    assert list(pd.read_parquet(f"{d}/units.parquet").columns) == ["unit_id", "title_count"]
+    assert "Life Estate" not in open(f"{d}/q.json").read() and json.load(open(f"{d}/q.json"))["provenance"]["titles"] == dict(url="u")
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

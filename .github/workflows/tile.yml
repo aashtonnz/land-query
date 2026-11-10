@@ -67,6 +67,7 @@ jobs:
         run: |
           D=results/${TILE_XMIN}_${TILE_YMIN}
           cp -r pipeline/data /tmp/tiledata && cp pipeline/summary.md /tmp/tiledata/
+          python3 pipeline/public_strip.py /tmp/tiledata   # no title references or types in public results (T-106)
           git fetch origin tile-results && git checkout tile-results || git checkout --orphan tile-results
           git rm -rq --cached . 2>/dev/null || true
           mkdir -p "$D" && cp /tmp/tiledata/{provenance.json,inverse_queries.json,summary.md,qa.json} "$D/"

@@ -14,7 +14,7 @@ def merge(shares_dir, out, n, tiles):
     provs = [json.load(open(os.path.join(d, "provenance.json"))) for d in dirs]
     built = sorted(tuple(t["tile"]) for p in provs for t in p["tiles"])
     if built != sorted(tuple(t) for t in tiles): sys.exit(f"{len(built)} tiles built against {len(tiles)} planned: nothing written")
-    df = pd.concat([pd.read_parquet(os.path.join(d, "index.parquet")) for d in dirs], ignore_index=True)
+    df = pd.concat([pd.read_parquet(os.path.join(d, "index.parquet")) for d in dirs], ignore_index=True).drop(columns=["titles", "title_types"], errors="ignore")   # T-106
     dup = int(df.parcel_id.duplicated().sum())
     if dup: sys.exit(f"{dup} parcels appear twice: nothing written")
     commits = sorted({p.get("commit") for p in provs})

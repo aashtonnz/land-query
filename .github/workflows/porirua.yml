@@ -157,6 +157,7 @@ jobs:
       - name: Push results to porirua-results branch
         run: |
           mkdir -p /tmp/out && cp district/{units.parquet,provenance.json,blocks.json,qa_summary.json,inverse_queries.json,summary.md,merge_log.txt,measures_checks.json} /tmp/out/
+          python3 pipeline/public_strip.py /tmp/out   # no title references or types in public results (T-106)
           git fetch origin porirua-results && git checkout porirua-results || git checkout --orphan porirua-results
           git rm -rq --cached . 2>/dev/null || true
           rm -rf results && mkdir -p results && cp /tmp/out/* results/
