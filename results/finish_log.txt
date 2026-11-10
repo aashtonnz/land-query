@@ -1,0 +1,5 @@
+values changed by column: {}
+Rules applied to published results; not a rebuild. Columns only a full rebuild adds, not yet present: unmapped_structure_m2. 1 parcels have building values a full rebuild would restore (finish.py only empties).
+finished: 27284 parcels
+_p50_deg": 2, "roof_flat_m2": 2, "roof_north_m2": 2, "roof_solar_rel_pct": 2, "upslope_area_max_m2": 113, "upslope_area_truncated": 113, "flow_path_m": 113, "level_open_cut_m3": 2, "level_open_fill_m3": 2, "platform_15m_earthworks_min_m3": 2}
+finished: 27284 parcels

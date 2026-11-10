@@ -1,0 +1,3929 @@
+[
+ {
+  "block": [
+   1755000,
+   5470000,
+   1760000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1755000,
+   5470000,
+   1760001,
+   5475001
+  ],
+  "parcels": 25,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 25,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.0,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 25,
+    "no_lidar": 25
+   }
+  }
+ },
+ {
+  "block": [
+   1755000,
+   5475000,
+   1760000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1755000,
+   5475000,
+   1760001,
+   5480001
+  ],
+  "parcels": 1,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.0,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 1,
+    "no_lidar": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5455000,
+   1765000,
+   5460000
+  ],
+  "fetch_bbox": [
+   1760000,
+   5455000,
+   1765512,
+   5461001
+  ],
+  "parcels": 15,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 2,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4041122,
+    "appellation": "Part Paekakariki 2A2 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7788283,
+    "appellation": null,
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 22,
+  "outside_district_examples": [
+   {
+    "id": 3962822,
+    "appellation": "Lot 2 DP 90282"
+   },
+   {
+    "id": 3986176,
+    "appellation": "Lot 2 DP 90776"
+   },
+   {
+    "id": 3794614,
+    "appellation": "Part Lot 1 DP 4268"
+   },
+   {
+    "id": 3938317,
+    "appellation": "Lot 7 DP 90282"
+   },
+   {
+    "id": 7267491,
+    "appellation": "Section 2 SO 431263"
+   },
+   {
+    "id": 3918274,
+    "appellation": "Lot 6 DP 90282"
+   },
+   {
+    "id": 3825214,
+    "appellation": "Lot 1 DP 90776"
+   },
+   {
+    "id": 4066631,
+    "appellation": "Lot 1 DP 90282"
+   },
+   {
+    "id": 3900722,
+    "appellation": "Part Lot 1 DP 11960"
+   },
+   {
+    "id": 4003951,
+    "appellation": "Lot 1 DP 87334"
+   },
+   {
+    "id": 3912535,
+    "appellation": "Lot 8 DP 33618"
+   },
+   {
+    "id": 3850749,
+    "appellation": "Lot 1 DP 33618"
+   },
+   {
+    "id": 3754769,
+    "appellation": "Lot 2 DP 33618"
+   },
+   {
+    "id": 3828803,
+    "appellation": "Lot 3 DP 33618"
+   },
+   {
+    "id": 3980430,
+    "appellation": "Lot 4 DP 33618"
+   },
+   {
+    "id": 3897001,
+    "appellation": "Lot 5 DP 33618"
+   },
+   {
+    "id": 3989161,
+    "appellation": "Lot 6 DP 33618"
+   },
+   {
+    "id": 3904760,
+    "appellation": "Lot 7 DP 33618"
+   },
+   {
+    "id": 3891609,
+    "appellation": "Lot 1 DP 14057"
+   },
+   {
+    "id": 3872230,
+    "appellation": "Lot 1 DP 61197"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 15,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 22,
+    "median": -0.091,
+    "iqr": [
+     -0.146,
+     -0.038
+    ],
+    "p5_p95": [
+     -0.248,
+     0.23
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 416,
+    "median": -0.08,
+    "iqr": [
+     -0.179,
+     0.004
+    ],
+    "p5_p95": [
+     -0.447,
+     0.226
+    ],
+    "share_abs_gt_0_5m": 0.048
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 159277,
+    "median": 0.071,
+    "iqr": [
+     0.051,
+     0.105
+    ],
+    "p5_p95": [
+     -0.003,
+     0.456
+    ],
+    "share_abs_gt_0_5m": 0.032
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 354,
+    "median": -0.651,
+    "iqr": [
+     -1.251,
+     -0.261
+    ],
+    "p5_p95": [
+     -2.989,
+     0.008
+    ],
+    "share_abs_gt_0_5m": 0.633
+   },
+   "parcels": {
+    "n": 15,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5460000,
+   1765000,
+   5465000
+  ],
+  "fetch_bbox": [
+   1760000,
+   5459977,
+   1765059,
+   5465001
+  ],
+  "parcels": 676,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 3,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 3792079,
+    "appellation": "Part Paekakariki 1E Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 4066997,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7788814,
+    "appellation": "Part Section 10 Wainui DIST",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 676,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 67,
+    "median": -0.065,
+    "iqr": [
+     -0.098,
+     -0.033
+    ],
+    "p5_p95": [
+     -0.235,
+     0.043
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 1419,
+    "median": -0.086,
+    "iqr": [
+     -0.191,
+     -0.001
+    ],
+    "p5_p95": [
+     -0.506,
+     0.246
+    ],
+    "share_abs_gt_0_5m": 0.068
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.069,
+    "iqr": [
+     0.051,
+     0.097
+    ],
+    "p5_p95": [
+     0.009,
+     0.367
+    ],
+    "share_abs_gt_0_5m": 0.036
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 1216,
+    "median": -0.636,
+    "iqr": [
+     -1.25,
+     -0.248
+    ],
+    "p5_p95": [
+     -2.829,
+     -0.022
+    ],
+    "share_abs_gt_0_5m": 0.603
+   },
+   "parcels": {
+    "n": 676,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5470000,
+   1765000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1760000,
+   5470000,
+   1765001,
+   5475001
+  ],
+  "parcels": 6,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 6,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.0,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 6,
+    "no_lidar": 6,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1760000,
+   5475000,
+   1765000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1759000,
+   5474000,
+   1765001,
+   5480001
+  ],
+  "parcels": 17,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 17,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 17,
+    "no_lidar": 17
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5455000,
+   1770000,
+   5460000
+  ],
+  "fetch_bbox": [
+   1764732,
+   5455000,
+   1770001,
+   5460703
+  ],
+  "parcels": 12,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 12,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.09,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 2,
+    "median": -0.26,
+    "iqr": [
+     -0.402,
+     -0.118
+    ],
+    "p5_p95": [
+     -0.516,
+     -0.004
+    ],
+    "share_abs_gt_0_5m": 0.5
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 39967,
+    "median": 0.083,
+    "iqr": [
+     0.053,
+     0.246
+    ],
+    "p5_p95": [
+     -0.041,
+     0.492
+    ],
+    "share_abs_gt_0_5m": 0.059
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2,
+    "median": 4.306,
+    "iqr": [
+     1.862,
+     6.75
+    ],
+    "p5_p95": [
+     -0.093,
+     8.705
+    ],
+    "share_abs_gt_0_5m": 1.0
+   },
+   "parcels": {
+    "n": 12,
+    "no_lidar": 2,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5460000,
+   1770000,
+   5465000
+  ],
+  "fetch_bbox": [
+   1764724,
+   5459360,
+   1770486,
+   5466001
+  ],
+  "parcels": 210,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 5,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4066933,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067160,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067268,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7238270,
+    "appellation": "Section 1 SO 429649",
+    "intent": "Railway"
+   },
+   {
+    "id": 7257692,
+    "appellation": "Section 16 SO 427118",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 210,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 52,
+    "median": -0.073,
+    "iqr": [
+     -0.136,
+     -0.045
+    ],
+    "p5_p95": [
+     -0.289,
+     0.028
+    ],
+    "share_abs_gt_0_5m": 0.038
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 56,
+    "median": -0.065,
+    "iqr": [
+     -0.098,
+     -0.021
+    ],
+    "p5_p95": [
+     -0.171,
+     0.048
+    ],
+    "share_abs_gt_0_5m": 0.018
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 1530,
+    "median": -0.087,
+    "iqr": [
+     -0.182,
+     -0.014
+    ],
+    "p5_p95": [
+     -0.528,
+     0.224
+    ],
+    "share_abs_gt_0_5m": 0.073
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.116,
+    "iqr": [
+     0.062,
+     0.222
+    ],
+    "p5_p95": [
+     -0.007,
+     0.363
+    ],
+    "share_abs_gt_0_5m": 0.033
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 1304,
+    "median": -0.559,
+    "iqr": [
+     -1.214,
+     -0.232
+    ],
+    "p5_p95": [
+     -2.823,
+     0.035
+    ],
+    "share_abs_gt_0_5m": 0.571
+   },
+   "parcels": {
+    "n": 210,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5465000,
+   1770000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1765000,
+   5464478,
+   1770602,
+   5470235
+  ],
+  "parcels": 6345,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 13,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4066978,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067216,
+    "appellation": "Part Muaupoko 2 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7337772,
+    "appellation": "Section 1 SO 442373",
+    "intent": "Railway"
+   },
+   {
+    "id": 7337773,
+    "appellation": "Section 2 SO 442373",
+    "intent": "Railway"
+   },
+   {
+    "id": 7337775,
+    "appellation": "Section 4 SO 442373",
+    "intent": "Railway"
+   },
+   {
+    "id": 7337776,
+    "appellation": "Section 5 SO 442373",
+    "intent": "Railway"
+   },
+   {
+    "id": 7337777,
+    "appellation": "Section 6 SO 442373",
+    "intent": "Railway"
+   },
+   {
+    "id": 7674564,
+    "appellation": "Part Ngarara West B 1 1 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7787731,
+    "appellation": "Part Section 13 Block I Paekakariki SD",
+    "intent": "Railway"
+   },
+   {
+    "id": 7787732,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7787758,
+    "appellation": "Part Section 15 Block I Paekakariki SD",
+    "intent": "Railway"
+   },
+   {
+    "id": 7788127,
+    "appellation": "Part Ngarara West B1 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7788142,
+    "appellation": "Part Paraparaumu Block BLK",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 6345,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.05,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 1810,
+    "median": -0.073,
+    "iqr": [
+     -0.123,
+     -0.036
+    ],
+    "p5_p95": [
+     -0.42,
+     0.08
+    ],
+    "share_abs_gt_0_5m": 0.052
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 1424,
+    "median": -0.066,
+    "iqr": [
+     -0.113,
+     -0.027
+    ],
+    "p5_p95": [
+     -0.315,
+     0.076
+    ],
+    "share_abs_gt_0_5m": 0.03
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 12752,
+    "median": -0.084,
+    "iqr": [
+     -0.149,
+     -0.03
+    ],
+    "p5_p95": [
+     -0.411,
+     0.176
+    ],
+    "share_abs_gt_0_5m": 0.049
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.075,
+    "iqr": [
+     0.057,
+     0.109
+    ],
+    "p5_p95": [
+     0.01,
+     0.287
+    ],
+    "share_abs_gt_0_5m": 0.02
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2591,
+    "median": -0.768,
+    "iqr": [
+     -1.508,
+     -0.308
+    ],
+    "p5_p95": [
+     -3.221,
+     -0.014
+    ],
+    "share_abs_gt_0_5m": 0.65
+   },
+   "parcels": {
+    "n": 6345,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1765000,
+   5470000,
+   1770000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1765000,
+   5469237,
+   1770470,
+   5475001
+  ],
+  "parcels": 5816,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 5816,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 2028,
+    "median": -0.063,
+    "iqr": [
+     -0.104,
+     -0.028
+    ],
+    "p5_p95": [
+     -0.296,
+     0.055
+    ],
+    "share_abs_gt_0_5m": 0.033
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 1438,
+    "median": -0.068,
+    "iqr": [
+     -0.107,
+     -0.036
+    ],
+    "p5_p95": [
+     -0.263,
+     0.048
+    ],
+    "share_abs_gt_0_5m": 0.021
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 14280,
+    "median": -0.084,
+    "iqr": [
+     -0.131,
+     -0.041
+    ],
+    "p5_p95": [
+     -0.315,
+     0.11
+    ],
+    "share_abs_gt_0_5m": 0.028
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.073,
+    "iqr": [
+     0.054,
+     0.101
+    ],
+    "p5_p95": [
+     -0.092,
+     0.329
+    ],
+    "share_abs_gt_0_5m": 0.042
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2661,
+    "median": -0.76,
+    "iqr": [
+     -1.417,
+     -0.336
+    ],
+    "p5_p95": [
+     -2.939,
+     -0.034
+    ],
+    "share_abs_gt_0_5m": 0.658
+   },
+   "parcels": {
+    "n": 5816,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1770000,
+   5460000,
+   1775000,
+   5465000
+  ],
+  "fetch_bbox": [
+   1769000,
+   5459000,
+   1775242,
+   5465469
+  ],
+  "parcels": 13,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 4,
+  "outside_district_examples": [
+   {
+    "id": 3927256,
+    "appellation": "Section 8 Block VI Akatarawa SD"
+   },
+   {
+    "id": 3880106,
+    "appellation": "Section 1 Block V Akatarawa SD"
+   },
+   {
+    "id": 3960610,
+    "appellation": "Section 18 Block I Akatarawa SD"
+   },
+   {
+    "id": 3971507,
+    "appellation": "Lot 1 DP 10581"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 13,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 1,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.1,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 12,
+    "median": -0.122,
+    "iqr": [
+     -0.311,
+     -0.065
+    ],
+    "p5_p95": [
+     -0.382,
+     0.05
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 52911,
+    "median": 0.097,
+    "iqr": [
+     0.059,
+     0.184
+    ],
+    "p5_p95": [
+     -0.038,
+     0.407
+    ],
+    "share_abs_gt_0_5m": 0.049
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 8,
+    "median": -0.353,
+    "iqr": [
+     -1.466,
+     -0.106
+    ],
+    "p5_p95": [
+     -4.414,
+     74.615
+    ],
+    "share_abs_gt_0_5m": 0.375
+   },
+   "parcels": {
+    "n": 13,
+    "no_lidar": 7,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1770000,
+   5465000,
+   1775000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1769434,
+   5464000,
+   1775977,
+   5470486
+  ],
+  "parcels": 255,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 255,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.15,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 268,
+    "median": -0.088,
+    "iqr": [
+     -0.136,
+     -0.051
+    ],
+    "p5_p95": [
+     -0.495,
+     0.043
+    ],
+    "share_abs_gt_0_5m": 0.06
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 201,
+    "median": -0.088,
+    "iqr": [
+     -0.133,
+     -0.064
+    ],
+    "p5_p95": [
+     -0.279,
+     0.007
+    ],
+    "share_abs_gt_0_5m": 0.03
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 2048,
+    "median": -0.092,
+    "iqr": [
+     -0.141,
+     -0.048
+    ],
+    "p5_p95": [
+     -0.308,
+     0.071
+    ],
+    "share_abs_gt_0_5m": 0.022
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.08,
+    "iqr": [
+     0.06,
+     0.114
+    ],
+    "p5_p95": [
+     -0.002,
+     0.273
+    ],
+    "share_abs_gt_0_5m": 0.035
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 1640,
+    "median": -0.687,
+    "iqr": [
+     -1.362,
+     -0.289
+    ],
+    "p5_p95": [
+     -2.773,
+     0.005
+    ],
+    "share_abs_gt_0_5m": 0.625
+   },
+   "parcels": {
+    "n": 255,
+    "no_lidar": 4,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1770000,
+   5470000,
+   1775000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1769637,
+   5469169,
+   1775355,
+   5475209
+  ],
+  "parcels": 5803,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 11,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4067001,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067114,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067150,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7323384,
+    "appellation": "Section 1 SO 442372",
+    "intent": "Railway"
+   },
+   {
+    "id": 7323385,
+    "appellation": "Section 2 SO 442372",
+    "intent": "Railway"
+   },
+   {
+    "id": 7323386,
+    "appellation": "Section 3 SO 442372",
+    "intent": "Railway"
+   },
+   {
+    "id": 7323387,
+    "appellation": "Section 4 SO 442372",
+    "intent": "Railway"
+   },
+   {
+    "id": 7965976,
+    "appellation": "Part Ngarara West A4 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7966121,
+    "appellation": "Section 1 Block IX Kaitawa SD",
+    "intent": "Railway"
+   },
+   {
+    "id": 8938989,
+    "appellation": "Lot 1 DP 632471",
+    "intent": "Fee Simple Title"
+   },
+   {
+    "id": 8938990,
+    "appellation": "Lot 2 DP 632471",
+    "intent": "Fee Simple Title"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 5802,
+    "units_without_linz_geometry": 1,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.09,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 1723,
+    "median": -0.077,
+    "iqr": [
+     -0.129,
+     -0.04
+    ],
+    "p5_p95": [
+     -0.37,
+     0.073
+    ],
+    "share_abs_gt_0_5m": 0.046
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 1104,
+    "median": -0.072,
+    "iqr": [
+     -0.113,
+     -0.038
+    ],
+    "p5_p95": [
+     -0.371,
+     0.071
+    ],
+    "share_abs_gt_0_5m": 0.048
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 12288,
+    "median": -0.089,
+    "iqr": [
+     -0.139,
+     -0.043
+    ],
+    "p5_p95": [
+     -0.311,
+     0.103
+    ],
+    "share_abs_gt_0_5m": 0.025
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.078,
+    "iqr": [
+     0.054,
+     0.11
+    ],
+    "p5_p95": [
+     -0.049,
+     0.322
+    ],
+    "share_abs_gt_0_5m": 0.045
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2720,
+    "median": -0.632,
+    "iqr": [
+     -1.26,
+     -0.284
+    ],
+    "p5_p95": [
+     -2.891,
+     0.001
+    ],
+    "share_abs_gt_0_5m": 0.611
+   },
+   "parcels": {
+    "n": 5803,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1770000,
+   5475000,
+   1775000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1770000,
+   5474291,
+   1775613,
+   5480523
+  ],
+  "parcels": 938,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 938,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.07,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 273,
+    "median": -0.043,
+    "iqr": [
+     -0.082,
+     -0.01
+    ],
+    "p5_p95": [
+     -0.265,
+     0.17
+    ],
+    "share_abs_gt_0_5m": 0.051
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 186,
+    "median": -0.051,
+    "iqr": [
+     -0.084,
+     -0.015
+    ],
+    "p5_p95": [
+     -0.259,
+     0.59
+    ],
+    "share_abs_gt_0_5m": 0.081
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 2763,
+    "median": -0.078,
+    "iqr": [
+     -0.14,
+     -0.028
+    ],
+    "p5_p95": [
+     -0.351,
+     0.118
+    ],
+    "share_abs_gt_0_5m": 0.034
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.073,
+    "iqr": [
+     0.039,
+     0.151
+    ],
+    "p5_p95": [
+     -0.25,
+     0.427
+    ],
+    "share_abs_gt_0_5m": 0.07
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2395,
+    "median": -0.536,
+    "iqr": [
+     -1.082,
+     -0.246
+    ],
+    "p5_p95": [
+     -2.85,
+     -0.016
+    ],
+    "share_abs_gt_0_5m": 0.55
+   },
+   "parcels": {
+    "n": 938,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1770000,
+   5480000,
+   1775000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1770000,
+   5480000,
+   1775197,
+   5485001
+  ],
+  "parcels": 2,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 2,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.13,
+    "iqr": [
+     0.062,
+     0.309
+    ],
+    "p5_p95": [
+     -0.01,
+     0.469
+    ],
+    "share_abs_gt_0_5m": 0.026
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 2,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5460000,
+   1780000,
+   5465000
+  ],
+  "fetch_bbox": [
+   1774242,
+   5460000,
+   1780724,
+   5466001
+  ],
+  "parcels": 29,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 15,
+  "outside_district_examples": [
+   {
+    "id": 3795750,
+    "appellation": "Part Section 404 Hutt DIST"
+   },
+   {
+    "id": 3882700,
+    "appellation": "Part Section 403 Hutt DIST"
+   },
+   {
+    "id": 4031972,
+    "appellation": "Part Section 407 Hutt DIST"
+   },
+   {
+    "id": 4021152,
+    "appellation": "Section 408 Hutt DIST"
+   },
+   {
+    "id": 3938547,
+    "appellation": "Section 411 Hutt DIST"
+   },
+   {
+    "id": 3750533,
+    "appellation": "Part Section 412 Hutt DIST"
+   },
+   {
+    "id": 8040299,
+    "appellation": "Lot 1 DP 542376"
+   },
+   {
+    "id": 3960615,
+    "appellation": "Section 2 Block VI Akatarawa SD"
+   },
+   {
+    "id": 3864879,
+    "appellation": "Section 1 Block VI Akatarawa SD"
+   },
+   {
+    "id": 4041126,
+    "appellation": "Part Section 402 Hutt DIST"
+   },
+   {
+    "id": 7652281,
+    "appellation": "Lot 1 DP 485970"
+   },
+   {
+    "id": 3799849,
+    "appellation": "Part Section 405 Hutt DIST"
+   },
+   {
+    "id": 4041127,
+    "appellation": "Part Section 406 Hutt DIST"
+   },
+   {
+    "id": 3965393,
+    "appellation": "Part Section 409 Hutt DIST"
+   },
+   {
+    "id": 3755447,
+    "appellation": "Part Section 410 Hutt DIST"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 29,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 29,
+    "no_lidar": 29,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5465000,
+   1780000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1774437,
+   5464387,
+   1781001,
+   5470269
+  ],
+  "parcels": 173,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 173,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.11,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 75,
+    "median": -0.091,
+    "iqr": [
+     -0.129,
+     -0.035
+    ],
+    "p5_p95": [
+     -0.257,
+     0.077
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.084,
+    "iqr": [
+     0.06,
+     0.124
+    ],
+    "p5_p95": [
+     -0.011,
+     0.247
+    ],
+    "share_abs_gt_0_5m": 0.016
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 56,
+    "median": -0.531,
+    "iqr": [
+     -1.044,
+     -0.17
+    ],
+    "p5_p95": [
+     -3.741,
+     1.071
+    ],
+    "share_abs_gt_0_5m": 0.589
+   },
+   "parcels": {
+    "n": 173,
+    "no_lidar": 134,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5470000,
+   1780000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1774693,
+   5469416,
+   1781001,
+   5475895
+  ],
+  "parcels": 387,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 387,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.13,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 261,
+    "median": -0.108,
+    "iqr": [
+     -0.239,
+     -0.04
+    ],
+    "p5_p95": [
+     -0.712,
+     0.389
+    ],
+    "share_abs_gt_0_5m": 0.134
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 211,
+    "median": -0.081,
+    "iqr": [
+     -0.207,
+     -0.023
+    ],
+    "p5_p95": [
+     -0.68,
+     0.281
+    ],
+    "share_abs_gt_0_5m": 0.142
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 1183,
+    "median": -0.101,
+    "iqr": [
+     -0.202,
+     -0.01
+    ],
+    "p5_p95": [
+     -0.464,
+     0.294
+    ],
+    "share_abs_gt_0_5m": 0.065
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.083,
+    "iqr": [
+     0.059,
+     0.123
+    ],
+    "p5_p95": [
+     -0.011,
+     0.269
+    ],
+    "share_abs_gt_0_5m": 0.027
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 956,
+    "median": -0.75,
+    "iqr": [
+     -1.322,
+     -0.292
+    ],
+    "p5_p95": [
+     -2.823,
+     0.02
+    ],
+    "share_abs_gt_0_5m": 0.662
+   },
+   "parcels": {
+    "n": 387,
+    "no_lidar": 15,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5475000,
+   1780000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1774538,
+   5474764,
+   1781001,
+   5480487
+  ],
+  "parcels": 388,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 8,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 7785072,
+    "appellation": "Part Ngakaroro 2F49 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7785093,
+    "appellation": "Part Ngakaroro 2F63 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7785094,
+    "appellation": "Part Ngakaroro 2F70 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7785095,
+    "appellation": "Part Ngakaroro 2F Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789341,
+    "appellation": "Part Ngakaroro 2F Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789348,
+    "appellation": "Part Ngawhakangutu South Block BLK",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789349,
+    "appellation": "Part Ngakaroro 4 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789366,
+    "appellation": "Part Ngawhakangutu North 1 Block",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 388,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.04,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 34,
+    "median": -0.134,
+    "iqr": [
+     -0.284,
+     -0.011
+    ],
+    "p5_p95": [
+     -1.046,
+     0.16
+    ],
+    "share_abs_gt_0_5m": 0.176
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 1651,
+    "median": -0.079,
+    "iqr": [
+     -0.132,
+     -0.028
+    ],
+    "p5_p95": [
+     -0.273,
+     0.115
+    ],
+    "share_abs_gt_0_5m": 0.021
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.074,
+    "iqr": [
+     0.048,
+     0.113
+    ],
+    "p5_p95": [
+     -0.014,
+     0.258
+    ],
+    "share_abs_gt_0_5m": 0.017
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 1341,
+    "median": -0.514,
+    "iqr": [
+     -1.191,
+     -0.201
+    ],
+    "p5_p95": [
+     -3.042,
+     0.538
+    ],
+    "share_abs_gt_0_5m": 0.56
+   },
+   "parcels": {
+    "n": 388,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5480000,
+   1780000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1774788,
+   5479814,
+   1780450,
+   5485821
+  ],
+  "parcels": 753,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 9,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 7128086,
+    "appellation": "Part Ngakororo 3D Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7784808,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7784818,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7784873,
+    "appellation": "Part Ngakaroro 2F5 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7784874,
+    "appellation": "Part Ngakaroro 2F19 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7784913,
+    "appellation": "Part Ngakaroro 2F20 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7785070,
+    "appellation": "Part Ngakaroro 2F21 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7785071,
+    "appellation": "Part Ngakaroro 2F30 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789447,
+    "appellation": "Part Ngakaroro 1A6 Block",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 753,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 2,
+    "max_abs": 2.95,
+    "worst": [
+     [
+      3835893,
+      2.95
+     ],
+     [
+      4018213,
+      -2.88
+     ]
+    ]
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 24,
+    "median": -0.108,
+    "iqr": [
+     -0.122,
+     -0.057
+    ],
+    "p5_p95": [
+     -0.178,
+     0.014
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 11,
+    "median": -0.06,
+    "iqr": [
+     -0.075,
+     -0.017
+    ],
+    "p5_p95": [
+     -0.121,
+     0.097
+    ],
+    "share_abs_gt_0_5m": 0.0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 2583,
+    "median": -0.065,
+    "iqr": [
+     -0.115,
+     -0.017
+    ],
+    "p5_p95": [
+     -0.254,
+     0.113
+    ],
+    "share_abs_gt_0_5m": 0.017
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.061,
+    "iqr": [
+     0.035,
+     0.092
+    ],
+    "p5_p95": [
+     -0.034,
+     0.259
+    ],
+    "share_abs_gt_0_5m": 0.029
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2090,
+    "median": -0.476,
+    "iqr": [
+     -1.012,
+     -0.205
+    ],
+    "p5_p95": [
+     -2.825,
+     0.028
+    ],
+    "share_abs_gt_0_5m": 0.513
+   },
+   "parcels": {
+    "n": 753,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1775000,
+   5485000,
+   1780000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1775000,
+   5484140,
+   1781001,
+   5490001
+  ],
+  "parcels": 1351,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1351,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.03,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 681,
+    "median": -0.084,
+    "iqr": [
+     -0.115,
+     -0.047
+    ],
+    "p5_p95": [
+     -0.276,
+     0.044
+    ],
+    "share_abs_gt_0_5m": 0.025
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 249,
+    "median": -0.06,
+    "iqr": [
+     -0.096,
+     -0.035
+    ],
+    "p5_p95": [
+     -0.205,
+     0.065
+    ],
+    "share_abs_gt_0_5m": 0.024
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 5279,
+    "median": -0.06,
+    "iqr": [
+     -0.103,
+     -0.012
+    ],
+    "p5_p95": [
+     -0.219,
+     0.102
+    ],
+    "share_abs_gt_0_5m": 0.01
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.054,
+    "iqr": [
+     0.028,
+     0.09
+    ],
+    "p5_p95": [
+     -0.091,
+     0.329
+    ],
+    "share_abs_gt_0_5m": 0.048
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2635,
+    "median": -0.471,
+    "iqr": [
+     -0.848,
+     -0.223
+    ],
+    "p5_p95": [
+     -2.569,
+     -0.017
+    ],
+    "share_abs_gt_0_5m": 0.486
+   },
+   "parcels": {
+    "n": 1351,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5460000,
+   1785000,
+   5465000
+  ],
+  "fetch_bbox": [
+   1779505,
+   5460000,
+   1786001,
+   5465479
+  ],
+  "parcels": 13,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 13,
+  "outside_district_examples": [
+   {
+    "id": 3865137,
+    "appellation": "Lot 5 DP 10208"
+   },
+   {
+    "id": 3973668,
+    "appellation": "Part Blk III Akatarawa SD"
+   },
+   {
+    "id": 4054791,
+    "appellation": "Part Blk III Akatarawa SD"
+   },
+   {
+    "id": 3749753,
+    "appellation": "Lot 8 DP 10208"
+   },
+   {
+    "id": 3909049,
+    "appellation": "Part Section 6 Block III Akatarawa SD"
+   },
+   {
+    "id": 3974203,
+    "appellation": "Lot 4 DP 10208"
+   },
+   {
+    "id": 3910395,
+    "appellation": "Lot 2 DP 10208"
+   },
+   {
+    "id": 3867507,
+    "appellation": "Lot 3 DP 10208"
+   },
+   {
+    "id": 4019481,
+    "appellation": "Part Section 6 Block III Akatarawa SD"
+   },
+   {
+    "id": 3927119,
+    "appellation": "Section 2 Block III Akatarawa SD"
+   },
+   {
+    "id": 3974737,
+    "appellation": "Section 5 Block III Akatarawa SD"
+   },
+   {
+    "id": 3764140,
+    "appellation": "Lot 7 DP 10208"
+   },
+   {
+    "id": 3948208,
+    "appellation": "Lot 6 DP 10208"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 13,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 13,
+    "no_lidar": 13,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5465000,
+   1785000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1779000,
+   5464379,
+   1786001,
+   5470383
+  ],
+  "parcels": 10,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 10,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.1,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 10,
+    "no_lidar": 10,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5470000,
+   1785000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1779000,
+   5469000,
+   1786001,
+   5475359
+  ],
+  "parcels": 22,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 22,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.23,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 22,
+    "no_lidar": 22,
+    "coverage_lt_99pct": 2
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5475000,
+   1785000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1779000,
+   5474290,
+   1785590,
+   5480504
+  ],
+  "parcels": 106,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 106,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.09,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 495,
+    "median": -0.062,
+    "iqr": [
+     -0.109,
+     -0.011
+    ],
+    "p5_p95": [
+     -0.211,
+     0.092
+    ],
+    "share_abs_gt_0_5m": 0.014
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.059,
+    "iqr": [
+     0.032,
+     0.09
+    ],
+    "p5_p95": [
+     -0.028,
+     0.189
+    ],
+    "share_abs_gt_0_5m": 0.026
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 400,
+    "median": -0.61,
+    "iqr": [
+     -1.206,
+     -0.229
+    ],
+    "p5_p95": [
+     -2.658,
+     0.09
+    ],
+    "share_abs_gt_0_5m": 0.57
+   },
+   "parcels": {
+    "n": 106,
+    "no_lidar": 7,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5480000,
+   1785000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1779826,
+   5479675,
+   1785488,
+   5485222
+  ],
+  "parcels": 495,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 1,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 7128085,
+    "appellation": "Part I Waopukatea Block",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 495,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 78,
+    "median": -0.069,
+    "iqr": [
+     -0.154,
+     -0.006
+    ],
+    "p5_p95": [
+     -0.367,
+     0.335
+    ],
+    "share_abs_gt_0_5m": 0.064
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 16,
+    "median": -0.048,
+    "iqr": [
+     -0.084,
+     0.135
+    ],
+    "p5_p95": [
+     -0.115,
+     0.729
+    ],
+    "share_abs_gt_0_5m": 0.25
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 2161,
+    "median": -0.062,
+    "iqr": [
+     -0.108,
+     -0.017
+    ],
+    "p5_p95": [
+     -0.206,
+     0.085
+    ],
+    "share_abs_gt_0_5m": 0.006
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.06,
+    "iqr": [
+     0.034,
+     0.088
+    ],
+    "p5_p95": [
+     -0.069,
+     0.187
+    ],
+    "share_abs_gt_0_5m": 0.033
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 1849,
+    "median": -0.512,
+    "iqr": [
+     -1.12,
+     -0.202
+    ],
+    "p5_p95": [
+     -3.04,
+     0.288
+    ],
+    "share_abs_gt_0_5m": 0.552
+   },
+   "parcels": {
+    "n": 495,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5485000,
+   1785000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1779278,
+   5484177,
+   1785546,
+   5490453
+  ],
+  "parcels": 3045,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 18,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4067058,
+    "appellation": "Part Totaranui 11F Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 4067236,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067261,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 4067287,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7367597,
+    "appellation": "Section 2 SO 437319",
+    "intent": "Railway"
+   },
+   {
+    "id": 7367598,
+    "appellation": "Section 3 SO 437319",
+    "intent": "Railway"
+   },
+   {
+    "id": 7367605,
+    "appellation": "Part Pukehou 5L3 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7367606,
+    "appellation": "Part Pukehou 5L2 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7424979,
+    "appellation": "Part Pukehou 5K Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7425000,
+    "appellation": "Part Pukehou 5H Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7425001,
+    "appellation": "Part Pukehou 5F Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7425012,
+    "appellation": "Part Pukehou 5L7 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7426168,
+    "appellation": "Pukehou 3 5G Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7771912,
+    "appellation": "Pukehou 4G9 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7788764,
+    "appellation": "Part Paruauku 2 Block",
+    "intent": "Railway"
+   },
+   {
+    "id": 7788770,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7789415,
+    "appellation": "Part Matitikura Block BLK",
+    "intent": "Railway"
+   },
+   {
+    "id": 7789425,
+    "appellation": "Part Awahohonu A1 Block",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 1,
+  "outside_district_examples": [
+   {
+    "id": 3784322,
+    "appellation": "Section 1 SO 26184"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 3045,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.26,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 851,
+    "median": -0.085,
+    "iqr": [
+     -0.129,
+     -0.043
+    ],
+    "p5_p95": [
+     -0.385,
+     0.094
+    ],
+    "share_abs_gt_0_5m": 0.039
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 363,
+    "median": -0.069,
+    "iqr": [
+     -0.107,
+     -0.041
+    ],
+    "p5_p95": [
+     -0.54,
+     0.132
+    ],
+    "share_abs_gt_0_5m": 0.074
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 6711,
+    "median": -0.061,
+    "iqr": [
+     -0.103,
+     -0.016
+    ],
+    "p5_p95": [
+     -0.202,
+     0.091
+    ],
+    "share_abs_gt_0_5m": 0.006
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.056,
+    "iqr": [
+     0.028,
+     0.09
+    ],
+    "p5_p95": [
+     -0.168,
+     0.229
+    ],
+    "share_abs_gt_0_5m": 0.033
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 2646,
+    "median": -0.497,
+    "iqr": [
+     -0.962,
+     -0.225
+    ],
+    "p5_p95": [
+     -2.773,
+     -0.003
+    ],
+    "share_abs_gt_0_5m": 0.521
+   },
+   "parcels": {
+    "n": 3045,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1780000,
+   5490000,
+   1785000,
+   5495000
+  ],
+  "fetch_bbox": [
+   1779638,
+   5489572,
+   1785001,
+   5495001
+  ],
+  "parcels": 29,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 130,
+  "outside_district_examples": [
+   {
+    "id": 3776427,
+    "appellation": "Lot 1 DP 60996"
+   },
+   {
+    "id": 4063260,
+    "appellation": "Part Waiorongomai 9D Block"
+   },
+   {
+    "id": 4058114,
+    "appellation": "Lot 1 DP 57983"
+   },
+   {
+    "id": 4051882,
+    "appellation": "Lot 2 DP 73046"
+   },
+   {
+    "id": 7835897,
+    "appellation": "Lot 2 DP 483676"
+   },
+   {
+    "id": 3807550,
+    "appellation": "Lot 1 DP 83201"
+   },
+   {
+    "id": 8259713,
+    "appellation": "Lot 1 DP 567271"
+   },
+   {
+    "id": 7126145,
+    "appellation": "Lot 2 DP 407480"
+   },
+   {
+    "id": 8259715,
+    "appellation": "Lot 3 DP 567271"
+   },
+   {
+    "id": 3942057,
+    "appellation": "Manawatu-Kukutauaki 4A2,1A3B1B Block"
+   },
+   {
+    "id": 3953357,
+    "appellation": "Manawatu-Kukutauaki 4A2,1A3B1A Block"
+   },
+   {
+    "id": 8259714,
+    "appellation": "Lot 2 DP 567271"
+   },
+   {
+    "id": 3902397,
+    "appellation": "Lot 1 DP 73047"
+   },
+   {
+    "id": 7577932,
+    "appellation": "Lot 1 DP 467255"
+   },
+   {
+    "id": 3885593,
+    "appellation": "Lot 3 DP 73047"
+   },
+   {
+    "id": 7835896,
+    "appellation": "Lot 1 DP 483676"
+   },
+   {
+    "id": 7835898,
+    "appellation": "Lot 3 DP 483676"
+   },
+   {
+    "id": 7835899,
+    "appellation": "Lot 4 DP 483676"
+   },
+   {
+    "id": 8051137,
+    "appellation": "Lot 1 DP 536667"
+   },
+   {
+    "id": 3944736,
+    "appellation": "Waiorongomai 8A Block"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 29,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.15,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 131,
+    "median": -0.067,
+    "iqr": [
+     -0.131,
+     -0.012
+    ],
+    "p5_p95": [
+     -0.295,
+     0.131
+    ],
+    "share_abs_gt_0_5m": 0.031
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.052,
+    "iqr": [
+     0.01,
+     0.115
+    ],
+    "p5_p95": [
+     -0.19,
+     0.304
+    ],
+    "share_abs_gt_0_5m": 0.013
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 103,
+    "median": -0.446,
+    "iqr": [
+     -1.348,
+     -0.245
+    ],
+    "p5_p95": [
+     -3.563,
+     -0.007
+    ],
+    "share_abs_gt_0_5m": 0.505
+   },
+   "parcels": {
+    "n": 29,
+    "no_lidar": 0,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1785000,
+   5465000,
+   1790000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1784000,
+   5464000,
+   1791001,
+   5470389
+  ],
+  "parcels": 9,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 9,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.1,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 9,
+    "no_lidar": 9,
+    "coverage_lt_99pct": 2
+   }
+  }
+ },
+ {
+  "block": [
+   1785000,
+   5470000,
+   1790000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1784000,
+   5469000,
+   1790959,
+   5475115
+  ],
+  "parcels": 24,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 24,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.15,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 24,
+    "no_lidar": 24,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1785000,
+   5475000,
+   1790000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1784639,
+   5474000,
+   1791001,
+   5481001
+  ],
+  "parcels": 126,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 126,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.14,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.03,
+    "iqr": [
+     0.003,
+     0.061
+    ],
+    "p5_p95": [
+     -0.472,
+     0.245
+    ],
+    "share_abs_gt_0_5m": 0.068
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 126,
+    "no_lidar": 36,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1785000,
+   5480000,
+   1790000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1784000,
+   5479003,
+   1791001,
+   5485344
+  ],
+  "parcels": 66,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 66,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.13,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 337,
+    "median": -0.048,
+    "iqr": [
+     -0.104,
+     0.002
+    ],
+    "p5_p95": [
+     -0.224,
+     0.14
+    ],
+    "share_abs_gt_0_5m": 0.018
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.042,
+    "iqr": [
+     0.009,
+     0.08
+    ],
+    "p5_p95": [
+     -0.188,
+     0.219
+    ],
+    "share_abs_gt_0_5m": 0.043
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 292,
+    "median": -0.563,
+    "iqr": [
+     -1.057,
+     -0.228
+    ],
+    "p5_p95": [
+     -3.193,
+     0.945
+    ],
+    "share_abs_gt_0_5m": 0.603
+   },
+   "parcels": {
+    "n": 66,
+    "no_lidar": 15,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1785000,
+   5485000,
+   1790000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1784599,
+   5484727,
+   1790005,
+   5490001
+  ],
+  "parcels": 53,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 2,
+  "linz_not_in_mirror_examples": [
+   {
+    "id": 4067084,
+    "appellation": null,
+    "intent": "Railway"
+   },
+   {
+    "id": 7735880,
+    "appellation": "Part Pukehou 4H Block",
+    "intent": "Railway"
+   }
+  ],
+  "outside_district": 126,
+  "outside_district_examples": [
+   {
+    "id": 4004425,
+    "appellation": "Lot 3 DP 13993"
+   },
+   {
+    "id": 3763422,
+    "appellation": "Lot 4 DP 13993"
+   },
+   {
+    "id": 3763424,
+    "appellation": "Part Lot 1 DP 12882"
+   },
+   {
+    "id": 3856512,
+    "appellation": "Lot 5 DP 33061"
+   },
+   {
+    "id": 7558203,
+    "appellation": "Lot 1 DP 480279"
+   },
+   {
+    "id": 8592513,
+    "appellation": "Lot 1 DP 597675"
+   },
+   {
+    "id": 6621575,
+    "appellation": "Lot 21 DP 320610"
+   },
+   {
+    "id": 8592514,
+    "appellation": "Lot 2 DP 597675"
+   },
+   {
+    "id": 7202097,
+    "appellation": "Lot 2 DP 422205"
+   },
+   {
+    "id": 7419575,
+    "appellation": "Part Lot 28A DP 415"
+   },
+   {
+    "id": 4002204,
+    "appellation": "Part Lot 28 DP 415"
+   },
+   {
+    "id": 3854887,
+    "appellation": "Lot 1 DP 54757"
+   },
+   {
+    "id": 7012924,
+    "appellation": "Lot 8 DP 394488"
+   },
+   {
+    "id": 3765804,
+    "appellation": "Lot 2 DP 86605"
+   },
+   {
+    "id": 7419574,
+    "appellation": "Part Lot 28A DP 415"
+   },
+   {
+    "id": 6938418,
+    "appellation": "Lot 1 DP 380196"
+   },
+   {
+    "id": 6856767,
+    "appellation": "Lot 2 DP 369031"
+   },
+   {
+    "id": 6856766,
+    "appellation": "Lot 1 DP 369031"
+   },
+   {
+    "id": 3869375,
+    "appellation": "Lot 2 DP 705"
+   },
+   {
+    "id": 3789731,
+    "appellation": "Lot 3 DP 705"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 53,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 2,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.06,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 222,
+    "median": -0.073,
+    "iqr": [
+     -0.132,
+     -0.02
+    ],
+    "p5_p95": [
+     -0.25,
+     0.109
+    ],
+    "share_abs_gt_0_5m": 0.018
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 200000,
+    "median": 0.066,
+    "iqr": [
+     0.041,
+     0.097
+    ],
+    "p5_p95": [
+     -0.016,
+     0.197
+    ],
+    "share_abs_gt_0_5m": 0.012
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 196,
+    "median": -0.496,
+    "iqr": [
+     -0.889,
+     -0.175
+    ],
+    "p5_p95": [
+     -3.4,
+     0.112
+    ],
+    "share_abs_gt_0_5m": 0.541
+   },
+   "parcels": {
+    "n": 53,
+    "no_lidar": 3,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1790000,
+   5465000,
+   1795000,
+   5470000
+  ],
+  "fetch_bbox": [
+   1789000,
+   5465000,
+   1795001,
+   5470884
+  ],
+  "parcels": 5,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 5,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.1,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 5,
+    "no_lidar": 5,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1790000,
+   5470000,
+   1795000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1789725,
+   5469000,
+   1795656,
+   5475369
+  ],
+  "parcels": 2,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 2,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.2,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 2,
+    "no_lidar": 2,
+    "coverage_lt_99pct": 0
+   }
+  }
+ },
+ {
+  "block": [
+   1790000,
+   5475000,
+   1795000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1789000,
+   5474000,
+   1796001,
+   5480338
+  ],
+  "parcels": 8,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 8,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.13,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 8,
+    "no_lidar": 8,
+    "coverage_lt_99pct": 2
+   }
+  }
+ },
+ {
+  "block": [
+   1790000,
+   5480000,
+   1795000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1789000,
+   5479000,
+   1796001,
+   5485633
+  ],
+  "parcels": 25,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 1,
+  "outside_district_examples": [
+   {
+    "id": 3871039,
+    "appellation": "Section 75 Block XIII Waiopehu SD"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 25,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.21,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 25,
+    "no_lidar": 25,
+    "coverage_lt_99pct": 3
+   }
+  }
+ },
+ {
+  "block": [
+   1790000,
+   5485000,
+   1795000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1789884,
+   5484340,
+   1796001,
+   5490001
+  ],
+  "parcels": 5,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 4,
+  "outside_district_examples": [
+   {
+    "id": 3987773,
+    "appellation": "Section 71 Block XIII Waiopehu SD"
+   },
+   {
+    "id": 3907428,
+    "appellation": "Section 63 Block XIII Waiopehu SD"
+   },
+   {
+    "id": 3908076,
+    "appellation": "Section 70 Block XIII Waiopehu SD"
+   },
+   {
+    "id": 3843590,
+    "appellation": "Section 66 Block XIII Waiopehu SD"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 5,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 3,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.11,
+    "worst": []
+   },
+   "ww_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "sw_manhole_cover_minus_lidar_m": {
+    "n": 0
+   },
+   "building_ground_minus_lidar_m": {
+    "n": 0
+   },
+   "lidar_2025_minus_2021_flat_m": {
+    "n": 0
+   },
+   "roof_dsm_minus_kcdc_bld_ave_m": {
+    "n": 0
+   },
+   "parcels": {
+    "n": 5,
+    "no_lidar": 5,
+    "coverage_lt_99pct": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1795000,
+   5470000,
+   1800000,
+   5475000
+  ],
+  "fetch_bbox": [
+   1794000,
+   5469000,
+   1801001,
+   5476001
+  ],
+  "parcels": 1,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 1,
+    "mirror_differs_gt_1": 0,
+    "max_abs": null,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 1,
+    "no_lidar": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1795000,
+   5475000,
+   1800000,
+   5480000
+  ],
+  "fetch_bbox": [
+   1794000,
+   5475000,
+   1800001,
+   5480784
+  ],
+  "parcels": 5,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 5,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 0,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.15,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 5,
+    "no_lidar": 5
+   }
+  }
+ },
+ {
+  "block": [
+   1795000,
+   5480000,
+   1800000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1795000,
+   5479000,
+   1801001,
+   5485354
+  ],
+  "parcels": 7,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 7,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 4,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.09,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 7,
+    "no_lidar": 7
+   }
+  }
+ },
+ {
+  "block": [
+   1795000,
+   5485000,
+   1800000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1794954,
+   5484000,
+   1801001,
+   5490001
+  ],
+  "parcels": 8,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 2,
+  "outside_district_examples": [
+   {
+    "id": 6560719,
+    "appellation": "Lot 1 DP 308821"
+   },
+   {
+    "id": 3827647,
+    "appellation": "Section 81 Block XIV Waiopehu SD"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 8,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 3,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.01,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 8,
+    "no_lidar": 8
+   }
+  }
+ },
+ {
+  "block": [
+   1800000,
+   5480000,
+   1805000,
+   5485000
+  ],
+  "fetch_bbox": [
+   1799000,
+   5480000,
+   1805001,
+   5485934
+  ],
+  "parcels": 1,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 0,
+  "outside_district_examples": [],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 1,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 1,
+    "mirror_differs_gt_1": 0,
+    "max_abs": null,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 1,
+    "no_lidar": 1
+   }
+  }
+ },
+ {
+  "block": [
+   1800000,
+   5485000,
+   1805000,
+   5490000
+  ],
+  "fetch_bbox": [
+   1799000,
+   5484431,
+   1805379,
+   5490107
+  ],
+  "parcels": 4,
+  "commit": "0b921c246bd92277e93ece4848302f842bd7c985",
+  "linz_not_in_mirror": 0,
+  "linz_not_in_mirror_examples": [],
+  "outside_district": 1,
+  "outside_district_examples": [
+   {
+    "id": 3973582,
+    "appellation": "Section 1 Block XI Waiopehu SD"
+   }
+  ],
+  "district_flow_sha256": "cbde77fbab7df55e77442c4de4745ce7cd189f0ff524bb0d18a3522fdcd2cfb6",
+  "failed_sources": [],
+  "no_coverage": [
+   "dem_2025",
+   "dsm_2025",
+   "dem_2021"
+  ],
+  "qa": {
+   "kcdc_mirror_area_minus_linz_m2": {
+    "n": 4,
+    "units_without_linz_geometry": 0,
+    "clipped_at_district_boundary": 3,
+    "mirror_differs_gt_1": 0,
+    "max_abs": 0.05,
+    "worst": []
+   },
+   "no_lidar_window": true,
+   "parcels": {
+    "n": 4,
+    "no_lidar": 4
+   }
+  }
+ }
+]

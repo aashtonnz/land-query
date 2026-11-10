@@ -1,0 +1,1 @@
+Rules applied to published results; not a rebuild. Columns only a full rebuild adds, not yet present: unmapped_structure_m2. 1 parcels have building values a full rebuild would restore (finish.py only empties).
