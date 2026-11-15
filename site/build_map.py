@@ -383,17 +383,26 @@ def water(bounds):
     for url, where in [(svc + "LINZ_NZ_Primary_Parcels/FeatureServer/0", "parcel_intent IN ('Hydro','Riverbed','Streambed')"),
                        (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1"),
                        (svc + "LINZ_NZ_River_Name_Polygons_Pilot/FeatureServer/0", "1=1")]:
-        # the whole country in one query is too much for the parcel service ("Unable to perform query"), so it is asked
-        # in blocks of up to 200 km; a feature in two blocks is kept once, by its object id
-        step = 200_000 if NATIONAL else 10 ** 9; seen = set(); feats = []
-        for bx in np.arange(x0, x1, step):
-            for by in np.arange(y0, y1, step):
-                for f in arcgis.query_all(url, dict(where=where, geometry=f"{bx},{by},{min(bx + step, x1)},{min(by + step, y1)}", geometryType="esriGeometryEnvelope",
-                                                    inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193,
-                                                    maxAllowableOffset=2 if NATIONAL else 0.5), workers=8 if "Primary_Parcels" in url else 2):
-                    k = (f.get("properties") or {}).get("OBJECTID", f.get("id"))
-                    if k is not None and k in seen: continue
-                    seen.add(k); feats.append(f)
+        # the whole country in one query is too much for the parcel service: it gives up after about 55 s ("Unable to
+        # perform query"; a 200 km block took that long, an 80 km block 14 s). Nationally it is asked in 80 km blocks,
+        # only where the national index has tiles, four at a time; a feature in two blocks is kept once, by object id
+        if NATIONAL:
+            step = 80_000
+            tiles = json.load(open(os.path.join(ROOT, "pipeline", "nz_tiles.json")))
+            blocks = sorted({(math.floor(t[0] / step) * step, math.floor(t[1] / step) * step) for t in tiles})
+            boxes = [(bx, by, bx + step, by + step) for bx, by in blocks]
+        else: boxes = [(x0, y0, x1, y1)]
+        from concurrent.futures import ThreadPoolExecutor
+        ask = lambda bb: arcgis.query_all(url, dict(where=where, geometry=",".join(str(v) for v in bb), geometryType="esriGeometryEnvelope",
+                                                     inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193,
+                                                     maxAllowableOffset=2 if NATIONAL else 0.5), workers=4 if "Primary_Parcels" in url else 2)
+        with ThreadPoolExecutor(4 if NATIONAL else 1) as ex: got = list(ex.map(ask, boxes))
+        seen = set(); feats = []
+        for fs in got:
+            for f in fs:
+                k = (f.get("properties") or {}).get("OBJECTID", f.get("id"))
+                if k is not None and k in seen: continue
+                seen.add(k); feats.append(f)
         for f in feats:
             if not f.get("geometry"): continue
             g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
