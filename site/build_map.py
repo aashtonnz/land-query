@@ -383,9 +383,18 @@ def water(bounds):
     for url, where in [(svc + "LINZ_NZ_Primary_Parcels/FeatureServer/0", "parcel_intent IN ('Hydro','Riverbed','Streambed')"),
                        (svc + "NZ_Lake_Polygons_Topo_1_50k/FeatureServer/0", "1=1"),
                        (svc + "LINZ_NZ_River_Name_Polygons_Pilot/FeatureServer/0", "1=1")]:
-        for f in arcgis.query_all(url, dict(where=where, geometry=f"{x0},{y0},{x1},{y1}", geometryType="esriGeometryEnvelope", inSR=2193,
-                                            spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193,
-                                            maxAllowableOffset=2 if NATIONAL else 0.5), workers=8 if "Primary_Parcels" in url else 2):
+        # the whole country in one query is too much for the parcel service ("Unable to perform query"), so it is asked
+        # in blocks of up to 200 km; a feature in two blocks is kept once, by its object id
+        step = 200_000 if NATIONAL else 10 ** 9; seen = set(); feats = []
+        for bx in np.arange(x0, x1, step):
+            for by in np.arange(y0, y1, step):
+                for f in arcgis.query_all(url, dict(where=where, geometry=f"{bx},{by},{min(bx + step, x1)},{min(by + step, y1)}", geometryType="esriGeometryEnvelope",
+                                                    inSR=2193, spatialRel="esriSpatialRelIntersects", outFields="OBJECTID", outSR=2193,
+                                                    maxAllowableOffset=2 if NATIONAL else 0.5), workers=8 if "Primary_Parcels" in url else 2):
+                    k = (f.get("properties") or {}).get("OBJECTID", f.get("id"))
+                    if k is not None and k in seen: continue
+                    seen.add(k); feats.append(f)
+        for f in feats:
             if not f.get("geometry"): continue
             g = clip_by_rect(overlays.repaired(shape(f["geometry"])), x0, y0, x1, y1)
             if not g.is_empty and g.area > 0: out.append((g, "Primary_Parcels" not in url))
