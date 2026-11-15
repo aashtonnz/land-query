@@ -15,12 +15,14 @@ const ns = $('natstatus'), say = t => { ns.textContent = t; };
 
 // every data file carries this build's stamp, so a browser never mixes an older saved copy with a new page
 const V = '?v=' + encodeURIComponent(window.LQ_BUILD || '');
-const meta = await fetch('data/meta.json' + V).then(r=>r.json());
+// the map data: beside the page, or on Cloudflare R2 for the whole country in full (D-26; the page sets LQ_DATA)
+const DATA = window.LQ_DATA || 'data/';
+const meta = await fetch(DATA + 'meta.json' + V).then(r=>r.json());
 const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
 if(meta.national){ const h = document.querySelector('.hero h1'); if(h) h.textContent = 'Every land parcel in New Zealand, measured from public data.';
   const pv = document.createElement('p'); pv.className = 'label'; pv.style.color = 'var(--mark)';
-  pv.textContent = 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
+  pv.textContent = meta.full ? 'Preview: the whole-country map is new and not yet reviewed.' : 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
   document.querySelector('.hero').insertBefore(pv, $('councils')); }
 // council cards and run line
 const st = meta.stats, cc = $('councils');
@@ -62,7 +64,7 @@ const SCALES = Object.fromEntries(meta.colours.map(c => { const f = TF[c.scale];
     ends:[(c.clipped_lo ? '≤' : '') + unitFmt(c.lo, c.unit), unitFmt(c.hi, c.unit) + (c.clipped_hi ? '+' : '')], n:c.n}]; }));
 const values = new Map();   // measure -> Promise of Float32Array (one value per parcel)
 let cur = null, curKey = null;   // the measure drawn now and its values (the last chosen, once loaded)
-function loadValues(key){ if(!values.has(key)) values.set(key, fetch(`data/v/${key}.bin` + V).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Uint16Array(b.byteLength % 2 ? b.slice(0, b.byteLength - 1) : b)));
+function loadValues(key){ if(!values.has(key)) values.set(key, fetch(DATA + `v/${key}.bin` + V).then(r => { if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b => new Uint16Array(b.byteLength % 2 ? b.slice(0, b.byteLength - 1) : b)));
   return values.get(key); }
 function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(css('--highland'));
   const [p,q,u] = t<.5 ? [a,m,t*2] : [m,b,(t-.5)*2]; return 'rgb(' + p.map((v,i)=>Math.round((v+(q[i]-v)*u)*255)).join(',') + ')'; }
@@ -181,7 +183,7 @@ function fillArray(pidx){ const a = new Float32Array(pidx.length);
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
-    fetch(`data/L${level}/${key}.bin` + V).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    fetch(DATA + `L${level}/${key}.bin` + V).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
       .then(buf => worker.postMessage({key:id, buf, M, OX, OY}, [buf])).catch(()=>{ P.state = 'failed'; }); }
   P.used = frame; return P; }
 function piecesFor(level, x0, y0, x1, y1){ const out = [];
@@ -312,7 +314,7 @@ function render(){
   if(waiting && !loadedOnce) say('Loading parcels for this area…'); else if(!waiting && !loadedOnce){ loadedOnce = true; say(status()); }
 }
 let loadedOnce = false;
-const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.`
+const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet reviewed.` + (meta.full ? ' Search by the start of a legal description or address; select a parcel for its values.' : ' Street-level detail, search and parcel values cover Greater Wellington only for now.')
   : `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
 
 // ---- overlay: selected parcel, scale bar
@@ -344,7 +346,7 @@ const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national
 const details = new Map();
 async function select(hit){ selected = hit; draw(); const det = $('detail');
   if(!hit){ det.className = 'empty'; det.textContent = 'Select a parcel on the plan, or search for a legal description or address.'; return; }
-  const key = hit.piece.key; if(!details.has(key)) details.set(key, fetch(`data/detail/${key}.json` + V).then(r=>r.json()));
+  const key = hit.piece.key; if(!details.has(key)) details.set(key, fetch(DATA + `detail/${key}.json` + V).then(r=>r.json()));
   const row = (await details.get(key))[String(hit.id)]; if(!row || selected !== hit) return;
   const r = Object.fromEntries(meta.detail_fields.map((f,i)=>[f, row[i]]));
   // every measure this parcel has, grouped as in the menu; measures it lacks are left out
@@ -401,20 +403,28 @@ async function setMode(m){ mode = m; legend();
   if(loadedOnce) say(status()); recolour(); }
 $('colour').onchange = e => setMode(e.target.value);
 $('council').onchange = e => { filter = e.target.value; recolour(); };
-const res = $('results'); let search = null;
+const res = $('results'); let search = null; const shards = new Map();
+// the first letters and digits of a text, as the build files the search under them (build_map.search_key)
+const skey = t => t.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 6);
+async function searchList(q){
+  if(!meta.search_keys){ if(!search) search = fetch(DATA + 'search.json' + V).then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); return search; }
+  // whole country: the file for the longest key the typed text starts with
+  const k = skey(q); let key = null; for(let n = Math.min(6, k.length); n >= 3 && !key; n--) if(meta.search_keys.includes(k.slice(0, n))) key = k.slice(0, n);
+  if(!key) return null;
+  if(!shards.has(key)) shards.set(key, fetch(DATA + `search/${key}.json` + V).then(r=>r.json()).then(es => ({id: es.map(e=>e[0]), x: es.map(e=>e[1]), y: es.map(e=>e[2]), c: es.map(e=>e[3]), t: es.map(e=>e[4]), lt: es.map(e=>e[4].toLowerCase())})));
+  return shards.get(key); }
 $('search').addEventListener('input', async e => {
   const q = e.target.value.trim().toLowerCase(); res.innerHTML = ''; if(q.length < 3){ res.hidden = true; return; }
-  if(!search){ res.hidden = false; res.innerHTML = '<div class="empty" style="padding:5px 6px">Loading the search list…</div>';
-    search = fetch('data/search.json' + V).then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); }
-  const s = await search; if(e.target.value.trim().toLowerCase() !== q) return; res.innerHTML = '';
+  res.hidden = false; res.innerHTML = '<div class="empty" style="padding:5px 6px">Searching…</div>';
+  const s = await searchList(q); if(e.target.value.trim().toLowerCase() !== q) return; res.innerHTML = '';
+  if(!s){ res.innerHTML = '<div class="empty" style="padding:5px 6px">Keep typing: the start of a legal description or address, for example "Lot 2 DP 12726" or "32 Paremata".</div>'; return; }
   // exact matches first (a legal description or address equal to what was typed), then others containing it
   const exact = [], part = [];
   for(let i=0; i<s.id.length; i++){ const t = s.lt[i];   // the whole list, so an exact match late in it is found
     if(String(s.id[i]) === q || t.split('|').includes(q)) exact.push(i); else if(part.length < 40 && t.includes(q)) part.push(i); }
   const hits = exact.concat(part).slice(0, 40);
-  res.hidden = false;
   if(!hits.length){ res.innerHTML = '<div class="empty" style="padding:5px 6px">No parcel matches. Try the lot and DP number, for example "Lot 2 DP 12726", or an address.</div>'; return; }
-  const SHORT = {k:'Kāpiti', p:'Porirua', n:'Gtr Wellington'};
+  const SHORT = {k:'Kāpiti', p:'Porirua', n: meta.national ? 'NZ' : 'Gtr Wellington'};
   for(const i of hits){ const b = document.createElement('button'), [app, addr] = s.t[i].split('|');
     b.innerHTML = `<span>${esc(app || addr)}</span><span class="c">${SHORT[s.c[i]]}</span>`; if(addr) b.title = addr;
     b.onclick = async () => { touched = true; view.cx = s.x[i]; view.cy = s.y[i]; view.s = Math.max(view.s, 1); draw(); select(await pickAt(s.x[i], s.y[i], s.id[i])); };

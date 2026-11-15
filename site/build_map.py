@@ -95,7 +95,12 @@ COUNCILS = {"k": 0, "p": 1, "n": 2}
 NATIONAL = os.environ.get("LQ_NATIONAL")
 if NATIONAL: LEVELS = LEVELS + [(262144, 75.0), (524288, 300.0)]
 CELLS = {3: 48.0, 4: 150.0, 5: 600.0} if NATIONAL else {}
-DETAIL_IDS = None   # None: every parcel has full detail
+# LQ_FULL (with LQ_NATIONAL, D-26): full detail, the side panel and search for every parcel in the country; the data
+# then goes to Cloudflare R2, being larger than GitHub Pages allows. Search is split into small files by the first
+# letters of each legal description and address (search/{key}.json, keys in meta.search_keys)
+FULL = bool(NATIONAL and os.environ.get("LQ_FULL"))
+NAT = None          # full mode: the national rows the side panel and search need, for parcels without a full row in P
+DETAIL_IDS = None   # parcels with a full row in P (councils, pilot); None: every parcel
 NATVALS = {}        # national mode: measure -> (parcel ids, values) for every parcel in the country
 WATER_PCT = {}   # parcel id -> national index water_pct
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
@@ -153,6 +158,11 @@ def parcels():
                 d = con.sql(f"SELECT parcel_id, CAST({c} AS DOUBLE) v FROM '{nf}'").fetchnumpy()
                 NATVALS[k] = (d["parcel_id"], np.ma.filled(d["v"].astype("f8"), np.nan) if hasattr(d["v"], "mask") else d["v"])
         DETAIL_IDS = set(con.sql(f"SELECT parcel_id FROM '{pilot}'").fetchnumpy()["parcel_id"].tolist())
+        if FULL:
+            global NAT
+            sel = [c for c in ["appellation", "parcel_intent", "address", "territorial_authority"] + [c for c in keep if NATIONAL_AS.get(c, c) in MKEYS] if c in cols]
+            NAT = con.sql(f"SELECT parcel_id, {', '.join(sel)} FROM '{nf}' WHERE parcel_id NOT IN (SELECT parcel_id FROM '{pilot}')").df()
+            NAT = NAT.rename(columns=NATIONAL_AS).set_index("parcel_id")
     n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
     if NATIONAL:
         prov = json.load(open(os.path.join(NATIONAL, "provenance.json")))
@@ -210,6 +220,37 @@ def level_shape(g, p, tol):
         sg = g.simplify(t, preserve_topology=True)
         if not sg.is_empty and abs(sg.area - g.area) <= 0.1 * g.area: return sg
     return g
+
+
+def search_key(text, n):
+    """The first n letters and digits of a legal description or address, lower case and without macrons."""
+    import unicodedata
+    t = unicodedata.normalize("NFKD", text or "").encode("ascii", "ignore").decode().lower()
+    return "".join(ch for ch in t if ch.isalnum())[:n]
+
+
+def write_search_shards(rows, max_bytes=400_000):
+    """Search split by the first letters of each legal description and address: 3 letters and digits, a longer prefix
+    where a file would pass max_bytes. Each file holds the parcels whose description or address starts that way;
+    returns the keys (the page picks the longest one the typed text starts with)."""
+    from collections import defaultdict
+    d = os.path.join(OUT, "data", "search"); os.makedirs(d, exist_ok=True)
+    entries = []
+    for pid, x, y, c, app, adr in rows:
+        t = (app or "") + ("|" + adr if adr else "")
+        for k in {search_key(app, 6), search_key(adr, 6)} - {""}: entries.append((k, [pid, round(x), round(y), c, t]))
+    def split(items, n):
+        groups = defaultdict(list)
+        for k, e in items: groups[k[:n]].append((k, e))
+        for key, g in groups.items():
+            if n < 6 and sum(len(e[4]) + 30 for _, e in g) > max_bytes and any(len(k) > n for k, _ in g):
+                yield from split(g, n + 1)
+            else: yield key, [e for _, e in g]
+    keys = []
+    for key, es in split(entries, 3):
+        json.dump(es, open(os.path.join(d, key + ".json"), "w"), separators=(",", ":"), ensure_ascii=False); keys.append(key)
+    print(len(keys), "search files,", len(entries), "entries")
+    return sorted(keys)
 
 
 def colour_arrays(P, order, idx):
@@ -361,7 +402,7 @@ def main():
     bounds = (min(xs) - 20000, min(ys) - 20000, max(xs) + 20000, max(ys) + 20000)
     # places in the value files: detailed parcels, then the blended cells (those holding council parcels first), then
     # the other parcels; so a measure only the councils have is a short file
-    isdet = (lambda pid: True) if DETAIL_IDS is None else DETAIL_IDS.__contains__
+    isdet = (lambda pid: True) if DETAIL_IDS is None or FULL else DETAIL_IDS.__contains__
     order = sorted(pid for pid in P if isdet(pid)); nd = len(order); order += sorted(pid for pid in P if not isdet(pid))
     idx = {pid: i for i, pid in enumerate(order)}
     V = colour_arrays(P, order, idx); NATVALS.clear()
@@ -381,7 +422,7 @@ def main():
             for li, (_, cells) in blends.items(): c[cells["place"] - nd] = cells["vals"][k]
             V[k] = np.concatenate([V[k][:nd], c, V[k][nd:]])
     meta = dict(origin=ORIGIN, levels=[], measures=["index"], colours=colour_files(V), councils=list(COUNCILS),
-                detail_fields=DETAIL, stats=stats, national=bool(NATIONAL),
+                detail_fields=DETAIL, stats=stats, national=bool(NATIONAL), full=FULL,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
     if NATIONAL: meta["fit"] = [1060000, 4730000, 2100000, 6200000]   # the North, South and Stewart islands
     del V
@@ -433,34 +474,54 @@ def main():
             open(os.path.join(OUT, "data", f"L{name}", key + ".bin"), "wb").write(blob)
             index[key] = [round(x) for x in bb] + [len(pids)]; total += len(blob)
             if detail and pids:   # the side panel's values, in the same squares as full detail
-                det = {str(pid): [clean(P[pid].get(f)) for f in DETAIL] for pid in pids}
+                full = [pid for pid in pids if DETAIL_IDS is None or pid in DETAIL_IDS]
+                det = {str(pid): [clean(P[pid].get(f)) for f in DETAIL] for pid in full}
+                rest = [pid for pid in pids if pid not in det and NAT is not None]
+                if rest:
+                    sub = NAT.reindex(rest); cols_ = [f if f in sub.columns else None for f in DETAIL]
+                    vals = {f: sub[f].tolist() for f in DETAIL if f in sub.columns}
+                    for k, pid in enumerate(rest):
+                        det[str(pid)] = [clean("n" if f == "c" else (vals[f][k] if f in vals else None)) for f in DETAIL]
                 json.dump(det, open(os.path.join(OUT, "data", "detail", key + ".json"), "w"), separators=(",", ":"), ensure_ascii=False)
         print(f"level {name}: {len(index)} pieces, {total / 1e6:.1f} MB", flush=True)
         return dict(side=side, tol=tol, pieces=index)
 
     detailed = [pid for pid in P if isdet(pid)]; others = [pid for pid in P if not isdet(pid)]
     for li, (side, tol) in enumerate(LEVELS):
-        if li == 0: meta["levels"].append(write_level(0, side, tol, detailed, not NATIONAL, detail=True))
-        elif li == 1 and NATIONAL:   # the parcels without full detail apart, so level 0 views can draw them too; water with them
+        if li == 0: meta["levels"].append(write_level(0, side, tol, detailed, not NATIONAL or FULL, detail=True))
+        elif li == 1 and NATIONAL and others:   # the parcels without full detail apart, so level 0 views can draw them too; water with them
             meta["levels"].append(write_level(1, side, tol, detailed, False))
             meta["rest"] = write_level("R", side, tol, others, True)
         elif li in blends:
             gone, cells = blends[li]
             meta["levels"].append(write_level(li, side, tol, [pid for pid in P if pid not in gone], True, cells))
         else: meta["levels"].append(write_level(li, side, tol, list(P), True))
-    srch = dict(id=[], x=[], y=[], t=[], c=[])
-    for pid, p in P.items():
-        if not isdet(pid): continue
-        srch["id"].append(pid); srch["x"].append(round(p["rep_x"])); srch["y"].append(round(p["rep_y"])); srch["c"].append(p["c"])
-        srch["t"].append((p.get("appellation") or "") + ("|" + p["address"] if p.get("address") else ""))
-    json.dump(srch, open(os.path.join(OUT, "data", "search.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    def search_rows():
+        for pid, p in P.items():
+            if not isdet(pid): continue
+            if DETAIL_IDS is None or pid in DETAIL_IDS or NAT is None:
+                yield pid, p["rep_x"], p["rep_y"], p["c"], p.get("appellation"), p.get("address")
+        if FULL and NAT is not None:
+            for pid, app, adr in zip(NAT.index.tolist(), NAT["appellation"].tolist(), NAT["address"].tolist()):
+                p = P[pid]; yield pid, p["rep_x"], p["rep_y"], "n", app, adr
+    if not FULL:
+        srch = dict(id=[], x=[], y=[], t=[], c=[])
+        for pid, x, y, c, app, adr in search_rows():
+            srch["id"].append(pid); srch["x"].append(round(x)); srch["y"].append(round(y)); srch["c"].append(c)
+            srch["t"].append((app or "") + ("|" + adr if adr else ""))
+        json.dump(srch, open(os.path.join(OUT, "data", "search.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    else:
+        meta["search_keys"] = write_search_shards(search_rows())
     json.dump(meta, open(os.path.join(OUT, "data", "meta.json"), "w"), separators=(",", ":"))
     here = os.path.dirname(os.path.abspath(__file__))
     # a stamp per build on the script and every data file (map.js adds it), so browsers fetch the new ones after an update
     build = time.strftime("%Y%m%d%H%M%S", time.gmtime())
     page = open(os.path.join(here, "map.html")).read()
     assert '<script src="map.js"></script>' in page
-    page = page.replace('<script src="map.js"></script>', f'<script>window.LQ_BUILD = "{build}";</script>\n<script src="map.js?v={build}"></script>')
+    data_url = os.environ.get("LQ_DATA_URL")   # the data on R2 (D-26): under builds/{build}/, so a page and its data always match
+    data_js = f' window.LQ_DATA = "{data_url.rstrip("/")}/builds/{build}/";' if data_url else ""
+    page = page.replace('<script src="map.js"></script>', f'<script>window.LQ_BUILD = "{build}";{data_js}</script>\n<script src="map.js?v={build}"></script>')
+    open(os.path.join(OUT, "BUILD.txt"), "w").write(build)
     open(os.path.join(OUT, "index.html"), "w").write(page)
     shutil.copy(os.path.join(here, "map.js"), os.path.join(OUT, "map.js"))
     shutil.copy(os.path.join(here, "vendor", "earcut-2.2.4.min.js"), os.path.join(OUT, "earcut.min.js"))

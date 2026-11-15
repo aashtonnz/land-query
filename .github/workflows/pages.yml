@@ -20,6 +20,11 @@ env:
   # the National index run whose index the whole-country map is drawn from (an unreviewed preview, asked for by the
   # owner on 10 Nov 2026; kept 30 days). Empty: the Greater Wellington pilot only
   NATIONAL_RUN: "42746250658"
+  # Cloudflare R2 (D-26): the public address of the bucket land-query-map. With it and the secrets R2_ACCESS_KEY_ID,
+  # R2_SECRET_ACCESS_KEY and R2_ACCOUNT_ID, the map is built in full for the whole country and its data goes to R2;
+  # without them, the site is built as before, all on GitHub Pages
+  R2_PUBLIC_URL: ""
+  R2_BUCKET: land-query-map
 
 concurrency:
   group: pages
@@ -41,7 +46,27 @@ jobs:
         run: |
           python3 site/test_site.py
           if [ -n "$NATIONAL_RUN" ]; then export LQ_NATIONAL=national; fi
+          if [ -n "$R2_PUBLIC_URL" ] && [ -n "$R2_KEY" ]; then export LQ_FULL=1 LQ_DATA_URL="$R2_PUBLIC_URL"; fi
           python3 site/build_map.py _site
+          du -sm _site
+        env: { R2_KEY: "${{ secrets.R2_ACCESS_KEY_ID }}" }
+      - name: Send the map data to R2
+        if: env.R2_PUBLIC_URL != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: |
+          [ -n "$AWS_ACCESS_KEY_ID" ] || { echo "R2 secrets not set: nothing sent"; exit 0; }
+          E="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"; B=$(cat _site/BUILD.txt)
+          # each build under its own folder, never changed once written, so browsers may keep files for a year
+          aws s3 cp _site/data "s3://$R2_BUCKET/builds/$B/" --recursive --endpoint-url "$E" --only-show-errors \
+            --cache-control "public, max-age=31536000, immutable"
+          rm -rf _site/data
+          # keep the newest three builds (a page loaded just before an update still finds its data), remove older ones
+          for old in $(aws s3 ls "s3://$R2_BUCKET/builds/" --endpoint-url "$E" | awk '{print $2}' | sort | head -n -3); do
+            aws s3 rm "s3://$R2_BUCKET/builds/$old" --recursive --endpoint-url "$E" --only-show-errors; done
           du -sm _site
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }
