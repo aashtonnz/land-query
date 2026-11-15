@@ -179,6 +179,10 @@ def overlap(a, b):
     national park or a great lake for each small shape that meets it (T-102)."""
     x0, y0, x1, y1 = max(a.bounds[0], b.bounds[0]), max(a.bounds[1], b.bounds[1]), min(a.bounds[2], b.bounds[2]), min(a.bounds[3], b.bounds[3])
     if x0 >= x1 or y0 >= y1: return shapely.Polygon()   # apart, or touching only: no area in common
+    # the box is widened by 1 m: GEOS's box clip can return nothing for a shape whose edge lies on the box's edge (a
+    # rectangular building filling its own box lost all its area in the 15 Nov build: 4 parcels), and a ∩ b lies inside
+    # the shared box either way
+    x0, y0, x1, y1 = x0 - 1, y0 - 1, x1 + 1, y1 + 1
     return shapely.clip_by_rect(a, x0, y0, x1, y1).intersection(shapely.clip_by_rect(b, x0, y0, x1, y1))
 
 

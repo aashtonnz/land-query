@@ -428,6 +428,21 @@ def test_lots_beside_a_huge_detailed_parcel_stay_fast():
     assert 20 <= rows[0]["road_frontage_m"] <= 21 and w[0] == 0
 
 
+def test_overlap_keeps_a_rectangle_lying_on_the_shared_box():
+    """A rectangular building inside a parcel fills its own box, so the shared box's edges lie on the building's: the
+    box clip returned nothing and the building's area was lost (15 Nov build, parcel 3468632)."""
+    import shapely
+    parcel = Polygon([(0, 0), (100, 0), (100, 50), (0, 60)])
+    # the real building and parcel (LINZ building 1995273 on parcel 3468632): clockwise, with an extra vertex on its top edge
+    # exact coordinates: its top edge has a kink of 1e-8 m, which is what defeats the box clip
+    real_b = Polygon([(1576323.06186805, 5185173.80810025), (1576326.81394941, 5185173.80810026), (1576326.81394941, 5185166.79949546),
+                      (1576322.56631014, 5185166.79949546), (1576322.56631014, 5185173.80810026)])
+    real_p = Polygon([(1576322.176, 5185193.808), (1576339.672, 5185193.808), (1576340.753, 5185146.799), (1576323.258, 5185146.799)])
+    for pa, b in ((real_p, real_b), (parcel, box(10, 10, 14.25, 17.01)), (parcel, box(98, 40, 102, 45)), (parcel, box(0, 0, 5, 5))):
+        assert abs(N.overlap(pa, b).area - pa.intersection(b).area) < 1e-6, (b.bounds, N.overlap(pa, b).area, pa.intersection(b).area)
+    assert N.overlap(box(0, 0, 1, 1), box(1, 0, 2, 1)).area == 0 and N.overlap(box(0, 0, 1, 1), box(5, 5, 6, 6)).area == 0
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
