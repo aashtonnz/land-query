@@ -174,22 +174,35 @@ def _date(ms):
     return dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc).date().isoformat() if ms else None
 
 
+def overlap(a, b):
+    """a ∩ b, with each cut first to the box the two share: the same result, without walking the whole outline of a
+    national park or a great lake for each small shape that meets it (T-102)."""
+    x0, y0, x1, y1 = max(a.bounds[0], b.bounds[0]), max(a.bounds[1], b.bounds[1]), min(a.bounds[2], b.bounds[2]), min(a.bounds[3], b.bounds[3])
+    if x0 >= x1 or y0 >= y1: return shapely.Polygon()   # apart, or touching only: no area in common
+    return shapely.clip_by_rect(a, x0, y0, x1, y1).intersection(shapely.clip_by_rect(b, x0, y0, x1, y1))
+
+
 def frontage(g, own_id, road_tree, road_buf, nb_tree, nb):
     """Length of g's boundary within 1 m of a road parcel (road parcels often sit 0.2-0.4 m off the lot line), less the
     short pieces, up to 1.5 m, where a side boundary with another land parcel runs into the road: the ends of the
     frontage. Longer stretches are kept, so messy surveys (a road a little off a lot's side, a thin reserve strip
     between lot and road) can lengthen a frontage but never empty it (T-111, T-112)."""
-    near = [road_buf[i] for i in (road_tree.query(g) if road_tree else [])]
+    # roads and neighbours are cut to the parcel's surroundings first (its box plus 1 m, more than any distance used
+    # here), which changes nothing in the result: thickening the whole outline of a national park for each of the
+    # parcels beside it took half an hour in one Fiordland tile (T-102)
+    x0, y0, x1, y1 = g.bounds; here = lambda q: shapely.clip_by_rect(q, x0 - 1, y0 - 1, x1 + 1, y1 + 1)
+    near = [here(road_buf[i]) for i in (road_tree.query(g) if road_tree else [])]
+    near = [q for q in near if not q.is_empty]
     if not near: return 0.0, 0.0
     edge = g.boundary.intersection(unary_union(near))
     sides = [q for q in (nb[i][0] for i in (nb_tree.query(g.buffer(0.2)) if nb_tree else []) if nb[i][1] != own_id)]
     # each neighbour separately: one that shares only an end piece is a side; one sharing more (a strip along the
     # frontage) is not
-    ends = [piece for piece in (edge.intersection(q.buffer(0.1)) for q in sides) if 0 < piece.length <= 1.5]
+    ends = [piece for piece in (edge.intersection(here(q).buffer(0.1)) for q in sides) if 0 < piece.length <= 1.5]
     if ends: edge = edge.difference(unary_union([x.buffer(0.01) for x in ends]))
     # the part reached only across a strip under 1 m wide (often a reserve that bars access): reported apart (T-113)
     thin = [q for q in sides if q.length and 2 * q.area / q.length < 1.0]
-    via = edge.intersection(unary_union([q.buffer(0.1) for q in thin])).length if thin else 0.0
+    via = edge.intersection(unary_union([here(q).buffer(0.1) for q in thin])).length if thin else 0.0
     return round(edge.length, 1), round(via, 1)
 
 
@@ -217,7 +230,7 @@ def water_shares(parcels, water, land):
         else:
             near = clip_by_rect(L, *g.bounds) if L is not None else None
             sea = g.difference(near) if near is not None and not near.is_empty else g
-        wet = unary_union([g.intersection(water[i][0]) for i in wt.query(g)]) if wt is not None else None
+        wet = unary_union([overlap(g, water[i][0]) for i in wt.query(g)]) if wt is not None else None
         unproven = sea.difference(wet) if wet is not None and not wet.is_empty else sea   # sea no lake or river confirms
         if unproven.area >= 0.5 * g.area: out.append(None); continue
         allw = unary_union([sea] + ([wet] if wet is not None else []))
@@ -290,7 +303,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), 
         bm2, n, big, cap = 0.0, 0, 0.0, None
         for i in (bt.query(g) if bt else []):
             b, bp = buildings[i]
-            ia = g.intersection(b).area
+            ia = overlap(g, b).area
             if ia <= 0: continue
             bm2 += ia
             if ia >= 0.5 * b.area: n += 1; big = max(big, b.area)

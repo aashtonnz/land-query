@@ -43,6 +43,11 @@ def synthetic(n, seed=0):
                     c = g.centroid
                     buildings.append((box(c.x - 5, c.y - 5, c.x + 5, c.y + 5), dict(building_id=pid, use_="House")))
                     addresses.append((Point(c.x, c.y), dict(address_id=pid, full_address=f"{pid} Street", address_number=pid)))
+    # a reserve along the whole shore, as detailed as the coast and bordering every shore lot (a national park beside
+    # farms: thickening its whole outline for each neighbour took half an hour in one Fiordland tile)
+    reserve = Polygon(list(zip(xs, ys - 25)) + list(zip(xs[::-1], ys[::-1] - 45)))
+    pid += 1; p = dict(id=pid, parcel_intent="DCDB"); parcels.append((reserve, p, reserve.representative_point())); neighbours.append((reserve, p))
+    roads.append((Polygon(list(zip(xs, ys - 45)) + list(zip(xs[::-1], ys[::-1] - 55))), dict(parcel_intent="Road")))   # a shore road beside it
     coast = [(land.exterior, dict(id=1))]
     water = [(box(side * 0.3, side * 0.2, side * 0.3 + 60, side * 0.2 + 60), dict(t50_fid=1))]   # one small lake
     return parcels, roads, buildings, addresses, coast, [(land, dict(id=1))], water, neighbours

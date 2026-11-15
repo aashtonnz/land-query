@@ -2,7 +2,7 @@
 import os, sys
 import numpy as np, pandas as pd
 from rasterio.transform import from_origin
-from shapely.geometry import box, Point, LineString
+from shapely.geometry import box, Point, LineString, Polygon
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import national_index as N
 
@@ -403,6 +403,24 @@ def test_a_saved_half_is_reused_and_gives_the_same_rows():
         o = run_tile(other, Z=np.full((140, 140), 4.0, np.float32))
         assert set(o) == {1, 2} and o[1]["ground_mean_m"] == 4.0 and o[1]["territorial_authority"] == "Buller District"
     finally: N.STAGES, N.REDO = keep
+
+
+def test_lots_beside_a_huge_detailed_parcel_stay_fast():
+    """T-102: 180 lots along a national park whose outline has 200,000 vertices (Fiordland: one tile took 31 minutes,
+    as each lot's frontage, buildings and water thickened or cut the park's whole outline). With every shape first cut to
+    the lot's surroundings this takes well under a second per ten lots."""
+    import time
+    xs = np.linspace(0, 6000, 200_000); edge = list(zip(xs, 196.1 + 0.05 * np.sin(xs / 3.1)))   # the lots' back boundary
+    park = Polygon(edge + [(6000, 5000), (0, 5000)])
+    lots = [box(x, 150, x + 20, 196) for x in range(0, 3600, 20)]
+    parcels = [(g, dict(id=i + 2, parcel_intent="DCDB"), g.representative_point()) for i, g in enumerate(lots)] + [(park, dict(id=1), park.representative_point())]
+    road = [(box(0, 120, 6000, 150), dict(parcel_intent="Road"))]
+    nb = [(g, p) for g, p, _ in parcels]
+    t0 = time.perf_counter()
+    rows = N.vector_columns(parcels[:-1], road, {}, [(park.buffer(-50), dict(building_id=1))], [], [], (), nb)
+    w = N.water_shares(parcels[:-1], [(park, dict())], [(box(-10, -10, 7000, 6000), dict())])
+    assert time.perf_counter() - t0 < 3, time.perf_counter() - t0   # about 1 s now; the old code took about 9
+    assert 20 <= rows[0]["road_frontage_m"] <= 21 and w[0] == 0
 
 
 if __name__ == "__main__":
