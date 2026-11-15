@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-08T22:26:37+00:00",
+ "checked": "2026-11-15T23:08:21+00:00",
  "sources": {
   "buildings_2021": {
    "count": 50623,
@@ -641,7 +641,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/5"
   },
   "sw_point": {
-   "count": 17887,
+   "count": 17888,
    "fields": [
     "OBJECTID:OID",
     "Shape:Geometry",
@@ -730,7 +730,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/2"
   },
   "ws_pipe": {
-   "count": 33179,
+   "count": 33185,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
@@ -763,7 +763,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/2"
   },
   "ww_lateral": {
-   "count": 21177,
+   "count": 21186,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
@@ -789,7 +789,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/11"
   },
   "ww_node": {
-   "count": 10131,
+   "count": 10132,
    "fields": [
     "OBJECTID:OID",
     "Shape:Geometry",
