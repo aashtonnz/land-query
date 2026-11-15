@@ -223,3 +223,18 @@ identical to the reviewed Wellington build on all 217,409 parcels; no title or o
 flag on the Shotover. Not checked: building and address counts against the source layers outside Wellington; the bulk
 download path. A rebuild and a second review follow before anything is published.
 
+## Twenty-sixth review: the rebuild with review 25's fixes (run 42843565463)
+
+The rebuild matched the first build except where the fixes meant it to: districts on 141,078 parcels, the ground share
+on 81 large parcels (79 truly reaching past the elevation window). No combined district names remain; no title data.
+
+| # | Finding | Seriousness | Fix |
+| --- | --- | --- | --- |
+| 1 | 9,217 parcels (0.4%) had no district, but they are mostly large conservation parcels: 12% of the land by area (44% of Carterton's area, 41% of Kāpiti Coast's), silently left out of any district filter. `SOURCES.md` said 0.2% | Serious | A locality naming several districts now takes the nearest address naming one of them at any distance; empty only where no locality holds the parcel (the subantarctic islands). Checked against the official Wellington polygons (below) |
+| 2 | A locality naming one district can reach over a boundary (Papamoa: 1,702 Tauranga addresses, 208 Western Bay of Plenty): its parcels without an address took the locality's district; about 0.06% wrong | Moderate | The nearest address within 1 km now comes before the locality |
+| 3 | Parcels too small for a cell centre show `ground_cells_pct` 0 though they have a height from their point; two parcels inside the window read 53 and 79 (overlapping parcels taking each other's cells); the Auckland Islands parcel is empty, not "outside" | Minor | Documented; the overlap case left for later |
+
+LINZ publishes no district boundaries on its open services and the national catalogue blocks automated requests, so
+the district is still worked out from LINZ's addresses and localities. Official boundaries (Stats NZ, which needs a key)
+would remove the remaining error near boundaries.
+

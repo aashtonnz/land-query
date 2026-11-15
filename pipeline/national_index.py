@@ -244,31 +244,40 @@ ADDRESS_NEAR_M = 1000.0
 
 
 def national_districts(parcels, rows, localities, addresses):
-    """One district name per parcel for the national build, or None where it cannot be told (review 25). LINZ's
-    localities name every district a locality touches ("Auckland, Waikato District" for Pukekohe), so they decide
-    only where they name one. In order: the parcel's own address; a locality naming a single district; where the
-    locality names several, the nearest address within 1 km naming one of them; LINZ's "outside" name only where no
-    address within 1 km says otherwise (harbour-edge parcels in a city)."""
+    """One district name per parcel for the national build (reviews 25, 26). LINZ publishes no district boundaries on
+    its open services, so the district comes from LINZ's addresses, each of which names one, and its localities, which
+    name every district they touch. In order: the parcel's own address; the nearest address within 1 km (addresses
+    outvote a locality that names one district but reaches over a boundary, as Papamoa does); a locality naming one
+    district; where the locality names several, the nearest address naming one of them at any distance (large
+    conservation parcels far from any address); LINZ's "outside" name where it says so and no address is near. Empty
+    only where no locality holds the parcel (the subantarctic islands)."""
     lt = STRtree([g for g, _ in localities]) if localities else None
-    at = STRtree([g for g, _ in addresses]) if addresses else None
-    def near(rp, among=None):
-        if at is None: return None
+    named = [(g, p.get("territorial_authority")) for g, p in addresses if p.get("territorial_authority") and p.get("territorial_authority") != NO_DISTRICT]
+    at = STRtree([g for g, _ in named]) if named else None
+    by = {}
+    for g, d in named: by.setdefault(d, []).append(g)
+    trees = {d: STRtree(gs) for d, gs in by.items()}
+    def nearest(rp, among=None, limit=None):
         best = None
-        for i in at.query(rp.buffer(ADDRESS_NEAR_M)):
-            d = addresses[int(i)][1].get("territorial_authority")
-            if not d or d == NO_DISTRICT or (among is not None and d not in among): continue
-            dist = addresses[int(i)][0].distance(rp)
-            if dist <= ADDRESS_NEAR_M and (best is None or dist < best[0]): best = (dist, d)
+        for d in (among if among is not None else [None]):
+            t = at if d is None else trees.get(d)
+            if t is None: continue
+            i, dist = t.query_nearest(rp, max_distance=limit, return_distance=True)
+            if len(i) and (best is None or dist[0] < best[0]): best = (float(dist[0]), named[int(i[0])][1] if d is None else d)
         return best[1] if best else None
     out = []
     for (g, _, rp), r in zip(parcels, rows):
         own = r.get("territorial_authority")   # from vector_columns: the parcel's lowest-numbered address
         if own and own != NO_DISTRICT: out.append(own); continue
+        near = nearest(rp, limit=ADDRESS_NEAR_M)
+        if near: out.append(near); continue
         names = [localities[int(i)][1] for i in lt.query(rp, predicate="within")] if lt is not None else []
         name = names[0] if names else None
-        if name and "," in name: out.append(near(rp, {n.strip() for n in name.split(",")}))
-        elif name and name != NO_DISTRICT: out.append(name)
-        else: out.append(near(rp) or name)
+        if name and "," not in name and name != NO_DISTRICT: out.append(name); continue
+        cands = [n.strip() for n in name.split(",")] if name and "," in name else None
+        # several districts: the nearest address naming one; LINZ's "outside" name stays; no locality at all (the
+        # subantarctic islands): empty, as no district holds them
+        out.append(nearest(rp, among=cands) if cands else name)
     return out
 
 

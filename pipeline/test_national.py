@@ -279,8 +279,9 @@ def test_partly_cancelled_titles_count_as_current_and_beds_are_not_land():
 
 
 def test_national_district_is_one_name_from_the_address_or_an_unambiguous_locality():
-    """T-102, review 25: LINZ localities name every district they touch, so the parcel's address decides first, then a
-    locality naming one district, then the nearest address within 1 km among the names; never the combined string."""
+    """T-102, reviews 25 and 26: LINZ localities name every district they touch, so the parcel's address decides first,
+    then the nearest address within the limit, then a locality naming one district, then the nearest address naming one
+    of the locality's districts at any distance; never the combined string."""
     P = lambda i: dict(id=i, parcel_intent="DCDB")
     A = lambda x, y, ta, i: (Point(x, y), dict(address_id=i, full_address=f"{i} Road", address_number=i, territorial_authority=ta))
     keep = N.ADDRESS_NEAR_M; N.ADDRESS_NEAR_M = 100.0
@@ -298,7 +299,9 @@ def test_national_district_is_one_name_from_the_address_or_an_unambiguous_locali
                                         (box(700, 0, 1000, 1000), dict(id=3, territorial_authority=N.NO_DISTRICT))]})
     finally: N.ADDRESS_NEAR_M = keep
     d = {k: r["territorial_authority"] for k, r in rows.items()}
-    assert d == {1: "Tasman District", 2: "Tasman District", 3: None, 4: "Porirua City", 5: "Napier City", 6: N.NO_DISTRICT, 7: "Wellington City"}, d
+    # 2: the nearest address within the limit decides, whichever district (addresses outvote a locality); 3: a
+    # two-district locality with no address near takes the nearest address naming one of its districts, however far
+    assert d == {1: "Tasman District", 2: "Buller District", 3: "Tasman District", 4: "Porirua City", 5: "Napier City", 6: N.NO_DISTRICT, 7: "Wellington City"}, d
 
 
 def test_ground_share_is_of_the_whole_parcel_not_only_the_part_in_the_window():
