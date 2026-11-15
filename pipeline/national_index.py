@@ -244,13 +244,17 @@ ADDRESS_NEAR_M = 1000.0
 
 
 def national_districts(parcels, rows, localities, addresses):
-    """One district name per parcel for the national build (reviews 25, 26). LINZ publishes no district boundaries on
-    its open services, so the district comes from LINZ's addresses, each of which names one, and its localities, which
-    name every district they touch. In order: the parcel's own address; the nearest address within 1 km (addresses
-    outvote a locality that names one district but reaches over a boundary, as Papamoa does); a locality naming one
-    district; where the locality names several, the nearest address naming one of them at any distance (large
-    conservation parcels far from any address); LINZ's "outside" name where it says so and no address is near. Empty
-    only where no locality holds the parcel (the subantarctic islands)."""
+    """[(district, how it was decided)] per parcel for the national build (reviews 25, 26). LINZ publishes no district
+    boundaries on its open services, so the district comes from LINZ's addresses, each of which names one, and its
+    localities, which name every district they touch. In order (district_from):
+    - "address": the parcel's own address;
+    - "locality": a locality naming one district (one can reach a little over a boundary: Papamoa);
+    - "nearby address": the nearest address within 1 km, where the locality names several districts or none;
+    - "distant address": the nearest address naming one of the locality's districts, at any distance (large
+      conservation parcels; in Greater Wellington these were the least reliable, see SOURCES.md);
+    - "outside": LINZ's own "Area outside Territorial Authority" (offshore islands) with no address near;
+    - None: no locality holds the parcel (the subantarctic islands).
+    Measured against the official Greater Wellington boundaries in review 26 (SOURCES.md)."""
     lt = STRtree([g for g, _ in localities]) if localities else None
     named = [(g, p.get("territorial_authority")) for g, p in addresses if p.get("territorial_authority") and p.get("territorial_authority") != NO_DISTRICT]
     at = STRtree([g for g, _ in named]) if named else None
@@ -268,16 +272,16 @@ def national_districts(parcels, rows, localities, addresses):
     out = []
     for (g, _, rp), r in zip(parcels, rows):
         own = r.get("territorial_authority")   # from vector_columns: the parcel's lowest-numbered address
-        if own and own != NO_DISTRICT: out.append(own); continue
-        near = nearest(rp, limit=ADDRESS_NEAR_M)
-        if near: out.append(near); continue
+        if own and own != NO_DISTRICT: out.append((own, "address")); continue
         names = [localities[int(i)][1] for i in lt.query(rp, predicate="within")] if lt is not None else []
         name = names[0] if names else None
-        if name and "," not in name and name != NO_DISTRICT: out.append(name); continue
-        cands = [n.strip() for n in name.split(",")] if name and "," in name else None
-        # several districts: the nearest address naming one; LINZ's "outside" name stays; no locality at all (the
-        # subantarctic islands): empty, as no district holds them
-        out.append(nearest(rp, among=cands) if cands else name)
+        if name and "," not in name and name != NO_DISTRICT: out.append((name, "locality")); continue
+        near = nearest(rp, limit=ADDRESS_NEAR_M)
+        if near: out.append((near, "nearby address")); continue
+        if name and "," in name:
+            far = nearest(rp, among=[n.strip() for n in name.split(",")])
+            if far: out.append((far, "distant address")); continue
+        out.append((name, "outside") if name == NO_DISTRICT else (None, None))
     return out
 
 
@@ -452,7 +456,7 @@ def index_tile(tile, cache, region=None, tas=None):
         neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
         rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), () if national else tas, neighbours)
         if national:
-            for r, d in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"] = d
+            for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"], r["district_from"] = d, how
         # water is measured, never guessed from a name or a title (T-113, T-115)
         lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
         lf, prov["land"] = fetch("land", win, cache)
