@@ -550,6 +550,21 @@ def test_an_address_over_several_parcels_asks_which_one():
     finally: R.q = keep
 
 
+def test_the_report_warns_when_ground_and_surface_come_from_different_surveys():
+    """T-110 (review 22, finding 19): Waiau had a 2016–17 ground model under a 2013 surface model, with no warning."""
+    import report_page as P
+    sv = lambda t, a, b, pct=100.0: dict(survey=t, flown_from=a, flown_to=b, producer="P", licensor="L", share_pct=pct)
+    rep = dict(parcel_id=7, address="1 Test Road", geometry=box(0, 0, 20, 30).__geo_interface__, buildings_nearby=[],
+               values=dict(area_m2=600.0, rep_x=1.0, rep_y=2.0), sources={},
+               lidar_surveys=dict(dem=[sv("Canterbury 2016-2017", "2016-11-01", "2017-03-01")], dsm=[sv("Canterbury 2013", "2013-01-01", "2013-06-01")]))
+    h = P.page(rep)
+    assert "Two surveys." in h and "2016–2017" in h and "trees) in 2013" in h
+    rep["lidar_surveys"]["dsm"] = [sv("Canterbury 2016-2017", "2016-11-01", "2017-03-01")]
+    assert "Two surveys." not in P.page(rep)
+    rep["lidar_surveys"]["dsm"] = []                                     # no surface model: nothing to compare
+    assert "Two surveys." not in P.page(rep)
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

@@ -94,9 +94,24 @@ def plan_svg(rep):
     return "".join(out)
 
 
+def survey_warning(rep):
+    """A warning when the ground and surface models under the parcel come from different LiDAR surveys (review 22,
+    finding 19): heights of roofs and trees, and the shade they cast, are then the difference between two dates, and
+    anything built or cleared between them reads wrongly. None when they come from the same survey."""
+    s = rep.get("lidar_surveys") or {}
+    dem, dsm = (s.get("dem") or [None])[0], (s.get("dsm") or [None])[0]
+    if not dem or not dsm: return None
+    if dem.get("survey") == dsm.get("survey") or (dem.get("flown_from"), dem.get("flown_to")) == (dsm.get("flown_from"), dsm.get("flown_to")):
+        return None
+    yr = lambda x: "–".join(sorted({str(x.get(k) or "?")[:4] for k in ("flown_from", "flown_to")}))
+    return (f"The ground model here was flown in {yr(dem)} and the surface model (roofs, trees) in {yr(dsm)}. Roof, tree "
+            "and shade values compare the two, so anything built, removed or grown between those dates reads wrongly.")
+
+
 def page(rep):
     v = rep["values"]
     title = rep.get("address") or v.get("appellation") or f"Parcel {rep['parcel_id']}"
+    warn = survey_warning(rep)
     rows = []
     for name, cols in GROUPS:
         items = [c for c in cols if c[0] in v]
@@ -157,6 +172,7 @@ dd {{ margin: 0 }}
 .unit {{ color: var(--muted); margin-left: .3em }}
 .what {{ color: var(--muted); font-size: 15px }}
 .unknown {{ font-family: var(--body); font-style: italic; color: var(--muted) }}
+.warn {{ border-left: 3px solid var(--contour); padding: 8px 12px; margin: 18px 0; max-width: 70ch }}
 .notes {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px }}
 .notes ul {{ margin: 8px 0 0; padding-left: 1.1em }}
 .notes li {{ margin: 4px 0 }}
@@ -181,6 +197,7 @@ dd {{ margin: 0 }}
   </div>
   <figure>{plan_svg(rep)}<figcaption>Parcel (brown) and LINZ building outlines nearby, north up.</figcaption></figure>
 </header>
+{f'<p class="warn"><b>Two surveys.</b> {E(warn)}</p>' if warn else ""}
 {"".join(rows)}
 <div class="notes">
   <section><h2>LiDAR surveys used</h2>
