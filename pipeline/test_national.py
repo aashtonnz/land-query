@@ -495,6 +495,25 @@ def test_a_monthly_build_publishes_itself_only_if_nothing_moved_too_far():
     assert not ok(old.assign(territorial_authority=["Hutt City"] * 1100 + ["Porirua City"] * 900))   # a district moved
 
 
+def test_kinds_of_parcel_missing_from_the_export_come_from_the_service():
+    """T-102: LINZ's export of layer 50823 holds no road or hydro parcels; they are taken from the service, replacing any
+    the export has of that kind, so none is held twice."""
+    import bulk, shapely
+    from shapely.geometry import mapping
+    cols = dict(id=[1, 2, 3], parcel_intent=["DCDB", "Road", "Hydro"], appellation=["Lot 1", "Road 1 (old)", "Hydro 1"])
+    wkbs = [shapely.to_wkb(box(i, 0, i + 1, 1)) for i in range(3)]
+    asked = {}
+    def fake_blocks(url, fields, key, step=80_000, where="1=1"):
+        asked["where"] = where
+        return [dict(geometry=mapping(box(5, 0, 6, 1)), properties=dict(id=2, parcel_intent="Road", appellation="Road 1")),
+                dict(geometry=mapping(box(7, 0, 8, 1)), properties=dict(id=4, parcel_intent="Road", appellation="Road 2"))]
+    keep = bulk.blocks; bulk.blocks = fake_blocks
+    try: out, w, n = bulk.add_from_service(cols, wkbs, {"Road"})
+    finally: bulk.blocks = keep
+    assert asked["where"] == "parcel_intent IN ('Road')" and n == 2
+    assert out["id"] == [1, 3, 2, 4] and out["appellation"] == ["Lot 1", "Hydro 1", "Road 1", "Road 2"] and len(w) == 4
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

@@ -115,13 +115,13 @@ def count_titles(titles, current):
     return n, missing
 
 
-def blocks(url, fields, key, step=80_000):
-    """Every feature of a point layer, asked in step-sized blocks where the national index has tiles (four at a time);
-    a feature on a block edge is kept once, by its key."""
+def blocks(url, fields, key, step=80_000, where="1=1"):
+    """Every feature of a layer matching `where`, asked in step-sized blocks where the national index has tiles (four
+    at a time); a feature reaching over a block edge is kept once, by its key."""
     from concurrent.futures import ThreadPoolExecutor
     tiles = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nz_tiles.json")))
     boxes = sorted({(math.floor(t[0] / step) * step, math.floor(t[1] / step) * step) for t in tiles})
-    ask = lambda b: arcgis.query_all(url, dict(where="1=1", geometry=f"{b[0]},{b[1]},{b[0] + step},{b[1] + step}", geometryType="esriGeometryEnvelope",
+    ask = lambda b: arcgis.query_all(url, dict(where=where, geometry=f"{b[0]},{b[1]},{b[0] + step},{b[1] + step}", geometryType="esriGeometryEnvelope",
                                                inSR=2193, spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193), workers=2)
     with ThreadPoolExecutor(4) as ex: got = list(ex.map(ask, boxes))
     seen, out = set(), []
@@ -133,9 +133,10 @@ def blocks(url, fields, key, step=80_000):
     return out
 
 
-def intent_check(intents):
-    """{parcel intent: (records in the export, records in the service)}; fails if a kind of parcel is missing or short
-    in the export (the build needs every road parcel for frontage). The service holds about 6,000 parcels twice."""
+def intent_check(intents, fail=True):
+    """{parcel intent: (records in the export, records in the service)} and the kinds short in the export; with fail,
+    exits if any is. The Data Service's export of layer 50823 holds no road or hydro parcels (16 Nov 2026), which the
+    build needs for frontage and neighbours; the service holds about 6,000 parcels twice."""
     from collections import Counter
     got = Counter(intents); url = N.SVC + N.LAYERS["parcels"][0] + "/FeatureServer/0/query"
     out = {}
@@ -144,8 +145,20 @@ def intent_check(intents):
         out[str(k)] = (got.get(k, 0), arcgis._get(url, dict(where=q, returnCountOnly="true", f="json"))["count"])
     print("parcels by intent (export, service):", out, flush=True)
     short = {k: v for k, v in out.items() if v[0] < v[1] - max(50, 0.01 * v[1])}
-    if short: sys.exit(f"the parcels export is short of these kinds of parcel (export, service): {short}")
-    return out
+    if short and fail: sys.exit(f"the parcels export is short of these kinds of parcel (export, service): {short}")
+    return out, short
+
+
+def add_from_service(cols, wkbs, kinds):
+    """Replace the export's parcels of these kinds with the service's, asked in blocks: (cols, wkbs, how many added)."""
+    keep = [i for i, k in enumerate(cols["parcel_intent"]) if k not in kinds]
+    cols = {k: [v[i] for i in keep] for k, v in cols.items()}; wkbs = [wkbs[i] for i in keep]
+    svc, fields, _ = N.LAYERS["parcels"]
+    where = "parcel_intent IN (" + ", ".join("'" + k.replace("'", "''") + "'" for k in sorted(kinds)) + ")"
+    feats = [f for f in blocks(N.SVC + svc + "/FeatureServer/0", fields, N.KEYS["parcels"], where=where) if f.get("geometry")]
+    for k in cols: cols[k] += [f["properties"].get(k) for f in feats]
+    wkbs += [shapely.to_wkb(shape(f["geometry"])) for f in feats]
+    return cols, wkbs, len(feats)
 
 
 def service_count(layer):
@@ -171,11 +184,15 @@ def main(out):
                                    service_records=service_count(layer), seconds=round(time.time() - t0))
             print(layer, manifest[layer], flush=True); del cols, wkbs; continue
         if layer == "parcels":
+            by_intent, short = intent_check(cols["parcel_intent"], fail=False)
+            if short:   # kinds the export leaves out (roads, hydro): from the service, then checked again
+                cols, wkbs, added = add_from_service(cols, wkbs, set(short))
+                print(f"{added} parcels of {sorted(short)} from the service", flush=True)
+                by_intent, _ = intent_check(cols["parcel_intent"])
             cols["title_count"], cols["titles_not_found"] = count_titles(cols.pop("titles"), current); current = None
-            by_intent = intent_check(cols["parcel_intent"])
         n = write_layer(os.path.join(out, layer + ".parquet"), cols, wkbs); del cols, wkbs
         manifest[layer] = dict(source=f"LINZ Data Service layer {lds} (whole-layer export)", url=N.LDS + str(lds),
-                               **(dict(by_intent=by_intent) if layer == "parcels" else {}),
+                               **(dict(by_intent=by_intent, from_service=sorted(short)) if layer == "parcels" else {}),
                                fetched=utc_now(), records=n, service_records=None if layer == "nonprimary" else service_count(layer), seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
     assert not os.path.exists(os.path.join(out, "titles.parquet")) and "titles" not in pq.read_schema(os.path.join(out, "parcels.parquet")).names
