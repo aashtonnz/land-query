@@ -335,7 +335,7 @@ def test_every_column_defined_in_sources_md_is_published():
 
 def test_the_national_index_is_served_with_its_own_sources_and_columns():
     """T-102: prepare_national.py turns a national build into results the service reads; every column the build makes is
-    described in SOURCES.md, title references never reach it, and columns from unconfirmed licences are withheld."""
+    described in SOURCES.md and title references never reach it."""
     import pandas as pd
     from shapely.geometry import box
     sys.path.insert(0, os.path.join(cat.ROOT, "pipeline"))
@@ -354,12 +354,11 @@ def test_the_national_index_is_served_with_its_own_sources_and_columns():
         assert q.national and not [c for c, m in q.meta.items() if m is None]   # every column described
         assert not {"titles", "title_types", "geometry_wkb", "parcel_id"} & set(q.all_columns)
     q = LandQuery(out, "public")
-    assert {"water_pct", "coast_distance_m", "territorial_authority"} <= set(q.withheld) and "area_m2" in q.columns
+    assert not q.withheld and {"water_pct", "coast_distance_m", "territorial_authority"} <= set(q.columns)   # T-104
     r = q.parcel(7)
     assert r["total"] == 1 and r["rows"][0]["block_id"] == "0_0" and r["sources"]["parcels"]["by_block"]["0_0"]["features"] == 2
     assert q.search(bbox=[490, 490, 600, 600])["total"] == 1
-    try: q.search(where=[dict(column="water_pct", op=">", value=1)]); assert False
-    except QueryError as e: assert "T-104" in str(e)
+    assert q.search(where=[dict(column="water_pct", op=">=", value=0)])["total"] == 2
     assert "New Zealand" in q.about()["dataset"]
 
 

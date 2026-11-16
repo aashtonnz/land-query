@@ -163,7 +163,7 @@ class LandQuery:
     # ---- helpers ----
     def _why(self, c):
         """Why a column is withheld in public mode."""
-        return cat.PUBLIC_EXCLUDE.get(c, "a source's licence is assumed but not yet confirmed (T-104)" if self.national
+        return cat.PUBLIC_EXCLUDE.get(c, "a source's licence is not yet confirmed" if self.national
                                       else "licence not yet confirmed in writing (T-35)")
 
     def _columns(self, columns):

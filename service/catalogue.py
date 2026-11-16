@@ -189,8 +189,7 @@ class National:
     NAME, LABEL = "national", "New Zealand"
     DATASET_SOURCES = "LINZ data (parcels, titles, buildings, addresses, roads, coastline, LiDAR), Stats NZ district boundaries and Topo50 water"
     PARCELS_KEY = PARCELS_COPY = None
-    ABOUT = dict(licence_note="LINZ and Stats NZ data, CC BY 4.0. Columns whose sources' licence is assumed but not yet "
-                              "confirmed (the coastline, Topo50 water and localities, T-104) are withheld in public mode.",
+    ABOUT = dict(licence_note="LINZ and Stats NZ data, CC BY 4.0: attribute Land Information New Zealand and Stats NZ.",
                  boundary="Every primary parcel in New Zealand, including the Chathams and outlying islands; road parcels and "
                           "parcels LINZ marks as water or seabed are left out.",
                  empty_values="Empty means not known: no address, no ground data (the Chathams and outlying islands), the "
