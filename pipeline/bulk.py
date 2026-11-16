@@ -132,6 +132,21 @@ def blocks(url, fields, key, step=80_000):
     return out
 
 
+def intent_check(intents):
+    """{parcel intent: (records in the export, records in the service)}; fails if a kind of parcel is missing or short
+    in the export (the build needs every road parcel for frontage). The service holds about 6,000 parcels twice."""
+    from collections import Counter
+    got = Counter(intents); url = N.SVC + N.LAYERS["parcels"][0] + "/FeatureServer/0/query"
+    out = {}
+    for k in sorted(set(got) | {"Road", "DCDB", "Fee Simple Title", "Hydro"}):
+        q = "parcel_intent IS NULL" if k is None else "parcel_intent='" + str(k).replace("'", "''") + "'"
+        out[str(k)] = (got.get(k, 0), arcgis._get(url, dict(where=q, returnCountOnly="true", f="json"))["count"])
+    print("parcels by intent (export, service):", out, flush=True)
+    short = {k: v for k, v in out.items() if v[0] < v[1] - max(50, 0.01 * v[1])}
+    if short: sys.exit(f"the parcels export is short of these kinds of parcel (export, service): {short}")
+    return out
+
+
 def service_count(layer):
     svc = N.LAYERS[layer][0]
     return arcgis._get(N.SVC + svc + "/FeatureServer/0/query", dict(where="1=1", returnCountOnly="true", f="json"))["count"]
@@ -156,8 +171,10 @@ def main(out):
             print(layer, manifest[layer], flush=True); del cols, wkbs; continue
         if layer == "parcels":
             cols["title_count"], cols["titles_not_found"] = count_titles(cols.pop("titles"), current); current = None
+            by_intent = intent_check(cols["parcel_intent"])
         n = write_layer(os.path.join(out, layer + ".parquet"), cols, wkbs); del cols, wkbs
         manifest[layer] = dict(source=f"LINZ Data Service layer {lds} (whole-layer export)", url=N.LDS + str(lds),
+                               **(dict(by_intent=by_intent) if layer == "parcels" else {}),
                                fetched=utc_now(), records=n, service_records=service_count(layer), seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
     assert not os.path.exists(os.path.join(out, "titles.parquet")) and "titles" not in pq.read_schema(os.path.join(out, "parcels.parquet")).names
@@ -178,6 +195,7 @@ def main(out):
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
     # the export and the service are the same dataset; they may differ by a few days of edits, never by much
     for layer, m in manifest.items():
+        if layer == "parcels": continue   # checked kind by kind above (intent_check)
         if abs(m["records"] - m["service_records"]) > max(100, 0.02 * m["service_records"]):   # the service holds some records twice (once_each)
             sys.exit(f"{layer}: {m['records']} records in the export against {m['service_records']} in the service")
 
