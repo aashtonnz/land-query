@@ -5,8 +5,15 @@ name: National index
 # published as a release file. Free: the repository is public (D-24). With source "bulk" (the default) one job first
 # downloads every layer for the whole country (bulk.py: LINZ Data Service exports with the key, small layers from the
 # ArcGIS services once), and the shares read only those files, so they make no requests to LINZ and can run 20 at once.
+#
+# Monthly (D-27): on the 3rd of each month it builds with the defaults, compares the result with the last published
+# index (national_compare.py) and, if nothing moved further than a month of LINZ changes explains, publishes it and
+# rebuilds the map. If a check fails, the build waits as an artifact for a person, who publishes it with publish_run.
+# The first index is always published by a person, after a review.
 
 on:
+  schedule:
+    - cron: "23 15 3 * *"   # 15:23 UTC on the 3rd: early morning in New Zealand
   workflow_dispatch:
     inputs:
       shares:
@@ -46,17 +53,24 @@ permissions:
 
 jobs:
   plan:
-    if: inputs.publish_run == '' && inputs.merge_run == ''
+    # the settings every later job reads: a scheduled run has no inputs, so the defaults are filled in here
     runs-on: ubuntu-latest
     outputs:
       shares: ${{ steps.s.outputs.shares }}
+      n: ${{ steps.s.outputs.n }}
+      source: ${{ steps.s.outputs.source }}
+      build: ${{ steps.s.outputs.build }}
     steps:
       - id: s
-        env: { N: "${{ inputs.shares }}" }
-        run: python3 -c "import json, os; print('shares=' + json.dumps(list(range(int(os.environ['N'])))))" >> "$GITHUB_OUTPUT"
+        env: { N: "${{ inputs.shares || '40' }}", SOURCE: "${{ inputs.source || 'bulk' }}", PUB: "${{ inputs.publish_run }}", MERGE: "${{ inputs.merge_run }}" }
+        run: |
+          python3 -c "import json, os; print('shares=' + json.dumps(list(range(int(os.environ['N'])))))" >> "$GITHUB_OUTPUT"
+          echo "n=$N" >> "$GITHUB_OUTPUT"; echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
+          if [ -z "$PUB$MERGE" ]; then echo "build=true" >> "$GITHUB_OUTPUT"; else echo "build=false" >> "$GITHUB_OUTPUT"; fi
 
   bulk:
-    if: inputs.publish_run == '' && inputs.merge_run == '' && inputs.source == 'bulk'
+    needs: plan
+    if: needs.plan.outputs.build == 'true' && needs.plan.outputs.source == 'bulk'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -75,7 +89,8 @@ jobs:
 
   districts:
     # official district boundaries from Stats NZ (review 26), with the STATSNZ_API_KEY secret; without it, nothing
-    if: inputs.publish_run == '' && inputs.merge_run == ''
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -93,12 +108,12 @@ jobs:
 
   share:
     needs: [plan, bulk, districts]
-    if: always() && needs.plan.result == 'success' && !inputs.stop_after_bulk && (needs.bulk.result == 'success' || needs.bulk.result == 'skipped') && needs.districts.result == 'success'
+    if: always() && needs.plan.outputs.build == 'true' && !inputs.stop_after_bulk && (needs.bulk.result == 'success' || needs.bulk.result == 'skipped') && needs.districts.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
       fail-fast: false
-      max-parallel: ${{ inputs.source == 'bulk' && 20 || 6 }}   # bulk: no requests to LINZ; service: its rate limit is shared by every job
+      max-parallel: ${{ needs.plan.outputs.source == 'bulk' && 20 || 6 }}   # bulk: no requests to LINZ; service: its rate limit is shared by every job
       matrix:
         k: ${{ fromJson(needs.plan.outputs.shares) }}
     steps:
@@ -107,7 +122,7 @@ jobs:
         with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
       - run: pip install -r pipeline/requirements.txt
       - uses: actions/download-artifact@v4
-        if: inputs.source == 'bulk'
+        if: needs.plan.outputs.source == 'bulk'
         with: { name: bulk, path: bulk }
       - uses: actions/download-artifact@v4
         continue-on-error: true   # no artifact when there is no Stats NZ key
@@ -119,9 +134,9 @@ jobs:
       - name: Build this share
         working-directory: pipeline
         env:
-          N: "${{ inputs.shares }}"
+          N: "${{ needs.plan.outputs.n }}"
           K: "${{ matrix.k }}"
-          NI_BULK: "${{ inputs.source == 'bulk' && '../bulk' || '' }}"
+          NI_BULK: "${{ needs.plan.outputs.source == 'bulk' && '../bulk' || '' }}"
           NI_STAGES: ../share/stages
           NI_DISTRICTS: ../districts
           NI_REDO: "${{ inputs.reuse_run != '' && inputs.redo || 'vector,elevation' }}"
@@ -138,11 +153,13 @@ jobs:
           retention-days: 5
 
   merge:
-    needs: share
+    needs: [plan, share]
     # runs after the shares whether or not the bulk job before them was skipped (a skipped job upstream would skip this
     # one too: run 42774512412 built every share and merged nothing), or alone on an earlier run's shares (merge_run)
     if: always() && inputs.publish_run == '' && (needs.share.result == 'success' || inputs.merge_run != '')
     runs-on: ubuntu-latest
+    outputs:
+      passed: ${{ steps.compare.outputs.passed }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -155,24 +172,40 @@ jobs:
         if: inputs.merge_run != ''
         with: { pattern: "share-*", path: shares, run-id: "${{ inputs.merge_run }}", github-token: "${{ github.token }}" }
       - name: Merge and check
-        run: python3 pipeline/national_merge.py shares nz "${{ inputs.shares }}"
+        run: python3 pipeline/national_merge.py shares nz "${{ needs.plan.outputs.n }}"
       - uses: actions/upload-artifact@v4
         with: { name: national-index, path: nz/, retention-days: 30 }
+      - name: Compare with the last published index
+        id: compare
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          tag=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("national-"))][0].tagName // ""')
+          if [ -z "$tag" ]; then echo "no published index yet: the first is published by a person after a review"; echo "passed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          gh release download "$tag" --repo "${{ github.repository }}" --pattern index.parquet --dir last
+          if python3 pipeline/national_compare.py last/index.parquet nz/index.parquet; then echo "passed=true" >> "$GITHUB_OUTPUT"
+          else echo "passed=false" >> "$GITHUB_OUTPUT"; echo "::warning::differs from $tag beyond a month of changes: not published; a person looks, then runs again with publish_run"; fi
 
   publish:
-    # a build is published only once reviewed: run again with publish_run set to the build's run id
-    if: inputs.publish_run != ''
+    # by a person (publish_run: an earlier build's run id, once reviewed), or by the monthly build itself when the
+    # comparison with the last published index passed (D-27)
+    needs: merge
+    if: always() && (inputs.publish_run != '' || (github.event_name == 'schedule' && needs.merge.outputs.passed == 'true'))
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # the release
+      actions: write    # to start the map site build
+    env: { RUN: "${{ inputs.publish_run || github.run_id }}" }
     steps:
       - uses: actions/download-artifact@v4
-        with: { name: national-index, path: nz, run-id: "${{ inputs.publish_run }}", github-token: "${{ github.token }}" }
+        with: { name: national-index, path: nz, run-id: "${{ env.RUN }}", github-token: "${{ github.token }}" }
       - uses: actions/checkout@v4
         with: { path: code }
       - run: pip install -q pyarrow && python3 code/pipeline/public_strip.py nz   # never title references or types (T-106), whatever code built it
       - env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           commit=$(python3 -c "import json; print(json.load(open('nz/provenance.json'))['commit'])")
-          tag="national-$(date -u +%Y-%m-%d)-${{ inputs.publish_run }}"
+          tag="national-$(date -u +%Y-%m-%d)-$RUN"
           gh release create "$tag" nz/index.parquet nz/provenance.json nz/run.json --repo "${{ github.repository }}" \
             --title "National index $(date -u +%Y-%m-%d)" \
-            --notes "Every primary parcel in New Zealand from LINZ data (CC BY 4.0), built from $commit by run ${{ inputs.publish_run }}. Columns: SOURCES.md. Counts: run.json."
+            --notes "Every primary parcel in New Zealand from LINZ data (CC BY 4.0), built from $commit by run $RUN. Columns: SOURCES.md. Counts: run.json."
+          gh workflow run pages.yml --repo "${{ github.repository }}" --ref main   # the map follows the newest index

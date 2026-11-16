@@ -18,7 +18,8 @@ permissions:
 
 env:
   # the National index run whose index the whole-country map is drawn from (an unreviewed preview, asked for by the
-  # owner on 10 Nov 2026; kept 30 days). Empty: the Greater Wellington pilot only
+  # owner on 10 Nov 2026; kept 30 days). Empty: the newest published national index (a release national-*, D-27),
+  # or the Greater Wellington pilot only if none is published yet
   NATIONAL_RUN: "43746075318"
   # Cloudflare R2 (D-26): the public address of the bucket land-query-map. With it and the secrets R2_ACCESS_KEY_ID,
   # R2_SECRET_ACCESS_KEY and R2_ACCOUNT_ID, the map is built in full for the whole country and its data goes to R2;
@@ -42,10 +43,16 @@ jobs:
       - uses: actions/download-artifact@v4
         if: env.NATIONAL_RUN != ''
         with: { name: national-index, path: national, run-id: "${{ env.NATIONAL_RUN }}", github-token: "${{ github.token }}" }
+      - name: The newest published national index
+        if: env.NATIONAL_RUN == ''
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          tag=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("national-"))][0].tagName // ""')
+          if [ -n "$tag" ]; then gh release download "$tag" --repo "${{ github.repository }}" --dir national; echo "drawing $tag"; else echo "no national index published yet"; fi
       - name: Test and build the site
         run: |
           python3 site/test_site.py
-          if [ -n "$NATIONAL_RUN" ]; then export LQ_NATIONAL=national; fi
+          if [ -f national/index.parquet ]; then export LQ_NATIONAL=national; fi
           if [ -n "$R2_PUBLIC_URL" ] && [ -n "$R2_KEY" ]; then export LQ_FULL=1 LQ_DATA_URL="$R2_PUBLIC_URL"; fi
           python3 site/build_map.py _site
           du -sm _site

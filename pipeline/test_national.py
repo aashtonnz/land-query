@@ -477,6 +477,24 @@ def test_easements_and_covenants_are_counted_from_the_bulk_layer_and_unknown_wit
     assert none[1]["easements_n"] is None and none[1]["land_covenants_n"] is None
 
 
+def test_a_monthly_build_publishes_itself_only_if_nothing_moved_too_far():
+    import pandas as pd
+    from national_compare import compare
+    n = 2000
+    old = pd.DataFrame(dict(parcel_id=range(n), area_m2=[600.0 + i for i in range(n)], address=[f"{i} Street" for i in range(n)],
+                            territorial_authority=["Hutt City"] * 1000 + ["Porirua City"] * 1000, water_pct=[0.0] * n))
+    ok = lambda new: all(p for _, p, _ in compare(old, new))
+    new = pd.concat([old, old.tail(20).assign(parcel_id=lambda d: d.parcel_id + n)], ignore_index=True)   # 1% new parcels
+    new.loc[:30, "area_m2"] += 50   # a few resurveyed
+    assert ok(old) and ok(new)
+    assert not ok(old.head(1900))                                                   # 5% of parcels gone
+    assert not ok(old.drop(columns="water_pct"))                                    # a column lost
+    assert not ok(old.assign(water_pct=[None] * 100 + [0.0] * (n - 100)))           # unknowns up 5 points
+    assert not ok(old.assign(area_m2=old.area_m2 * 1.5))                            # every area changed
+    assert not ok(old.assign(address=old.address.where(old.parcel_id >= 200, "x")))  # 10% of addresses changed
+    assert not ok(old.assign(territorial_authority=["Hutt City"] * 1100 + ["Porirua City"] * 900))   # a district moved
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
