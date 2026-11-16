@@ -15,7 +15,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,6 +41,11 @@ jobs:
         run: |
           pip install -q numpy pyproj rasterio pandas pyarrow scipy numba duckdb
           python3 national_licences.py | tee -a "$GITHUB_STEP_SUMMARY" || echo "licence lookup failed"
+      - name: Council zoning and hazard layers on ArcGIS Online, and their licences (T-35, T-38)
+        working-directory: pipeline
+        run: python3 council_survey.py ../survey && cat ../survey/council_survey.md >> "$GITHUB_STEP_SUMMARY" || echo "survey failed"
+      - uses: actions/upload-artifact@v4
+        with: { name: council-survey, path: survey/, retention-days: 30, if-no-files-found: ignore }
       - name: Push snapshot to source-checks branch
         run: |
           git fetch -q origin source-checks && git checkout -q source-checks || git checkout -q --orphan source-checks

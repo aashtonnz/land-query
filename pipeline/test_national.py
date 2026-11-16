@@ -565,6 +565,15 @@ def test_the_report_warns_when_ground_and_surface_come_from_different_surveys():
     assert "Two surveys." not in P.page(rep)
 
 
+def test_the_council_survey_tells_a_dataset_licence_from_none():
+    """T-35: a Creative Commons licence written on the item counts; a blank one or 'all rights reserved' does not."""
+    from council_survey import licence_class
+    assert licence_class("<p>This work is licensed under a Creative Commons Attribution 4.0 International licence</p>", "") == "dataset licence"
+    assert licence_class("CC-BY 4.0", "") == "dataset licence" and licence_class("", "Licensed CC BY 4.0, Greater Wellington") == "dataset licence"
+    assert licence_class("", "") == "none stated" and licence_class("Copyright 2024 Council. All rights reserved.", "") == "restricted"
+    assert licence_class("See our terms of use on the website.", "") == "other"
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
