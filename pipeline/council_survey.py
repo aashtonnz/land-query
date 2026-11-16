@@ -82,17 +82,23 @@ def main(out):
                                                      url=it.get("url"), type=it.get("type"), modified=it.get("modified"), topics=set(),
                                                      licence=text(it.get("licenseInfo"))[:400], credits=text(it.get("accessInformation"))[:200]))
                 rec["topics"].add(topic)
-    # an organisation's name is not public on ArcGIS Online; it is shown by its account names and the credit it states
-    owners, credits = {}, {}
+    # ArcGIS Online's search gives no organisation, so each layer is grouped by the server it lives on (a council's own
+    # server, or an ArcGIS Online account's key in the address), and the group named by the credit its layers state most
+    def server(url):
+        m = re.match(r"https?://([^/]+)(/[^/]+)?", url or "")
+        return (m.group(1) + (m.group(2) or "")) if m else "(no service address)"
+    groups = {}
     for rec in items.values():
-        owners.setdefault(rec["orgid"], set()).add(rec["owner"] or "?")
-        if rec["credits"]: credits.setdefault(rec["orgid"], {}).setdefault(rec["credits"][:60], 0); credits[rec["orgid"]][rec["credits"][:60]] += 1
-    for rec in items.values():
-        o = rec["orgid"]
-        top = max(credits.get(o, {"": 0}).items(), key=lambda kv: kv[1])[0]
-        rec["org"] = (top + " " if top else "") + "[" + ", ".join(sorted(owners[o])[:3]) + "]"
-        rec["licence_class"] = licence_class(rec["licence"], rec["credits"])
-        rec["topics"] = sorted(rec["topics"])
+        rec["server"] = server(rec["url"])
+        groups.setdefault(rec["server"], []).append(rec)
+    for key, recs in groups.items():
+        cr = {}
+        for r in recs:
+            if r["credits"]: cr[r["credits"][:70]] = cr.get(r["credits"][:70], 0) + 1
+        name = max(cr.items(), key=lambda kv: kv[1])[0] if cr else ""
+        for r in recs:
+            r["org"] = (name + " " if name else "") + "(" + key + ")"
+            r["licence_class"] = licence_class(r["licence"], r["credits"])
     rows = sorted(items.values(), key=lambda r: (r["org"] or "", r["title"] or ""))
     json.dump(rows, open(os.path.join(out, "council_layers.json"), "w"), indent=1, default=str)
     # per organisation: topics found, and how many items of each have a dataset licence
