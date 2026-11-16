@@ -2,4 +2,5 @@ pipeline/data/
 __pycache__/
 *.duckdb
 service/results/
-.tmp/   # DuckDB's spill folder
+# DuckDB's spill folders
+.tmp/
