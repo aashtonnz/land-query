@@ -666,6 +666,12 @@ def test_finish_rules_apply_to_published_rows_and_are_idempotent():
     assert ov.finish_row(dict(once)) == once
     r = ov.finish_row({k: v for k, v in base.items() if k != "unmapped_structure_m2"} | dict(lidar_coverage_pct=10.0))
     assert "unmapped_structure_m2" not in r                                            # an absent column stays absent
+    # a strip too thin to hold a cell centre is read from every cell it touches: its areas never exceed its own (T-85)
+    strip = ov.finish_row(dict(base, area_m2=35.9, open_ground_m2=257, open_ground_slope_lt5_m2=200, building_2021_m2=0, unmapped_structure_m2=None))
+    assert (strip["open_ground_m2"], strip["open_ground_slope_lt5_m2"], strip["building_2021_m2"]) == (36, 36, 0) and strip["unmapped_structure_m2"] is None
+    assert ov.finish_row(dict(strip)) == strip and ov.finish_row(dict(base, area_m2=float("nan")))["open_ground_m2"] == 5
+    import councils.porirua as PC
+    assert ov.finish_row(dict(base, area_m2=3.0, building_m2=9), PC)["building_m2"] == 3     # under the council's name for it
 
 
 def test_porirua_settings_are_consistent():

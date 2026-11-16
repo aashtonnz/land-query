@@ -253,6 +253,10 @@ def empty_near_surface_gap(row, gap_m_parcel, gap_m_view, shadow_m=300, horizon_
     return row
 
 
+CELL_AREA_COLUMNS = ("open_ground_m2", "open_ground_slope_lt5_m2", "building_2021_m2", "roof_flat_m2", "roof_north_m2",
+                     "unmapped_structure_m2")   # m², counted in 1 m cells (T-85)
+
+
 def finish_row(row, council=None):
     """Rules that need only a parcel's own published values, applied by the compiler to every row and by finish.py to
     published results, so a change to them republishes in minutes without a rebuild (T-82). Each is idempotent.
@@ -261,6 +265,8 @@ def finish_row(row, council=None):
       T-79); the published, rounded figure decides (T-77).
     - Flow and structure columns empty under 99% LiDAR coverage: a part's values are not the parcel's (T-81).
     - KCDC's condition grade 0 means "not graded": empty (T-79). A count of 0 recommended building levels: empty (T-76).
+    - Areas counted in 1 m cells are at most the parcel's own area: a strip too thin to hold a cell centre is read from
+      every cell it touches, which gave 257 m² of open ground on a 36 m² parcel (T-85).
     """
     def below(k):
         v = row.get(k)
@@ -275,6 +281,15 @@ def finish_row(row, council=None):
     if below("lidar_coverage_pct"):
         for k in LIDAR_FLOW_COLUMNS:
             if k in row: row[k] = None
+    area = row.get("area_m2")
+    if area is not None and area == area:
+        from councils import COUNCIL
+        council = council or COUNCIL
+        cap = int(round(area))
+        for k in CELL_AREA_COLUMNS:
+            for name in (k, council.RENAME_COLUMNS.get(k)):
+                v = row.get(name) if name else None
+                if v is not None and v == v and v > cap: row[name] = cap
     if row.get("ww_pipe_condition_grade") == 0: row["ww_pipe_condition_grade"] = None
     if row.get("rbl_in_parcel_n") == 0: row["rbl_in_parcel_n"] = None
     return row
