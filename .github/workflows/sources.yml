@@ -36,6 +36,11 @@ jobs:
           cat ../out/changes.md >> "$GITHUB_STEP_SUMMARY"
           echo "changed=$([ $code -eq 3 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           [ $code -eq 0 ] || [ $code -eq 3 ]
+      - name: Licences of the national index's layers (T-104)
+        working-directory: pipeline
+        run: |
+          pip install -q numpy pyproj rasterio pandas pyarrow scipy numba duckdb
+          python3 national_licences.py | tee -a "$GITHUB_STEP_SUMMARY" || echo "licence lookup failed"
       - name: Push snapshot to source-checks branch
         run: |
           git fetch -q origin source-checks && git checkout -q source-checks || git checkout -q --orphan source-checks
