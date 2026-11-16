@@ -202,9 +202,10 @@ if HAVE_LIDAR:
     INFLOW = np.zeros(Z.shape, bool); INFLOW[0, :] = INFLOW[-1, :] = INFLOW[:, 0] = INFLOW[:, -1] = True
     GAP = ~np.isfinite(Z) & ~SEA
     # how far each cell is from a gap in the surface model that is not sea: shade and views reaching into one are
-    # unknown (review 22); None where the surface model has no gap here, as in every council survey so far
+    # unknown (review 22); None where the surface model has no gap here. National reports only for now: in a council
+    # build the land past the survey's edge would count as a gap too, which is not yet measured (T-110)
     _dgap = ~np.isfinite(dsm) & ~SEA
-    if _dgap.any():
+    if COUNCIL.NAME == "national" and _dgap.any():
         from scipy.ndimage import distance_transform_edt
         GAPD = (distance_transform_edt(~_dgap) * abs(dem.transform.a)).astype(np.float32)
     else: GAPD = None
