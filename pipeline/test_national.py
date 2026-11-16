@@ -579,6 +579,17 @@ def test_the_council_survey_tells_a_dataset_licence_from_none():
     assert in_nz([[174.6, -41.4], [175.0, -41.1]]) and not in_nz([[-180, -90], [180, 90]]) and not in_nz([[-95, 41], [-90, 43]]) and not in_nz(None)
 
 
+def test_buildings_are_unknown_where_no_outline_reaches_the_tile():
+    """Service review (16 Nov): LINZ's outlines do not reach the Chathams, where every parcel read 0 buildings; with no
+    outline anywhere in a tile the building columns are empty, while a tile with outlines keeps its 0s."""
+    lot, other = box(0, 0, 40, 40), box(300, 300, 340, 340)
+    P = lambda i: dict(id=i, parcel_intent="DCDB", appellation=f"Lot {i} DP 1")
+    none = run_tile({"parcels": [(lot, P(1)), (other, P(2))]})
+    assert all(none[1][k] is None for k in N.BUILDING_COLS)
+    some = run_tile({"parcels": [(lot, P(1)), (other, P(2))], "buildings": [(box(310, 310, 320, 320), dict(building_id=1, use_="House", capture_source_to=None))]})
+    assert some[1]["building_count"] == 0 and some[1]["building_m2"] == 0 and some[2]["building_count"] == 1
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

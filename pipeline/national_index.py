@@ -271,10 +271,21 @@ def official_districts():
     return _OFFICIAL
 
 
+BUILDING_COLS = ("building_count", "building_m2", "building_cover_pct", "largest_building_m2", "buildings_captured_to")
+
+
+def official_meta():
+    """The provenance of Stats NZ's district boundaries (districts.json: layer, title, url, fetched, licence, count)."""
+    f = os.path.join(DISTRICTS_DIR, "districts.json") if DISTRICTS_DIR else None
+    return json.load(open(f)) if f and os.path.exists(f) else dict(source="Stats NZ district boundaries")
+
+
 def national_districts(parcels, rows, localities, addresses, official=()):
-    """[(district, how it was decided)] per parcel for the national build (reviews 25, 26). LINZ publishes no district
-    boundaries on its open services, so the district comes from LINZ's addresses, each of which names one, and its
-    localities, which name every district they touch. In order (district_from):
+    """[(district, how it was decided)] per parcel for the national build (reviews 25, 26). First, with Stats NZ's
+    official boundaries (official, from districts.py), every parcel whose point lies in one takes it ("boundary").
+    Where none holds the parcel, or a build has no boundaries (LINZ publishes none on its open services), the district
+    comes from LINZ's addresses, each of which names one, and its localities, which name every district they touch.
+    In order (district_from):
     - "address": the parcel's own address;
     - "locality": a locality naming one district (one can reach a little over a boundary: Papamoa);
     - "nearby address": the nearest address within 1 km, where the locality names several districts or none;
@@ -282,9 +293,7 @@ def national_districts(parcels, rows, localities, addresses, official=()):
       conservation parcels; in Greater Wellington these were the least reliable, see SOURCES.md);
     - "outside": LINZ's own "Area outside Territorial Authority" (offshore islands) with no address near;
     - None: no locality holds the parcel (the subantarctic islands).
-    Measured against the official Greater Wellington boundaries in review 26 (SOURCES.md).
-    With Stats NZ's boundaries (official), every parcel whose point lies in one takes it ("boundary"), and the rules
-    above apply only to the rest (offshore rocks beyond them)."""
+    Measured against the official Greater Wellington boundaries in review 26 (SOURCES.md)."""
     ot = STRtree([g for g, _ in official]) if official else None
     lt = STRtree([g for g, _ in localities]) if localities else None
     named = [(g, p.get("territorial_authority")) for g, p in addresses if p.get("territorial_authority") and p.get("territorial_authority") != NO_DISTRICT]
@@ -489,11 +498,16 @@ def index_tile(tile, cache, region=None, tas=None):
         titles = current_titles(tf)
         neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
         rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), () if national else tas, neighbours)
+        # LINZ's outlines do not reach some places (the Chathams, outlying islands): with none in the whole tile, the
+        # building columns are unknown, not 0 (service review, 16 Nov)
+        if not bf:
+            for r in rows: r.update({k: None for k in BUILDING_COLS})
         # easements and land covenants: non-primary parcels overlapping the parcel by more than 1 m², as the council
         # builds count them; only the bulk download carries them (the open services do not), so otherwise unknown, not 0
         npf = os.path.join(BULK, "nonprimary.parquet") if BULK else None
         if npf and os.path.exists(npf):
-            nonpri = geoms(fetch("nonprimary", win, cache)[0]); nt_ = STRtree([g for g, _ in nonpri]) if nonpri else None
+            nf_, prov["nonprimary"] = fetch("nonprimary", win, cache)
+            nonpri = geoms(nf_); nt_ = STRtree([g for g, _ in nonpri]) if nonpri else None
             for r, (g, _, _) in zip(rows, parcels):
                 hits = [nonpri[i][1].get("parcel_intent") for i in (nt_.query(g) if nt_ is not None else []) if overlap(g, nonpri[i][0]).area > 1]
                 r["easements_n"], r["land_covenants_n"] = hits.count("Easement"), hits.count("Covenant - Land")
@@ -501,6 +515,7 @@ def index_tile(tile, cache, region=None, tas=None):
             for r in rows: r["easements_n"] = r["land_covenants_n"] = None
         if national:
             for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af), official_districts())): r["territorial_authority"], r["district_from"] = d, how
+            if official_districts(): prov["districts"] = official_meta()   # recorded where used (service review, 16 Nov)
         # water is measured, never guessed from a name or a title (T-113, T-115)
         lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
         lf, prov["land"] = fetch("land", win, cache)
@@ -629,8 +644,9 @@ if __name__ == "__main__":
     elif len(sys.argv) > 2 and sys.argv[2] == "nz":
         tiles = [tuple(t) for t in json.load(open(sys.argv[3]))]
         k, n = int(sys.argv[4]), int(sys.argv[5])
-        run(sys.argv[1], tiles[k::n], rprov=dict(name="New Zealand", share=f"{k + 1} of {n}",
-                                                  districts="LINZ NZ Suburbs and Localities (territorial_authority)"))
+        how = (official_meta().get("title", "Stats NZ district boundaries") + " (Stats NZ), then LINZ addresses and localities where "
+               "no boundary holds the parcel (district_from)") if official_districts() else "LINZ addresses and localities (district_from)"
+        run(sys.argv[1], tiles[k::n], rprov=dict(name="New Zealand", share=f"{k + 1} of {n}", districts=how))
     else:
         key = sys.argv[2] if len(sys.argv) > 2 else "wellington"
         region, tas, rprov = region_shapes(key)

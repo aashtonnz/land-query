@@ -405,6 +405,54 @@ def test_the_hosted_service_limits_each_address_and_answers_only_its_own_host_na
 
 
 
+def test_the_service_review_fixes_hold():
+    """Service review (16 Nov): a request waiting too long for the database is told it is busy; a search's count and
+    rows share one deadline; bad arguments get a clear message; the national sources and attribution come from what
+    the build recorded; behind a proxy the address is the one the proxy added; old addresses are dropped first."""
+    import asyncio, threading, landquery as LQm
+    try: out = national_fixture()
+    except ImportError as e: print("SKIPPED without the pipeline's packages:", e); return
+    q = LandQuery(out, "public")
+    # busy: the database held by another request for longer than the wait
+    keep = LQm.QUERY_SECONDS; LQm.QUERY_SECONDS = 0.2
+    try:
+        q._lock.acquire()
+        try: q.search(bbox=[0, 0, 100, 100]); assert False
+        except QueryError as e: assert "busy" in str(e)
+        finally: q._lock.release()
+        calls = []
+        real = q._run_all
+        q._run_all = lambda st: (calls.append(len(st)), real(st))[1]
+        q.search(bbox=[0, 0, 100, 100]); assert calls == [2]                  # count and rows: one call, one deadline
+    finally: LQm.QUERY_SECONDS = keep
+    for bad in ([dict(column="unit_id", op=["="], value=1)], [dict(column="unit_id", op="=", value=None)],
+                [dict(column=["unit_id"], op="=", value=1)], [dict(column="area_m2", op=">", value=float("nan"))]):
+        try: q.search(where=bad); assert False, bad
+        except QueryError: pass
+    for bad in (dict(bbox=[True, True, True, True]), dict(columns="area_m2"), dict(limit=float("inf"))):
+        try: q.search(**bad); assert False, bad
+        except QueryError: pass
+    try: q.parcel(unit_id="abc"); assert False
+    except QueryError: pass
+    # sources and attribution: only those recorded (this fixture records parcels only)
+    assert q.dataset_sources() == "LINZ parcels" and "Stats NZ" not in q.licence_note()
+    q.prov["districts"] = {"by_block": {}}; assert "Stats NZ" in q.dataset_sources() and "Stats NZ" in q.licence_note()
+    # the rate limiter behind a proxy, and its memory of addresses
+    import server
+    seen = []
+    async def app(scope, receive, send): seen.append(1); await server.RateLimit._send(send, 200, b"ok")
+    rl = server.RateLimit(app, per_minute=2, trust_proxy=True)
+    def call(xff):
+        sent = []
+        async def send(m): sent.append(m)
+        asyncio.run(rl(dict(type="http", path="/mcp", headers=[(b"x-forwarded-for", xff.encode())], client=("10.0.0.1", 1)), None, send))
+        return sent[0]["status"]
+    assert [call(f"9.9.9.{i}, 1.2.3.4") for i in range(3)] == [200, 200, 429]   # the caller's own entries do not help
+    rl.MAX_ADDRESSES = 3
+    for i in range(5): call(f"5.5.5.{i}")
+    assert len(rl.buckets) == 3 and "1.2.3.4" not in rl.buckets and "5.5.5.4" in rl.buckets
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

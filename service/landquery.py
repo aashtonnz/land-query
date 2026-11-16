@@ -35,6 +35,7 @@ class LandQuery:
         self.audience, self.dir = audience, results_dir
         self._lock = threading.Lock()
         self.db = duckdb.connect(config=dict(memory_limit="1GB", threads=2))  # one request cannot take the host down (T-52)
+        self.db.execute("SET enable_progress_bar = false")   # never on stdout, the MCP channel in stdio mode
         path = os.path.join(results_dir, "units.parquet").replace("'", "''")  # a view cannot take a parameter
         self.db.execute(f"CREATE VIEW units AS SELECT * FROM read_parquet('{path}')")
         self.all_columns = [r[0] for r in self.db.execute("DESCRIBE units").fetchall()]
@@ -62,15 +63,34 @@ class LandQuery:
     def about(self):
         n = self._run("SELECT count(*) FROM units", [])[0][0]  # under the lock like every query (T-62)
         return dict(
-            dataset=f"{self.council.LABEL} parcels, compiled from {self.council.DATASET_SOURCES}",
+            dataset=f"{self.council.LABEL} parcels, compiled from {self.dataset_sources()}",
             run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),
             coordinates="NZTM2000 (EPSG:2193), metres; heights NZVD2016",
-            licence_note=self.council.ABOUT["licence_note"],
+            licence_note=self.licence_note(),
             caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
             boundary=self.council.ABOUT["boundary"], empty_values=self.council.ABOUT["empty_values"],   # per council (twelfth review)
             provenance_available=bool(self.prov))
 
+    NATIONAL_NAMES = [("parcels", "LINZ parcels"), ("titles", "titles (counted, never listed)"), ("buildings", "building outlines"),
+                      ("addresses", "addresses"), ("roads", "road parcels"), ("nonprimary", "easements and covenants"),
+                      ("coast", "coastline"), ("land", "land outline"), ("lakes_rivers", "lakes and rivers"),
+                      ("localities", "localities"), ("elevation", "LiDAR and the 8 m elevation model"),
+                      ("districts", "Stats NZ district boundaries")]
+
+    def dataset_sources(self):
+        """The sources these results were built from: for the national index, those its provenance records (a build
+        without the Stats NZ key has no district boundaries, and must not say it has: service review, 16 Nov)."""
+        if not self.national: return self.council.DATASET_SOURCES
+        return ", ".join(name for key, name in self.NATIONAL_NAMES if key in self.prov)
+
+    def licence_note(self):
+        if not self.national: return self.council.ABOUT["licence_note"]
+        who = ["Land Information New Zealand"] + (["Stats NZ"] if "districts" in self.prov else []) + \
+              (["Geographx (8 m elevation model)"] if "elevation" in self.prov else [])
+        return "CC BY 4.0: attribute " + ", ".join(who) + "."
+
     def describe_columns(self, contains=None):
+        if contains is not None and not isinstance(contains, str): raise QueryError("contains is text to look for in column names and meanings")
         out = {}
         for c in self.all_columns:
             if c in self.withheld:  # describing a withheld column can reveal its contents (T-52)
@@ -84,6 +104,9 @@ class LandQuery:
     # ---- queries ----
     def parcel(self, unit_id=None, appellation=None, columns=None):
         if unit_id is None and not appellation: raise QueryError("give unit_id or appellation")
+        if unit_id is not None:
+            try: unit_id = int(unit_id)
+            except (TypeError, ValueError, OverflowError): raise QueryError("unit_id is a LINZ parcel id, a whole number") from None
         where = [dict(column="unit_id", op="=", value=int(unit_id))] if unit_id is not None else \
                 [dict(column="appellation", op="=", value=str(appellation))]
         return self.search(where=where, columns=columns, limit=20)
@@ -94,6 +117,7 @@ class LandQuery:
         if bbox is not None:
             if "bbox_xmin" not in self.all_columns: raise QueryError("these results predate parcel locations (T-36): area queries need the next rebuild")
             if not isinstance(bbox, (list, tuple)) or len(bbox) != 4: raise QueryError("bbox is [xmin, ymin, xmax, ymax] in NZTM2000 metres")
+            if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in bbox): raise QueryError("bbox values must be numbers")
             try: x0, y0, x1, y1 = (float(v) for v in bbox)
             except (TypeError, ValueError): raise QueryError("bbox values must be numbers") from None
             if not all(map(math.isfinite, (x0, y0, x1, y1))) or x1 < x0 or y1 < y0: raise QueryError("bbox must be finite, with xmin <= xmax and ymin <= ymax")
@@ -107,14 +131,16 @@ class LandQuery:
             c, p = self._condition(cond); clauses.append(c); params += p
         sql_where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
         try: limit, offset = int(limit), int(offset)
-        except (TypeError, ValueError): raise QueryError("limit and offset must be whole numbers") from None
+        except (TypeError, ValueError, OverflowError): raise QueryError("limit and offset must be whole numbers") from None
         cap = MAX_ROWS if columns and len(cols) <= WIDE_COLUMNS else MAX_ROWS_ALL_COLUMNS
         limit = max(1, min(limit, cap))
         if not 0 <= offset <= MAX_OFFSET: raise QueryError(f"offset must be between 0 and {MAX_OFFSET}")
-        total = self._run(f"SELECT count(*) FROM units{sql_where}", params)[0][0]
         fixed = ["unit_id", "appellation", "block_id", "geometry_source"] if "geometry_source" in self.all_columns else ["unit_id", "appellation", "block_id"]
         sel = ", ".join(f'"{c}"' for c in dict.fromkeys(fixed + cols))
-        res = self._run(f"SELECT {sel} FROM units{sql_where} ORDER BY unit_id LIMIT {limit} OFFSET {offset}", params, names=True)
+        # the count and the rows under one lock and one deadline: a request holds the database at most QUERY_SECONDS
+        count, res = self._run_all([(f"SELECT count(*) FROM units{sql_where}", params, False),
+                                    (f"SELECT {sel} FROM units{sql_where} ORDER BY unit_id LIMIT {limit} OFFSET {offset}", params, True)])
+        total = count[0][0]
         names, data = res
         rows = []
         for r in data:
@@ -125,21 +151,28 @@ class LandQuery:
 
     def _run(self, sql, params, names=False):
         """Run a query with a time limit; database errors become a plain message (the details stay in the server)."""
-        with self._lock:  # one query at a time: a request's timer must never interrupt another request's query (T-59)
-            return self._run_locked(sql, params, names)
+        return self._run_all([(sql, params, names)])[0]
 
-    def _run_locked(self, sql, params, names):
+    def _run_all(self, statements):
+        """Run statements one after another with one deadline for them all. One request at a time holds the database (a
+        request's timer must never interrupt another's query, T-59); one that cannot get it within QUERY_SECONDS is
+        told the service is busy instead of queueing behind slow requests (service review, 16 Nov)."""
+        if not self._lock.acquire(timeout=QUERY_SECONDS):
+            raise QueryError("the service is busy with other queries: retry in a few seconds")
         timer = threading.Timer(QUERY_SECONDS, self.db.interrupt); timer.start()
         try:
-            res = self.db.execute(sql, params)
-            out = res.fetchall()
-            return ([d[0] for d in res.description], out) if names else out
+            out = []
+            for sql, params, names in statements:
+                res = self.db.execute(sql, params)
+                rows = res.fetchall()
+                out.append(([d[0] for d in res.description], rows) if names else rows)
+            return out
         except duckdb.Error as e:
             if "INTERRUPT" in type(e).__name__.upper() or "interrupt" in str(e).lower():
                 raise QueryError(f"query took longer than {QUERY_SECONDS} s: narrow it") from None
             raise QueryError("the query could not be run: check each condition's column, op and value type") from None
         finally:
-            timer.cancel()
+            timer.cancel(); self._lock.release()
 
     def inverse_query(self, qid):
         if not os.path.exists(os.path.join(self.dir, "inverse_queries.json")): raise QueryError("no precomputed queries for these results")
@@ -168,6 +201,7 @@ class LandQuery:
 
     def _columns(self, columns):
         if not columns: return list(self.columns)
+        if not isinstance(columns, (list, tuple)) or not all(isinstance(c, str) for c in columns): raise QueryError("columns is a list of column names")
         bad = [c for c in columns if c not in self.all_columns]
         if bad: raise QueryError(f"unknown columns: {bad}")
         held = [c for c in columns if c in self.withheld]
@@ -177,7 +211,11 @@ class LandQuery:
     def _condition(self, cond):
         if not isinstance(cond, dict): raise QueryError("each condition is an object: {column, op, value}")
         c, op, v = cond.get("column"), cond.get("op", "="), cond.get("value")
+        if not isinstance(op, str): raise QueryError("op is a string such as '=' or 'in'")
+        if not isinstance(c, str): raise QueryError("column is a column name (see the columns tool)")
         if isinstance(v, (dict, list)) and op not in ("in", "has_class"): raise QueryError(f"op {op!r} takes a single value")
+        if v is None and op not in ("is_null", "not_null"): raise QueryError(f"op {op!r} needs a value; for empty values use is_null or not_null")
+        if isinstance(v, float) and not math.isfinite(v): raise QueryError("values must be finite numbers")
         if c not in self.all_columns: raise QueryError(f"unknown column {c!r}")
         if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on ({self._why(c)})")
         q = f'"{c}"'
@@ -215,7 +253,8 @@ class LandQuery:
         sources = {}
         for k in keys:
             s = self.sources.get(k, {})
-            p = self.prov.get("district_flow" if k == "sea_mask" else k, {})
+            alias = {"sea_mask": "district_flow"} if not self.national else {"lakes": "lakes_rivers", "rivers": "lakes_rivers"}
+            p = self.prov.get(alias.get(k, k), {})
             sources[k] = dict(dataset=s.get("dataset"), url=p.get("url"), licence=s.get("licence"),
                               licence_status=s.get("licence_status"), fit=s.get("fit"),
                               by_block={b: p.get("by_block", {}).get(b) for b in blocks} if p else None)
