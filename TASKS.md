@@ -12,6 +12,7 @@ Standing priorities:
 ## Doing (at most 3)
 
 ## Waiting on you
+- T-126: Choose a host for the query service so AI agents outside can use it: about US$7 a month on Fly.io recommended, or Cloudflare Containers beside R2 (US$5 plan plus usage). Ready: the service over HTTP with a rate limit, and a container that serves the newest published national index. Goes public after the first national publish (T-102) and the service review. [Proposal](docs/proposals/2026-11-16-hosted-service.md) Raised 2026-11-16.
 - T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Confirm KCDC and GWRC licences in writing: 13 of the 28 source rows rely on a portal-wide CC BY 4.0 statement rather than a licence on the dataset (see [`SOURCES.md`](SOURCES.md)). Before anything is sold, ask each council's GIS team to confirm the statement covers the uncatalogued service layers. Only you can make that contact. Raised 2026-11-06.
 

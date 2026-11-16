@@ -333,14 +333,12 @@ def test_every_column_defined_in_sources_md_is_published():
     assert not missing, f"defined in SOURCES.md but not in the results: {missing}"
 
 
-def test_the_national_index_is_served_with_its_own_sources_and_columns():
-    """T-102: prepare_national.py turns a national build into results the service reads; every column the build makes is
-    described in SOURCES.md and title references never reach it."""
+def national_fixture():
+    """A two-parcel national index built by the real tile code, prepared for the service: its results folder."""
     import pandas as pd
     from shapely.geometry import box
     sys.path.insert(0, os.path.join(cat.ROOT, "pipeline"))
-    try: import test_national as TN
-    except ImportError as e: print("SKIPPED without the pipeline's packages (the national build runs it):", e); return
+    import test_national as TN
     from prepare_national import prepare
     rows = TN.run_tile({"parcels": [(box(0, 0, 20, 30), dict(id=7, parcel_intent="DCDB", appellation="Lot 1 DP 1", titles="T1")),
                                     (box(500, 500, 540, 540), dict(id=8, parcel_intent="DCDB", appellation="Lot 2 DP 1", titles="T2"))]})
@@ -349,6 +347,14 @@ def test_the_national_index_is_served_with_its_own_sources_and_columns():
     json.dump(dict(tiles=[dict(tile=[0.0, 0.0, 40000.0, 40000.0], parcels=dict(url="https://example/parcels", fetched="2026-11-16", features=2))],
                    built="2026-11-16", commit="abc"), open(os.path.join(d, "provenance.json"), "w"))
     prepare(d, out)
+    return out
+
+
+def test_the_national_index_is_served_with_its_own_sources_and_columns():
+    """T-102: prepare_national.py turns a national build into results the service reads; every column the build makes is
+    described in SOURCES.md and title references never reach it."""
+    try: out = national_fixture()
+    except ImportError as e: print("SKIPPED without the pipeline's packages (the national build runs it):", e); return
     for audience in ("public", "internal"):
         q = LandQuery(out, audience)
         assert q.national and not [c for c, m in q.meta.items() if m is None]   # every column described
@@ -360,6 +366,43 @@ def test_the_national_index_is_served_with_its_own_sources_and_columns():
     assert q.search(bbox=[490, 490, 600, 600])["total"] == 1
     assert q.search(where=[dict(column="water_pct", op=">=", value=0)])["total"] == 2
     assert "New Zealand" in q.about()["dataset"]
+
+
+def test_the_hosted_service_limits_each_address_and_answers_only_its_own_host_names():
+    """T-26: over HTTP, at most LANDQ_RATE requests a minute per address (429 after), /health for the host, and a request
+    naming another host is refused (DNS rebinding)."""
+    import asyncio, importlib
+    try: out = national_fixture()
+    except ImportError as e: print("SKIPPED without the pipeline's packages:", e); return
+    os.environ.update(LANDQ_RESULTS=out, LANDQ_RATE="3", LANDQ_ALLOWED_HOSTS="lq.example")
+    import server; importlib.reload(server)
+    app = server.http_app()
+    body = json.dumps(dict(jsonrpc="2.0", id=1, method="tools/list")).encode()
+    async def call(path="/mcp", host="lq.example", ip="1.2.3.4"):
+        sent = []
+        scope = dict(type="http", method="POST" if path == "/mcp" else "GET", path=path, raw_path=path.encode(), query_string=b"",
+                     root_path="", scheme="http", http_version="1.1", client=(ip, 5000), server=("lq.example", 80),
+                     headers=[(b"host", host.encode()), (b"content-type", b"application/json"), (b"accept", b"application/json, text/event-stream"),
+                              (b"content-length", str(len(body)).encode())])
+        msgs = [dict(type="http.request", body=body, more_body=False)]
+        async def receive(): return msgs.pop(0) if msgs else dict(type="http.disconnect")
+        async def send(m): sent.append(m)
+        await app(scope, receive, send)
+        return next(m["status"] for m in sent if m["type"] == "http.response.start"), b"".join(m.get("body", b"") for m in sent if m["type"] == "http.response.body")
+    async def run():
+        async with server.mcp.session_manager.run():   # what the app's lifespan does when a host starts it
+            out = [await call("/health"), await call(), await call(host="evil.example", ip="5.6.7.8")]
+            out.append([(await call())[0] for _ in range(3)])
+            out.append(await call(ip="9.9.9.9"))
+            return out
+    health, ok, evil, three, other = asyncio.run(run())
+    assert health == (200, b"ok")
+    assert ok[0] == 200 and b"search" in ok[1], ok
+    assert evil[0] in (400, 403, 421), evil                       # another host name: refused
+    assert three == [200, 200, 429], three                        # 3 a minute from one address
+    assert other[0] == 200                                        # another address is not held back
+
+
 
 
 if __name__ == "__main__":

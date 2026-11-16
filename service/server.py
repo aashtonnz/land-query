@@ -1,6 +1,7 @@
 """MCP server for the Kāpiti Coast parcel results (T-36). Read-only.
 
-Run: LANDQ_RESULTS=/path/to/results LANDQ_AUDIENCE=public python3 server.py   (stdio transport)
+Run: LANDQ_RESULTS=/path/to/results LANDQ_AUDIENCE=public python3 server.py   (stdio transport; LANDQ_TRANSPORT=http
+serves MCP over HTTP at /mcp on PORT, with a per-address rate limit, for hosting: see http_app)
 LANDQ_RESULTS holds the files published on the council's `<council>-results` branch (see fetch_results.py); COUNCIL
 (default kapiti) names the council, and the service refuses another council's results (T-87). LANDQ_AUDIENCE is
 "public" (default: only columns whose sources all carry a dataset licence) or "internal" (everything, for the owner).
@@ -60,5 +61,54 @@ def query(id: str) -> dict:
     return _call(LQ.inverse_query, id)
 
 
+class RateLimit:
+    """ASGI middleware: at most `per_minute` requests a minute from one address (a token bucket), and /health for the
+    host's checks. Behind a proxy that sets X-Forwarded-For, LANDQ_TRUST_PROXY=1 takes the address from it."""
+    def __init__(self, app, per_minute=60, trust_proxy=False):
+        import time
+        self.app, self.rate, self.trust, self.now = app, per_minute / 60.0, trust_proxy, time.monotonic
+        self.cap, self.buckets = float(per_minute), {}
+
+    def client(self, scope):
+        if self.trust:
+            for k, v in scope.get("headers", []):
+                if k == b"x-forwarded-for": return v.decode("latin-1").split(",")[0].strip()
+        return (scope.get("client") or ("?",))[0]
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http": return await self.app(scope, receive, send)
+        if scope.get("path") == "/health": return await self._send(send, 200, b"ok")
+        ip, t = self.client(scope), self.now()
+        tokens, last = self.buckets.get(ip, (self.cap, t))
+        tokens = min(self.cap, tokens + (t - last) * self.rate)
+        if tokens < 1:
+            self.buckets[ip] = (tokens, t)
+            return await self._send(send, 429, b"too many requests: at most %d a minute" % int(self.cap), [(b"retry-after", b"5")])
+        self.buckets[ip] = (tokens - 1, t)
+        if len(self.buckets) > 100_000: self.buckets.clear()   # bounded memory under a flood of addresses
+        return await self.app(scope, receive, send)
+
+    @staticmethod
+    async def _send(send, status, body, headers=()):
+        await send(dict(type="http.response.start", status=status, headers=[(b"content-type", b"text/plain")] + list(headers)))
+        await send(dict(type="http.response.body", body=body))
+
+
+def http_app():
+    """The service over HTTP (MCP streamable HTTP at /mcp, stateless JSON), for hosting (T-26). LANDQ_ALLOWED_HOSTS: the
+    host names it answers to (comma-separated; checked against DNS rebinding); LANDQ_RATE: requests a minute per address."""
+    from mcp.server.transport_security import TransportSecuritySettings
+    hosts = [h.strip() for h in os.environ.get("LANDQ_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+    sec = TransportSecuritySettings(enable_dns_rebinding_protection=True, allowed_hosts=hosts + [h + ":*" for h in hosts],
+                                    allowed_origins=[])
+    app = mcp.streamable_http_app(stateless_http=True, json_response=True, transport_security=sec,
+                                  max_request_body_size=64 * 1024, host="0.0.0.0")
+    return RateLimit(app, int(os.environ.get("LANDQ_RATE", "60")), os.environ.get("LANDQ_TRUST_PROXY") == "1")
+
+
 if __name__ == "__main__":
-    mcp.run("stdio")
+    if os.environ.get("LANDQ_TRANSPORT") == "http":
+        import uvicorn
+        uvicorn.run(http_app(), host="0.0.0.0", port=int(os.environ.get("PORT", "8000")), log_level="warning")
+    else:
+        mcp.run("stdio")
