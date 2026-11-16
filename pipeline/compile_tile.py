@@ -201,6 +201,14 @@ if HAVE_LIDAR:
     from scipy.ndimage import binary_dilation
     INFLOW = np.zeros(Z.shape, bool); INFLOW[0, :] = INFLOW[-1, :] = INFLOW[:, 0] = INFLOW[:, -1] = True
     GAP = ~np.isfinite(Z) & ~SEA
+    # how far each cell is from a gap in the surface model that is not sea: shade and views reaching into one are
+    # unknown (review 22); None where the surface model has no gap here, as in every council survey so far
+    _dgap = ~np.isfinite(dsm) & ~SEA
+    if _dgap.any():
+        from scipy.ndimage import distance_transform_edt
+        GAPD = (distance_transform_edt(~_dgap) * abs(dem.transform.a)).astype(np.float32)
+    else: GAPD = None
+    del _dgap
     OUTSIDE = np.full(Z.shape, np.nan, np.float32)  # what lies in no-data cells: the 10 m ground in a survey gap; NaN is sea
     if G10 is not None:
         land = GAP & np.isfinite(G10) & (G10 > -9000)
@@ -364,6 +372,9 @@ for uid, (g, p) in enumerate(units):
     if HAVE_LIDAR and r["lidar_cells"]:
         zg = np.isfinite(Zw) & m
         OV.empty_without_dsm(r, 100.0 * float((np.isfinite(dsm[rs, cs]) & zg).sum()) / max(1, int(zg.sum())))
+        if GAPD is not None:
+            view = float(GAPD[pr_, pc]) if kk is not None else None
+            OV.empty_near_surface_gap(r, float(GAPD[rs, cs][m].min()) if m.any() else None, view, M.MAX_SHADOW_M, M.MAX_HORIZON_M)
     OV.withhold_uncovered_buildings(r, g, BLD_COVER)  # empty, not 0, where the outlines don't reach (T-73, T-79)
     # whole-catchment upslope area from the district 10 m flow (available with or without LiDAR on the parcel)
     dc = district_cells(g) if DF is not None else None

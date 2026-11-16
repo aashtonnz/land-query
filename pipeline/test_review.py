@@ -823,6 +823,22 @@ def test_invalid_source_shapes_are_repaired_without_filling_their_holes():
     assert ov.points_on(box(490, 490, 510, 510), [(item, {"ID": "H1"})], "ID") == [{"id": "H1", "significance": None}]
 
 
+def test_sun_and_views_are_unknown_near_a_surface_model_gap():
+    """Review 22: a gap in the surface model reads as nothing standing there, so shade and views reaching into it are
+    unknown, not overstated; a gap beyond the search distance, or none, changes nothing."""
+    import overlays as ov
+    row = lambda: dict(winter_sun_hours_open_mean=5.0, winter_sun_open_ge3h_pct=80.0, roof_solar_rel_pct=90.0,
+                       horizon_mean_deg=4.0, horizon_north_deg=6.0, sky_view_pct=95.0, area_m2=600.0)
+    assert ov.empty_near_surface_gap(row(), None, None) == row()
+    assert ov.empty_near_surface_gap(row(), 300.0, 500.0) == row()                          # just out of reach
+    r = ov.empty_near_surface_gap(row(), 120.0, 600.0)
+    assert r["winter_sun_hours_open_mean"] is None and r["roof_solar_rel_pct"] is None and r["sky_view_pct"] == 95.0
+    r = ov.empty_near_surface_gap(row(), 350.0, 450.0)
+    assert r["winter_sun_hours_open_mean"] == 5.0 and r["horizon_mean_deg"] is None and r["area_m2"] == 600.0
+    assert set(ov.SUN_COLUMNS + ov.VIEW_COLUMNS) <= set(ov.DSM_COLUMNS)
+    assert "OV.empty_near_surface_gap(" in open(os.path.join(os.path.dirname(__file__), "compile_tile.py")).read()
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

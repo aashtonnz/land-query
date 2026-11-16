@@ -235,6 +235,24 @@ def empty_without_dsm(row, dsm_pct):
     return row
 
 
+SUN_COLUMNS = ("winter_sun_hours_open_mean", "winter_sun_open_ge3h_pct", "roof_solar_rel_pct")
+VIEW_COLUMNS = ("horizon_mean_deg", "horizon_north_deg", "sky_view_pct")
+
+
+def empty_near_surface_gap(row, gap_m_parcel, gap_m_view, shadow_m=300, horizon_m=500):
+    """Sun and view columns empty (unknown) where a gap in the surface model lies within their search distance: a gap
+    reads as nothing standing there, so a building or hill in it would cast no shade and block no view (review 22).
+    gap_m_parcel: the distance from the parcel to the nearest surface-model gap that is not sea; gap_m_view: the same
+    from the viewpoint; None where there is no gap."""
+    if gap_m_parcel is not None and gap_m_parcel < shadow_m:
+        for c in SUN_COLUMNS:
+            if c in row: row[c] = None
+    if gap_m_view is not None and gap_m_view < horizon_m:
+        for c in VIEW_COLUMNS:
+            if c in row: row[c] = None
+    return row
+
+
 def finish_row(row, council=None):
     """Rules that need only a parcel's own published values, applied by the compiler to every row and by finish.py to
     published results, so a change to them republishes in minutes without a rebuild (T-82). Each is idempotent.

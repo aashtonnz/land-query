@@ -184,7 +184,8 @@ LINZ's public ArcGIS services as in "Register: national index" (or the LINZ Data
 CC BY 4.0, surveys 2008–2026; the report names each survey under the parcel, with its dates, producer and licensor);
 and `district_flow` over 8 km around the parcel. Differences from the shared meanings: `building_m2` is the area under
 LINZ's national building outlines; `easements_n` and `land_covenants_n` are empty without the key; council columns
-(zones, overlays, flood, three waters) and ground change are not compiled.
+(zones, overlays, flood, three waters) and ground change are not compiled. Sun values (shade searched to 300 m) and view values (horizon to 500 m) are empty where a gap in the surface
+model, other than sea, lies within those distances: a gap reads as nothing standing there (review 22).
 
 ## Compiled columns (per parcel, table `units`)
 
