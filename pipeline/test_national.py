@@ -443,6 +443,22 @@ def test_overlap_keeps_a_rectangle_lying_on_the_shared_box():
     assert N.overlap(box(0, 0, 1, 1), box(1, 0, 2, 1)).area == 0 and N.overlap(box(0, 0, 1, 1), box(5, 5, 6, 6)).area == 0
 
 
+def test_an_official_boundary_decides_the_district_before_any_address():
+    """Review 26: with Stats NZ's boundaries a parcel takes the district its point lies in, whatever its address or
+    locality say; a parcel beyond every boundary falls back to the address rules."""
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    keep = N._OFFICIAL
+    N._OFFICIAL = [(box(0, 0, 500, 1000), "Kāpiti Coast District"), (box(500, 0, 900, 1000), "Horowhenua District")]
+    try:
+        rows = run_tile({"parcels": [(box(100, 100, 150, 150), P(1)), (box(600, 100, 650, 150), P(2)), (box(950, 100, 990, 150), P(3))],
+                         "addresses": [(Point(125, 125), dict(address_id=1, full_address="1 Road", address_number=1, territorial_authority="Horowhenua District")),
+                                       (Point(970, 125), dict(address_id=2, full_address="2 Road", address_number=2, territorial_authority="Tararua District"))],
+                         "localities": [(box(0, 0, 1000, 1000), dict(id=1, territorial_authority="Horowhenua District, Kapiti Coast District"))]})
+    finally: N._OFFICIAL = keep
+    d = {k: (r["territorial_authority"], r["district_from"]) for k, r in rows.items()}
+    assert d == {1: ("Kāpiti Coast District", "boundary"), 2: ("Horowhenua District", "boundary"), 3: ("Tararua District", "address")}, d
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

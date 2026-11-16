@@ -142,6 +142,7 @@ tile entries in its `provenance.json`.
 | `coast` | NZ Coastline - Mean High Water Springs (LINZ) | ◐ assumed LINZ CC BY 4.0; layer number and licence to confirm (T-104) | — | ✅ | Searched to 10 km |
 | `elevation` | New Zealand LiDAR 1 m DEM read at 10 m, gaps from the 8 m contour DEM (LINZ; Geographx for the 8 m) | ✅ CC BY 4.0 | national mosaic, surveys 2008–2026 | ⚠ | Per tile plus 5 km, as `district_flow`. 10 m cells smooth small slopes and banks |
 | `region` | Stats NZ district polygons, via GWRC (pilot only) | ✅ Stats NZ CC BY 4.0 | — | — | Which parcels are in the pilot region, and the district name |
+| `districts` | Territorial Authority boundaries (Stats NZ Datafinder, newest year, full extent; with the `STATSNZ_API_KEY` secret) | ✅ Stats NZ CC BY 4.0 | yearly | ✅ | The national build's district: the boundary holding the parcel's point (`district_from` = `boundary`). Without the key, or beyond every boundary, the address and locality rules below apply (review 26) |
 | `localities` | NZ Suburbs and Localities (LINZ), each naming its district | ◐ assumed LINZ CC BY 4.0; to confirm (T-104) | — | ✅ | The national build's district names where the parcel has no address (T-102); a locality touching several districts names them all, so it decides only where it names one; simplified to 1 m |
 
 The national build (`.github/workflows/national.yml`, T-102) covers the 370 tiles that hold a parcel (`pipeline/nz_tiles.json`),

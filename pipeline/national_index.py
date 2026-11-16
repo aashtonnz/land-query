@@ -247,7 +247,22 @@ NO_DISTRICT = "Area outside Territorial Authority"   # LINZ's name for land in n
 ADDRESS_NEAR_M = 1000.0
 
 
-def national_districts(parcels, rows, localities, addresses):
+DISTRICTS_DIR = os.environ.get("NI_DISTRICTS")   # districts.py's folder: official boundaries from Stats NZ (review 26)
+_OFFICIAL = None
+
+
+def official_districts():
+    """[(geometry, name)] of Stats NZ's district boundaries, or [] when the build has none."""
+    global _OFFICIAL
+    if _OFFICIAL is None:
+        f = os.path.join(DISTRICTS_DIR, "districts.parquet") if DISTRICTS_DIR else None
+        if f and os.path.exists(f):
+            t = pd.read_parquet(f); _OFFICIAL = list(zip(shapely.from_wkb(t.wkb.tolist()), t.name.tolist()))
+        else: _OFFICIAL = []
+    return _OFFICIAL
+
+
+def national_districts(parcels, rows, localities, addresses, official=()):
     """[(district, how it was decided)] per parcel for the national build (reviews 25, 26). LINZ publishes no district
     boundaries on its open services, so the district comes from LINZ's addresses, each of which names one, and its
     localities, which name every district they touch. In order (district_from):
@@ -258,7 +273,10 @@ def national_districts(parcels, rows, localities, addresses):
       conservation parcels; in Greater Wellington these were the least reliable, see SOURCES.md);
     - "outside": LINZ's own "Area outside Territorial Authority" (offshore islands) with no address near;
     - None: no locality holds the parcel (the subantarctic islands).
-    Measured against the official Greater Wellington boundaries in review 26 (SOURCES.md)."""
+    Measured against the official Greater Wellington boundaries in review 26 (SOURCES.md).
+    With Stats NZ's boundaries (official), every parcel whose point lies in one takes it ("boundary"), and the rules
+    above apply only to the rest (offshore rocks beyond them)."""
+    ot = STRtree([g for g, _ in official]) if official else None
     lt = STRtree([g for g, _ in localities]) if localities else None
     named = [(g, p.get("territorial_authority")) for g, p in addresses if p.get("territorial_authority") and p.get("territorial_authority") != NO_DISTRICT]
     at = STRtree([g for g, _ in named]) if named else None
@@ -275,6 +293,9 @@ def national_districts(parcels, rows, localities, addresses):
         return best[1] if best else None
     out = []
     for (g, _, rp), r in zip(parcels, rows):
+        if ot is not None:
+            hit = ot.query(rp, predicate="within")
+            if len(hit): out.append((official[int(hit[0])][1], "boundary")); continue
         own = r.get("territorial_authority")   # from vector_columns: the parcel's lowest-numbered address
         if own and own != NO_DISTRICT: out.append((own, "address")); continue
         names = [localities[int(i)][1] for i in lt.query(rp, predicate="within")] if lt is not None else []
@@ -460,7 +481,7 @@ def index_tile(tile, cache, region=None, tas=None):
         neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
         rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), () if national else tas, neighbours)
         if national:
-            for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af))): r["territorial_authority"], r["district_from"] = d, how
+            for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af), official_districts())): r["territorial_authority"], r["district_from"] = d, how
         # water is measured, never guessed from a name or a title (T-113, T-115)
         lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
         lf, prov["land"] = fetch("land", win, cache)
