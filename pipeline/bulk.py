@@ -26,6 +26,7 @@ LDS_LAYERS = dict(
     parcels=(50823, dict(id="id", appellation="appellation", parcel_intent="parcel_intent", topology_type="topology_type",
                          land_district="land_district", titles="titles", survey_area="survey_area", calc_area="calc_area")),
     titles=(50804, dict(title_no="title_no", status="status", type="type")),          # never owners, their number or the estate text
+    nonprimary=(50782, dict(id="id", parcel_intent="parcel_intent")),   # easements and covenants (T-102); no title references kept
     buildings=(101290, dict(building_id="building_id", use_="use", capture_source_to="capture_source_to")),
     # addresses: the Data Service's layer 105689 no longer exists (16 Nov 2026), so they come from the ArcGIS service
 )
@@ -155,7 +156,7 @@ def service_count(layer):
 def main(out):
     os.makedirs(out, exist_ok=True); manifest = {}
     current = None
-    for layer in ["titles", "parcels", "buildings"]:
+    for layer in ["titles", "parcels", "nonprimary", "buildings"]:
         lds, fields = LDS_LAYERS[layer]
         t0 = time.time()
         with tempfile.TemporaryDirectory(dir=out) as tmp:
@@ -175,7 +176,7 @@ def main(out):
         n = write_layer(os.path.join(out, layer + ".parquet"), cols, wkbs); del cols, wkbs
         manifest[layer] = dict(source=f"LINZ Data Service layer {lds} (whole-layer export)", url=N.LDS + str(lds),
                                **(dict(by_intent=by_intent) if layer == "parcels" else {}),
-                               fetched=utc_now(), records=n, service_records=service_count(layer), seconds=round(time.time() - t0))
+                               fetched=utc_now(), records=n, service_records=None if layer == "nonprimary" else service_count(layer), seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
     assert not os.path.exists(os.path.join(out, "titles.parquet")) and "titles" not in pq.read_schema(os.path.join(out, "parcels.parquet")).names
     for layer in SERVICE_LAYERS:
@@ -195,7 +196,7 @@ def main(out):
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
     # the export and the service are the same dataset; they may differ by a few days of edits, never by much
     for layer, m in manifest.items():
-        if layer == "parcels": continue   # checked kind by kind above (intent_check)
+        if layer in ("parcels", "nonprimary"): continue   # parcels: checked kind by kind (intent_check); nonprimary: not on the service
         if abs(m["records"] - m["service_records"]) > max(100, 0.02 * m["service_records"]):   # the service holds some records twice (once_each)
             sys.exit(f"{layer}: {m['records']} records in the export against {m['service_records']} in the service")
 

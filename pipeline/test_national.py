@@ -459,6 +459,24 @@ def test_an_official_boundary_decides_the_district_before_any_address():
     assert d == {1: ("Kāpiti Coast District", "boundary"), 2: ("Horowhenua District", "boundary"), 3: ("Tararua District", "address")}, d
 
 
+def test_easements_and_covenants_are_counted_from_the_bulk_layer_and_unknown_without_it():
+    """T-102: non-primary parcels overlapping a parcel by more than 1 m² are counted, as in the council builds; a sliver
+    along an edge is not; without the bulk download the counts are unknown (None), never 0."""
+    import tempfile
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    layers = lambda: {"parcels": [(box(100, 100, 200, 200), P(1)), (box(300, 100, 400, 200), P(2))],
+                      "nonprimary": [(box(110, 110, 130, 190), dict(id=11, parcel_intent="Easement")), (box(150, 150, 190, 190), dict(id=12, parcel_intent="Easement")),
+                                     (box(100, 100, 200, 120), dict(id=13, parcel_intent="Covenant - Land")),
+                                     (box(399.99, 100, 420, 200), dict(id=14, parcel_intent="Easement"))]}   # touches parcel 2 by 0.001 x 100 m
+    keep = N.BULK; d = tempfile.mkdtemp(); open(os.path.join(d, "nonprimary.parquet"), "w").close()
+    try:
+        N.BULK = d; rows = run_tile(layers())
+        N.BULK = None; none = run_tile(layers())
+    finally: N.BULK = keep
+    assert (rows[1]["easements_n"], rows[1]["land_covenants_n"], rows[2]["easements_n"]) == (2, 1, 0)
+    assert none[1]["easements_n"] is None and none[1]["land_covenants_n"] is None
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

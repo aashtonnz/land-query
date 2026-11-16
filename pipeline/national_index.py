@@ -40,9 +40,10 @@ LAYERS = dict(
     lakes=("NZ_Lake_Polygons_Topo_1_50k", "t50_fid", None),                     # Topo50 lakes (T-113)
     rivers=("LINZ_NZ_River_Name_Polygons_Pilot", "river_section_id", None),     # river areas (T-113)
     land=("LINZ_NZ_Coastline", "id", None),                                     # land outline (Topo50): the sea is outside it (T-115)
+    nonprimary=("(bulk download only)", "id,parcel_intent", 50782),             # easements and land covenants (T-102)
     localities=("LINZ_NZ_Suburbs_and_Localities", "id,territorial_authority", None),  # districts, nationally (T-102)
 )
-KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id", lakes="t50_fid", rivers=None, land="id", localities="id")
+KEYS = dict(parcels="id", titles="title_no", buildings="building_id", addresses="address_id", coast="id", lakes="t50_fid", rivers=None, land="id", localities="id", nonprimary="id")
 EXCLUDE_INTENTS = ov.NOT_PRIMARY_INTENTS | {"Common Marine and Coastal Area (Sec 237A(1)(b) RM Act)", "Riverbed", "Streambed"}
 # a parcel belongs to a region if its point lies within this distance of the region's boundary polygons, which follow
 # a simplified coast: shore and island parcels fell just outside (T-108)
@@ -480,6 +481,16 @@ def index_tile(tile, cache, region=None, tas=None):
         titles = current_titles(tf)
         neighbours = [(g, p) for g, p in geoms(pf) if p.get("parcel_intent") != "Road"]
         rows = vector_columns(parcels, geoms(rf), titles, geoms(bf), geoms(af), geoms(cf), () if national else tas, neighbours)
+        # easements and land covenants: non-primary parcels overlapping the parcel by more than 1 m², as the council
+        # builds count them; only the bulk download carries them (the open services do not), so otherwise unknown, not 0
+        npf = os.path.join(BULK, "nonprimary.parquet") if BULK else None
+        if npf and os.path.exists(npf):
+            nonpri = geoms(fetch("nonprimary", win, cache)[0]); nt_ = STRtree([g for g, _ in nonpri]) if nonpri else None
+            for r, (g, _, _) in zip(rows, parcels):
+                hits = [nonpri[i][1].get("parcel_intent") for i in (nt_.query(g) if nt_ is not None else []) if overlap(g, nonpri[i][0]).area > 1]
+                r["easements_n"], r["land_covenants_n"] = hits.count("Easement"), hits.count("Covenant - Land")
+        else:
+            for r in rows: r["easements_n"] = r["land_covenants_n"] = None
         if national:
             for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af), official_districts())): r["territorial_authority"], r["district_from"] = d, how
         # water is measured, never guessed from a name or a title (T-113, T-115)
