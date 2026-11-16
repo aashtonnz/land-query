@@ -25,6 +25,10 @@ on:
         type: choice
         options: [bulk, service]
         default: bulk
+      bulk_run:
+        description: "With source bulk: use the download an earlier run made (its run id, kept 2 days) instead of downloading again"
+        required: false
+        default: ""
       stop_after_bulk:
         description: "Only download the bulk layers and check them (a test of the download)"
         type: boolean
@@ -70,7 +74,7 @@ jobs:
 
   bulk:
     needs: plan
-    if: needs.plan.outputs.build == 'true' && needs.plan.outputs.source == 'bulk'
+    if: needs.plan.outputs.build == 'true' && needs.plan.outputs.source == 'bulk' && inputs.bulk_run == ''
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -84,6 +88,13 @@ jobs:
         run: |
           /usr/bin/time -v -o time.txt python3 bulk.py ../bulk
           grep -h -E "Elapsed|Maximum resident" time.txt; ls -la ../bulk; cat ../bulk/manifest.json
+      - name: Build one tile from the download (Wellington), before forty jobs start on it
+        working-directory: pipeline
+        env: { NI_BULK: ../bulk }
+        run: |
+          python3 national_index.py ../smoke nz nz_tiles.json 199 370
+          python3 -c "import pandas as pd; d = pd.read_parquet('../smoke/index.parquet'); print(len(d), 'parcels'); print(d.drop(columns='geometry_wkb').notna().mean().round(3).to_string())"
+          rm -rf ../smoke
       - uses: actions/upload-artifact@v4
         with: { name: bulk, path: bulk/, retention-days: 2, compression-level: 0 }   # parquet is compressed already
 
@@ -122,8 +133,11 @@ jobs:
         with: { python-version: "3.12", cache: pip, cache-dependency-path: pipeline/requirements.txt }
       - run: pip install -r pipeline/requirements.txt
       - uses: actions/download-artifact@v4
-        if: needs.plan.outputs.source == 'bulk'
+        if: needs.plan.outputs.source == 'bulk' && inputs.bulk_run == ''
         with: { name: bulk, path: bulk }
+      - uses: actions/download-artifact@v4
+        if: needs.plan.outputs.source == 'bulk' && inputs.bulk_run != ''
+        with: { name: bulk, path: bulk, run-id: "${{ inputs.bulk_run }}", github-token: "${{ github.token }}" }
       - uses: actions/download-artifact@v4
         continue-on-error: true   # no artifact when there is no Stats NZ key
         with: { name: districts, path: districts }

@@ -514,6 +514,18 @@ def test_kinds_of_parcel_missing_from_the_export_come_from_the_service():
     assert out["id"] == [1, 3, 2, 4] and out["appellation"] == ["Lot 1", "Hydro 1", "Road 1", "Road 2"] and len(w) == 4
 
 
+def test_a_capture_date_reads_the_same_from_the_service_and_the_export():
+    """T-102: the services give building capture dates in milliseconds, LINZ's export as '2021-01-27' (run 43818905767)."""
+    ms = N._ms("2021-01-27")
+    assert N._date(ms) == "2021-01-27" and N._ms(ms) == ms and N._ms(None) is None and N._ms("") is None
+    assert N._date(N._ms("2021-01-27T00:00:00Z")) == "2021-01-27"
+    lot = box(0, 0, 40, 40)
+    for b in ({"capture_source_to": "2021-01-27"}, {"capture_source_to": N._ms("2021-01-27")}):
+        rows = run_tile({"parcels": [(lot, dict(id=1, parcel_intent="DCDB", appellation="Lot 1 DP 1"))],
+                         "buildings": [(box(10, 10, 20, 20), dict(building_id=1, use_="House", **b)), (box(22, 22, 30, 30), dict(building_id=2, use_="House", capture_source_to=None))]})
+        assert rows[1]["buildings_captured_to"] == "2021-01-27" and rows[1]["building_count"] == 2
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

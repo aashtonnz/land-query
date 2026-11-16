@@ -175,6 +175,14 @@ def _date(ms):
     return dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc).date().isoformat() if ms else None
 
 
+def _ms(v):
+    """A date as milliseconds since 1970: the services give milliseconds, LINZ's export a date such as '2021-01-27'."""
+    if v is None or v == "": return None
+    if isinstance(v, (int, float)): return v
+    d = dt.datetime.fromisoformat(str(v)[:10]).replace(tzinfo=dt.timezone.utc)
+    return int(d.timestamp() * 1000)
+
+
 def overlap(a, b):
     """a ∩ b, with each cut first to the box the two share: the same result, without walking the whole outline of a
     national park or a great lake for each small shape that meets it (T-102)."""
@@ -346,7 +354,7 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), 
             if ia <= 0: continue
             bm2 += ia
             if ia >= 0.5 * b.area: n += 1; big = max(big, b.area)
-            cap = max(cap or 0, bp.get("capture_source_to") or 0) or cap
+            cap = max(cap or 0, _ms(bp.get("capture_source_to")) or 0) or cap
         r.update(building_count=n, building_m2=round(bm2, 1), building_cover_pct=round(100 * bm2 / a, 1) if a else None,
                  largest_building_m2=round(big, 1) if n else None, buildings_captured_to=_date(cap))
         # addresses whose point lies in the parcel; the lowest number names it
