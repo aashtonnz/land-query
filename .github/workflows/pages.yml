@@ -34,7 +34,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -66,6 +66,7 @@ jobs:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
         run: |
           [ -n "$AWS_ACCESS_KEY_ID" ] || { echo "R2 secrets not set: nothing sent"; exit 0; }
+          aws configure set default.s3.max_concurrent_requests 64   # about 107,000 small files: 10 at a time took over an hour
           E="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"; B=$(cat _site/BUILD.txt)
           # each build under its own folder, never changed once written, so browsers may keep files for a year
           aws s3 cp _site/data "s3://$R2_BUCKET/builds/$B/" --recursive --endpoint-url "$E" --only-show-errors \
