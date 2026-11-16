@@ -31,14 +31,20 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
   `SOURCES.md` ("Register: Porirua City").
 - **[`pipeline/national_index.py`](pipeline/national_index.py)**: the national index (D-21, D-22): one row per parcel
   anywhere in New Zealand from LINZ data only (parcels, titles, building outlines, addresses, road frontage, coast
-  distance, and ground, slope and flow from the national 10 m ground model), built in 40 km tiles. Piloted on Greater
-  Wellington (217,326 parcels, T-100); results on the `national-pilot` branch.
+  distance, district, easements, water share, and ground, slope and flow from the national 10 m ground model), about
+  2.5 million parcels in 370 tiles of 40 km. Built by [`national.yml`](.github/workflows/national.yml): one job
+  downloads every layer for the whole country once (`bulk.py`, with the `LINZ_API_KEY` secret; district boundaries
+  from Stats NZ with `STATSNZ_API_KEY`), then 40 jobs build the tiles, and the merge checks nothing is missing.
+  Monthly (D-27): on the 3rd it rebuilds, compares with the last published index (`national_compare.py`) and
+  publishes itself as a release if nothing moved further than a month of LINZ changes explains; otherwise it waits
+  for a person. The first index is published by a person after a review.
 - **[`pipeline/parcel_report.py`](pipeline/parcel_report.py)**: the parcel report on demand (T-101): the full 1 m
   analysis for any one parcel in New Zealand, by LINZ parcel id or address, in about a minute, from LINZ data and the
   national LiDAR mosaics; `report_page.py` turns it into a page. On GitHub: [`report.yml`](.github/workflows/report.yml).
 - **[`site/build_map.py`](site/build_map.py), [`site/map.js`](site/map.js)**: the public map site (T-105): parcels cut into
   pieces at three levels of detail and loaded by area, drawn on the graphics card (WebGL 2) into map tiles so a
-  zoomed-out view blends parcels by area. Published by [`pages.yml`](.github/workflows/pages.yml) to GitHub Pages.
+  zoomed-out view blends parcels by area. Published by [`pages.yml`](.github/workflows/pages.yml): the page on GitHub
+  Pages, the whole country's map data (about 2 GB) on Cloudflare R2 (D-26, `upload_r2.py`).
 - **[`site/`](site/)**: the project page, a parcel explorer of both councils showing only public-mode columns (T-98). `python3 site/build_site.py OUT.html` builds it from the published results; it is published as a private Claude page.
 - **[`.github/workflows/finish.yml`](.github/workflows/finish.yml)**: applies the row rules (`finish_row` in
   `pipeline/overlays.py`) to the published results and republishes them, in a few minutes for about US$0.02, with the
@@ -47,16 +53,17 @@ This project follows [ai-working-practices](https://github.com/aashtonnz/ai-work
 - **[`.github/workflows/sources.yml`](.github/workflows/sources.yml)**: a weekly check of every source's fields,
   record count and last-edit date. Snapshots go to the `source-checks` branch, and the run is flagged when anything
   changed, so a rebuild can be planned.
-- **[`service/`](service/)**: a read-only MCP server over those results, run locally. Each value comes with its kind,
-  sources, licence and fit-for-parcel flag. In public mode it serves only licence-cleared columns (D-12). It is not yet
-  offered to outside users.
+- **[`service/`](service/)**: a read-only MCP server over those results, run locally: a council's results, or the
+  national index after `prepare_national.py`. Each value comes with its kind, sources, licence and fit-for-parcel flag.
+  In public mode it serves only licence-cleared columns (D-12). It is not yet offered to outside users.
 - **[`archive/prototype-2026-11/`](archive/prototype-2026-11/)**: the original 96-domain design prototype, kept for
   reference. Its data is fictional.
 
 ## What is planned
 
-Tracked on [`TASKS.md`](TASKS.md): a fresh-eyes review of the query service before anyone outside uses it,
-confirmation of the council licences (T-35), source-change checks (T-25), then one more council (T-24).
+Tracked on [`TASKS.md`](TASKS.md): the first published national index after its review (T-102), a fresh-eyes review
+of the query service before anyone outside uses it, confirmation of the council licences (T-35), and later Australia,
+one state at a time (T-27).
 
 ## Run one tile
 
