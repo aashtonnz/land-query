@@ -116,13 +116,17 @@ def ground_clear(dsm, dem, clear_m=CLEAR_M):
         return (dsm - dem) <= clear_m
 
 
-def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.2, k=3):
+def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.2, k=3, top=300.0, wide=9):
     """Cells of building-like structures that no 2021 outline covers (T-79, T-81): 2.5-15 m above the ground, on a
     surface that is locally a plane (a 3 x 3 plane fit leaves a residual under 0.2 m, so pitched roofs pass and tree
     crowns don't), at least 3 m wide (an opening removes the strips where a roof overhangs its outline), and more
     than 2 m from any outline. The interior found is then grown back by one cell, over cells still 2.5-15 m up, to
     give the footprint. KCDC's outlines miss some houses, even inside the area they cover (ninth review); the
-    smoothness test used first (T-79) rejected roofs steeper than about 23 degrees (tenth review)."""
+    smoothness test used first (T-79) rejected roofs steeper than about 23 degrees (tenth review).
+
+    Taller structures (15 m up to `top`) are found too when they are at least `wide` m across, so a tower block with
+    no outline is not read as open ground under trees (review 22, finding 20), while masts, towers and chimneys,
+    narrower than that, still are not."""
     from scipy.ndimage import uniform_filter, correlate, binary_opening, binary_dilation
     with np.errstate(invalid="ignore"):
         nd = dsm - dem
@@ -134,9 +138,12 @@ def unmapped_structures(dsm, dem, outlines, low=2.5, high=15.0, rough=0.2, k=3):
         rss = n * (m2 - m1 * m1) - (sx * sx + sy * sy) / sxx   # residual of z = a + b x + c y over the k x k cells
         resid = np.sqrt(np.clip(rss, 0, None) / n)
         tall = (nd > low) & (nd < high) & np.isfinite(nd)
+        taller = (nd >= high) & (nd < top) & np.isfinite(nd)
     near = binary_dilation(outlines, iterations=2)
     core = binary_opening(tall & (resid < rough) & ~near, structure=np.ones((3, 3), bool))
-    return binary_dilation(core, structure=np.ones((3, 3), bool)) & tall & ~near
+    found = binary_dilation(core, structure=np.ones((3, 3), bool)) & tall & ~near
+    big = binary_opening(taller & (resid < rough) & ~near, structure=np.ones((wide, wide), bool))
+    return found | (binary_dilation(big, structure=np.ones((3, 3), bool)) & taller & ~near)
 
 
 def largest_structure_m2(mask, cell_m2=1.0):

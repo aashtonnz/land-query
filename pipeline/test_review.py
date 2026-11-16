@@ -613,6 +613,11 @@ def test_lidar_warns_of_houses_the_outlines_miss():
     g[14:16, 26] = 20.0                                       # and a chimney stack at its edge: over 15 m, never counted
     uu = M.unmapped_structures(g, np.zeros((40, 60)), o)
     assert not uu[14:16, 26].any() and M.largest_structure_m2(uu) == 90
+    # a tower block with no outline (review 22, finding 20: a 47 m building read as open ground under trees)
+    tb = np.zeros((60, 60)); tb[10:30, 10:35] = 47.0; tb[40:46, 40:46] = 30.0; tb[40:48, 5:13] = 25.0   # 20 x 25 m; a 6 m and an 8 m tower
+    rng = np.random.default_rng(2); tb[45:58, 20:34] = 25 + rng.uniform(-1.5, 1.5, (13, 14))           # a tall tree, rough
+    ut = M.unmapped_structures(tb, np.zeros((60, 60)), np.zeros((60, 60), bool))
+    assert M.largest_structure_m2(ut) == 500 and not ut[38:, :].any()
     two = np.zeros((20, 20), bool); two[0:5, 0:5] = True; two[10:16, 10:16] = True    # two separate patches
     assert M.largest_structure_m2(two) == 36
     low = np.zeros((30, 30)); low[5:15, 5:15] = 2.0          # a 2 m flat object (a car, a fence line): too low
@@ -741,7 +746,7 @@ def test_porirua_layers_labels_and_queries_say_what_they_claim():
     for c in ("pdp_notable_tree_groups", "pdp_heritage_settings", "pdp_heritage_item_extents"): assert c in iq.P3_AREAS, c   # run in the table test
     root = os.path.join(os.path.dirname(__file__), "..", "service")
     assert 'os.environ.get("COUNCIL"' in open(os.path.join(root, "fetch_results.py")).read()
-    assert "cat.COUNCIL.LABEL" in open(os.path.join(root, "server.py")).read()
+    assert "LQ.council.LABEL" in open(os.path.join(root, "server.py")).read()
     K = load("kapiti")
     assert "615 km2" in K.ABOUT["boundary"] and "KCDC" in K.ABOUT["boundary"] and "Kāpiti Coast District Council" in K.ABOUT["licence_note"]
 

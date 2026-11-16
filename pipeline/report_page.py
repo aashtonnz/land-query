@@ -31,7 +31,7 @@ GROUPS = [
         ("open_ground_slope_lt5_m2", "Open and flattish", "m²", 0, "Open ground sloping less than 5°."),
         ("open_ground_clear_pct", "Open ground clear", "%", 1, "Share of open ground with nothing over 0.5 m standing on it (no tree, hedge, fence, car or new building)."),
         ("canopy_gt3m_open_pct", "Tall cover", "%", 1, "Share of open ground under something more than 3 m tall, mostly trees."),
-        ("unmapped_structure_m2", "Possible missing building", "m²", 0, "The largest flat-topped shape 2.5–15 m tall on open ground with no outline. Often a building newer than the photos; sometimes a dense tree."),
+        ("unmapped_structure_m2", "Possible missing building", "m²", 0, "The largest flat-topped shape on open ground with no outline: 2.5–15 m tall, or taller and at least 9 m across (masts and chimneys are not counted). Often a building newer than the photos; sometimes a dense tree."),
     ]),
     ("Sun, outlook and shelter", [
         ("winter_sun_hours_open_mean", "Midwinter sun", "h", 1, "Average hours of direct sun on the clear open ground on 21 June, from the LiDAR surface (no cloud). Shadows are cast by anything within 300 m; a distant range of hills is not counted."),
