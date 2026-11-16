@@ -33,10 +33,10 @@ Seriousness: serious = an error that would otherwise have gone unnoticed and mis
 | 16 | Map | Workflow: publishing rights granted to the build job; the site did not rebuild when results changed | Minor | Fixed (T-109): rights on the deploy job only; weekly rebuild |
 | 17 | Map | Search could bury an exact match | Minor | Fixed (T-109): exact matches first |
 | 18 | All | The results branches still hold `titles` and `title_types` (D-15, D-17) | Serious before any announcement | Open: T-106 |
-| 19 | Report | Ground and surface models from different surveys (Waiau: 2016–17 ground, 2013 surface) with no warning | Moderate | Open: T-110 |
-| 20 | Report | A 47 m building with no LINZ outline reads as open ground under trees | Moderate | Open: T-110 |
-| 21 | Report | The 10 m catchment differed widely from the Kāpiti build on a coastal parcel; which is right not settled | Suspected | Open: T-110 |
-| 22 | Report | `report.json` holds title references (D-15); several page explanations leave out their limits (500 m horizon, 300 m shadows); an address over several parcels takes the first | Minor | Open: T-110 |
+| 19 | Report | Ground and surface models from different surveys (Waiau: 2016–17 ground, 2013 surface) with no warning | Moderate | Fixed 16 Nov (T-110): the report warns |
+| 20 | Report | A 47 m building with no LINZ outline reads as open ground under trees | Moderate | Fixed 16 Nov (T-110): structures over 15 m and 9 m across are flagged by `unmapped_structure_m2` |
+| 21 | Report | The 10 m catchment differed widely from the Kāpiti build on a coastal parcel; which is right not settled | Suspected | Settled 16 Nov (T-110): a limit, documented. Across 26,721 Kāpiti parcels the 10 m and 1 m values agree in the middle (median ratio 1.0 at every size) but only 55% within 2×; the tenfold differences are streams along a parcel's edge, inside it in one model and outside in the other. Neither is wrong; the 10 m value is described as rough for a single parcel |
+| 22 | Report | `report.json` holds title references (D-15); several page explanations leave out their limits (500 m horizon, 300 m shadows); an address over several parcels takes the first | Minor | Fixed 16 Nov (T-110) |
 | 23 | Index | Overlapping duplicate parcels (84 pairs) lose elevation cells; slope at 10 m is about 2° gentler than at 1 m; Chatham Islands and a national region source need handling for T-102 | Minor | Open: T-102 (documented) |
 
 ## The Kāpiti building-area difference
@@ -79,7 +79,7 @@ A new reviewer reviewed the T-107 to T-109 fixes. Three of them had serious faul
 | 2 | The 0.1 m frontage tolerance missed roads set 0.2–0.3 m off the lot line: 291 parcels went from over 5 m to 0 | Serious | 1 m to the road, less only the short end pieces (1.5 m or less) shared with a neighbouring parcel. A first attempt that subtracted all boundary shared with other parcels zeroed 532 frontages, because thin reserve strips run between many lots and their roads; caught in the check of the rebuilt pilot before publishing |
 | 3 | Clipping lakes by parcels erased Lake Wairarapa, whose bed is a 75 km² parcel | Serious (map) | Lakes are clipped only by parcels mostly outside them |
 | 4 | The coastal margin took 11 Waikawa Beach (Horowhenua) parcels into Greater Wellington | Moderate | A parcel in the margin whose address names another district is left out |
-| 5 | Sun and horizon treat missing surface-model cells nearby as open sky | Suspected | Open: T-110 |
+| 5 | Sun and horizon treat missing surface-model cells nearby as open sky | Suspected | Fixed 16 Nov (T-110): national reports leave sun and view values empty near a surface-model gap |
 | 6 | Seven of the fixes had no test that failed when the fix was undone | Moderate | New tests; each of ten fixes now fails a test when undone (the compiler's call to the surface-model rule is the exception, as the compiler is a script) |
 | 7 | −100 m dropped a real height (Martha pit, −101 m); two ground-change columns use the surface model; stale page text; railways called land without a parcel | Minor | Floor −1,000 m; columns added; text corrected |
 
