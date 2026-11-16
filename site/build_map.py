@@ -232,6 +232,18 @@ def search_key(text, n):
 KEY_MAX = 12   # "Section 12 Block II" files under "section12blo" when the "section" group is large
 
 
+def data_id(root):
+    """16 hex digits of a sha256 over every file under root, by path and content: the same data, the same name."""
+    import hashlib
+    h = hashlib.sha256()
+    for d, _, names in sorted(os.walk(root)):
+        for n in sorted(names):
+            p = os.path.join(d, n)
+            h.update(os.path.relpath(p, root).replace(os.sep, "/").encode() + b"\0")
+            with open(p, "rb") as f: h.update(hashlib.sha256(f.read()).digest())
+    return h.hexdigest()[:16]
+
+
 def write_search_shards(rows, max_bytes=400_000):
     """Search split by the first letters of each legal description and address: 3 letters and digits, a longer prefix
     where a file would pass max_bytes. Each file holds the parcels whose description or address starts that way;
@@ -537,13 +549,15 @@ def main():
         meta["search_keys"] = write_search_shards(search_rows())
     json.dump(meta, open(os.path.join(OUT, "data", "meta.json"), "w"), separators=(",", ":"))
     here = os.path.dirname(os.path.abspath(__file__))
-    # a stamp per build on the script and every data file (map.js adds it), so browsers fetch the new ones after an update
-    build = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    # the data's own name: a hash of every data file, so a build whose data has not changed keeps its folder on R2 and
+    # browsers keep their copies (map.js adds it to every data file); the script gets a stamp per build
+    build = data_id(os.path.join(OUT, "data"))
+    stamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
     page = open(os.path.join(here, "map.html")).read()
     assert '<script src="map.js"></script>' in page
     data_url = os.environ.get("LQ_DATA_URL")   # the data on R2 (D-26): under builds/{build}/, so a page and its data always match
     data_js = f' window.LQ_DATA = "{data_url.rstrip("/")}/builds/{build}/";' if data_url else ""
-    page = page.replace('<script src="map.js"></script>', f'<script>window.LQ_BUILD = "{build}";{data_js}</script>\n<script src="map.js?v={build}"></script>')
+    page = page.replace('<script src="map.js"></script>', f'<script>window.LQ_BUILD = "{build}";{data_js}</script>\n<script src="map.js?v={stamp}"></script>')
     open(os.path.join(OUT, "BUILD.txt"), "w").write(build)
     open(os.path.join(OUT, "index.html"), "w").write(page)
     shutil.copy(os.path.join(here, "map.js"), os.path.join(OUT, "map.js"))

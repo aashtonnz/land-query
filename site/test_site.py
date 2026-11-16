@@ -34,14 +34,21 @@ def test_search_files_take_parcels_without_an_address_and_split_large_groups():
     assert next(e for e in every if e[0] == 1)[4] == "Lot 1 DP 100"
 
 
-def test_the_r2_upload_sends_every_file_once_and_keeps_the_newest_three_builds():
-    """D-26: every data file under builds/BUILD/, with its type and a year's caching; older builds deleted."""
-    import tempfile, threading
+def test_the_r2_upload_sends_changed_data_once_and_keeps_the_newest_three_builds():
+    """D-26: every data file under builds/BUILD/ with its type and a year's caching, meta.json last; a build whose data
+    is already there sends only meta.json; the newest three complete builds kept, incomplete ones deleted."""
+    import tempfile, threading, itertools
     import upload_r2 as U
+    clock = itertools.count(100)
+    class Missing(Exception):
+        response = {"Error": {"Code": "404"}}
     class Bucket:
-        def __init__(self, keys): self.objs, self.lock, self.deletes = dict.fromkeys(keys), threading.Lock(), 0
+        def __init__(self, keys): self.objs, self.lock, self.deletes, self.puts = {k: (b"", None, None, next(clock)) for k in keys}, threading.Lock(), 0, []
         def put_object(self, Bucket, Key, Body, CacheControl, ContentType):
-            with self.lock: assert Key not in self.objs; self.objs[Key] = (Body, CacheControl, ContentType)
+            with self.lock: self.objs[Key] = (Body, CacheControl, ContentType, next(clock)); self.puts.append(Key)
+        def head_object(self, Bucket, Key):
+            if Key not in self.objs: raise Missing()
+            return dict(LastModified=self.objs[Key][3])
         def list_objects_v2(self, Bucket, Prefix, Delimiter=None, ContinuationToken=None):
             keys = sorted(k for k in self.objs if k.startswith(Prefix))
             if Delimiter: return dict(CommonPrefixes=[dict(Prefix=p) for p in sorted({Prefix + k[len(Prefix):].split("/")[0] + "/" for k in keys})])
@@ -51,15 +58,25 @@ def test_the_r2_upload_sends_every_file_once_and_keeps_the_newest_three_builds()
         def delete_objects(self, Bucket, Delete):
             assert len(Delete["Objects"]) <= 1000; self.deletes += 1
             for o in Delete["Objects"]: self.objs.pop(o["Key"])
-    old = [f"builds/2026111{d}000000/x{i}.bin" for d in range(4) for i in range(2500 if d == 0 else 2)]
+    # four complete builds, oldest first ("old" holds 2,500 files), and one a cancelled upload left without meta.json
+    old = [f"builds/old/x{i}.bin" for i in range(2500)] + ["builds/old/meta.json"]
+    old += [f"builds/{b}/{n}" for b in ("b1", "b2", "b3") for n in ("x.bin", "meta.json")] + ["builds/cut/x.bin"]
     b = Bucket(old)
     d = tempfile.mkdtemp(); os.makedirs(os.path.join(d, "L0"))
     for name in ("meta.json", "L0/a.bin", "L0/b.bin"): open(os.path.join(d, name), "wb").write(b"x")
-    assert U.upload(b, "bk", d, "20261116090000", threads=4) == 3
-    assert b.objs["builds/20261116090000/L0/a.bin"] == (b"x", U.CACHE, "application/octet-stream")
-    assert b.objs["builds/20261116090000/meta.json"][2] == "application/json"
-    assert U.prune(b, "bk") == ["20261110000000", "20261111000000"]     # the first holds 2,500 files: 1,000 a request
-    assert U.builds(b, "bk") == ["20261112000000", "20261113000000", "20261116090000"] and b.deletes == 4
+    assert U.upload(b, "bk", d, "new", threads=4) == 3 and b.puts[-1] == "builds/new/meta.json"   # meta.json last
+    assert b.objs["builds/new/L0/a.bin"][:3] == (b"x", U.CACHE, "application/octet-stream")
+    assert b.objs["builds/new/meta.json"][2] == "application/json"
+    assert sorted(U.prune(b, "bk", current="new")) == ["b1", "cut", "old"]          # 2,500 files: 1,000 a request
+    assert U.builds(b, "bk") == (["b2", "b3", "new"], []) and b.deletes == 6
+    b.puts.clear()
+    assert U.upload(b, "bk", d, "b2", threads=4) == 1 and b.puts == ["builds/b2/meta.json"]   # unchanged data: one write
+    assert U.builds(b, "bk")[0] == ["b3", "new", "b2"]                                # and it counts as newest
+    BM = B
+    e = tempfile.mkdtemp(); os.makedirs(os.path.join(e, "L0"))
+    for name in ("meta.json", "L0/a.bin", "L0/b.bin"): open(os.path.join(e, name), "wb").write(b"x")
+    assert BM.data_id(d) == BM.data_id(e) and len(BM.data_id(d)) == 16
+    open(os.path.join(e, "L0/b.bin"), "wb").write(b"y"); assert BM.data_id(d) != BM.data_id(e)
 
 
 if __name__ == "__main__":
