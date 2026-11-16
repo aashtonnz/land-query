@@ -12,7 +12,7 @@ and record count of each, and the count the ArcGIS service reports, for the chec
 
 Usage: bulk.py DIR
 """
-import io, json, os, sqlite3, struct, sys, tempfile, time, zipfile
+import io, json, math, os, sqlite3, struct, sys, tempfile, time, zipfile
 import numpy as np, pyarrow as pa, pyarrow.parquet as pq, requests, shapely
 from shapely.geometry import shape
 
@@ -27,10 +27,10 @@ LDS_LAYERS = dict(
                          land_district="land_district", titles="titles", survey_area="survey_area", calc_area="calc_area")),
     titles=(50804, dict(title_no="title_no", status="status", type="type")),          # never owners, their number or the estate text
     buildings=(101290, dict(building_id="building_id", use_="use", capture_source_to="capture_source_to")),
-    addresses=(105689, dict(address_id="address_id", full_address="full_address", address_number="address_number",
-                            suburb_locality="suburb_locality", town_city="town_city", territorial_authority="territorial_authority")),
+    # addresses: the Data Service's layer 105689 no longer exists (16 Nov 2026), so they come from the ArcGIS service
 )
-SERVICE_LAYERS = ["coast", "lakes", "rivers", "land", "localities"]   # small: from the ArcGIS services, once each
+SERVICE_LAYERS = ["coast", "lakes", "rivers", "land", "localities", "addresses"]   # from the ArcGIS services, once each
+BLOCKED = {"addresses"}   # asked in 80 km blocks: the service gives up on a query running past about 55 s
 
 
 def _key():
@@ -114,6 +114,24 @@ def count_titles(titles, current):
     return n, missing
 
 
+def blocks(url, fields, key, step=80_000):
+    """Every feature of a point layer, asked in step-sized blocks where the national index has tiles (four at a time);
+    a feature on a block edge is kept once, by its key."""
+    from concurrent.futures import ThreadPoolExecutor
+    tiles = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nz_tiles.json")))
+    boxes = sorted({(math.floor(t[0] / step) * step, math.floor(t[1] / step) * step) for t in tiles})
+    ask = lambda b: arcgis.query_all(url, dict(where="1=1", geometry=f"{b[0]},{b[1]},{b[0] + step},{b[1] + step}", geometryType="esriGeometryEnvelope",
+                                               inSR=2193, spatialRel="esriSpatialRelIntersects", outFields=fields, outSR=2193), workers=2)
+    with ThreadPoolExecutor(4) as ex: got = list(ex.map(ask, boxes))
+    seen, out = set(), []
+    for fs in got:
+        for f in fs:
+            k = (f.get("properties") or {}).get(key)
+            if k is not None and k in seen: continue
+            seen.add(k); out.append(f)
+    return out
+
+
 def service_count(layer):
     svc = N.LAYERS[layer][0]
     return arcgis._get(N.SVC + svc + "/FeatureServer/0/query", dict(where="1=1", returnCountOnly="true", f="json"))["count"]
@@ -122,7 +140,7 @@ def service_count(layer):
 def main(out):
     os.makedirs(out, exist_ok=True); manifest = {}
     current = None
-    for layer in ["titles", "parcels", "buildings", "addresses"]:
+    for layer in ["titles", "parcels", "buildings"]:
         lds, fields = LDS_LAYERS[layer]
         t0 = time.time()
         with tempfile.TemporaryDirectory(dir=out) as tmp:
@@ -145,13 +163,17 @@ def main(out):
     assert not os.path.exists(os.path.join(out, "titles.parquet")) and "titles" not in pq.read_schema(os.path.join(out, "parcels.parquet")).names
     for layer in SERVICE_LAYERS:
         t0 = time.time(); svc, fields, lds = N.LAYERS[layer]; opts = N.FETCH_OPTS.get(layer, {})
-        feats = arcgis.query_all(N.SVC + svc + "/FeatureServer/0", dict(where="1=1", outFields=fields, outSR=2193,
-                                 **{k: v for k, v in opts.items() if k != "workers"}), workers=opts.get("workers", N.WORKERS))
+        url = N.SVC + svc + "/FeatureServer/0"; extra = {k: v for k, v in opts.items() if k != "workers"}
+        if layer in BLOCKED:
+            feats = blocks(url, fields, N.KEYS[layer])
+        else:
+            feats = arcgis.query_all(url, dict(where="1=1", outFields=fields, outSR=2193, **extra), workers=opts.get("workers", N.WORKERS))
         feats = [f for f in feats if f.get("geometry")]
         cols = {k: [f["properties"].get(k) for f in feats] for k in fields.split(",")}
         n = write_layer(os.path.join(out, layer + ".parquet"), cols, [shapely.to_wkb(shape(f["geometry"])) for f in feats])
-        manifest[layer] = dict(source="LINZ ArcGIS service, whole layer", url=N.SVC + svc + "/FeatureServer/0", fetched=utc_now(),
-                               records=n, service_records=n, seconds=round(time.time() - t0))
+        manifest[layer] = dict(source="LINZ ArcGIS service, whole layer" + (" in 80 km blocks" if layer in BLOCKED else ""), url=url,
+                               fetched=utc_now(), records=n, service_records=service_count(layer) if layer in BLOCKED else n,
+                               seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
     # the export and the service are the same dataset; they may differ by a few days of edits, never by much
