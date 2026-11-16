@@ -229,6 +229,9 @@ def search_key(text, n):
     return "".join(ch for ch in t if ch.isalnum())[:n]
 
 
+KEY_MAX = 12   # "Section 12 Block II" files under "section12blo" when the "section" group is large
+
+
 def write_search_shards(rows, max_bytes=400_000):
     """Search split by the first letters of each legal description and address: 3 letters and digits, a longer prefix
     where a file would pass max_bytes. Each file holds the parcels whose description or address starts that way;
@@ -237,13 +240,14 @@ def write_search_shards(rows, max_bytes=400_000):
     d = os.path.join(OUT, "data", "search"); os.makedirs(d, exist_ok=True)
     entries = []
     for pid, x, y, c, app, adr in rows:
+        app, adr = (v if isinstance(v, str) else None for v in (app, adr))
         t = (app or "") + ("|" + adr if adr else "")
-        for k in {search_key(app, 6), search_key(adr, 6)} - {""}: entries.append((k, [pid, round(x), round(y), c, t]))
+        for k in {search_key(app, KEY_MAX), search_key(adr, KEY_MAX)} - {""}: entries.append((k, [pid, round(x), round(y), c, t]))
     def split(items, n):
         groups = defaultdict(list)
         for k, e in items: groups[k[:n]].append((k, e))
         for key, g in groups.items():
-            if n < 6 and sum(len(e[4]) + 30 for _, e in g) > max_bytes and any(len(k) > n for k, _ in g):
+            if n < KEY_MAX and sum(len(e[4]) + 30 for _, e in g) > max_bytes and any(len(k) > n for k, _ in g):
                 yield from split(g, n + 1)
             else: yield key, [e for _, e in g]
     keys = []
@@ -520,8 +524,9 @@ def main():
             if DETAIL_IDS is None or pid in DETAIL_IDS or NAT is None:
                 yield pid, p["rep_x"], p["rep_y"], p["c"], p.get("appellation"), p.get("address")
         if FULL and NAT is not None:
+            text = lambda v: v if isinstance(v, str) and v else None   # pandas gives NaN for a missing address
             for pid, app, adr in zip(NAT.index.tolist(), NAT["appellation"].tolist(), NAT["address"].tolist()):
-                p = P[pid]; yield pid, p["rep_x"], p["rep_y"], "n", app, adr
+                p = P[pid]; yield pid, p["rep_x"], p["rep_y"], "n", text(app), text(adr)
     if not FULL:
         srch = dict(id=[], x=[], y=[], t=[], c=[])
         for pid, x, y, c, app, adr in search_rows():

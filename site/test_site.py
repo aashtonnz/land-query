@@ -21,6 +21,19 @@ def test_the_page_script_parses():
     if shutil.which("node"): subprocess.run(["node", "--check", os.path.join(HERE, "map.js")], check=True)
 
 
+def test_search_files_take_parcels_without_an_address_and_split_large_groups():
+    import json, tempfile
+    B.OUT = tempfile.mkdtemp()
+    rows = [(1, 0, 0, "n", "Lot 1 DP 100", float("nan")), (2, 5, 5, "n", "Lot 2 DP 100", "2 Kōwhai Road, Ōtaki"), (3, 9, 9, "n", None, None)]
+    rows += [(10 + i, i, i, "n", f"Section {i} Block II", None) for i in range(4000)]
+    keys = B.write_search_shards(iter(rows), max_bytes=20_000)
+    assert "lot" in keys and "2kowha" in keys or "2ko" in keys, keys[:10]
+    assert len([k for k in keys if k.startswith("sec")]) > 1                 # a large group is split by more letters
+    every = [e for k in keys for e in json.load(open(os.path.join(B.OUT, "data", "search", k + ".json")))]
+    assert {1, 2} <= {e[0] for e in every} and 3 not in {e[0] for e in every}   # nothing to search by: left out
+    assert next(e for e in every if e[0] == 1)[4] == "Lot 1 DP 100"
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

@@ -405,11 +405,11 @@ $('colour').onchange = e => setMode(e.target.value);
 $('council').onchange = e => { filter = e.target.value; recolour(); };
 const res = $('results'); let search = null; const shards = new Map();
 // the first letters and digits of a text, as the build files the search under them (build_map.search_key)
-const skey = t => t.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 6);
+const skey = t => t.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
 async function searchList(q){
   if(!meta.search_keys){ if(!search) search = fetch(DATA + 'search.json' + V).then(r=>r.json()).then(s => (s.lt = s.t.map(t => t.toLowerCase()), s)); return search; }
   // whole country: the file for the longest key the typed text starts with
-  const k = skey(q); let key = null; for(let n = Math.min(6, k.length); n >= 3 && !key; n--) if(meta.search_keys.includes(k.slice(0, n))) key = k.slice(0, n);
+  const k = skey(q); let key = null; for(let n = Math.min(12, k.length); n >= 3 && !key; n--) if(meta.search_keys.includes(k.slice(0, n))) key = k.slice(0, n);
   if(!key) return null;
   if(!shards.has(key)) shards.set(key, fetch(DATA + `search/${key}.json` + V).then(r=>r.json()).then(es => ({id: es.map(e=>e[0]), x: es.map(e=>e[1]), y: es.map(e=>e[2]), c: es.map(e=>e[3]), t: es.map(e=>e[4]), lt: es.map(e=>e[4].toLowerCase())})));
   return shards.get(key); }
