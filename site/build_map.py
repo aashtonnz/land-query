@@ -498,7 +498,7 @@ def main():
             if detail and pids:   # the side panel's values, in the same squares as full detail
                 full = [pid for pid in pids if DETAIL_IDS is None or pid in DETAIL_IDS]
                 det = {str(pid): [clean(P[pid].get(f)) for f in DETAIL] for pid in full}
-                rest = [pid for pid in pids if pid not in det and NAT is not None]
+                rest = [pid for pid in pids if str(pid) not in det and NAT is not None]   # det is keyed by text
                 if rest:
                     sub = NAT.reindex(rest); cols_ = [f if f in sub.columns else None for f in DETAIL]
                     vals = {f: sub[f].tolist() for f in DETAIL if f in sub.columns}
