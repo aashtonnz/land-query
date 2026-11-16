@@ -572,6 +572,11 @@ def test_the_council_survey_tells_a_dataset_licence_from_none():
     assert licence_class("CC-BY 4.0", "") == "dataset licence" and licence_class("", "Licensed CC BY 4.0, Greater Wellington") == "dataset licence"
     assert licence_class("", "") == "none stated" and licence_class("Copyright 2024 Council. All rights reserved.", "") == "restricted"
     assert licence_class("See our terms of use on the website.", "") == "other"
+    assert licence_class("Creative Commons Attribution 4.0 New Zealand (CC BY 4.0) non-commercial licence", "") == "non-commercial or no-derivatives"
+    assert licence_class("Creative Commons Attribution-NoDerivatives 4.0 International License", "") == "non-commercial or no-derivatives"
+    assert licence_class("Creative Commons Attribution-ShareAlike 4.0 International License", "") == "share-alike"
+    from council_survey import in_nz
+    assert in_nz([[174.6, -41.4], [175.0, -41.1]]) and not in_nz([[-180, -90], [180, 90]]) and not in_nz([[-95, 41], [-90, 43]]) and not in_nz(None)
 
 
 if __name__ == "__main__":

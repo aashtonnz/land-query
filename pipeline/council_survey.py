@@ -21,8 +21,11 @@ TOPICS = {
     "land": ["liquefaction", "landslide", "slope hazard", "fault avoidance", "active fault"],
     "heritage": ["heritage", "notable trees"],
 }
-OPEN = re.compile(r"creative\s*commons|cc[\s-]*by|cc0|open\s+government\s+licen|attribution\s+4\.0", re.I)
-NOT_OPEN = re.compile(r"all rights reserved|not (?:be )?(?:re)?(?:used|distributed)|no(?:t)? licen[cs]e|copyright .* reserved", re.I)
+OPEN = re.compile(r"creative\s*commons|cc[\s-]*by|cc0|open\s+government\s+licen|attribution\s+[34]\.0", re.I)
+NC_ND = re.compile(r"non[\s-]*commercial|\bnc\b|by-nc|noderiv|no[\s-]*derivatives|by-nd|\bnd\b|educational (?:use|purposes) only|not .{0,30}commercial", re.I)
+SA = re.compile(r"share[\s-]*alike|by-sa", re.I)
+NOT_OPEN = re.compile(r"all rights reserved|not (?:be )?(?:re)?(?:used|distributed)|no(?:t)? licen[cs]e|copyright .* reserved|must not be distributed|only\.?$", re.I)
+NZ_BOX = (160.0, -53.0, 185.0, -28.0)   # an item's own extent must lie inside this, and be under 15 degrees across
 SESSION = requests.Session()
 
 
@@ -42,9 +45,19 @@ def text(s):
 
 def licence_class(lic, access):
     t = text(lic) + " " + text(access)
-    if OPEN.search(t): return "dataset licence"
+    if OPEN.search(t):
+        if NC_ND.search(t): return "non-commercial or no-derivatives"
+        if SA.search(t): return "share-alike"
+        return "dataset licence"
     if NOT_OPEN.search(t): return "restricted"
     return "none stated" if not text(lic) else "other"
+
+
+def in_nz(extent):
+    """True if an item's extent [[xmin, ymin], [xmax, ymax]] (lon/lat) lies in New Zealand and is not the world."""
+    try: (x0, y0), (x1, y1) = extent
+    except (TypeError, ValueError): return False
+    return NZ_BOX[0] <= x0 <= x1 <= NZ_BOX[2] and NZ_BOX[1] <= y0 <= y1 <= NZ_BOX[3] and x1 - x0 < 15
 
 
 def search(q):
@@ -64,17 +77,20 @@ def main(out):
     for topic, queries in TOPICS.items():
         for q in queries:
             for it in search(q):
+                if not in_nz(it.get("extent")): continue
                 rec = items.setdefault(it["id"], dict(id=it["id"], title=it.get("title"), owner=it.get("owner"), orgid=it.get("orgId"),
                                                      url=it.get("url"), type=it.get("type"), modified=it.get("modified"), topics=set(),
                                                      licence=text(it.get("licenseInfo"))[:400], credits=text(it.get("accessInformation"))[:200]))
                 rec["topics"].add(topic)
+    # an organisation's name is not public on ArcGIS Online; it is shown by its account names and the credit it states
+    owners, credits = {}, {}
+    for rec in items.values():
+        owners.setdefault(rec["orgid"], set()).add(rec["owner"] or "?")
+        if rec["credits"]: credits.setdefault(rec["orgid"], {}).setdefault(rec["credits"][:60], 0); credits[rec["orgid"]][rec["credits"][:60]] += 1
     for rec in items.values():
         o = rec["orgid"]
-        if o and o not in orgs:
-            p = get(API + f"/portals/{o}")
-            orgs[o] = p.get("name") or o
-            time.sleep(0.5)
-        rec["org"] = orgs.get(o, o)
+        top = max(credits.get(o, {"": 0}).items(), key=lambda kv: kv[1])[0]
+        rec["org"] = (top + " " if top else "") + "[" + ", ".join(sorted(owners[o])[:3]) + "]"
         rec["licence_class"] = licence_class(rec["licence"], rec["credits"])
         rec["topics"] = sorted(rec["topics"])
     rows = sorted(items.values(), key=lambda r: (r["org"] or "", r["title"] or ""))
@@ -83,21 +99,19 @@ def main(out):
     by = {}
     for r in rows:
         for t in r["topics"]:
-            d = by.setdefault(r["org"], {}).setdefault(t, [0, 0])
-            d[0] += 1; d[1] += r["licence_class"] == "dataset licence"
+            d = by.setdefault(r["org"], {}).setdefault(t, [0, 0, 0])
+            d[0] += 1; d[1] += r["licence_class"] == "dataset licence"; d[2] += r["licence_class"] == "non-commercial or no-derivatives"
     lines = ["# Council zoning and hazard layers on ArcGIS Online (T-35, T-38)", "",
-             f"{len(rows)} public layers inside New Zealand from {len(by)} organisations. Each cell: layers found / of them with an open licence stated on the dataset.", "",
+             f"{len(rows)} public layers inside New Zealand from {len(by)} organisations. Each cell: layers found / with an open licence (CC BY or similar, commercial use allowed) written on the dataset / with a non-commercial or no-derivatives licence.", "",
              "| Organisation | " + " | ".join(TOPICS) + " |", "| --- |" + " --- |" * len(TOPICS)]
     for org in sorted(by, key=lambda o: -sum(v[1] for v in by[o].values())):
-        lines.append(f"| {org} | " + " | ".join(f"{by[org][t][0]} / {by[org][t][1]}" if t in by[org] else "" for t in TOPICS) + " |")
-    lines += ["", "## Licence texts seen (first of each)", ""]
-    seen = set()
+        lines.append(f"| {org} | " + " | ".join(f"{by[org][t][0]} / {by[org][t][1]} / {by[org][t][2]}" if t in by[org] else "" for t in TOPICS) + " |")
+    lines += ["", "## Open zoning and hazard layers (dataset licence)", ""]
     for r in rows:
-        k = (r["org"], r["licence"][:80])
-        if k in seen or not r["licence"]: continue
-        seen.add(k); lines.append(f"- {r['org']}: {r['licence'][:300]}")
+        if r["licence_class"] == "dataset licence" and set(r["topics"]) & {"zoning", "flood", "coastal", "land"}:
+            lines.append(f"- {r['org']}: {r['title']} ({', '.join(r['topics'])}) {r['url'] or ''}")
     open(os.path.join(out, "council_survey.md"), "w").write("\n".join(lines) + "\n")
-    print("\n".join(lines[:200]))
+    print("\n".join(lines))
 
 
 if __name__ == "__main__":
