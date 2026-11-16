@@ -6,7 +6,7 @@ Each check compares two independent sources; it reports agreement, it does not c
    kerb that a 1 m LiDAR cell takes in (T-44, the Te Horo block).
 2. Council 2021 building ground heights against LiDAR ground at the building's centre.
 3. LiDAR epoch offset: 2024-25 minus 2021 on flat, open, unbuilt ground.
-4. KCDC's mirror polygon area against the LINZ parcel of the same id (which the units use, T-51), in every block,
+4. The council's copy of the parcels (KCDC's or PCC's mirror): its polygon area against the LINZ parcel of the same id (which the units use, T-51), in every block,
    with or without LiDAR; differences not explained by clipping at the district boundary are reported.
 5. LiDAR coverage: share of parcels with no LiDAR cells.
 6. Roof surface (2024-25 DSM median inside each outline) against KCDC's 2021 photogrammetric building height (BLD_ave).
@@ -34,7 +34,7 @@ def summary(d):
                 p5_p95=[round(float(q[0]), 3), round(float(q[4]), 3)], share_abs_gt_0_5m=round(float((np.abs(d) > 0.5).mean()), 3))
 
 def area_check(db):
-    """KCDC mirror polygon area against the LINZ parcel the units now use (T-51), by parcel id.
+    """The council's mirror polygon area against the LINZ parcel the units now use (T-51), by parcel id.
 
     The mirror clips parcels that cross the district boundary (expected); any other difference means the mirror
     truncates or alters the parcel, which is reported with examples. Units without LINZ geometry are counted."""
@@ -55,14 +55,14 @@ def area_check(db):
 
 
 db = duckdb.connect(os.path.join(D, "tile.duckdb"), read_only=True)
-qa = {"kcdc_mirror_area_minus_linz_m2": area_check(db)}
+qa = {"parcel_copy_area_minus_linz_m2": area_check(db)}
 from councils import COUNCIL as _C
 LK = _C.LIDAR_KEYS  # the council's surveys (T-87)
 if not all(os.path.exists(os.path.join(RAW, n + ".tif")) for n in (LK["dem"], LK["dsm"]) + ((LK["dem_old"],) if LK["dem_old"] else ())):
     n = db.execute("SELECT count(*) FROM units").fetchone()[0]
     qa.update(no_lidar_window=True, parcels=dict(n=n, no_lidar=n))
     json.dump(qa, open(os.path.join(D, "qa.json"), "w"), indent=1)
-    print(f"QA: no LiDAR for this window; {n} parcels without terrain; area n {qa['kcdc_mirror_area_minus_linz_m2']['n']}"); sys.exit(0)
+    print(f"QA: no LiDAR for this window; {n} parcels without terrain; area n {qa['parcel_copy_area_minus_linz_m2']['n']}"); sys.exit(0)
 dem = rasterio.open(os.path.join(RAW, LK["dem"] + ".tif")); Z = dem.read(1)
 z21 = rasterio.open(os.path.join(RAW, LK["dem_old"] + ".tif")).read(1) if LK["dem_old"] else np.full(Z.shape, np.nan, Z.dtype)
 dsm = rasterio.open(os.path.join(RAW, LK["dsm"] + ".tif")).read(1)
@@ -108,5 +108,5 @@ qa["parcels"] = dict(n=n, no_lidar=nl, coverage_lt_99pct=partial)
 json.dump(qa, open(os.path.join(D, "qa.json"), "w"), indent=1)
 w, sw, b, o = qa["ww_manhole_cover_minus_lidar_m"], qa["sw_manhole_cover_minus_lidar_m"], qa["building_ground_minus_lidar_m"], qa["lidar_2025_minus_2021_flat_m"]
 print(f"QA: wastewater manholes {w.get('n')} median {w.get('median')} m; stormwater manholes {sw.get('n')} median {sw.get('median')} m; buildings {b.get('n')} median {b.get('median')} m; "
-      f"LiDAR offset {o.get('median')} m; area vs LINZ max diff {qa['kcdc_mirror_area_minus_linz_m2'].get('max_abs')} m² (n {qa['kcdc_mirror_area_minus_linz_m2']['n']}); "
+      f"LiDAR offset {o.get('median')} m; area vs LINZ max diff {qa['parcel_copy_area_minus_linz_m2'].get('max_abs')} m² (n {qa['parcel_copy_area_minus_linz_m2']['n']}); "
       f"parcels {n}, no LiDAR {nl}, partial {partial}")

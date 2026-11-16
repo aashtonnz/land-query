@@ -8,6 +8,9 @@ import duckdb
 
 db = duckdb.connect(sys.argv[1], read_only=True)
 BASE = "FROM units WHERE coverage_pct >= 99 AND area_m2 >= 20 AND lidar_cells > 0"
+# which parcels every check counts, written into the results so a reader knows (T-95)
+UNIVERSE = ("parcels whose fetch window covers at least 99% of them, of 20 m² or more, with LiDAR cells: a lift compares "
+            "the share of flagged parcels in the reference layer with the share of all of these")
 
 def lift(flag, ref):
     n, nf, nr, nfr = db.execute(f"SELECT count(*), count(*) FILTER (WHERE {flag}), count(*) FILTER (WHERE {ref}), "
@@ -21,12 +24,13 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from councils import COUNCIL
 if COUNCIL.NAME == "porirua":   # PCC's own layers (T-87)
-    json.dump(dict(overland_flow_path_vs_pcc_flood_overlays=lift("flow_path_m > 0", "(pdp_flood_overland_flow IS NOT NULL "
+    json.dump(dict(universe=UNIVERSE, overland_flow_path_vs_pcc_flood_overlays=lift("flow_path_m > 0", "(pdp_flood_overland_flow IS NOT NULL "
               "OR pdp_flood_stream_corridor IS NOT NULL OR pdp_flood_inundation IS NOT NULL)")), open(sys.argv[2], "w"), indent=1)
     sys.exit(0)
 flood = ("(ovl_flood_hazard IS NOT NULL OR flood_stream_corridor IS NOT NULL OR flood_overflow_path IS NOT NULL "
          "OR flood_storage IS NOT NULL OR flood_ponding IS NOT NULL)")
 out = dict(
+    universe=UNIVERSE,
     overland_flow_path_vs_kcdc_flood_hazard=lift("flow_path_m > 0", flood),
     # the modelled wind class failed this check (lift 0.58 and 0.31 on the densest block) and was withdrawn; the
     # input is still reported so a better model can be compared later
@@ -35,4 +39,5 @@ out = dict(
     high_floor_level_vs_overland_flow=lift("rbl_in_parcel_max_minus_ground_mean_m > 1", "flow_path_m > 0"),
 )
 json.dump(out, open(sys.argv[2], "w"), indent=1)
-for k, v in out.items(): print(f"{k}: lift {v['lift']} ({v['both']} of {v['flagged']} flagged)")
+for k, v in out.items():
+    if isinstance(v, dict): print(f"{k}: lift {v['lift']} ({v['both']} of {v['flagged']} flagged)")

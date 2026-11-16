@@ -167,3 +167,12 @@ ABOUT = dict(
                   "parcels the fetch window cuts (coverage_pct under 99), overlays cover only the part inside it. An empty zones or "
                   "gw_eq_slope_failure value means not mapped; gw_liquefaction maps only soils with significant "
                   "potential. In public mode PCC's layers are withheld until its licence is confirmed."))
+
+# QA checks that cannot apply here, with the reason, so the summary says so rather than "n = 0" (T-95)
+QA_NOT_APPLICABLE = {
+    "ww_manhole_cover_minus_lidar_m": "three waters are left out for Porirua (D-16, D-20)",
+    "sw_manhole_cover_minus_lidar_m": "three waters are left out for Porirua (D-16, D-20)",
+    "building_ground_minus_lidar_m": "PCC's footprints carry no ground height",
+    "roof_dsm_minus_kcdc_bld_ave_m": "PCC's footprints carry no building height",
+    "lidar_2025_minus_2021_flat_m": "Porirua has one LiDAR survey (2023), so there is no earlier one to compare",
+}

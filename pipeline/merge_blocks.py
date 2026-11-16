@@ -40,7 +40,17 @@ db.executemany("INSERT INTO provenance VALUES (?, ?)", [(k, json.dumps(v)) for k
 db.execute(f"COPY units TO '{os.path.join(OUT, 'units.parquet')}' (FORMAT PARQUET)")
 json.dump(blocks, open(os.path.join(OUT, "blocks.json"), "w"), indent=1)
 
+from councils import COUNCIL as _C
+NA = getattr(_C, "QA_NOT_APPLICABLE", {})   # checks that cannot apply to this council, and why (T-95)
+
+
+def area_qa(b):
+    """A block's parcel-copy area check (named for KCDC in blocks built before T-95)."""
+    return b["qa"].get("parcel_copy_area_minus_linz_m2") or b["qa"].get("kcdc_mirror_area_minus_linz_m2") or {}
+
+
 def pooled(key):
+    if key in NA: return dict(not_applicable=NA[key])
     xs = [b["qa"].get(key, {}) for b in blocks if b["qa"].get(key, {}).get("n")]
     n = sum(x["n"] for x in xs)
     return dict(n=n, blocks=len(xs), median_of_block_medians=sorted(x["median"] for x in xs)[len(xs) // 2] if xs else None,
@@ -57,10 +67,8 @@ qs = dict(blocks=len(blocks), blocks_with_failed_sources=sum(1 for b in blocks i
           building_ground_minus_lidar_m=pooled("building_ground_minus_lidar_m"),
           lidar_2025_minus_2021_flat_m=pooled("lidar_2025_minus_2021_flat_m"),
           roof_dsm_minus_kcdc_bld_ave_m=pooled("roof_dsm_minus_kcdc_bld_ave_m"),
-          kcdc_mirror_vs_linz=dict(
-              n=sum(b["qa"].get("kcdc_mirror_area_minus_linz_m2", {}).get("n", 0) for b in blocks),
-              units_without_linz_geometry=sum(b["qa"].get("kcdc_mirror_area_minus_linz_m2", {}).get("units_without_linz_geometry", 0) for b in blocks),
-              clipped_at_district_boundary=sum(b["qa"].get("kcdc_mirror_area_minus_linz_m2", {}).get("clipped_at_district_boundary", 0) for b in blocks),
-              mirror_differs_gt_1=sum(b["qa"].get("kcdc_mirror_area_minus_linz_m2", {}).get("mirror_differs_gt_1", 0) for b in blocks)))
+          parcel_copy_vs_linz=dict(copy=_C.PARCELS_COPY,
+              **{k: sum(area_qa(b).get(k, 0) for b in blocks)
+                 for k in ("n", "units_without_linz_geometry", "clipped_at_district_boundary", "mirror_differs_gt_1")}))
 json.dump(qs, open(os.path.join(OUT, "qa_summary.json"), "w"), indent=1)
 print(json.dumps(qs, indent=1))

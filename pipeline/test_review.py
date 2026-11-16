@@ -845,6 +845,30 @@ def test_sun_and_views_are_unknown_near_a_surface_model_gap():
     assert "OV.empty_near_surface_gap(" in open(os.path.join(os.path.dirname(__file__), "compile_tile.py")).read()
 
 
+def test_the_qa_summary_says_which_checks_do_not_apply_to_a_council():
+    """T-95: Porirua's summary used Kāpiti's names and checks and showed n = 0; each council now names the checks that
+    cannot apply, with the reason, and the parcel-copy check names the copy. Blocks built before keep their old key."""
+    import json, subprocess, sys, tempfile, pandas as pd
+    src = tempfile.mkdtemp()
+    for i, key in enumerate(("kcdc_mirror_area_minus_linz_m2", "parcel_copy_area_minus_linz_m2")):
+        d = os.path.join(src, f"b{i}"); os.makedirs(d)
+        pd.DataFrame(dict(unit_id=[i + 1], block_id=[f"b{i}"], coverage_pct=[100.0], lidar_cells=[10])).to_parquet(os.path.join(d, "units.parquet"))
+        json.dump(dict(block=[1000 * i, 0, 1000 * i + 1000, 1000], sources=dict(parcels=dict(features=1, ok=True))), open(os.path.join(d, "provenance.json"), "w"))
+        json.dump({key: dict(n=3, mirror_differs_gt_1=1), "building_ground_minus_lidar_m": dict(n=4, median=0.1)}, open(os.path.join(d, "qa.json"), "w"))
+    here = os.path.dirname(os.path.abspath(__file__))
+    out = {}
+    for council in ("kapiti", "porirua"):
+        o = tempfile.mkdtemp()
+        subprocess.run([sys.executable, os.path.join(here, "merge_blocks.py"), src, o], check=True, capture_output=True,
+                       env=dict(os.environ, COUNCIL=council), cwd=here)
+        out[council] = json.load(open(os.path.join(o, "qa_summary.json")))
+    k, p = out["kapiti"], out["porirua"]
+    assert k["parcel_copy_vs_linz"] == dict(copy="KCDC mirror", n=6, units_without_linz_geometry=0, clipped_at_district_boundary=0, mirror_differs_gt_1=2)
+    assert p["parcel_copy_vs_linz"]["copy"] == "PCC mirror" and k["building_ground_minus_lidar_m"]["n"] == 8
+    assert "no ground height" in p["building_ground_minus_lidar_m"]["not_applicable"] and "D-16" in p["ww_manhole_cover_minus_lidar_m"]["not_applicable"]
+    assert "not_applicable" not in k["ww_manhole_cover_minus_lidar_m"]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
