@@ -141,7 +141,7 @@ jobs:
           NI_DISTRICTS: ../districts
           NI_REDO: "${{ inputs.reuse_run != '' && inputs.redo || 'vector,elevation' }}"
         run: |
-          python3 test_national.py
+          env -u NI_BULK -u NI_STAGES -u NI_DISTRICTS -u NI_REDO python3 test_national.py   # the tests use made-up data, never this build's settings
           rm -f ../share/index.parquet ../share/provenance.json ../share/run.json
           /usr/bin/time -v -o time.txt python3 national_index.py ../share nz nz_tiles.json "$K" "$N"   # errors stay in the log
           grep -h -E "Elapsed|Maximum resident" time.txt
