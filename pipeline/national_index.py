@@ -88,8 +88,11 @@ def fetch_bulk(layer, bbox, where="1=1"):
     """Features of a layer intersecting bbox from the bulk folder: (features, provenance entry). The only `where` the
     index uses picks road parcels."""
     import pyarrow.dataset as ds
+    manifest = json.load(open(os.path.join(BULK, "manifest.json")))
     if layer == "titles":   # bulk.py counted each parcel's titles and kept no title reference (T-106)
-        return [], dict(source="counted in the bulk download; no title references kept", features=0, licence=LICENCE)
+        m = manifest.get("titles", {})
+        return [], dict(url=m.get("url"), source="counted per parcel in the bulk download; no title references kept",
+                        fetched=m.get("fetched"), features=0, licence=LICENCE)
     x0, y0, x1, y1 = bbox
     f = (ds.field("xmin") <= x1) & (ds.field("xmax") >= x0) & (ds.field("ymin") <= y1) & (ds.field("ymax") >= y0)
     if where == "parcel_intent='Road'": f = f & (ds.field("parcel_intent") == "Road")
@@ -98,9 +101,13 @@ def fetch_bulk(layer, bbox, where="1=1"):
     cols = [c for c in t.column_names if c not in ("wkb", "xmin", "ymin", "xmax", "ymax")]
     props = t.select(cols).to_pylist(); gs = shapely.from_wkb(t.column("wkb").to_numpy(zero_copy_only=False))
     feats = [dict(geometry=g, properties=p) for g, p in zip(gs, props)]
-    m = json.load(open(os.path.join(BULK, "manifest.json")))[layer]
+    m = manifest[layer]
     feats, repeats, differ = once_each(feats, KEYS[layer])
-    return feats, dict(url=m["url"], source=m["source"], features=len(feats), repeated_records=repeats,
+    url, source = m["url"], m["source"]
+    if layer == "parcels" and where == "parcel_intent='Road'" and "Road" in (m.get("from_service") or []):
+        # road parcels are not in LINZ's export: bulk.py took them from the parcel service (review 27)
+        url, source = SVC + LAYERS["parcels"][0] + "/FeatureServer/0", "LINZ ArcGIS parcel service, road parcels in 80 km blocks (not in the export)"
+    return feats, dict(url=url, source=source, features=len(feats), repeated_records=repeats,
                        repeated_with_other_values=differ, fetched=m["fetched"], licence=LICENCE)
 
 
@@ -274,6 +281,13 @@ def official_districts():
 BUILDING_COLS = ("building_count", "building_m2", "building_cover_pct", "largest_building_m2", "buildings_captured_to")
 
 
+SHORE_M = 100   # a parcel seaward of the official coastline takes a district within this distance (review 27)
+
+
+def is_outside(name):
+    return (name or "").strip().lower() == NO_DISTRICT.lower()
+
+
 def official_meta():
     """The provenance of Stats NZ's district boundaries (districts.json: layer, title, url, fetched, licence, count)."""
     f = os.path.join(DISTRICTS_DIR, "districts.json") if DISTRICTS_DIR else None
@@ -309,11 +323,28 @@ def national_districts(parcels, rows, localities, addresses, official=()):
             i, dist = t.query_nearest(rp, max_distance=limit, return_distance=True)
             if len(i) and (best is None or dist[0] < best[0]): best = (float(dist[0]), named[int(i[0])][1] if d is None else d)
         return best[1] if best else None
+    # Stats NZ's layer puts the sea in its "Area Outside Territorial Authority", so a reclaimed, foreshore or reef parcel
+    # whose point lies seaward of its coastline lands there (10 Herd Street, Wellington: review 27). Such a parcel takes
+    # the district it overlaps most, or the nearest within SHORE_M ("shore"); farther out it stays outside (Motiti)
+    real = [(gg, n) for gg, n in official if not is_outside(n)]
+    rt = STRtree([gg for gg, _ in real]) if real else None
+    def shore(g):
+        if rt is None: return None
+        cands = [(overlap(g, real[int(i)][0]).area, real[int(i)][1]) for i in rt.query(g)]
+        cands = [c for c in cands if c[0] > 0]
+        if cands: return max(cands)[1]
+        i, dist = rt.query_nearest(g, max_distance=SHORE_M, return_distance=True)
+        return real[int(i[0])][1] if len(i) else None
     out = []
     for (g, _, rp), r in zip(parcels, rows):
         if ot is not None:
             hit = ot.query(rp, predicate="within")
-            if len(hit): out.append((official[int(hit[0])][1], "boundary")); continue
+            if len(hit):
+                name = official[int(hit[0])][1]
+                if is_outside(name):
+                    near = shore(g)
+                    if near: out.append((near, "shore")); continue
+                out.append((NO_DISTRICT if is_outside(name) else name, "boundary")); continue   # one spelling
         own = r.get("territorial_authority")   # from vector_columns: the parcel's lowest-numbered address
         if own and own != NO_DISTRICT: out.append((own, "address")); continue
         names = [localities[int(i)][1] for i in lt.query(rp, predicate="within")] if lt is not None else []
@@ -341,7 +372,9 @@ def vector_columns(parcels, roads, titles, buildings, addresses, coast, tas=(), 
     rows = []
     for g, p, rp in parcels:
         a, per = g.area, g.length
-        mrr = g.minimum_rotated_rectangle
+        # the shape in a standard order first: where two smallest rectangles tie, the one found depended on the order of
+        # the vertices, which LINZ's export and its service give the other way round (review 27)
+        mrr = g.normalize().minimum_rotated_rectangle
         sides = [math.dist(*c) for c in zip(mrr.exterior.coords, list(mrr.exterior.coords)[1:])] if mrr.geom_type == "Polygon" else [0.0]
         tnos = [t.strip() for t in (p.get("titles") or "").split(",") if t.strip()]
         ttypes = sorted({titles[t]["type"] for t in tnos if t in titles and titles[t].get("type")})

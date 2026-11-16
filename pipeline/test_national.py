@@ -459,6 +459,22 @@ def test_an_official_boundary_decides_the_district_before_any_address():
     assert d == {1: ("Kāpiti Coast District", "boundary"), 2: ("Horowhenua District", "boundary"), 3: ("Tararua District", "address")}, d
 
 
+def test_a_parcel_seaward_of_the_official_coast_takes_the_district_beside_it():
+    """Review 27: Stats NZ puts the sea in "Area Outside Territorial Authority", so reclaimed land whose point lies
+    seaward of its coastline read as in no district (10 Herd Street, Wellington). It takes the district it overlaps
+    most, or the nearest within 100 m ("shore"); an island farther out stays outside, in one spelling."""
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    keep = N._OFFICIAL
+    N._OFFICIAL = [(box(0, 0, 500, 1000), "Wellington City"), (box(500, 0, 1000, 1000), "Area Outside Territorial Authority")]
+    try:
+        rows = run_tile({"parcels": [(box(480, 100, 540, 150), P(1)),    # reclaimed: its point is at sea, 20 m of it on land
+                                     (box(550, 300, 600, 350), P(2)),    # 50 m off the coast
+                                     (box(800, 500, 850, 550), P(3))]})  # an island 300 m out
+    finally: N._OFFICIAL = keep
+    d = {k: (r["territorial_authority"], r["district_from"]) for k, r in rows.items()}
+    assert d == {1: ("Wellington City", "shore"), 2: ("Wellington City", "shore"), 3: (N.NO_DISTRICT, "boundary")}, d
+
+
 def test_easements_and_covenants_are_counted_from_the_bulk_layer_and_unknown_without_it():
     """T-102: non-primary parcels overlapping a parcel by more than 1 m² are counted, as in the council builds; a sliver
     along an edge is not; without the bulk download the counts are unknown (None), never 0."""
@@ -506,12 +522,19 @@ def test_kinds_of_parcel_missing_from_the_export_come_from_the_service():
     def fake_blocks(url, fields, key, step=80_000, where="1=1"):
         asked["where"] = where
         return [dict(geometry=mapping(box(5, 0, 6, 1)), properties=dict(id=2, parcel_intent="Road", appellation="Road 1")),
-                dict(geometry=mapping(box(7, 0, 8, 1)), properties=dict(id=4, parcel_intent="Road", appellation="Road 2"))]
+                dict(geometry=mapping(box(7, 0, 8, 1)), properties=dict(id=4, parcel_intent="Road", appellation="Road 2")),
+                dict(geometry=mapping(box(9, 0, 10, 1)), properties=dict(id=3, parcel_intent="Road", appellation="Hydro 1 as road"))]
     keep = bulk.blocks; bulk.blocks = fake_blocks
     try: out, w, n = bulk.add_from_service(cols, wkbs, {"Road"})
     finally: bulk.blocks = keep
     assert asked["where"] == "parcel_intent IN ('Road')" and n == 2
     assert out["id"] == [1, 3, 2, 4] and out["appellation"] == ["Lot 1", "Hydro 1", "Road 1", "Road 2"] and len(w) == 4
+    # every kind the service holds is compared, even one the export lacks entirely (348 parcels, review 27)
+    out, short = bulk.intent_check(["DCDB"] * 1000 + ["Road"] * 5, fail=False, service={"DCDB": 1000, "Road": 5, "Vesting on Deposit for Road": 1})
+    assert set(short) == {"Vesting on Deposit for Road"} and out["DCDB"] == (1000, 1000)
+    try: bulk.intent_check(["DCDB"] * 1000, service={"DCDB": 1000, "Vesting on Deposit for Road": 1}); assert False
+    except SystemExit: pass
+    assert bulk.intent_check(["DCDB"] * 1000, service={"DCDB": 1000})[1] == {}
 
 
 def test_a_capture_date_reads_the_same_from_the_service_and_the_export():
@@ -588,6 +611,19 @@ def test_buildings_are_unknown_where_no_outline_reaches_the_tile():
     assert all(none[1][k] is None for k in N.BUILDING_COLS)
     some = run_tile({"parcels": [(lot, P(1)), (other, P(2))], "buildings": [(box(310, 310, 320, 320), dict(building_id=1, use_="House", capture_source_to=None))]})
     assert some[1]["building_count"] == 0 and some[1]["building_m2"] == 0 and some[2]["building_count"] == 1
+
+
+def test_width_does_not_depend_on_the_order_of_the_vertices():
+    """Review 27: parcel 5082989 read 3.24 m wide from the service and 4.57 m from the export, the same four corners in
+    the other order: two smallest rectangles tie and the vertex order picked one."""
+    pts = [(0, 0), (6, 0), (6.5, 3.2), (0.5, 3.4)]
+    a, b = Polygon(pts), Polygon(pts[::-1])
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    ra = run_tile({"parcels": [(a, P(1))]})[1]["width_m"]; rb = run_tile({"parcels": [(b, P(1))]})[1]["width_m"]
+    assert ra == rb, (ra, rb)
+    for k in range(4):   # every starting corner too
+        r = pts[k:] + pts[:k]
+        assert run_tile({"parcels": [(Polygon(r), P(1))]})[1]["width_m"] == ra
 
 
 if __name__ == "__main__":

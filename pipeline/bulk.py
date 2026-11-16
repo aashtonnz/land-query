@@ -133,19 +133,29 @@ def blocks(url, fields, key, step=80_000, where="1=1"):
     return out
 
 
-def intent_check(intents, fail=True):
+def service_intents():
+    """{parcel intent: parcels} on LINZ's parcel service, in one grouped count: every kind it holds."""
+    url = N.SVC + N.LAYERS["parcels"][0] + "/FeatureServer/0/query"
+    r = arcgis._get(url, dict(where="1=1", groupByFieldsForStatistics="parcel_intent", f="json",
+                              outStatistics=json.dumps([dict(statisticType="count", onStatisticField="id", outStatisticFieldName="n")])))
+    out = {f["attributes"]["parcel_intent"]: f["attributes"]["n"] for f in r.get("features", [])}
+    if not out: raise RuntimeError(f"the parcel service gave no counts by intent: {str(r)[:300]}")
+    return out
+
+
+def intent_check(intents, fail=True, service=None):
     """{parcel intent: (records in the export, records in the service)} and the kinds short in the export; with fail,
-    exits if any is. The Data Service's export of layer 50823 holds no road or hydro parcels (16 Nov 2026), which the
-    build needs for frontage and neighbours; the service holds about 6,000 parcels twice."""
+    exits if any is, or if the total is short. Every kind the service holds is compared, not only those in the export:
+    LINZ's export of layer 50823 holds no road or hydro parcels, and no parcels of three "Vesting on Deposit" kinds
+    (348 parcels, review 27). The service holds about 6,000 parcels twice."""
     from collections import Counter
-    got = Counter(intents); url = N.SVC + N.LAYERS["parcels"][0] + "/FeatureServer/0/query"
-    out = {}
-    for k in sorted(set(got) | {"Road", "DCDB", "Fee Simple Title", "Hydro"}):
-        q = "parcel_intent IS NULL" if k is None else "parcel_intent='" + str(k).replace("'", "''") + "'"
-        out[str(k)] = (got.get(k, 0), arcgis._get(url, dict(where=q, returnCountOnly="true", f="json"))["count"])
-    print("parcels by intent (export, service):", out, flush=True)
-    short = {k: v for k, v in out.items() if v[0] < v[1] - max(50, 0.01 * v[1])}
-    if short and fail: sys.exit(f"the parcels export is short of these kinds of parcel (export, service): {short}")
+    got = Counter(intents); svc = service if service is not None else service_intents()
+    out = {str(k): (got.get(k, 0), svc.get(k, 0)) for k in set(got) | set(svc)}
+    print("parcels by intent (export, service):", dict(sorted(out.items())), flush=True)
+    short = {k: v for k, v in out.items() if v[0] < v[1] - max(50, 0.01 * v[1]) or (v[0] == 0 and v[1] > 0)}
+    total = (sum(got.values()), sum(svc.values()))
+    if fail and (short or total[0] < total[1] - max(1000, 0.003 * total[1])):
+        sys.exit(f"the parcels export is short (export, service): {short or total}")
     return out, short
 
 
@@ -155,7 +165,9 @@ def add_from_service(cols, wkbs, kinds):
     cols = {k: [v[i] for i in keep] for k, v in cols.items()}; wkbs = [wkbs[i] for i in keep]
     svc, fields, _ = N.LAYERS["parcels"]
     where = "parcel_intent IN (" + ", ".join("'" + k.replace("'", "''") + "'" for k in sorted(kinds)) + ")"
-    feats = [f for f in blocks(N.SVC + svc + "/FeatureServer/0", fields, N.KEYS["parcels"], where=where) if f.get("geometry")]
+    have = set(cols["id"])   # a parcel the export holds under another intent is not taken twice (review 27)
+    feats = [f for f in blocks(N.SVC + svc + "/FeatureServer/0", fields, N.KEYS["parcels"], where=where)
+             if f.get("geometry") and f["properties"].get("id") not in have]
     for k in cols: cols[k] += [f["properties"].get(k) for f in feats]
     wkbs += [shapely.to_wkb(shape(f["geometry"])) for f in feats]
     return cols, wkbs, len(feats)

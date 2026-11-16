@@ -238,3 +238,27 @@ LINZ publishes no district boundaries on its open services and the national cata
 the district is still worked out from LINZ's addresses and localities. Official boundaries (Stats NZ, which needs a key)
 would remove the remaining error near boundaries.
 
+
+## Twenty-seventh review: the first build with the bulk download, official districts and easements (run 43832779626)
+
+16 Nov 2026, 2,468,249 parcels, commit 040822d. Against the reviewed build of 15 Nov (2,467,530), `national_compare.py`
+flagged only `district_from` and the spelling of "Area Outside Territorial Authority", both changed on purpose; no
+other column changed on more than 0.35% of parcels or gained empty values.
+
+| # | Finding | Severity | Status |
+| --- | --- | --- | --- |
+| 1 | 348 parcels missing: LINZ's export holds no parcels of three "Vesting on Deposit" kinds (289, 58, 1), and the check compared only the kinds present in the export | Serious | Fixed: every kind the service holds is compared (one grouped count), any short kind is taken from the service, and the total is checked; test |
+| 2 | Provenance named LINZ localities for districts, the export for road parcels taken from the service, and nothing for Stats NZ or easements; release notes credited LINZ only | Serious | Fixed: builds record `districts` (Stats NZ layer, fetch time, licence) and `nonprimary` per tile, roads' true source, titles' address and fetch time, and how districts were decided; release notes credit Stats NZ and Geographx |
+| 3 | 458 parcels read "Area Outside Territorial Authority", among them reclaimed and foreshore land with addresses (10 Herd Street, Wellington): Stats NZ's outside area takes in the sea | Moderate | Fixed: such a parcel takes the district it overlaps most, or the nearest within 100 m (`shore`); one spelling of "outside"; test |
+| 4 | `width_m` changed on 8,324 parcels with identical shapes: tied smallest rectangles picked by vertex order, which the export reverses | Minor | Fixed: the shape is normalised first (the review's case could not be reproduced on the simplified stored shapes, so the test checks order independence on made-up shapes only) |
+| 5 | Documentation behind the build: district method, the Kermadecs among the 100 with no district, a retired address layer number | Minor | Fixed in SOURCES.md and districts.py |
+| 6 | One parcel arrived twice with different values (the export and the service gave it different kinds) | Minor | Fixed: a service parcel already in the export is not taken |
+
+Checked correct by this reviewer: no duplicate ids; road frontage (283,881 km against 283,923), building counts and
+areas, addresses and building dates match the previous build; easements on 13.7% of parcels and covenants on 2.0%,
+agreeing with the council builds on 27,282 of 27,283 Kāpiti parcels and 21,932 of 21,948 Porirua ones; the official
+districts differ from the old rules about as review 26 measured the old rules' errors; the Chathams complete; no title
+or owner data. `titles_not_found` is now 0 everywhere: the export's titles are current where the service's lagged.
+
+Next: a rebuild with these fixes (it needs GitHub Actions, refused for this repository since about 18:10 UTC), a check
+of it, then the first publish by the owner.

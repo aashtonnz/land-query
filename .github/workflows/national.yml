@@ -223,5 +223,5 @@ jobs:
           tag="national-$(date -u +%Y-%m-%d)-$RUN"
           gh release create "$tag" nz/index.parquet nz/provenance.json nz/run.json --repo "${{ github.repository }}" \
             --title "National index $(date -u +%Y-%m-%d)" \
-            --notes "Every primary parcel in New Zealand from LINZ data (CC BY 4.0), built from $commit by run $RUN. Columns: SOURCES.md. Counts: run.json."
+            --notes "Every primary parcel in New Zealand, from LINZ data (CC BY 4.0; attribute Land Information New Zealand) with district boundaries from Stats NZ (CC BY 4.0; attribute Stats NZ) and elevation including Geographx's 8 m model. Built from $commit by run $RUN. Each tile's sources are in provenance.json; columns: SOURCES.md; counts: run.json."
           gh workflow run pages.yml --repo "${{ github.repository }}" --ref main   # the map follows the newest index

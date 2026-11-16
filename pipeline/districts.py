@@ -5,7 +5,8 @@ district out from addresses and localities, which is wrong for about a quarter o
 the boundaries on its Datafinder (CC BY 4.0), which needs a key: the STATSNZ_API_KEY GitHub secret.
 
 Usage: districts.py OUT_DIR. Finds the newest "Territorial Authority YYYY" layer (full extent, not clipped to the
-coast, so islands and foreshore are covered; Stats NZ also has "Area Outside Territorial Authority"), downloads it in
+coast, so islands are covered; its "Area Outside Territorial Authority" takes in the sea, so foreshore and reclaimed
+parcels seaward of its coastline are given the district beside them by the build's "shore" rule), downloads it in
 NZTM2000 and writes OUT_DIR/districts.parquet (name, code, wkb) and OUT_DIR/districts.json (layer, title, fetched,
 licence, count). Without the key it writes nothing and exits 0: the build then keeps its address-based rule.
 """
