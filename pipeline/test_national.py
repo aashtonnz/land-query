@@ -526,6 +526,30 @@ def test_a_capture_date_reads_the_same_from_the_service_and_the_export():
         assert rows[1]["buildings_captured_to"] == "2021-01-27" and rows[1]["building_count"] == 2
 
 
+def test_a_parcel_report_holds_no_title_references_or_types():
+    """T-110 (review 22): report.json takes the compiled row's values, less titles and title types; the count stays."""
+    import parcel_report as R
+    v = R.report_values(dict(unit_id=np.int64(7), titles="WN1/1, WN2/2", title_types="Life Estate", title_count=np.int64(2), area_m2=float("nan")))
+    assert v == dict(unit_id=7, title_count=2, area_m2=None) and type(v["unit_id"]) is int
+
+
+def test_an_address_over_several_parcels_asks_which_one():
+    """T-110 (review 22): the report no longer takes the first parcel under an address; it lists them."""
+    import parcel_report as R
+    pt = lambda x, y: dict(geometry=dict(type="Point", coordinates=[x, y]), properties=dict(full_address="1 Main Street"))
+    par = lambda i, app, intent="DCDB": dict(geometry=None, properties=dict(id=i, appellation=app, parcel_intent=intent))
+    def fake(url, **kw):
+        if url == R.ADDRESSES: return [pt(1, 1), pt(5, 5)]
+        return {"1,1": [par(10, "Lot 1 DP 9"), par(99, "Road", "Road")], "5,5": [par(11, "Lot 2 DP 9")]}[kw["geometry"]]
+    keep = R.q; R.q = fake
+    try:
+        try: R.find_parcel(address="1 Main Street"); assert False
+        except SystemExit as e: assert "2 parcels" in str(e) and "10 (Lot 1 DP 9)" in str(e) and "99" not in str(e)
+        R.q = lambda url, **kw: [pt(1, 1)] if url == R.ADDRESSES else [par(10, "Lot 1 DP 9"), par(99, "Road", "Road")]
+        assert R.find_parcel(address="1 Main Street")[0] == 10
+    finally: R.q = keep
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

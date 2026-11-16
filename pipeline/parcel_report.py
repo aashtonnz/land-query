@@ -33,12 +33,19 @@ def find_parcel(pid=None, address=None):
         a = address.replace("'", "''").strip()
         fs = q(ADDRESSES, where=f"UPPER(full_address)=UPPER('{a}')", outFields="full_address", outSR=2193)
         if not fs: raise SystemExit(f"no LINZ address {address!r}")
-        x, y = fs[0]["geometry"]["coordinates"]
-        ps = [f for f in q(PARCELS, geometry=f"{x},{y}", geometryType="esriGeometryPoint", inSR=2193,
-                           spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193)
-              if f["properties"].get("parcel_intent") not in ("Road", "Hydro")]
+        # every point LINZ holds for the address, and every parcel under any of them (not road or water)
+        ps = {}
+        for f in fs:
+            x, y = f["geometry"]["coordinates"]
+            for p in q(PARCELS, geometry=f"{x},{y}", geometryType="esriGeometryPoint", inSR=2193,
+                       spatialRel="esriSpatialRelIntersects", outFields="*", outSR=2193):
+                if p["properties"].get("parcel_intent") not in ("Road", "Hydro"): ps.setdefault(p["properties"]["id"], p)
         if not ps: raise SystemExit(f"no parcel under the address point of {address!r}")
-        return ps[0]["properties"]["id"], ps[0], fs[0]["properties"]["full_address"]
+        if len(ps) > 1:   # one address over several parcels: the report would describe one of them as if it were the place (T-110)
+            raise SystemExit(f"{address!r} lies on {len(ps)} parcels; choose one with --id: "
+                             + "; ".join(f"{i} ({p['properties'].get('appellation')})" for i, p in sorted(ps.items())))
+        (pid, feat), = ps.items()
+        return pid, feat, fs[0]["properties"]["full_address"]
     fs = q(PARCELS, where=f"id={int(pid)}", outFields="*", outSR=2193)
     if not fs: raise SystemExit(f"no LINZ primary parcel {pid}")
     return int(pid), fs[0], None
@@ -99,8 +106,7 @@ def run(out, pid=None, address=None):
     df = pd.read_parquet(os.path.join(data, "units.parquet"))
     row = df[df.unit_id == pid]
     if len(row) != 1: raise SystemExit(f"parcel {pid} not compiled ({len(row)} rows); see {log.name}")
-    vals = {k: (None if (isinstance(v, float) and v != v) else (v.item() if hasattr(v, "item") else v))
-            for k, v in row.iloc[0].to_dict().items()}
+    vals = report_values(row.iloc[0].to_dict())
     prov = json.load(open(os.path.join(data, "provenance.json")))
     from shapely.geometry import mapping
     near = g.buffer(10)
@@ -112,6 +118,14 @@ def run(out, pid=None, address=None):
                sources=prov.get("sources"), seconds=round(time.time() - t0), step_seconds=timings)
     json.dump(rep, open(os.path.join(out, "report.json"), "w"), indent=1, default=str)
     return rep
+
+
+def report_values(row):
+    """The parcel's values for report.json: empty for NaN, plain Python numbers, and never title references or title
+    types, which public mode withholds (D-15, D-17, T-110); the title count stays."""
+    from public_strip import WITHHELD
+    return {k: (None if (isinstance(v, float) and v != v) else (v.item() if hasattr(v, "item") else v))
+            for k, v in row.items() if k not in WITHHELD}
 
 
 if __name__ == "__main__":
