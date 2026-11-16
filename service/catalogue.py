@@ -150,3 +150,60 @@ def column_meta(col):
     fit = max((x["fit"] if x else "unknown" for x in s), key=lambda f: FIT_RANK.get(f, 3), default="not applicable")
     return dict(kind=kind, meaning=meaning, sources=src, fit=fit,
                 licence_cleared=all(x and x["licence_cleared"] for x in s))
+
+
+# ---- the national index (T-102): its own register and column table in SOURCES.md, and its own sources per column ----
+NATIONAL_COLUMN_SOURCES = [
+    (r"unit_id|block_id|appellation|parcel_intent|land_district|survey_area_m2|area_m2|perimeter_m|compactness|width_m|rep_[xy]|bbox_\w+", ["parcels"]),
+    (r"title_count|titles_not_found", ["parcels", "titles"]),
+    (r"building_\w+|largest_building_m2|buildings_captured_to", ["parcels", "buildings"]),
+    (r"address_count|address|suburb_locality|town_city", ["parcels", "addresses"]),
+    # the official boundary first, then addresses, then localities (district_from says which)
+    (r"territorial_authority|district_from", ["parcels", "districts", "addresses", "localities"]),
+    (r"road_frontage_\w+", ["parcels", "roads"]),
+    (r"coast_\w+", ["parcels", "coast"]),
+    (r"water_pct", ["parcels", "lakes", "rivers", "land"]),
+    (r"easements_n|land_covenants_n", ["parcels", "nonprimary"]),
+    (r"ground_\w+|slope_\w+|flat_pct|steep_pct|low_lying_pct|lidar_pct|elevation_from|upslope_\w+", ["parcels", "elevation"]),
+]
+
+
+def load_national(path=os.path.join(ROOT, "SOURCES.md")):
+    """(sources, column patterns) of the national index, from its register and column table."""
+    text = open(path, encoding="utf-8").read()
+    sources = {}
+    for key_cell, dataset, lic, updated, fit, notes in (r[:6] for r in _table(text, "## Register: national index")):
+        for k in re.findall(r"`([^`]+)`", key_cell):
+            sources[k] = dict(dataset=dataset, licence=lic, licence_status=_symbol(lic, LICENCE) or "unknown",
+                              licence_cleared=lic.startswith("✅"), fit=_symbol(fit, FIT) or "unknown", updated=updated, notes=notes)
+    exact, globs = [], []
+    for cols, kind, meaning in (r[:3] for r in _table(text, "## Columns: national index")):
+        for pat in re.findall(r"`([^`]+)`", cols):
+            entry = (re.compile("^" + re.escape(pat).replace(r"\*", r"\w+") + "$"), kind, meaning)
+            (globs if "*" in pat else exact).append(entry)
+    return sources, exact + globs
+
+
+class National:
+    """The catalogue for the national index, in place of a council's."""
+    NAME, LABEL = "national", "New Zealand"
+    DATASET_SOURCES = "LINZ data (parcels, titles, buildings, addresses, roads, coastline, LiDAR), Stats NZ district boundaries and Topo50 water"
+    PARCELS_KEY = PARCELS_COPY = None
+    ABOUT = dict(licence_note="LINZ and Stats NZ data, CC BY 4.0. Columns whose sources' licence is assumed but not yet "
+                              "confirmed (the coastline, Topo50 water and localities, T-104) are withheld in public mode.",
+                 boundary="Every primary parcel in New Zealand, including the Chathams and outlying islands; road parcels and "
+                          "parcels LINZ marks as water or seabed are left out.",
+                 empty_values="Empty means not known: no address, no ground data (the Chathams and outlying islands), the "
+                              "water share of a parcel mostly over unproven sea, or a district no source could decide.")
+    SOURCES, _COLUMNS = load_national()
+
+    @classmethod
+    def column_meta(cls, col):
+        kind = meaning = None
+        for pat, k, m in cls._COLUMNS:
+            if pat.match(col): kind, meaning = k, m; break
+        src = next((s for pat, s in NATIONAL_COLUMN_SOURCES if re.fullmatch(pat, col)), None)
+        if src is None or kind is None: return None
+        s = [cls.SOURCES.get(k) for k in src]
+        fit = max((x["fit"] if x else "unknown" for x in s), key=lambda f: FIT_RANK.get(f, 3), default="not applicable")
+        return dict(kind=kind, meaning=meaning, sources=src, fit=fit, licence_cleared=all(x and x["licence_cleared"] for x in s))

@@ -38,17 +38,22 @@ class LandQuery:
         path = os.path.join(results_dir, "units.parquet").replace("'", "''")  # a view cannot take a parameter
         self.db.execute(f"CREATE VIEW units AS SELECT * FROM read_parquet('{path}')")
         self.all_columns = [r[0] for r in self.db.execute("DESCRIBE units").fetchall()]
-        self.meta = {c: cat.column_meta(c) for c in self.all_columns}
+        p = os.path.join(results_dir, "provenance.json")
+        self.prov = json.load(open(p)) if os.path.exists(p) else {}
+        # the national index (prepare_national.py) has its own sources and columns; otherwise the council's (T-102)
+        self.national = self.prov.get("dataset") == "national"
+        self.council = cat.National if self.national else cat.COUNCIL
+        self.sources = cat.National.SOURCES if self.national else cat.SOURCES
+        column_meta = cat.National.column_meta if self.national else cat.column_meta
+        self.meta = {c: column_meta(c) for c in self.all_columns}
         missing = [c for c, m in self.meta.items() if m is None]
         if missing: raise RuntimeError(f"columns missing from SOURCES.md or the catalogue: {missing}")
         self.columns = [c for c in self.all_columns
                         if audience == "internal" or (self.meta[c]["licence_cleared"] and c not in cat.PUBLIC_EXCLUDE)]
         self.withheld = [c for c in self.all_columns if c not in self.columns]
-        p = os.path.join(results_dir, "provenance.json")
-        self.prov = json.load(open(p)) if os.path.exists(p) else {}
         # results from another council's run would be described with this council's sources (twelfth review)
         copies = {k for k in self.prov if k.endswith("_parcels") and k not in ("nonprimary_parcels",)}
-        if copies and cat.COUNCIL.PARCELS_KEY not in copies:
+        if copies and not self.national and cat.COUNCIL.PARCELS_KEY not in copies:
             raise RuntimeError(f"these results come from another council ({', '.join(sorted(copies))}); COUNCIL is {cat.COUNCIL.NAME}")
         r = os.path.join(results_dir, "RUN.txt")
         self.run = open(r).read().strip() if os.path.exists(r) else None
@@ -57,12 +62,12 @@ class LandQuery:
     def about(self):
         n = self._run("SELECT count(*) FROM units", [])[0][0]  # under the lock like every query (T-62)
         return dict(
-            dataset=f"{cat.COUNCIL.LABEL} parcels, compiled from {cat.COUNCIL.DATASET_SOURCES}",
+            dataset=f"{self.council.LABEL} parcels, compiled from {self.council.DATASET_SOURCES}",
             run=self.run, parcels=n, audience=self.audience, columns_served=len(self.columns), columns_withheld=len(self.withheld),
             coordinates="NZTM2000 (EPSG:2193), metres; heights NZVD2016",
-            licence_note=cat.COUNCIL.ABOUT["licence_note"],
+            licence_note=self.council.ABOUT["licence_note"],
             caution="Derived and modelled values are estimates from public data; check against the sources before relying on them.",
-            boundary=cat.COUNCIL.ABOUT["boundary"], empty_values=cat.COUNCIL.ABOUT["empty_values"],   # per council (twelfth review)
+            boundary=self.council.ABOUT["boundary"], empty_values=self.council.ABOUT["empty_values"],   # per council (twelfth review)
             provenance_available=bool(self.prov))
 
     def describe_columns(self, contains=None):
@@ -70,7 +75,7 @@ class LandQuery:
         for c in self.all_columns:
             if c in self.withheld:  # describing a withheld column can reveal its contents (T-52)
                 if contains and contains.lower() not in c.lower(): continue
-                out[c] = dict(served=False, withheld=cat.PUBLIC_EXCLUDE.get(c, "licence not yet confirmed in writing (T-35)"))
+                out[c] = dict(served=False, withheld=self._why(c))
                 continue
             if contains and contains.lower() not in c.lower() and contains.lower() not in self.meta[c]["meaning"].lower(): continue
             out[c] = dict(self.meta[c], served=True)
@@ -137,13 +142,14 @@ class LandQuery:
             timer.cancel()
 
     def inverse_query(self, qid):
+        if not os.path.exists(os.path.join(self.dir, "inverse_queries.json")): raise QueryError("no precomputed queries for these results")
         iq = json.load(open(os.path.join(self.dir, "inverse_queries.json")))
         q = next((x for x in iq["queries"] if x["id"] == qid), None)
         if q is None: raise QueryError(f"unknown query {qid!r}; available: {[x['id'] for x in iq['queries']]}")
         used = {k for k in q["rows"][0] if k not in ("unit_id", "appellation", "block_id", "sources")} if q["rows"] else set()
         # judged by every source the query draws on, not only the columns it returns: a query can filter on a
         # withheld column, or rename one, without returning it (T-52)
-        blocked = sorted(k for k in q.get("provenance", {}) if not cat.SOURCES.get(k, {}).get("licence_cleared"))
+        blocked = sorted(k for k in q.get("provenance", {}) if not self.sources.get(k, {}).get("licence_cleared"))
         blocked += sorted(c for c in used if c in cat.PUBLIC_EXCLUDE)
         # a withheld column named anywhere in the SQL (a filter or the order) can be read back from the rows (T-70)
         blocked += sorted(c for c in cat.PUBLIC_EXCLUDE if re.search(rf"\b{c}\b", q.get("sql") or ""))
@@ -155,12 +161,17 @@ class LandQuery:
                     sources=q["provenance"], rows=q["rows"], run=self.run)
 
     # ---- helpers ----
+    def _why(self, c):
+        """Why a column is withheld in public mode."""
+        return cat.PUBLIC_EXCLUDE.get(c, "a source's licence is assumed but not yet confirmed (T-104)" if self.national
+                                      else "licence not yet confirmed in writing (T-35)")
+
     def _columns(self, columns):
         if not columns: return list(self.columns)
         bad = [c for c in columns if c not in self.all_columns]
         if bad: raise QueryError(f"unknown columns: {bad}")
         held = [c for c in columns if c in self.withheld]
-        if held: raise QueryError(f"withheld in public mode: {[(c, cat.PUBLIC_EXCLUDE.get(c, 'licence not yet confirmed (T-35)')) for c in held]}")
+        if held: raise QueryError(f"withheld in public mode: {[(c, self._why(c)) for c in held]}")
         return list(columns)
 
     def _condition(self, cond):
@@ -168,7 +179,7 @@ class LandQuery:
         c, op, v = cond.get("column"), cond.get("op", "="), cond.get("value")
         if isinstance(v, (dict, list)) and op not in ("in", "has_class"): raise QueryError(f"op {op!r} takes a single value")
         if c not in self.all_columns: raise QueryError(f"unknown column {c!r}")
-        if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on ({cat.PUBLIC_EXCLUDE.get(c, 'T-35')})")
+        if c in self.withheld: raise QueryError(f"{c} is withheld in public mode, so it cannot be filtered on ({self._why(c)})")
         q = f'"{c}"'
         if op in OPS: return f"{q} {OPS[op]} ?", [v]
         if op == "in":
@@ -198,12 +209,12 @@ class LandQuery:
 
     def _envelope(self, rows, cols, total, offset):
         keys = {k for c in cols for k in self.meta[c]["sources"]}
-        if any(r.get("geometry_source") == cat.COUNCIL.PARCELS_COPY for r in rows): keys.add(cat.COUNCIL.PARCELS_KEY)  # on the mirror polygon
+        if self.council.PARCELS_COPY and any(r.get("geometry_source") == self.council.PARCELS_COPY for r in rows): keys.add(self.council.PARCELS_KEY)  # on the mirror polygon
         keys = sorted(keys)
         blocks = sorted({r["block_id"] for r in rows})
         sources = {}
         for k in keys:
-            s = cat.SOURCES.get(k, {})
+            s = self.sources.get(k, {})
             p = self.prov.get("district_flow" if k == "sea_mask" else k, {})
             sources[k] = dict(dataset=s.get("dataset"), url=p.get("url"), licence=s.get("licence"),
                               licence_status=s.get("licence_status"), fit=s.get("fit"),

@@ -333,6 +333,36 @@ def test_every_column_defined_in_sources_md_is_published():
     assert not missing, f"defined in SOURCES.md but not in the results: {missing}"
 
 
+def test_the_national_index_is_served_with_its_own_sources_and_columns():
+    """T-102: prepare_national.py turns a national build into results the service reads; every column the build makes is
+    described in SOURCES.md, title references never reach it, and columns from unconfirmed licences are withheld."""
+    import pandas as pd
+    from shapely.geometry import box
+    sys.path.insert(0, os.path.join(cat.ROOT, "pipeline"))
+    try: import test_national as TN
+    except ImportError as e: print("SKIPPED without the pipeline's packages (the national build runs it):", e); return
+    from prepare_national import prepare
+    rows = TN.run_tile({"parcels": [(box(0, 0, 20, 30), dict(id=7, parcel_intent="DCDB", appellation="Lot 1 DP 1", titles="T1")),
+                                    (box(500, 500, 540, 540), dict(id=8, parcel_intent="DCDB", appellation="Lot 2 DP 1", titles="T2"))]})
+    d, out = tempfile.mkdtemp(), tempfile.mkdtemp()
+    pd.DataFrame(list(rows.values())).assign(titles="T1").to_parquet(os.path.join(d, "index.parquet"))
+    json.dump(dict(tiles=[dict(tile=[0.0, 0.0, 40000.0, 40000.0], parcels=dict(url="https://example/parcels", fetched="2026-11-16", features=2))],
+                   built="2026-11-16", commit="abc"), open(os.path.join(d, "provenance.json"), "w"))
+    prepare(d, out)
+    for audience in ("public", "internal"):
+        q = LandQuery(out, audience)
+        assert q.national and not [c for c, m in q.meta.items() if m is None]   # every column described
+        assert not {"titles", "title_types", "geometry_wkb", "parcel_id"} & set(q.all_columns)
+    q = LandQuery(out, "public")
+    assert {"water_pct", "coast_distance_m", "territorial_authority"} <= set(q.withheld) and "area_m2" in q.columns
+    r = q.parcel(7)
+    assert r["total"] == 1 and r["rows"][0]["block_id"] == "0_0" and r["sources"]["parcels"]["by_block"]["0_0"]["features"] == 2
+    assert q.search(bbox=[490, 490, 600, 600])["total"] == 1
+    try: q.search(where=[dict(column="water_pct", op=">", value=1)]); assert False
+    except QueryError as e: assert "T-104" in str(e)
+    assert "New Zealand" in q.about()["dataset"]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

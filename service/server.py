@@ -4,6 +4,10 @@ Run: LANDQ_RESULTS=/path/to/results LANDQ_AUDIENCE=public python3 server.py   (s
 LANDQ_RESULTS holds the files published on the council's `<council>-results` branch (see fetch_results.py); COUNCIL
 (default kapiti) names the council, and the service refuses another council's results (T-87). LANDQ_AUDIENCE is
 "public" (default: only columns whose sources all carry a dataset licence) or "internal" (everything, for the owner).
+
+The national index (T-102): `python3 prepare_national.py INDEX_DIR results` on a national build or release (index.parquet,
+provenance.json, run.json), then LANDQ_RESULTS=results as above; the service sees it is national and uses the national
+sources and columns in SOURCES.md, whatever COUNCIL is.
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -14,7 +18,7 @@ import catalogue as cat
 LQ = LandQuery(os.environ.get("LANDQ_RESULTS", "results"), os.environ.get("LANDQ_AUDIENCE", "public"))
 mcp = MCPServer(
     name="land-query",
-    instructions=(f"Parcel facts for {cat.COUNCIL.LABEL}, New Zealand, compiled from {cat.COUNCIL.DATASET_SOURCES}. "
+    instructions=(f"Parcel facts for {LQ.council.LABEL}{'' if LQ.national else ', New Zealand'}, compiled from {LQ.council.DATASET_SOURCES}. "
                   "Every response lists, for each column, its kind (published, derived or modelled), meaning, sources, "
                   "fit-for-parcel flag and licence status, and for each source the sha256 and fetch time of the data "
                   "each row's block was compiled from. Coordinates are NZTM2000 metres. Start with `about`, then "

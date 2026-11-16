@@ -171,6 +171,9 @@ islands, so their height columns are empty; nor do LINZ's building outlines reac
 | `ground_cells`, `ground_cells_pct`, `elevation_from` | derived | 10 m cells used, and the share of the parcel's own cell centres that have ground (under 100 where some have no ground data). For a parcel of 10 ha or more with over a tenth of its area outside the elevation read for its tile (the tile plus 5 km), it is the share of the whole parcel, so a national park's heights are seen to describe only part of it. A parcel too small to hold a cell centre is read at its point, and then shows `ground_cells_pct` 0 although it has a height (`elevation_from` `point`: only mean height and slope) |
 | `upslope_area_max_m2`, `upslope_truncated` | modelled | Largest area draining through the parcel on the 10 m ground (D8 flow); true where that catchment may reach past the tile plus 5 km |
 | `geometry_wkb` | derived | The parcel's shape simplified to 0.5 m, for maps |
+| `district_from` | derived | Which source decided `territorial_authority`: `boundary` (the Stats NZ district holding the parcel's point), `address` (its own address), `locality` (a locality in one district), `nearby address` (the nearest within 1 km), `distant address` (the nearest naming one of its locality's districts), `outside` (LINZ's area outside any district); empty when none could |
+| `easements_n`, `land_covenants_n` | derived | LINZ easement and covenant parcels (non-primary parcels) overlapping the parcel by more than 1 m². 0 means none surveyed as a parcel, not none at all; empty when the build had no bulk download |
+| `unit_id`, `block_id`, `bbox_*` | derived | In the query service: the parcel id (`parcel_id`); the 40 km tile it was built in, named by its south-west corner; the corners of the box around the parcel, NZTM2000 |
 
 ## Parcel report (national)
 

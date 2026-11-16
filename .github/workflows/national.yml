@@ -172,7 +172,9 @@ jobs:
         if: inputs.merge_run != ''
         with: { pattern: "share-*", path: shares, run-id: "${{ inputs.merge_run }}", github-token: "${{ github.token }}" }
       - name: Merge and check
-        run: python3 pipeline/national_merge.py shares nz "${{ needs.plan.outputs.n }}"
+        run: |
+          pip install -q "mcp==2.3.0" && python3 service/test_service.py   # the service reads what this build makes
+          python3 pipeline/national_merge.py shares nz "${{ needs.plan.outputs.n }}"
       - uses: actions/upload-artifact@v4
         with: { name: national-index, path: nz/, retention-days: 30 }
       - name: Compare with the last published index
