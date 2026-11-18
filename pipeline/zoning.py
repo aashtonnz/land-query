@@ -31,6 +31,8 @@ SOURCES = [
          field="CS_PAR_ZONE", plan="Western Bay of Plenty District Plan", licence="CC BY 4.0"),
     dict(district="Taupo District", url="https://services7.arcgis.com/S7DHOirgbYgdtrbR/arcgis/rest/services/Zone_NPS_view/FeatureServer/0",
          field="Zone", where="Status='Operative'", plan="Taupō District Plan, operative zones", licence="CC BY 4.0"),
+    dict(district="Waipa District", url="https://services9.arcgis.com/OsxSXqmTWVTZQ9ie/arcgis/rest/services/WaipaDistrictPlan_Zones/FeatureServer/0",
+         field="Zone", where="Type='Z'", plan="Waipā District Plan", licence="CC BY 4.0"),
     dict(district="Manawatu District", url="https://services9.arcgis.com/CzWZ8m5FuciqBibe/arcgis/rest/services/District_Plan_Zones/FeatureServer/0",
          field="zone", plan="Manawatū District Plan", licence="CC BY 4.0"),
     dict(district="Tararua District", url="https://services-ap1.arcgis.com/ry1jWJjaLhqVCFK6/arcgis/rest/services/TRR_Planning/FeatureServer/0",
