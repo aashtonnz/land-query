@@ -228,9 +228,15 @@ def main(out):
     manifest["zoning"] = dict(source="council zoning layers with an open licence (zoning.py)", councils=len(zm),
                               failed=sorted(d for d, m in zm.items() if m.get("failed")), fetched=utc_now())
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
-    # the export and the service are the same dataset; they may differ by a few days of edits, never by much
+    check_counts(manifest)
+
+
+def check_counts(manifest):
+    """The export and the service are the same dataset; they may differ by a few days of edits, never by much. Checked
+    for every layer holding both counts: parcels are checked kind by kind (intent_check), non-primary parcels are not
+    on the service, and zoning is per council in zoning.json (its entry has no counts: review of 18 Nov)."""
     for layer, m in manifest.items():
-        if layer in ("parcels", "nonprimary"): continue   # parcels: checked kind by kind (intent_check); nonprimary: not on the service
+        if layer == "parcels" or "records" not in m or m.get("service_records") is None: continue
         if abs(m["records"] - m["service_records"]) > max(100, 0.02 * m["service_records"]):   # the service holds some records twice (once_each)
             sys.exit(f"{layer}: {m['records']} records in the export against {m['service_records']} in the service")
 

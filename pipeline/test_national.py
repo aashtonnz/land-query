@@ -630,23 +630,43 @@ def test_width_does_not_depend_on_the_order_of_the_vertices():
 
 def test_a_parcel_takes_the_zone_covering_most_of_it_where_a_council_publishes_zoning():
     """T-38: the zone with the largest share of the parcel, its share and a broad class, and the plan it comes from;
-    empty where no published zoning reaches the parcel; the plan named in the tile's provenance."""
+    empty where no published zoning reaches the parcel. Zoning review (18 Nov): only the parcel's own council's zones
+    count (a neighbour's layer reaching over the boundary is ignored), duplicate polygons are not counted twice, and a
+    zone covering under half the parcel sets nothing."""
     import tempfile, json, pyarrow as pa, pyarrow.parquet as pq, shapely, zoning as ZN
     d = tempfile.mkdtemp()
-    zs = [(box(0, 0, 130, 500), "Christchurch City", "Residential Suburban"), (box(130, 0, 1000, 500), "Christchurch City", "Open Space Community Parks")]
+    zs = [(box(0, 0, 130, 500), "Christchurch City", "Residential Suburban"), (box(0, 0, 130, 500), "Christchurch City", "Residential Suburban"),   # a duplicate
+          (box(130, 0, 500, 500), "Christchurch City", "Open Space Community Parks"),
+          (box(500, 0, 1000, 500), "Selwyn District", "Rural Zone"),          # Selwyn's layer reaching into Christchurch
+          (box(0, 600, 1000, 1000), "Christchurch City", "Industrial General")]
     pq.write_table(pa.table(dict(district=[z[1] for z in zs], zone=[z[2] for z in zs], wkb=pa.array([shapely.to_wkb(z[0]) for z in zs], pa.binary()),
                                  xmin=[z[0].bounds[0] for z in zs], ymin=[z[0].bounds[1] for z in zs], xmax=[z[0].bounds[2] for z in zs], ymax=[z[0].bounds[3] for z in zs])),
                    os.path.join(d, "zoning.parquet"))
     json.dump({"Christchurch City": dict(plan="Christchurch District Plan", licence="CC BY 4.0", url="https://example/zones")}, open(os.path.join(d, "zoning.json"), "w"))
     P = lambda i: dict(id=i, parcel_intent="DCDB")
-    keep = N.BULK
+    keep = (N.BULK, N._OFFICIAL)
     try:
-        N.BULK = d
-        rows = run_tile({"parcels": [(box(100, 100, 140, 140), P(1)), (box(600, 800, 640, 840), P(2))]})
-    finally: N.BULK = keep
+        N.BULK = d; N._OFFICIAL = [(box(-10, -10, 1010, 1010), "Christchurch City")]
+        rows = run_tile({"parcels": [(box(100, 100, 140, 140), P(1)),       # 75% residential
+                                     (box(600, 100, 640, 140), P(2)),       # in Christchurch, under Selwyn's layer only
+                                     (box(300, 560, 340, 620), P(3))]})     # 20 m of 60 m in the industrial zone (33%)
+    finally: N.BULK, N._OFFICIAL = keep
     assert (rows[1]["zone"], rows[1]["zone_share_pct"], rows[1]["zone_class"], rows[1]["zone_plan"]) == ("Residential Suburban", 75.0, "residential", "Christchurch District Plan")
     assert rows[2]["zone"] is None and rows[2]["zone_share_pct"] is None
+    assert rows[3]["zone"] is None
     assert ZN.zone_class("Specific Purpose (School)") == "special purpose" and ZN.zone_class("OS8") == "open space" and ZN.zone_class("") is None
+    assert ZN.zone_class("Transport") == "infrastructure" and ZN.zone_class("Industrial Park") == "industrial" and ZN.zone_class("Village") == "residential"
+    assert ZN.tidy("Medium_Density_ResidentialMedium_Density_Residential") == "Medium Density Residential"
+
+def test_the_bulk_count_check_passes_layers_without_counts_and_stops_a_short_one():
+    """Zoning review (18 Nov): the manifest's zoning entry has no record counts, and the check after the download
+    crashed on it (KeyError), which would have stopped every national build."""
+    import bulk
+    ok = dict(addresses=dict(records=1000, service_records=1010), zoning=dict(councils=12, failed=[]),
+              parcels=dict(records=5, service_records=None), nonprimary=dict(records=7, service_records=None))
+    bulk.check_counts(ok)
+    try: bulk.check_counts(dict(addresses=dict(records=500, service_records=1000))); assert False
+    except SystemExit: pass
 
 
 if __name__ == "__main__":

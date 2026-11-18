@@ -59,7 +59,7 @@ const unitFmt = (v, u) => { const a = Math.abs(v), d = a >= 100 ? 0 : (a >= 10 ?
   if(u === 'm²' && a >= 10000) return fmt(v/10000, a >= 1e6 ? 0 : 1) + ' ha'; if(u === 'm' && a >= 10000) return fmt(v/1000, 1) + ' km';
   return fmt(v, d) + (u ? (u === '%' || u === '°' ? '' : ' ') + u : ''); };
 // categories (scale "cat", the broad zone class): one colour each, readable on light and dark
-const PAL = ['#e0a33a', '#79a85a', '#3f78c4', '#8a63be', '#2a9a68', '#d05a78', '#8c8c8c', '#b39a68'];
+const PAL = ['#e0a33a', '#79a85a', '#3f78c4', '#8a63be', '#2a9a68', '#d05a78', '#9c4f2e', '#b39a68'];   // infrastructure sienna: grey read as 'no value' in dark mode
 const SCALES = Object.fromEntries(meta.colours.map(c => { if(c.scale === 'cat') return [c.key, {cat:true, cats:c.cats, counts:c.counts, label:c.label, n:c.n}];
   const f = TF[c.scale];
   const t = v => f === 1 ? Math.sqrt(Math.max(v, 0)) : (f === 2 ? Math.log10(Math.max(v, 1)) : v);
@@ -75,7 +75,7 @@ function legend(){ const L = $('legend');
   if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div><div class="keys"><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel</span></div>`; return; }
   const s = SCALES[mode];
   if(s.cat){ L.innerHTML = `<div class="label">${s.label}</div><div class="keys">` + s.cats.map((k, i) => `<span><i style="background:${PAL[i]}"></i>${k}</span>`).join('') +
-    `<span><i style="background:var(--novalue)"></i>No zoning published openly</span></div>`; return; }
+    `<span><i style="background:var(--novalue)"></i>No zoning published openly</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Roads, railways and other land without a parcel</span></div>`; return; }
   const g = [0,.25,.5,.75,1].map(ramp).join(',');
   L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers (edges approximate, from 1:50,000 maps)</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Roads, railways and other land without a parcel</span></div>`; }
 

@@ -546,20 +546,21 @@ def index_tile(tile, cache, region=None, tas=None):
                 r["easements_n"], r["land_covenants_n"] = hits.count("Easement"), hits.count("Covenant - Land")
         else:
             for r in rows: r["easements_n"] = r["land_covenants_n"] = None
+        if national:
+            for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af), official_districts())): r["territorial_authority"], r["district_from"] = d, how
+            if official_districts(): prov["districts"] = official_meta()   # recorded where used (service review, 16 Nov)
         # district plan zoning where councils publish it under an open licence (T-38); empty elsewhere
         zf = os.path.join(BULK, "zoning.parquet") if BULK else None
         if national and zf and os.path.exists(zf):
             import zoning as ZN
             zmeta = json.load(open(os.path.join(BULK, "zoning.json")))
             zs = ZN.load(zf, bbox=win)
-            for r, z in zip(rows, ZN.zone_columns(parcels, zs, zmeta, overlap)): r.update(z)
-            used = sorted({d for _, d, _ in zs})
+            # only the parcel's own council's zones: the district is decided first (zoning review, 18 Nov)
+            for r, z in zip(rows, ZN.zone_columns(parcels, zs, zmeta, overlap, [r.get("territorial_authority") for r in rows])): r.update(z)
+            used = sorted({d for _, d, _ in zs} & {r.get("territorial_authority") for r in rows} & set(zmeta))   # councils whose zones were used here
             if used: prov["zoning"] = {d: zmeta[d] for d in used}
         else:
             for r in rows: r.update(zone=None, zone_share_pct=None, zone_class=None, zone_plan=None)
-        if national:
-            for r, (d, how) in zip(rows, national_districts(parcels, rows, loc, geoms(af), official_districts())): r["territorial_authority"], r["district_from"] = d, how
-            if official_districts(): prov["districts"] = official_meta()   # recorded where used (service review, 16 Nov)
         # water is measured, never guessed from a name or a title (T-113, T-115)
         lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
         lf, prov["land"] = fetch("land", win, cache)

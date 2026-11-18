@@ -43,7 +43,7 @@ def text(s):
     return " ".join(re.sub(r"<[^>]+>", " ", s or "").split())
 
 
-CLAUSE = re.compile(r"not permitted to (?:copy|republish)|without the (?:prior )?written consent|must not be (?:copied|republished)", re.I)
+CLAUSE = re.compile(r"not permitted to (?:copy|republish)|without the (?:prior )?written consent|must not be (?:copied|republished)|may not be used for the purposes? of any legal", re.I)
 
 
 def licence_class(lic, access):

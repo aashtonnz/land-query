@@ -32,8 +32,12 @@ One base zoning layer per council, with parcel counts from the national build of
 | Upper Hutt City | 18,721 | dataset licence | District Plan Zones |
 | South Waikato District | 13,708 | dataset licence | Plan Zones |
 
-The 16 with a plain open licence cover 667,834 parcels, **27% of New Zealand**; with Kāpiti Coast and Porirua, already
-compiled, about 29%.
+Of these, **12 are used** (`pipeline/zoning.py`): Christchurch, Far North, New Plymouth, Hastings, Marlborough, Gisborne,
+Western Bay of Plenty, Waipā (its combined "Waipa District Plan - Zones" layer, not the commercial zone listed above),
+Taupō, Manawatū, Tararua and South Waikato: **525,069 parcels, about 21% of New Zealand**; with Kāpiti Coast and Porirua,
+already compiled, about 23%. Left out although openly licensed: Wellington City (the open layer is the 2018 plan; the
+current 2024 zones carry no open licence), Whakatāne (its open layer is from 2016), Waimakariri (its open layer's
+appeals version covers 23.5% of the district's parcels) and Upper Hutt (not reached yet).
 
 Not yet usable:
 - **Auckland** (563,052 parcels, 23%): the dataset states CC BY 4.0 but also that "you are not permitted to copy or
@@ -54,7 +58,21 @@ climate scenarios, model or mapped), so each needs its own reading before use.
 
 ## Next
 
-A national zoning column from the 16 open layers (T-38): each parcel's zone with the largest share, its share, and the
+A national zoning column from the 12 layers used (T-38): each parcel's zone with the largest share, its share, and the
 layer and licence it came from, compiled in the national build. The zone names differ by council, so the council's own
 name is published, with a few broad classes (residential, rural, business, open space, other) for comparison across
 councils.
+
+## Review (18 Nov)
+
+A fresh-eyes review of the zoning work found: the bulk download would have crashed on the zoning entry (fixed before
+any build); parcels near a boundary took a neighbouring council's zone (1,478 parcels; now only the parcel's own
+council's zones count); misclassified names ("Transport" as open space, villages as other, lifestyle zones split; the
+classes reordered and widened); the map neither credited the councils nor told infrastructure from "no value" in dark
+mode (both fixed); slivers set zones (a zone must now cover half the parcel); duplicate polygons were counted twice
+(each zone's pieces are merged); Waipā's reserves were left out (now included); Hastings' open space codes and
+Western Bay of Plenty's underscores were unreadable (named and tidied); Marlborough's plan label lacked its status;
+South Waikato's service adds that its information may not be used for legal disputes (recorded with its licence).
+All 12 licences were confirmed as CC BY 4.0 on the council's dataset, every download matched the service's count, and
+238 of 240 parcels spot-checked against the live services agreed (the other two: a parcel across a boundary at 50.5%,
+and a 0.1% sliver).
