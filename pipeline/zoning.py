@@ -41,6 +41,27 @@ SOURCES = [
          field="ZONE_DESC", plan="South Waikato District Plan", licence="CC BY 4.0"),
 ]
 
+# Not used, and why (Nov 2026): Waimakariri's open layer ("Zones Query Layer") in its appeals version covers 23.5% of
+# the district's parcels, so it lacks most rural zones; Auckland's licence restricts copying and Wellington City's 2024
+# zones carry no open licence (both wait for the councils, T-35); Whakatāne's open layer is from 2016.
+
+# zone codes of the National Planning Standards (2019), as some councils publish them (Waimakariri: "GRZ")
+NPS_CODES = {"GRZ": "General Residential Zone", "MRZ": "Medium Density Residential Zone", "HRZ": "High Density Residential Zone",
+             "LRZ": "Low Density Residential Zone", "LLRZ": "Large Lot Residential Zone", "SETZ": "Settlement Zone",
+             "RLZ": "Rural Lifestyle Zone", "GRUZ": "General Rural Zone", "RPROZ": "Rural Production Zone",
+             "OSZ": "Open Space Zone", "NOSZ": "Natural Open Space Zone", "SARZ": "Sport and Active Recreation Zone",
+             "CMUZ": "Commercial Zone", "LCZ": "Local Centre Zone", "NCZ": "Neighbourhood Centre Zone", "TCZ": "Town Centre Zone",
+             "MCZ": "Metropolitan Centre Zone", "CCZ": "City Centre Zone", "LFRZ": "Large Format Retail Zone", "MUZ": "Mixed Use Zone",
+             "GIZ": "General Industrial Zone", "LIZ": "Light Industrial Zone", "HIZ": "Heavy Industrial Zone", "SPZ": "Special Purpose Zone",
+             "MPZ": "Māori Purpose Zone", "FUZ": "Future Urban Zone"}
+
+
+def expand(code):
+    """'SPZ(KN)' -> 'Special Purpose Zone (KN)'; a name that is not a code is returned as it is."""
+    m = re.fullmatch(r"([A-Z]{2,6})(\s*\(.*\))?", (code or "").strip())
+    return (NPS_CODES[m.group(1)] + (" " + m.group(2).strip() if m.group(2) else "")) if m and m.group(1) in NPS_CODES else code
+
+
 # broad classes for comparing councils, first match wins; the council's own zone name is always published as well
 CLASSES = [("special purpose", r"speci(fic|al) purpose|papak[aā]inga|m[aā]ori purpose|school|hospital|tertiary|education|golf|marina|major facilit"),
            ("open space", r"open space|reserve|recreation|park|conservation|natural|cemetery|sport|^os\d"),
@@ -74,6 +95,7 @@ def fetch_all(out, sources=SOURCES):
         n = 0
         for f in feats:
             name = ((f.get("properties") or {}).get(s["field"]) or "").strip()
+            if s.get("codes"): name = expand(name)
             if not f.get("geometry") or not name: continue
             g = shapely.make_valid(shape(f["geometry"]))
             if g.is_empty: continue
