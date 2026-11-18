@@ -628,6 +628,27 @@ def test_width_does_not_depend_on_the_order_of_the_vertices():
         assert run_tile({"parcels": [(Polygon(r), P(1))]})[1]["width_m"] == ra
 
 
+def test_a_parcel_takes_the_zone_covering_most_of_it_where_a_council_publishes_zoning():
+    """T-38: the zone with the largest share of the parcel, its share and a broad class, and the plan it comes from;
+    empty where no published zoning reaches the parcel; the plan named in the tile's provenance."""
+    import tempfile, json, pyarrow as pa, pyarrow.parquet as pq, shapely, zoning as ZN
+    d = tempfile.mkdtemp()
+    zs = [(box(0, 0, 130, 500), "Christchurch City", "Residential Suburban"), (box(130, 0, 1000, 500), "Christchurch City", "Open Space Community Parks")]
+    pq.write_table(pa.table(dict(district=[z[1] for z in zs], zone=[z[2] for z in zs], wkb=pa.array([shapely.to_wkb(z[0]) for z in zs], pa.binary()),
+                                 xmin=[z[0].bounds[0] for z in zs], ymin=[z[0].bounds[1] for z in zs], xmax=[z[0].bounds[2] for z in zs], ymax=[z[0].bounds[3] for z in zs])),
+                   os.path.join(d, "zoning.parquet"))
+    json.dump({"Christchurch City": dict(plan="Christchurch District Plan", licence="CC BY 4.0", url="https://example/zones")}, open(os.path.join(d, "zoning.json"), "w"))
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    keep = N.BULK
+    try:
+        N.BULK = d
+        rows = run_tile({"parcels": [(box(100, 100, 140, 140), P(1)), (box(600, 800, 640, 840), P(2))]})
+    finally: N.BULK = keep
+    assert (rows[1]["zone"], rows[1]["zone_share_pct"], rows[1]["zone_class"], rows[1]["zone_plan"]) == ("Residential Suburban", 75.0, "residential", "Christchurch District Plan")
+    assert rows[2]["zone"] is None and rows[2]["zone_share_pct"] is None
+    assert ZN.zone_class("Specific Purpose (School)") == "special purpose" and ZN.zone_class("OS8") == "open space" and ZN.zone_class("") is None
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

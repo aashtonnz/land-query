@@ -222,6 +222,11 @@ def main(out):
                                fetched=utc_now(), records=n, service_records=service_count(layer) if layer in BLOCKED else n,
                                seconds=round(time.time() - t0))
         print(layer, manifest[layer], flush=True)
+    # council zoning where it is published under an open licence (T-38): its own provenance in zoning.json
+    import zoning
+    zm = zoning.fetch_all(out)
+    manifest["zoning"] = dict(source="council zoning layers with an open licence (zoning.py)", councils=len(zm),
+                              failed=sorted(d for d, m in zm.items() if m.get("failed")), fetched=utc_now())
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
     # the export and the service are the same dataset; they may differ by a few days of edits, never by much
     for layer, m in manifest.items():

@@ -22,7 +22,7 @@ Standing priorities:
 
 ## Planned (after Next, by phase)
 Phase 2 — Greater Wellington:
-- T-38: Rest of Greater Wellington: Wellington City, Hutt, Upper Hutt and Porirua, once T-24 shows the adapter cost. Paused for the national tiers (D-21).
+- T-38: District plan zoning nationally, from councils that publish it under an open licence. Done 18 Nov: a weekly council survey (`council_survey.py`; [findings](docs/findings/2026-11-18-council-zoning-survey.md)); `zoning.py` reads 11 current open layers (Christchurch, Far North, New Plymouth, Hastings, Marlborough, Gisborne, Western Bay of Plenty, Taupō, Manawatū, Tararua, South Waikato: 495,074 parcels, 20%), and the national build gives each parcel `zone`, `zone_share_pct`, `zone_class` and `zone_plan` (checked locally on the 16 Nov build: 99.8–100% of those districts' parcels zoned, 96–99% within one zone). Next: in the next national build (needs GitHub Actions); then Waipā (one service per zone), Waimakariri (proposed and decisions mixed), Upper Hutt, and current layers for Wellington City and Whakatāne. Auckland waits for written consent (T-35). Raised 2026-11-06.
 
 ## Later / ideas
 - Wind exposure model that accounts for open sea and prevailing westerlies (the obstruction-and-height class failed against KCDC zones, T-37).

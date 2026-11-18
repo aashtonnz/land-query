@@ -75,7 +75,7 @@ class LandQuery:
                       ("addresses", "addresses"), ("roads", "road parcels"), ("nonprimary", "easements and covenants"),
                       ("coast", "coastline"), ("land", "land outline"), ("lakes_rivers", "lakes and rivers"),
                       ("localities", "localities"), ("elevation", "LiDAR and the 8 m elevation model"),
-                      ("districts", "Stats NZ district boundaries")]
+                      ("districts", "Stats NZ district boundaries"), ("zoning", "council district plan zones (open licence)")]
 
     def dataset_sources(self):
         """The sources these results were built from: for the national index, those its provenance records (a build
@@ -86,6 +86,7 @@ class LandQuery:
     def licence_note(self):
         if not self.national: return self.council.ABOUT["licence_note"]
         who = ["Land Information New Zealand"] + (["Stats NZ"] if "districts" in self.prov else []) + \
+              (["the councils named in each tile's zoning provenance"] if "zoning" in self.prov else []) + \
               (["Geographx (8 m elevation model)"] if "elevation" in self.prov else [])
         return "CC BY 4.0: attribute " + ", ".join(who) + "."
 
