@@ -27,6 +27,7 @@ from shapely import clip_by_rect
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import zoning   # zone_class for council parcels from their own zones (T-38)
 OUT = sys.argv[1] if len(sys.argv) > 1 else "map-site"
 ORIGIN = (1600000, 5300000)          # piece squares are counted from here (NZTM2000)
 # (square side m, simplification m): full detail for street level, then simpler shapes for zoomed-out views. Each
@@ -80,7 +81,16 @@ MEASURES = [
     ("ww_pipe_condition_grade", "Nearest sewer pipe, condition grade (1 very good to 5 very poor; Kāpiti)", "", "Services (Kāpiti)", "lin"),
     ("ws_pipe_dist_m", "Nearest water main (Kāpiti)", "m", "Services (Kāpiti)", "sqrt"),
     ("ws_pipe_dia_mm", "Nearest water main, diameter (Kāpiti)", "mm", "Services (Kāpiti)", "lin"),
+    ("zone_class", "District plan zone, broad class (councils that publish zoning openly)", "", "Planning", "cat"),
 ]
+# measures drawn by category (scale "cat"): their values are one of these, stored as its place in the list (1, 2, ...)
+CATS = {"zone_class": ["residential", "rural", "business", "industrial", "open space", "special purpose", "infrastructure", "other"]}
+
+
+def num(key, v):
+    """A measure's value as a number for colouring: a category's place in CATS (None if not one), else the number."""
+    if key in CATS: return float(CATS[key].index(v) + 1) if v in CATS[key] else None
+    return float(v)
 FIXED = {"ground_mean_m": (0, 200), "slope_p90_deg": (0, 35), "ww_pipe_year": (1950, 2020), "ww_pipe_condition_grade": (1, 5),
          "water_pct": (0, 100), "lidar_coverage_pct": (0, 100), "flat_pct": (0, 100), "steep_pct": (0, 100), "low_lying_pct": (0, 100)}
 MKEYS = [m[0] for m in MEASURES]
@@ -155,7 +165,8 @@ def parcels():
         for c in keep:
             k = NATIONAL_AS.get(c, c)
             if k in MKEYS:
-                d = con.sql(f"SELECT parcel_id, CAST({c} AS DOUBLE) v FROM '{nf}'").fetchnumpy()
+                expr = (f"CASE {c} " + " ".join(f"WHEN '{x}' THEN {i + 1}" for i, x in enumerate(CATS[k])) + " END") if k in CATS else f"CAST({c} AS DOUBLE)"
+                d = con.sql(f"SELECT parcel_id, CAST({expr} AS DOUBLE) v FROM '{nf}'").fetchnumpy()
                 NATVALS[k] = (d["parcel_id"], np.ma.filled(d["v"].astype("f8"), np.nan) if hasattr(d["v"], "mask") else d["v"])
         DETAIL_IDS = set(con.sql(f"SELECT parcel_id FROM '{pilot}'").fetchnumpy()["parcel_id"].tolist())
         if FULL:
@@ -173,10 +184,15 @@ def parcels():
                           open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
     for c, council, branch, extra in [("k", "kapiti", "kapiti-results", KAPITI_ONLY), ("p", "porirua", "porirua-results", [])]:
         d = results(branch); pub = public_columns(council, d)
-        cols = ["unit_id"] + [x for x in dict.fromkeys(COUNCIL_COLS + MKEYS) if x in pub and x != "unit_id"]
+        cols = ["unit_id"] + [x for x in dict.fromkeys(COUNCIL_COLS + MKEYS + ["zones"]) if x in pub and x != "unit_id"]
         f = os.path.join(d, "units.parquet")
         for r in duckdb.sql(f"SELECT {', '.join(cols)} FROM '{f}'").fetchall():
             row = dict(zip(cols, r)); old = P.get(row["unit_id"], {})
+            zs = row.pop("zones", None)   # the council's zones and their shares: the largest gives the broad class (T-38)
+            if zs:
+                try: shares = json.loads(zs) if isinstance(zs, str) else zs
+                except ValueError: shares = None
+                if shares: row["zone_class"] = zoning.zone_class(max(shares.items(), key=lambda kv: kv[1])[0])
             row.update(c=c, address=old.get("address"), territorial_authority=old.get("territorial_authority"))
             # measures the council build does not hold (or does not publish) come from the national index, same LINZ parcel
             for k in MKEYS + ["rep_x", "rep_y"]:
@@ -279,7 +295,9 @@ def colour_arrays(P, order, idx):
             ids, v = NATVALS[key]; a[np.fromiter((idx[i] for i in ids.tolist()), "i8", len(ids))] = v
         for pid in det:
             v = P[pid].get(key)
-            if v is not None: a[idx[pid]] = float(v)
+            if v is not None:
+                q = num(key, v)
+                if q is not None: a[idx[pid]] = q
         out[key] = a
     return out
 
@@ -297,6 +315,9 @@ def blend_cells(P, order, V, cell):
                  c=np.argmax(np.stack([np.bincount(inv, w * (cc[small] == k), n) for k in range(3)]), axis=0))
     for k, a in V.items():
         v = a[small].astype("f8"); ok = np.isfinite(v); den = np.bincount(inv, w * ok, n)
+        if k in CATS:   # a category is not averaged: the cell takes the one covering most of its area
+            share = np.stack([np.bincount(inv, w * (v == i + 1), n) for i in range(len(CATS[k]))])
+            cells["vals"][k] = np.where(den > 0, share.argmax(axis=0) + 1.0, np.nan).astype("f4"); continue
         with np.errstate(invalid="ignore", divide="ignore"):
             cells["vals"][k] = np.where(den > 0, np.bincount(inv, np.where(ok, w * v, 0.0), n) / den, np.nan).astype("f4")
     return small, cells
@@ -308,6 +329,13 @@ def colour_files(V):
     os.makedirs(os.path.join(OUT, "data", "v"), exist_ok=True); out = []
     for key, label, unit, group, scale in MEASURES:
         a = V[key].astype("<f4"); fin = np.isfinite(a); ok = a[fin]
+        if scale == "cat":   # stored as the category's place (1, 2, ...), 0 for none
+            if len(ok) == 0: continue
+            q = np.where(fin, np.nan_to_num(a), 0).astype("<u2")
+            q[:int(np.flatnonzero(fin)[-1]) + 1].tofile(os.path.join(OUT, "data", "v", key + ".bin"))
+            out.append(dict(key=key, label=label, unit=unit, group=group, scale="cat", cats=CATS[key], lo=1, hi=len(CATS[key]), n=int(len(ok)),
+                            counts=[int((ok == i + 1).sum()) for i in range(len(CATS[key]))]))
+            continue
         if len(ok) == 0 or ok.min() == ok.max(): continue   # nothing to show
         lo, hi = FIXED.get(key, (float(np.percentile(ok, 2)), float(np.percentile(ok, 98))))
         if hi <= lo: lo, hi = float(ok.min()), float(ok.max())

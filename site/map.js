@@ -58,7 +58,10 @@ const TF = {lin:0, sqrt:1, log:2};
 const unitFmt = (v, u) => { const a = Math.abs(v), d = a >= 100 ? 0 : (a >= 10 ? 1 : 2);
   if(u === 'm²' && a >= 10000) return fmt(v/10000, a >= 1e6 ? 0 : 1) + ' ha'; if(u === 'm' && a >= 10000) return fmt(v/1000, 1) + ' km';
   return fmt(v, d) + (u ? (u === '%' || u === '°' ? '' : ' ') + u : ''); };
-const SCALES = Object.fromEntries(meta.colours.map(c => { const f = TF[c.scale];
+// categories (scale "cat", the broad zone class): one colour each, readable on light and dark
+const PAL = ['#e0a33a', '#79a85a', '#3f78c4', '#8a63be', '#2a9a68', '#d05a78', '#8c8c8c', '#b39a68'];
+const SCALES = Object.fromEntries(meta.colours.map(c => { if(c.scale === 'cat') return [c.key, {cat:true, cats:c.cats, counts:c.counts, label:c.label, n:c.n}];
+  const f = TF[c.scale];
   const t = v => f === 1 ? Math.sqrt(Math.max(v, 0)) : (f === 2 ? Math.log10(Math.max(v, 1)) : v);
   return [c.key, {tf:f, lo:t(c.lo), hi:t(c.hi), label:c.label + (c.scale === 'lin' ? '' : c.scale === 'sqrt' ? ' (square-root scale)' : ' (log scale)'),
     ends:[(c.clipped_lo ? '≤' : '') + unitFmt(c.lo, c.unit), unitFmt(c.hi, c.unit) + (c.clipped_hi ? '+' : '')], n:c.n}]; }));
@@ -70,7 +73,10 @@ function ramp(t){ const a=hex(css('--lowland')), m=hex(css('--accent')), b=hex(c
   const [p,q,u] = t<.5 ? [a,m,t*2] : [m,b,(t-.5)*2]; return 'rgb(' + p.map((v,i)=>Math.round((v+(q[i]-v)*u)*255)).join(',') + ')'; }
 function legend(){ const L = $('legend');
   if(mode==='c'){ L.innerHTML = `<div class="label">Council</div><div><span style="color:var(--accent)">●</span> Kāpiti Coast &nbsp; <span style="color:var(--highland)">●</span> Porirua &nbsp; <span style="color:var(--lowland)">●</span> Greater Wellington (national index)</div><div class="keys"><span><i style="background:var(--sea)"></i>Sea, lakes and rivers</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Land without a parcel</span></div>`; return; }
-  const s = SCALES[mode], g = [0,.25,.5,.75,1].map(ramp).join(',');
+  const s = SCALES[mode];
+  if(s.cat){ L.innerHTML = `<div class="label">${s.label}</div><div class="keys">` + s.cats.map((k, i) => `<span><i style="background:${PAL[i]}"></i>${k}</span>`).join('') +
+    `<span><i style="background:var(--novalue)"></i>No zoning published openly</span></div>`; return; }
+  const g = [0,.25,.5,.75,1].map(ramp).join(',');
   L.innerHTML = `<div class="label">${s.label}</div><div class="bar" style="background:linear-gradient(90deg,${g})"></div><div class="ends"><span>${s.ends[0]}</span><span>${s.ends[1]}</span></div><div class="keys"><span><i style="background:var(--novalue)"></i>No value</span><span><i style="background:var(--sea)"></i>Sea, lakes and rivers (edges approximate, from 1:50,000 maps)</span><span><i style="background:var(--land);border:1px solid var(--rule)"></i>Roads, railways and other land without a parcel</span></div>`; }
 
 // ---- GL programs
@@ -83,14 +89,15 @@ function prog(vs, fs){ const p = gl.createProgram();
   for(let i=0;i<n;i++){ const a = gl.getActiveUniform(p, i); u[a.name] = gl.getUniformLocation(p, a.name); }
   return {p, u}; }
 const FS = 'in vec4 v; out vec4 o; void main(){ if(v.a < .01) discard; o = v; }';
-const PARCEL = prog(`in vec2 p; in float vals; in float cc; uniform vec2 sc, of; uniform int m, filt, tf; uniform float lo, hi;
-  uniform vec3 c0, c1, c2, grey, ck, cp, cn, sea; out vec4 v;
+const PARCEL = prog(`in vec2 p; in float vals; in float cc; uniform vec2 sc, of; uniform int m, filt, tf, cat; uniform float lo, hi;
+  uniform vec3 c0, c1, c2, grey, ck, cp, cn, sea; uniform vec3 pal[8]; out vec4 v;
   void main(){ gl_Position = vec4(p*sc+of, 0., 1.); int c = int(cc+.5);
     if(c == 3){ v = vec4(sea, 1.); return; }   // rivers and lakes
     if(filt >= 0 && c != filt){ v = vec4(0.); return; }
     if(m == 8){ v = vec4(c==0 ? ck : (c==1 ? cp : cn), 1.); return; }
     float x = vals;
     if(x < -1e29){ v = vec4(grey, 1.); return; }
+    if(cat == 1){ int k = clamp(int(x + .5) - 1, 0, 7); v = vec4(pal[k], 1.); return; }
     if(tf == 1) x = sqrt(max(x, 0.)); else if(tf == 2) x = log(max(x, 1.)) / log(10.);
     float t = clamp((x-lo)/(hi-lo), 0., 1.);
     v = vec4(t < .5 ? mix(c0, c1, t*2.) : mix(c1, c2, (t-.5)*2.), 1.); }`, FS);
@@ -179,7 +186,8 @@ worker.onmessage = e => { const d = e.data, P = pieces.get(d.key); if(!P) return
   pieceWaiters = pieceWaiters.filter(w => !w(P)); draw(); };
 // each vertex's value for the chosen measure; -1e30 for none (drawn grey)
 function fillArray(pidx){ const a = new Float32Array(pidx.length);
-  for(let v=0; v<pidx.length; v++){ const i = pidx[v], q = cur && i >= 0 && i < cur.length ? cur[i] : 0; a[v] = q ? (q - 1) / 65534 : -1e30; /* 0: no value */ } return a; }
+  const cat = SCALES[curKey] && SCALES[curKey].cat;   // a category's place (1, 2, ...) is passed as it is
+  for(let v=0; v<pidx.length; v++){ const i = pidx[v], q = cur && i >= 0 && i < cur.length ? cur[i] : 0; a[v] = q ? (cat ? q : (q - 1) / 65534) : -1e30; /* 0: no value */ } return a; }
 function fillValues(P){ gl.bindBuffer(gl.ARRAY_BUFFER, P.vbuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, fillArray(P.pidx)); }
 function piece(level, key){ const id = level + '/' + key; let P = pieces.get(id);
   if(!P){ P = {id, level, key, state:'loading'}; pieces.set(id, P);
@@ -223,6 +231,7 @@ function renderTile(z, i, j){
   gl.useProgram(PARCEL.p); const u = PARCEL.u;
   gl.uniform2fv(u.sc, sc); gl.uniform2fv(u.of, of); gl.uniform1i(u.m, mode==='c' ? 8 : 0); gl.uniform1i(u.tf, s.tf);
   gl.uniform1f(u.lo, s.lo); gl.uniform1f(u.hi, s.hi); gl.uniform1i(u.filt, filt);
+  gl.uniform1i(u.cat, mode !== 'c' && SCALES[mode] && SCALES[mode].cat ? 1 : 0); gl.uniform3fv(u['pal[0]'], PAL.flatMap(hex));
   gl.uniform3fv(u.c0, hex(css('--lowland'))); gl.uniform3fv(u.c1, hex(css('--accent'))); gl.uniform3fv(u.c2, hex(css('--highland')));
   gl.uniform3fv(u.sea, hex(css('--sea'))); gl.uniform3fv(u.grey, hex(css('--novalue'))); gl.uniform3fv(u.ck, hex(css('--accent'))); gl.uniform3fv(u.cp, hex(css('--highland'))); gl.uniform3fv(u.cn, hex(css('--lowland')));
   for(const P of ps) if(P.state === 'ready'){ gl.bindVertexArray(P.vao); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, P.tri); gl.drawElements(gl.TRIANGLES, P.ntri, gl.UNSIGNED_INT, 0); }
@@ -350,7 +359,7 @@ async function select(hit){ selected = hit; draw(); const det = $('detail');
   const row = (await details.get(key))[String(hit.id)]; if(!row || selected !== hit) return;
   const r = Object.fromEntries(meta.detail_fields.map((f,i)=>[f, row[i]]));
   // every measure this parcel has, grouped as in the menu; measures it lacks are left out
-  const val = (c, x) => c.key === 'ww_pipe_year' ? String(x) + ([1979, 1980].includes(x) ? ' (KCDC records many pipes with this year; it may be a placeholder)' : '') : unitFmt(x, c.unit);
+  const val = (c, x) => typeof x === 'string' ? x : c.key === 'ww_pipe_year' ? String(x) + ([1979, 1980].includes(x) ? ' (KCDC records many pipes with this year; it may be a placeholder)' : '') : unitFmt(x, c.unit);
   let items = '', grp = '';
   for(const c of meta.colours){ const x = r[c.key]; if(x == null) continue;
     if(c.group !== grp){ grp = c.group; items += `<dt class="grp">${esc(grp)}</dt><dd></dd>`; }

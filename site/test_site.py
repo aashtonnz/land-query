@@ -79,6 +79,17 @@ def test_the_r2_upload_sends_changed_data_once_and_keeps_the_newest_three_builds
     open(os.path.join(e, "L0/b.bin"), "wb").write(b"y"); assert BM.data_id(d) != BM.data_id(e)
 
 
+def test_a_category_is_coloured_by_its_class_and_cells_take_the_main_class():
+    """T-38: the zone class is drawn by category; zoomed out, a cell takes the class covering most of its area, never
+    an average of class numbers (residential and industrial must not blend into business)."""
+    import numpy as np
+    assert B.num("zone_class", "residential") == 1.0 and B.num("zone_class", "nonsense") is None and B.num("ground_mean_m", 3) == 3.0
+    P = {1: dict(rep_x=10, rep_y=10, area_m2=300, c="n"), 2: dict(rep_x=20, rep_y=20, area_m2=100, c="n"), 3: dict(rep_x=30, rep_y=30, area_m2=100, c="n")}
+    V = {"zone_class": np.array([1, 4, 4], "f4")}   # residential 300 m2; industrial 200 m2
+    small, cells = B.blend_cells(P, [1, 2, 3], V, 100)
+    assert small.all() and cells["vals"]["zone_class"].tolist() == [1.0]
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
