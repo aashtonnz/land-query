@@ -43,10 +43,16 @@ def text(s):
     return " ".join(re.sub(r"<[^>]+>", " ", s or "").split())
 
 
+CLAUSE = re.compile(r"not permitted to (?:copy|republish)|without the (?:prior )?written consent|must not be (?:copied|republished)", re.I)
+
+
 def licence_class(lic, access):
     t = text(lic) + " " + text(access)
     if OPEN.search(t):
         if NC_ND.search(t): return "non-commercial or no-derivatives"
+        # an open licence beside a clause that takes it back (Auckland Council: CC BY 4.0, yet "not permitted to copy or
+        # republish any substantial amount ... without the prior written consent"): for the council to confirm (T-35)
+        if CLAUSE.search(t): return "open licence with a restricting clause"
         if SA.search(t): return "share-alike"
         return "dataset licence"
     if NOT_OPEN.search(t): return "restricted"
@@ -80,7 +86,7 @@ def main(out):
                 if not in_nz(it.get("extent")): continue
                 rec = items.setdefault(it["id"], dict(id=it["id"], title=it.get("title"), owner=it.get("owner"), orgid=it.get("orgId"),
                                                      url=it.get("url"), type=it.get("type"), modified=it.get("modified"), topics=set(),
-                                                     licence=text(it.get("licenseInfo"))[:400], credits=text(it.get("accessInformation"))[:200]))
+                                                     licence=text(it.get("licenseInfo"))[:1200], credits=text(it.get("accessInformation"))[:200]))
                 rec["topics"].add(topic)
     # ArcGIS Online's search gives no organisation, so each layer is grouped by the server it lives on (a council's own
     # server, or an ArcGIS Online account's key in the address), and the group named by the credit its layers state most

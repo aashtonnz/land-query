@@ -598,6 +598,8 @@ def test_the_council_survey_tells_a_dataset_licence_from_none():
     assert licence_class("Creative Commons Attribution 4.0 New Zealand (CC BY 4.0) non-commercial licence", "") == "non-commercial or no-derivatives"
     assert licence_class("Creative Commons Attribution-NoDerivatives 4.0 International License", "") == "non-commercial or no-derivatives"
     assert licence_class("Creative Commons Attribution-ShareAlike 4.0 International License", "") == "share-alike"
+    assert licence_class("provided under the Creative Commons Attribution 4.0 International licence. You are not permitted to copy or republish any "
+                         "substantial amount of the information from this website without the prior written consent of Auckland Council", "") == "open licence with a restricting clause"
     from council_survey import in_nz
     assert in_nz([[174.6, -41.4], [175.0, -41.1]]) and not in_nz([[-180, -90], [180, 90]]) and not in_nz([[-95, 41], [-90, 43]]) and not in_nz(None)
 
