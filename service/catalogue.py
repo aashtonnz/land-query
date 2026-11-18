@@ -166,6 +166,7 @@ NATIONAL_COLUMN_SOURCES = [
     (r"easements_n|land_covenants_n", ["parcels", "nonprimary"]),
     (r"ground_\w+|slope_\w+|flat_pct|steep_pct|low_lying_pct|lidar_pct|elevation_from|upslope_\w+", ["parcels", "elevation"]),
     (r"zone|zone_share_pct|zone_class|zone_plan", ["parcels", "zoning"]),
+    (r"(flood|coastal)_area(_pct)?", ["parcels", "hazards"]),
 ]
 
 

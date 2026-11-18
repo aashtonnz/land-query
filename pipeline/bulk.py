@@ -227,6 +227,11 @@ def main(out):
     zm = zoning.fetch_all(out)
     manifest["zoning"] = dict(source="council zoning layers with an open licence (zoning.py)", councils=len(zm),
                               failed=sorted(d for d, m in zm.items() if m.get("failed")), fetched=utc_now())
+    # council flood and coastal hazard areas where mapped under an open licence (T-128): provenance in hazards.json
+    import hazards
+    hm = hazards.fetch_all(out)
+    manifest["hazards"] = dict(source="council flood and coastal hazard areas with an open licence (hazards.py)", sources=len(hm),
+                               failed=sorted(k for k, m in hm.items() if m.get("failed")), fetched=utc_now())
     json.dump(manifest, open(os.path.join(out, "manifest.json"), "w"), indent=1)
     check_counts(manifest)
 

@@ -82,6 +82,8 @@ MEASURES = [
     ("ws_pipe_dist_m", "Nearest water main (Kāpiti)", "m", "Services (Kāpiti)", "sqrt"),
     ("ws_pipe_dia_mm", "Nearest water main, diameter (Kāpiti)", "mm", "Services (Kāpiti)", "lin"),
     ("zone_class", "District plan zone, broad class (councils that publish zoning openly)", "", "Planning", "cat"),
+    ("flood_area_pct", "In a council-mapped flood hazard area (councils mapping it openly)", "%", "Hazards", "lin"),
+    ("coastal_area_pct", "In a council-mapped coastal hazard area (councils mapping it openly)", "%", "Hazards", "lin"),
 ]
 # measures drawn by category (scale "cat"): their values are one of these, stored as its place in the list (1, 2, ...)
 CATS = {"zone_class": ["residential", "rural", "business", "industrial", "open space", "special purpose", "infrastructure", "other"]}
@@ -92,7 +94,7 @@ def num(key, v):
     if key in CATS: return float(CATS[key].index(v) + 1) if v in CATS[key] else None
     return float(v)
 FIXED = {"ground_mean_m": (0, 200), "slope_p90_deg": (0, 35), "ww_pipe_year": (1950, 2020), "ww_pipe_condition_grade": (1, 5),
-         "water_pct": (0, 100), "lidar_coverage_pct": (0, 100), "flat_pct": (0, 100), "steep_pct": (0, 100), "low_lying_pct": (0, 100)}
+         "water_pct": (0, 100), "flood_area_pct": (0, 100), "coastal_area_pct": (0, 100), "lidar_coverage_pct": (0, 100), "flat_pct": (0, 100), "steep_pct": (0, 100), "low_lying_pct": (0, 100)}
 MKEYS = [m[0] for m in MEASURES]
 NATIONAL_AS = {"upslope_area_max_m2": "catchment_area_max_m2", "lidar_pct": "lidar_coverage_pct"}   # national name -> map name
 COUNCILS = {"k": 0, "p": 1, "n": 2}

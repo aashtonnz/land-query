@@ -561,6 +561,17 @@ def index_tile(tile, cache, region=None, tas=None):
             if used: prov["zoning"] = {d: zmeta[d] for d in used}
         else:
             for r in rows: r.update(zone=None, zone_share_pct=None, zone_class=None, zone_plan=None)
+        # flood and coastal hazard areas the parcel's council maps under an open licence (T-128); empty elsewhere
+        hf = os.path.join(BULK, "hazards.parquet") if BULK else None
+        if national and hf and os.path.exists(hf):
+            import hazards as HZ
+            hmeta = json.load(open(os.path.join(BULK, "hazards.json")))
+            hs = HZ.load(hf, bbox=win); tas = [r.get("territorial_authority") for r in rows]
+            for r, h in zip(rows, HZ.hazard_columns(parcels, hs, hmeta, overlap, tas)): r.update(h)
+            used = {k: m for k, m in hmeta.items() if m["district"] in set(tas) and not m.get("failed")}
+            if used: prov["hazards"] = used
+        else:
+            for r in rows: r.update({f"{k}_{c}": None for k in ("flood", "coastal") for c in ("area_pct", "area")})
         # water is measured, never guessed from a name or a title (T-113, T-115)
         lw = geoms(fetch("lakes", win, cache)[0]) + geoms(fetch("rivers", win, cache)[0])
         lf, prov["land"] = fetch("land", win, cache)

@@ -669,6 +669,29 @@ def test_the_bulk_count_check_passes_layers_without_counts_and_stops_a_short_one
     except SystemExit: pass
 
 
+def test_hazard_shares_count_only_the_councils_own_mapped_areas_and_are_empty_where_none_is_mapped():
+    """T-128: the share of the parcel in its council's flood (or coastal) area; 0 where the council maps one and the
+    parcel lies outside; empty where it maps none; overlapping areas counted once; a neighbour's area ignored."""
+    import tempfile, json, pyarrow as pa, pyarrow.parquet as pq, shapely
+    d = tempfile.mkdtemp()
+    hz = [(box(0, 0, 120, 500), "Taupo District", "flood"), (box(0, 0, 120, 500), "Taupo District", "flood"),   # overlapping copies
+          (box(500, 0, 1000, 1000), "Rotorua District", "flood")]                                              # a neighbour's area
+    pq.write_table(pa.table(dict(district=[h[1] for h in hz], kind=[h[2] for h in hz], wkb=pa.array([shapely.to_wkb(h[0]) for h in hz], pa.binary()),
+                                 xmin=[h[0].bounds[0] for h in hz], ymin=[h[0].bounds[1] for h in hz], xmax=[h[0].bounds[2] for h in hz], ymax=[h[0].bounds[3] for h in hz])),
+                   os.path.join(d, "hazards.parquet"))
+    json.dump({"Taupo District|flood": dict(district="Taupo District", kind="flood", label="Taupō District Plan: Flood Hazard Area, 1% AEP", urls=[], licence="CC BY 4.0")},
+              open(os.path.join(d, "hazards.json"), "w"))
+    P = lambda i: dict(id=i, parcel_intent="DCDB")
+    keep = (N.BULK, N._OFFICIAL)
+    try:
+        N.BULK = d; N._OFFICIAL = [(box(-10, -10, 1010, 1010), "Taupo District")]
+        rows = run_tile({"parcels": [(box(100, 100, 140, 140), P(1)), (box(300, 100, 340, 140), P(2)), (box(600, 100, 640, 140), P(3))]})
+    finally: N.BULK, N._OFFICIAL = keep
+    assert (rows[1]["flood_area_pct"], rows[1]["flood_area"]) == (50.0, "Taupō District Plan: Flood Hazard Area, 1% AEP")
+    assert rows[2]["flood_area_pct"] == 0.0 and rows[3]["flood_area_pct"] == 0.0     # outside Taupō's area; Rotorua's not counted
+    assert rows[1]["coastal_area_pct"] is None and rows[1]["coastal_area"] is None  # Taupō maps no coastal area
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
