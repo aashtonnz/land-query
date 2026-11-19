@@ -68,16 +68,18 @@ def check_chunk(feats, want, oid):
 SELECT_KEYS = frozenset({"where", "geometry", "geometryType", "inSR", "spatialRel", "text", "time", "distance", "units"})
 
 
-def query_all(url, query, workers=1):
+def query_all(url, query, workers=1, page_size=None):
     """Every feature matching query (ArcGIS query parameters), as GeoJSON features in the requested outSR.
 
     Asks for the matching object ids first, then fetches them in chunks and checks that each chunk holds exactly the
     ids asked for, so a layer is never silently cut short or padded with repeats (T-100). A layer that cannot list its
     ids is paged by offset instead, with the total checked against returnCountOnly and repeats refused (T-44).
-    With workers > 1 the chunks are fetched in parallel."""
+    With workers > 1 the chunks are fetched in parallel. page_size caps the chunk below the layer's own limit, for
+    layers whose features are so detailed that a full chunk is refused or times out (Christchurch's flood areas)."""
     try: info = _get(url, {"f": "json"}, 60)
     except Exception: info = {}
     page = max(1, min(int(info.get("maxRecordCount") or 1000), 2000))
+    if page_size: page = max(1, min(page, int(page_size)))
     oid = info.get("objectIdField") or next((f["name"] for f in info.get("fields") or [] if f.get("type") == "esriFieldTypeOID"), "OBJECTID")
     sel = {k: v for k, v in query.items() if k in SELECT_KEYS}
     try:

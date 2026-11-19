@@ -38,6 +38,8 @@ SOURCES = [
          field="zone", plan="Manawatū District Plan", licence="CC BY 4.0"),
     dict(district="Tararua District", url="https://services-ap1.arcgis.com/ry1jWJjaLhqVCFK6/arcgis/rest/services/TRR_Planning/FeatureServer/0",
          field="Zoning", plan="Tararua District Plan", licence="CC BY 4.0 (Tararua District Council)"),
+    dict(district="Upper Hutt City", url="https://maps.upperhutt.govt.nz/arcgis/rest/services/District_Plan_Zones/FeatureServer/0",
+         field="Zone", plan="Upper Hutt District Plan", licence="CC BY 4.0 (Upper Hutt City Council)"),
     dict(district="South Waikato District", url="https://services9.arcgis.com/pQ2VGNXWHZ4WkdmW/arcgis/rest/services/Plan_Zones/FeatureServer/1",
          field="ZONE_DESC", plan="South Waikato District Plan",
          licence="CC BY 4.0; the service adds that its information may not be used for the purposes of any legal disputes"),
@@ -45,7 +47,8 @@ SOURCES = [
 
 # Not used, and why (Nov 2026): Waimakariri's open layer ("Zones Query Layer") in its appeals version covers 23.5% of
 # the district's parcels, so it lacks most rural zones; Auckland's licence restricts copying and Wellington City's 2024
-# zones carry no open licence (both wait for the councils, T-35); Whakatāne's open layer is from 2016.
+# zones carry no open licence (both wait for the councils, T-35); Whakatāne's open layer is from 2016 and its server did
+# not answer (19 Nov).
 
 # zone codes of the National Planning Standards (2019), as some councils publish them (Waimakariri: "GRZ")
 NPS_CODES = {"GRZ": "General Residential Zone", "MRZ": "Medium Density Residential Zone", "HRZ": "High Density Residential Zone",

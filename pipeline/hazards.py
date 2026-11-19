@@ -60,7 +60,9 @@ def fetch_all(out, sources=SOURCES):
         key = f'{s["district"]}|{s["kind"]}'; t0 = time.time(); n = 0
         try:
             for u in s["urls"]:
-                for f in arcgis.query_all(u, dict(where=s.get("where", "1=1"), outFields="", outSR=2193), workers=2):
+                # all fields (some layers' id field is not OBJECTID), simplified to 1 m (hazard areas are mapped far more
+                # coarsely; Christchurch's came at 0.7 MB a polygon), 100 at a time
+                for f in arcgis.query_all(u, dict(where=s.get("where", "1=1"), outFields="*", outSR=2193, maxAllowableOffset=1), workers=4, page_size=100):
                     if not f.get("geometry"): continue
                     g = shapely.make_valid(shape(f["geometry"]))
                     g = shapely.get_parts(g); g = shapely.union_all([p for p in g if p.geom_type in ("Polygon", "MultiPolygon")]) if len(g) else None
