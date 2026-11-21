@@ -27,11 +27,17 @@ def files(root):
 MARK = "meta.json"   # written last: a folder holding it is complete
 
 
+def marked(client, bucket, build):
+    """When builds/BUILD/meta.json was written, or None. By listing, not HeadObject: the bucket's key refused
+    HeadObject with 403 (21 Nov), while listing and writing work."""
+    r = client.list_objects_v2(Bucket=bucket, Prefix=f"builds/{build}/{MARK}", MaxKeys=1)
+    for o in r.get("Contents", []):
+        if o["Key"] == f"builds/{build}/{MARK}": return o["LastModified"]
+    return None
+
+
 def complete(client, bucket, build):
-    try: client.head_object(Bucket=bucket, Key=f"builds/{build}/{MARK}"); return True
-    except Exception as e:
-        if getattr(e, "response", {}).get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"): return False
-        raise
+    return marked(client, bucket, build) is not None
 
 
 def upload(client, bucket, root, build, threads=THREADS):
@@ -65,10 +71,9 @@ def builds(client, bucket):
     """The complete build folders, oldest first by when their meta.json was written, and the incomplete ones."""
     done, partial = [], []
     for b in folders(client, bucket):
-        try: done.append((client.head_object(Bucket=bucket, Key=f"builds/{b}/{MARK}")["LastModified"], b))
-        except Exception as e:
-            if getattr(e, "response", {}).get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"): partial.append(b)
-            else: raise
+        t = marked(client, bucket, b)
+        if t is None: partial.append(b)
+        else: done.append((t, b))
     return [b for _, b in sorted(done)], partial
 
 

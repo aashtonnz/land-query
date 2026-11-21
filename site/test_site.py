@@ -40,21 +40,20 @@ def test_the_r2_upload_sends_changed_data_once_and_keeps_the_newest_three_builds
     import tempfile, threading, itertools
     import upload_r2 as U
     clock = itertools.count(100)
-    class Missing(Exception):
-        response = {"Error": {"Code": "404"}}
+    class Forbidden(Exception):
+        response = {"Error": {"Code": "403"}}
     class Bucket:
         def __init__(self, keys): self.objs, self.lock, self.deletes, self.puts = {k: (b"", None, None, next(clock)) for k in keys}, threading.Lock(), 0, []
         def put_object(self, Bucket, Key, Body, CacheControl, ContentType):
             with self.lock: self.objs[Key] = (Body, CacheControl, ContentType, next(clock)); self.puts.append(Key)
-        def head_object(self, Bucket, Key):
-            if Key not in self.objs: raise Missing()
-            return dict(LastModified=self.objs[Key][3])
-        def list_objects_v2(self, Bucket, Prefix, Delimiter=None, ContinuationToken=None):
+        def head_object(self, Bucket, Key):   # the bucket's key refuses this (21 Nov)
+            raise Forbidden()
+        def list_objects_v2(self, Bucket, Prefix, Delimiter=None, ContinuationToken=None, MaxKeys=1500):
             keys = sorted(k for k in self.objs if k.startswith(Prefix))
             if Delimiter: return dict(CommonPrefixes=[dict(Prefix=p) for p in sorted({Prefix + k[len(Prefix):].split("/")[0] + "/" for k in keys})])
             after = [k for k in keys if ContinuationToken is None or k > ContinuationToken]   # paged by key, as a bucket pages
-            page, more = after[:1500], len(after) > 1500
-            return dict(Contents=[dict(Key=k) for k in page], IsTruncated=more, **(dict(NextContinuationToken=page[-1]) if more else {}))
+            page, more = after[:min(1500, MaxKeys)], len(after) > min(1500, MaxKeys)
+            return dict(Contents=[dict(Key=k, LastModified=self.objs[k][3]) for k in page], IsTruncated=more, **(dict(NextContinuationToken=page[-1]) if more else {}))
         def delete_objects(self, Bucket, Delete):
             assert len(Delete["Objects"]) <= 1000; self.deletes += 1
             for o in Delete["Objects"]: self.objs.pop(o["Key"])
