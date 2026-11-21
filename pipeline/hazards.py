@@ -50,6 +50,20 @@ SOURCES = [
 # areas and wait for their own columns; Auckland's and Wellington City's licences wait for the councils (T-35).
 
 
+def polygonal(geom):
+    """The polygon part of a repaired shape, or None: repair can leave lines or points beside the polygons, and a merge of
+    mixed kinds fails. One of Far North's flood zones (24,502 pieces, some too short to be polygons) defeats even the
+    default repair ("Overlay input is mixed-dimension"); the structure method repairs it."""
+    try: g = shapely.make_valid(geom)
+    except shapely.errors.GEOSException: g = shapely.make_valid(geom, method="structure", keep_collapsed=False)
+    polys = [p for p in shapely.get_parts(g) if p.geom_type in ("Polygon", "MultiPolygon")]
+    while any(p.geom_type == "GeometryCollection" for p in shapely.get_parts(g)) and not polys:
+        g = shapely.union_all([q for p in shapely.get_parts(g) for q in shapely.get_parts(p)]); polys = [p for p in shapely.get_parts(g) if p.geom_type in ("Polygon", "MultiPolygon")]
+    if not polys: return None
+    out = shapely.union_all(polys)
+    return None if out.is_empty else out
+
+
 def fetch_all(out, sources=SOURCES):
     """Download every source to OUT/hazards.parquet and describe them in OUT/hazards.json. A source that cannot be
     read is recorded as failed and left out (its district's values are then empty, never 0)."""
@@ -64,9 +78,8 @@ def fetch_all(out, sources=SOURCES):
                 # coarsely; Christchurch's came at 0.7 MB a polygon), 100 at a time
                 for f in arcgis.query_all(u, dict(where=s.get("where", "1=1"), outFields="*", outSR=2193, maxAllowableOffset=1), workers=4, page_size=100):
                     if not f.get("geometry"): continue
-                    g = shapely.make_valid(shape(f["geometry"]))
-                    g = shapely.get_parts(g); g = shapely.union_all([p for p in g if p.geom_type in ("Polygon", "MultiPolygon")]) if len(g) else None
-                    if g is None or g.is_empty: continue
+                    g = polygonal(shape(f["geometry"]))
+                    if g is None: continue
                     rows["district"].append(s["district"]); rows["kind"].append(s["kind"]); rows["wkb"].append(shapely.to_wkb(g))
                     for k, v in zip(("xmin", "ymin", "xmax", "ymax"), g.bounds): rows[k].append(v)
                     n += 1
