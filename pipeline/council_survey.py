@@ -105,6 +105,7 @@ def main(out):
         for r in recs:
             r["org"] = (name + " " if name else "") + "(" + key + ")"
             r["licence_class"] = licence_class(r["licence"], r["credits"])
+    for r in items.values(): r["topics"] = sorted(r["topics"])   # a list in the JSON, not a set's text
     rows = sorted(items.values(), key=lambda r: (r["org"] or "", r["title"] or ""))
     json.dump(rows, open(os.path.join(out, "council_layers.json"), "w"), indent=1, default=str)
     # per organisation: topics found, and how many items of each have a dataset licence

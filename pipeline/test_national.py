@@ -1,3 +1,4 @@
+import json
 """Tests for the national index (T-100) on small made-up parcels; no network. Run: python3 test_national.py"""
 import os, sys
 import numpy as np, pandas as pd
@@ -713,3 +714,13 @@ def test_a_hazard_layer_of_lines_or_with_no_areas_fails_its_source_instead_of_va
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)
+
+
+def test_the_council_survey_writes_topics_as_a_list(tmp_path, monkeypatch):
+    import council_survey as cs
+    item = dict(id="a", title="Flood", owner="o", url="https://x.govt.nz/arcgis/rest/services/F/0", extent=[[174, -41], [175, -40]],
+                licenseInfo="CC BY 4.0", accessInformation="A Council")
+    monkeypatch.setattr(cs, "search", lambda q: [item] if q in ("flood hazard", "zoning") else [])
+    cs.main(str(tmp_path))
+    rows = json.load(open(tmp_path / "council_layers.json"))
+    assert rows[0]["topics"] == ["flood", "zoning"]
