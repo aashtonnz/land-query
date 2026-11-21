@@ -42,8 +42,9 @@ SOURCES = [
          label="Far North Proposed District Plan, decisions version: coastal flood and coastal erosion zones (50 year, 100 year and 100 year with rapid sea level rise)",
          urls=[FNDC + f"PDPDecisions_Hazards_Coastal{k}_FNDC_opendata/FeatureServer/{i}" for k in ("Flood", "Erosion") for i in range(3)],
          licence="CC BY 4.0"),
-    dict(district="Nelson City", kind="coastal", label="Nelson coastal flooding, present day (2020), Tonkin & Taylor for Nelson City Council",
-         urls=["https://services1.arcgis.com/Y4k7lyf2XTGeQC6V/arcgis/rest/services/Present_Day/FeatureServer/5"], licence="CC BY 4.0"),
+    # layer 4, not 5: layer 5 holds the model's cells (the areas studied), which covered 82% of Nelson's parcels (19 Nov)
+    dict(district="Nelson City", kind="coastal", label="Nelson coastal flooding, present day, 1% annual exceedance probability, areas connected to the sea (Tonkin & Taylor for Nelson City Council, 2023)",
+         urls=["https://services1.arcgis.com/Y4k7lyf2XTGeQC6V/arcgis/rest/services/Present_Day/FeatureServer/4"], where="connected = 1", licence="CC BY 4.0"),
 ]
 # Not used, and why (Nov 2026): Christchurch's coastal layers hold future scenarios only (2065 to 2130); Hawke's Bay's
 # coastal erosion is by probability and year to 2120; regional fault and liquefaction studies differ in kind from plan
