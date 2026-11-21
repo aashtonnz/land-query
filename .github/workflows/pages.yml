@@ -49,6 +49,15 @@ jobs:
         run: |
           tag=$(gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("national-"))][0].tagName // ""')
           if [ -n "$tag" ]; then gh release download "$tag" --repo "${{ github.repository }}" --dir national; echo "drawing $tag"; else echo "no national index published yet"; fi
+      - name: Can R2 be reached (before the half-hour build)
+        if: env.R2_PUBLIC_URL != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: |
+          [ -n "$AWS_ACCESS_KEY_ID" ] || { echo "R2 secrets not set"; exit 0; }
+          pip install -q boto3 && python3 site/upload_r2.py check
       - name: Test and build the site
         run: |
           python3 site/test_site.py
@@ -66,7 +75,6 @@ jobs:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
         run: |
           [ -n "$AWS_ACCESS_KEY_ID" ] || { echo "R2 secrets not set: nothing sent"; exit 0; }
-          pip install -q boto3
           # 128 at a time with boto3 (the AWS command line managed about 25 files a second: over an hour); each build
           # under its own folder, never changed once written; the newest three kept
           python3 site/upload_r2.py _site/data "$(cat _site/BUILD.txt)"

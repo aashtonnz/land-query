@@ -1,4 +1,4 @@
-"""Send a map build's data to Cloudflare R2 (D-26): upload_r2.py DATA_DIR BUILD.
+"""Send a map build's data to Cloudflare R2 (D-26): upload_r2.py DATA_DIR BUILD (or upload_r2.py check: can the bucket be reached).
 
 BUILD names the data by its content (build_map.data_id). Puts every file under DATA_DIR at builds/BUILD/<its path> in
 the bucket, many at once (about 107,000 small files: the AWS command line sent about 25 a second, too slow for the
@@ -94,11 +94,27 @@ def prune(client, bucket, keep=KEEP, current=None):
     return old
 
 
-def main(root, build):
+def client_from_env():
     import boto3
     from botocore.config import Config
-    client = boto3.client("s3", endpoint_url=f"https://{os.environ['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com", region_name="auto",
+    return boto3.client("s3", endpoint_url=f"https://{os.environ['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com", region_name="auto",
                           config=Config(max_pool_connections=THREADS, retries=dict(max_attempts=10, mode="adaptive")))
+
+
+def check():
+    """One listing of the bucket, before the half-hour build: R2 switched off on the account answers NotEntitled
+    ("Please enable R2 through the Cloudflare Dashboard", 21 Nov), a wrong key 403."""
+    try: client_from_env().list_objects_v2(Bucket=os.environ["R2_BUCKET"], Prefix="builds/", MaxKeys=1)
+    except Exception as e:
+        code = getattr(e, "response", {}).get("Error", {}).get("Code", "")
+        why = {"NotEntitled": "R2 is not enabled on the Cloudflare account: the owner turns it on in the Cloudflare dashboard (R2)",
+               "403": "the key was refused: check the R2 secrets and the token's permissions", "AccessDenied": "the key was refused"}.get(code, str(e)[:200])
+        raise SystemExit(f"R2 cannot be reached ({code}): {why}. Nothing built or sent.")
+    print("R2 reachable", flush=True)
+
+
+def main(root, build):
+    client = client_from_env()
     bucket = os.environ["R2_BUCKET"]
     t0 = time.time(); n = upload(client, bucket, root, build)
     print(f"{n} files to builds/{build}/ in {time.time() - t0:.0f} s" + (" (data unchanged: already there)" if n == 1 else ""), flush=True)
@@ -106,4 +122,4 @@ def main(root, build):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    check() if sys.argv[1:] == ["check"] else main(sys.argv[1], sys.argv[2])

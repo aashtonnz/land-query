@@ -8,5 +8,5 @@ Free right now (checked 21 Nov 2026):
 
 | Week (Mon) | Date | What | Service | Estimate | Actual | Running total for the week |
 | --- | --- | --- | --- | ---: | ---: | ---: |
-| 2026-11-16 | 21 Nov | Map site rebuild and R2 upload (up to about 107,000 writes of the free million) | GitHub, R2 | $0 | $0 (GitHub: 0 billable minutes) | $0 |
+| 2026-11-16 | 21 Nov | Map site rebuild and R2 upload (up to about 107,000 writes of the free million) | GitHub, R2 | $0 | $0 (GitHub: 0 billable minutes, two runs; R2 refused: not enabled on the account, nothing written) | $0 |
 | 2026-11-16 | 22 Nov | National rebuild, fresh download with zoning and hazards (about 40 jobs, a few hours; not published) | GitHub | $0 | | $0 |
