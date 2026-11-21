@@ -14,7 +14,7 @@ Standing priorities:
 ## Waiting on you
 - T-127: Unlock the GitHub account (billing, about US$56; options: pay, downgrade to Free, or ask GitHub Support to waive it) and set each Actions budget with "stop usage" on. Until then nothing runs on GitHub: the national rebuild with every fix since 16 Nov and zoning, the map site, the council survey, the first publish. Raised 2026-11-16.
 - T-126: Choose a host for the query service so AI agents outside can use it: about US$12 a month on Fly.io (2 GB) recommended, or Hetzner at about €5 with upkeep. Ready: the service over HTTP with a rate limit, and a container that serves the newest published national index. The service review (16 Nov) is done and its serious findings fixed ([findings](docs/findings/2026-11-16-service-review.md)); goes public after the first national publish (T-102). [Proposal](docs/proposals/2026-11-16-hosted-service.md) Raised 2026-11-16.
-- T-83: Next full rebuild (about US$2.20): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
+- T-83: Next full rebuild (free now the repository is public): adds the LiDAR warning column (`unmapped_structure_m2`, D-19). To be batched with the next change that needs new source data, or run when you say. Raised 2026-11-09.
 - T-35: Ask councils to confirm licences in writing (only you can make the contact; [drafts](docs/drafts/2026-11-18-council-licence-requests.md)): Auckland, whose zoning layer is CC BY 4.0 but restricts copying (23% of parcels, the biggest gain); Wellington City, whose 2024 zones carry no open licence; KCDC and GWRC, where 13 of 28 source rows rely on a portal-wide CC BY 4.0 statement. Palmerston North's terms are to be read first. Raised 2026-11-06.
 
 ## Next (in order, at most about 10)
@@ -23,7 +23,7 @@ Standing priorities:
 - T-110: Parcel-report findings left open by the sixteenth and seventeenth reviews: whether the council builds should also empty sun and view values near the survey's edge (measure at their next rebuild). Done 16 Nov: the 10 m catchment against Kāpiti's 1 m settled as a documented limit (rough beside streams); sun and view values empty near a surface-model gap; a warning where ground and surface surveys differ; tall unoutlined buildings (over 15 m, 9 m across) flagged by `unmapped_structure_m2`; no title references or types in report.json; the page states its limits (500 m horizon, 300 m shadows); an address over several parcels lists them instead of taking the first. [Review](docs/findings/2026-11-09-national-review.md) Raised 2026-11-09.
 
 ## Planned (after Next, by phase)
-- T-128: Council hazard layers nationally (flood, coastal, land), where published under an open licence: each council models hazards differently (return periods, climate scenarios, modelled or mapped), so each layer is read and labelled before use. Raised 2026-11-19.
+- T-128: Council flood and coastal hazard areas nationally, where mapped under an open licence (`hazards.py`). Done 19–21 Nov: flood for Christchurch, Taupō, Gisborne, Waipā and Far North, coastal for Gisborne, Far North and Nelson; each parcel gets the share inside its own council's area and what that area is (0 outside, empty where no council map); checked on 339,922 real parcels (Nelson's first layer was the model's cells, caught and replaced). Next: a fresh-eyes review (running), then into the next national build (needs GitHub, T-127). Raised 2026-11-19.
 Phase 2 — Greater Wellington:
 
 ## Later / ideas
