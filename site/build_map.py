@@ -82,8 +82,8 @@ MEASURES = [
     ("ws_pipe_dist_m", "Nearest water main (Kāpiti)", "m", "Services (Kāpiti)", "sqrt"),
     ("ws_pipe_dia_mm", "Nearest water main, diameter (Kāpiti)", "mm", "Services (Kāpiti)", "lin"),
     ("zone_class", "District plan zone, broad class (councils that publish zoning openly)", "", "Planning", "cat"),
-    ("flood_area_pct", "In a council-mapped flood hazard area (councils mapping it openly)", "%", "Hazards", "lin"),
-    ("coastal_area_pct", "In a council-mapped coastal hazard area (councils mapping it openly)", "%", "Hazards", "lin"),
+    ("flood_area_pct", "Share in the council's mapped flood hazard area (councils mapping it openly; not comparable between councils)", "%", "Hazards", "lin"),
+    ("coastal_area_pct", "Share in the council's mapped coastal hazard area (councils mapping it openly; not comparable between councils)", "%", "Hazards", "lin"),
 ]
 # measures drawn by category (scale "cat"): their values are one of these, stored as its place in the list (1, 2, ...)
 CATS = {"zone_class": ["residential", "rural", "business", "industrial", "open space", "special purpose", "infrastructure", "other"]}
@@ -118,7 +118,10 @@ WATER_PCT = {}   # parcel id -> national index water_pct
 WATER = 3   # council code for water (river and stream beds, lakes): drawn in the sea colour, never selected (id -1)
 COUNCIL_COLS = ["unit_id", "appellation", "parcel_intent", "rep_x", "rep_y"]
 KAPITI_ONLY = []
-DETAIL = ["c", "appellation", "parcel_intent", "address", "territorial_authority"] + MKEYS
+# text shown in the panel under a measure: what the zone is and which plan, what the hazard area is (T-38, T-128)
+NOTES = {"zone_class": ["zone", "zone_plan"], "flood_area_pct": ["flood_area"], "coastal_area_pct": ["coastal_area"]}
+NOTE_FIELDS = [f for fs in NOTES.values() for f in fs]
+DETAIL = ["c", "appellation", "parcel_intent", "address", "territorial_authority"] + MKEYS + NOTE_FIELDS
 
 
 def results(branch):
@@ -151,7 +154,7 @@ def parcels():
     if NATIONAL:   # the whole country; full rows only for the pilot region (the rest keep what drawing needs)
         pilot = os.path.join(nd, "index.parquet"); nd_run = "the Greater Wellington pilot"; nf = os.path.join(NATIONAL, "index.parquet")
     con = duckdb.connect(); rel = con.sql(f"SELECT * FROM '{nf}'"); cols = rel.columns
-    want = set(MKEYS) | set(NATIONAL_AS) | {"parcel_id", "appellation", "parcel_intent", "rep_x", "rep_y", "address", "territorial_authority", "water_pct"}
+    want = set(MKEYS) | set(NATIONAL_AS) | set(NOTE_FIELDS) | {"parcel_id", "appellation", "parcel_intent", "rep_x", "rep_y", "address", "territorial_authority", "water_pct"}
     keep = [c for c in cols if c in want]
     where = f"WHERE parcel_id IN (SELECT parcel_id FROM '{pilot}')" if pilot else ""
     for r in con.sql(f"SELECT {', '.join(keep)} FROM '{nf}' {where}").fetchall():
@@ -173,7 +176,7 @@ def parcels():
         DETAIL_IDS = set(con.sql(f"SELECT parcel_id FROM '{pilot}'").fetchnumpy()["parcel_id"].tolist())
         if FULL:
             global NAT
-            sel = [c for c in ["appellation", "parcel_intent", "address", "territorial_authority"] + [c for c in keep if NATIONAL_AS.get(c, c) in MKEYS] if c in cols]
+            sel = [c for c in ["appellation", "parcel_intent", "address", "territorial_authority"] + [c for c in keep if NATIONAL_AS.get(c, c) in MKEYS or c in NOTE_FIELDS] if c in cols]
             NAT = con.sql(f"SELECT parcel_id, {', '.join(sel)} FROM '{nf}' WHERE parcel_id NOT IN (SELECT parcel_id FROM '{pilot}')").df()
             NAT = NAT.rename(columns=NATIONAL_AS).set_index("parcel_id")
     n_all, nmed = duckdb.sql(f"SELECT count(*), round(median(ground_mean_m), 1) FROM '{nf}'").fetchall()[0]
@@ -486,7 +489,7 @@ def main():
             for li, (_, cells) in blends.items(): c[cells["place"] - nd] = cells["vals"][k]
             V[k] = np.concatenate([V[k][:nd], c, V[k][nd:]])
     meta = dict(origin=ORIGIN, levels=[], measures=["index"], colours=colour_files(V), councils=list(COUNCILS),
-                detail_fields=DETAIL, stats=stats, national=bool(NATIONAL), full=FULL,
+                detail_fields=DETAIL, notes=NOTES, stats=stats, national=bool(NATIONAL), full=FULL,
                 bounds=bounds, parcels=len(P), land=coastline(bounds))
     if NATIONAL: meta["fit"] = [1060000, 4730000, 2100000, 6200000]   # the North, South and Stewart islands
     del V

@@ -6,7 +6,9 @@ below names exactly what its area is, and the index publishes, per parcel and ki
   parcel lies outside; empty where the council publishes no such map openly (most of the country for now);
 - `{kind}_area`: what that area is, in the council's terms (for example "Taupō District Plan: Flood Hazard Area, 1%
   annual exceedance probability").
-Only areas a council uses now (its district plan or current hazard maps) are used, never future-scenario layers alone.
+Only areas in an operative or decisions-version plan, or a council's current hazard map, are used; where such an area
+includes a climate-change or sea-level-rise allowance, the label says so. The shares measure where a council has drawn
+its line, not risk, and are not comparable between councils.
 
 `fetch_all(OUT)` downloads them once (OUT/hazards.parquet, OUT/hazards.json); `hazard_columns` gives the columns.
 Usage: hazards.py OUT_DIR   (bulk.py calls fetch_all for the national build)
@@ -20,30 +22,33 @@ KINDS = ("flood", "coastal")
 FNDC = "https://services5.arcgis.com/H4FlrMy6xTBd6Ywx/arcgis/rest/services/"
 SOURCES = [
     # flood
-    dict(district="Christchurch City", kind="flood", label="Christchurch District Plan: Flood Management Area",
+    dict(district="Christchurch City", kind="flood", label="Christchurch District Plan: Flood Management Area (land prone to flooding, including the effect of rising sea levels)",
          urls=["https://gis.ccc.govt.nz/server/rest/services/OpenData/DistrictPlanB/FeatureServer/30"],
          where="RemovedByPlanChangeIdentifier IS NULL", licence="CC BY 4.0 (Christchurch City Council Open Data)"),
     dict(district="Taupo District", kind="flood", label="Taupō District Plan: Flood Hazard Area, 1% annual exceedance probability",
          urls=["https://services7.arcgis.com/S7DHOirgbYgdtrbR/arcgis/rest/services/Flood_Hazard_Area_1_percent_AEP_NPS_view/FeatureServer/0"],
-         licence="CC BY 4.0"),
+         licence="CC BY 4.0; Taupō asks derived work to say: \"This work is a derivative of the Taupō District Plan\" and that it is not the authoritative source"),
     dict(district="Gisborne District", kind="flood", label="Tairāwhiti Resource Management Plan: flood hazard areas (F1 to F9)",
          urls=["https://services7.arcgis.com/8G10QCd84QpdcTJ9/arcgis/rest/services/plan_flood_hazard/FeatureServer/0"],
          licence="CC BY 4.0 (Gisborne District Council)"),
-    dict(district="Waipa District", kind="flood", label="Waipā District Plan: Special Feature Area, Flood Hazard",
+    dict(district="Waipa District", kind="flood", label="Waipā District Plan: Special Feature Area, Flood Hazard (flood extents from several studies)",
          urls=["https://services9.arcgis.com/OsxSXqmTWVTZQ9ie/arcgis/rest/services/WaipaDistrictPlan_SpecialFeature_Area_Flood/FeatureServer/0"],
          licence="CC BY 4.0"),
-    dict(district="Far North District", kind="flood", label="Far North Proposed District Plan: River Flood Hazard Zone, 100 year event",
-         urls=[FNDC + "PDP_HazardsRivers_OpenData_FNDC/FeatureServer/1"], licence="CC BY 4.0"),
+    # the decisions version (tidied and republished July 2026): the notified layer needed a repair that grew one area 5%
+    dict(district="Far North District", kind="flood",
+         label="Far North Proposed District Plan, decisions version: River Flood Hazard Zone, 1% annual exceedance probability (100 year) including climate change",
+         urls=[FNDC + "PDPDecisions_Hazards_Rivers_FNDC_opendata/FeatureServer/1"], licence="CC BY 4.0"),
     # coastal
     dict(district="Gisborne District", kind="coastal", label="Tairāwhiti Resource Management Plan: Coastal Hazard Overlay (CH1 extreme to CH4 safety buffer)",
          urls=["https://services7.arcgis.com/8G10QCd84QpdcTJ9/arcgis/rest/services/plan_coastal_hazard/FeatureServer/0"],
          licence="CC BY 4.0 (Gisborne District Council)"),
     dict(district="Far North District", kind="coastal",
-         label="Far North Proposed District Plan, decisions version: coastal flood and coastal erosion zones (50 year, 100 year and 100 year with rapid sea level rise)",
-         urls=[FNDC + f"PDPDecisions_Hazards_Coastal{k}_FNDC_opendata/FeatureServer/{i}" for k in ("Flood", "Erosion") for i in range(3)],
+         label="Far North Proposed District Plan, decisions version: coastal flood zones 1 to 3 (2% annual exceedance probability in 50 years with 0.6 m sea level rise, to 1% in 100 years with rapid sea level rise)",
+         # flood zones only: the erosion zones are published as lines, not areas
+         urls=[FNDC + f"PDPDecisions_Hazards_CoastalFlood_FNDC_opendata/FeatureServer/{i}" for i in range(3)],
          licence="CC BY 4.0"),
     # layer 4, not 5: layer 5 holds the model's cells (the areas studied), which covered 82% of Nelson's parcels (19 Nov)
-    dict(district="Nelson City", kind="coastal", label="Nelson coastal flooding, present day, 1% annual exceedance probability, areas connected to the sea (Tonkin & Taylor for Nelson City Council, 2023)",
+    dict(district="Nelson City", kind="coastal", label="Nelson coastal flooding, present day, 1% annual exceedance probability, areas connected to the sea (Tonkin & Taylor for Nelson City Council, finalised 2026)",
          urls=["https://services1.arcgis.com/Y4k7lyf2XTGeQC6V/arcgis/rest/services/Present_Day/FeatureServer/4"], where="connected = 1", licence="CC BY 4.0"),
 ]
 # Not used, and why (Nov 2026): Christchurch's coastal layers hold future scenarios only (2065 to 2130); Hawke's Bay's
@@ -51,12 +56,19 @@ SOURCES = [
 # areas and wait for their own columns; Auckland's and Wellington City's licences wait for the councils (T-35).
 
 
-def polygonal(geom):
+REPAIR_TOLERANCE = 0.02   # a repaired area may differ from the area the council states by this much (simplified to 1 m)
+
+
+def polygonal(geom, stated_area=None):
     """The polygon part of a repaired shape, or None: repair can leave lines or points beside the polygons, and a merge of
-    mixed kinds fails. One of Far North's flood zones (24,502 pieces, some too short to be polygons) defeats even the
-    default repair ("Overlay input is mixed-dimension"); the structure method repairs it."""
+    mixed kinds fails. Where the default repair fails, the structure method is tried, but its result is kept only if
+    its area agrees with the area the council states for the feature: on one of Far North's notified flood zones it
+    grew the area by 5%, giving parcels outside the zone 100% (hazard review, 21 Nov)."""
     try: g = shapely.make_valid(geom)
-    except shapely.errors.GEOSException: g = shapely.make_valid(geom, method="structure", keep_collapsed=False)
+    except shapely.errors.GEOSException:
+        g = shapely.make_valid(geom, method="structure", keep_collapsed=False)
+        if not stated_area or abs(g.area - stated_area) > REPAIR_TOLERANCE * stated_area:
+            raise ValueError(f"shape repaired to {g.area:,.0f} m2 against the stated {stated_area or 0:,.0f} m2: not used")
     polys = [p for p in shapely.get_parts(g) if p.geom_type in ("Polygon", "MultiPolygon")]
     while any(p.geom_type == "GeometryCollection" for p in shapely.get_parts(g)) and not polys:
         g = shapely.union_all([q for p in shapely.get_parts(g) for q in shapely.get_parts(p)]); polys = [p for p in shapely.get_parts(g) if p.geom_type in ("Polygon", "MultiPolygon")]
@@ -75,15 +87,23 @@ def fetch_all(out, sources=SOURCES):
         key = f'{s["district"]}|{s["kind"]}'; t0 = time.time(); n = 0
         try:
             for u in s["urls"]:
+                # every address must be a polygon layer that yields areas: Far North's erosion zones are lines and had
+                # been dropped without notice (hazard review, 21 Nov)
+                gt = arcgis._get(u, {"f": "json"}, 60).get("geometryType")
+                if gt != "esriGeometryPolygon": raise RuntimeError(f"{u} is a {gt} layer, not areas")
+                nu = 0
                 # all fields (some layers' id field is not OBJECTID), simplified to 1 m (hazard areas are mapped far more
                 # coarsely; Christchurch's came at 0.7 MB a polygon), 100 at a time
                 for f in arcgis.query_all(u, dict(where=s.get("where", "1=1"), outFields="*", outSR=2193, maxAllowableOffset=1), workers=4, page_size=100):
                     if not f.get("geometry"): continue
-                    g = polygonal(shape(f["geometry"]))
+                    props = {k.lower(): v for k, v in (f.get("properties") or {}).items()}
+                    g = polygonal(shape(f["geometry"]), props.get("shape__area") or props.get("shape_area"))
                     if g is None: continue
+                    nu += 1
                     rows["district"].append(s["district"]); rows["kind"].append(s["kind"]); rows["wkb"].append(shapely.to_wkb(g))
                     for k, v in zip(("xmin", "ymin", "xmax", "ymax"), g.bounds): rows[k].append(v)
                     n += 1
+                if nu == 0: raise RuntimeError(f"{u} yielded no areas")
         except Exception as e:
             meta[key] = dict(district=s["district"], kind=s["kind"], label=s["label"], urls=s["urls"], failed=str(e)[:300], fetched=utc_now())
             print(key, "FAILED:", str(e)[:200], flush=True); continue

@@ -692,6 +692,24 @@ def test_hazard_shares_count_only_the_councils_own_mapped_areas_and_are_empty_wh
     assert rows[1]["coastal_area_pct"] is None and rows[1]["coastal_area"] is None  # Taupō maps no coastal area
 
 
+def test_a_hazard_layer_of_lines_or_with_no_areas_fails_its_source_instead_of_vanishing():
+    """Hazard review (21 Nov): Far North's erosion zones are lines; they were dropped without notice while the label still
+    named them. A source with a non-polygon layer, or a layer yielding no areas, is now recorded as failed."""
+    import tempfile, arcgis, hazards as H
+    from shapely.geometry import mapping
+    keep = (arcgis._get, arcgis.query_all)
+    gt = {"https://x/lines/0": "esriGeometryPolyline", "https://x/empty/0": "esriGeometryPolygon", "https://x/ok/0": "esriGeometryPolygon"}
+    arcgis._get = lambda u, params=None, timeout=None, **k: {"geometryType": gt[u]}
+    arcgis.query_all = lambda u, q, workers=1, page_size=None: [] if "empty" in u else [dict(geometry=mapping(box(0, 0, 10, 10)), properties=dict(Shape__Area=100.0))]
+    try:
+        src = [dict(district="A", kind="coastal", label="a", urls=["https://x/ok/0", "https://x/lines/0"], licence="CC BY 4.0"),
+               dict(district="B", kind="flood", label="b", urls=["https://x/empty/0"], licence="CC BY 4.0"),
+               dict(district="C", kind="flood", label="c", urls=["https://x/ok/0"], licence="CC BY 4.0")]
+        m = H.fetch_all(tempfile.mkdtemp(), src)
+    finally: arcgis._get, arcgis.query_all = keep
+    assert "esriGeometryPolyline" in m["A|coastal"]["failed"] and "no areas" in m["B|flood"]["failed"] and not m["C|flood"].get("failed")
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"): f(); print("ok", name)

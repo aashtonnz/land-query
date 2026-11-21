@@ -363,7 +363,10 @@ async function select(hit){ selected = hit; draw(); const det = $('detail');
   let items = '', grp = '';
   for(const c of meta.colours){ const x = r[c.key]; if(x == null) continue;
     if(c.group !== grp){ grp = c.group; items += `<dt class="grp">${esc(grp)}</dt><dd></dd>`; }
-    items += `<dt>${esc(c.label)}</dt><dd>${esc(val(c, x))}</dd>`; }
+    items += `<dt>${esc(c.label)}</dt><dd>${esc(val(c, x))}</dd>`;
+    // what the value refers to: the zone and its plan, or what the council's hazard area is
+    const notes = ((meta.notes || {})[c.key] || []).map(f => r[f]).filter(Boolean);
+    if(notes.length) items += `<dt></dt><dd style="font-size:.78rem;color:var(--muted)">${notes.map(esc).join(' · ')}</dd>`; }
   det.className = '';
   det.innerHTML = `<h3>${esc(r.appellation || 'Parcel ' + hit.id)}</h3>
     <div class="mono" style="font-size:.8rem;color:var(--muted)">${esc(r.c==='n' ? (r.territorial_authority || 'Greater Wellington') : COUNCIL[r.c])} · LINZ id ${esc(hit.id)} · ${esc(r.parcel_intent)}</div>
