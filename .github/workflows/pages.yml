@@ -17,10 +17,10 @@ permissions:
   actions: read   # to fetch the national index a National index run built
 
 env:
-  # the National index run whose index the whole-country map is drawn from (an unreviewed preview, asked for by the
-  # owner on 10 Nov 2026; kept 30 days). Empty: the newest published national index (a release national-*, D-27),
-  # or the Greater Wellington pilot only if none is published yet
-  NATIONAL_RUN: "43832779626"
+  # the National index run whose index the whole-country map is drawn from until the first is published (asked for by
+  # the owner on 10 Nov 2026): the 21 Nov build with zoning and hazards, reviewed 22 Nov, kept to 21 Dec. Empty: the
+  # newest published national index (a release national-*, D-27); set it empty once the first index is published
+  NATIONAL_RUN: "44954071348"
   # Cloudflare R2 (D-26): the public address of the bucket land-query-map. With it and the secrets R2_ACCESS_KEY_ID,
   # R2_SECRET_ACCESS_KEY and R2_ACCOUNT_ID, the map is built in full for the whole country and its data goes to R2;
   # without them, the site is built as before, all on GitHub Pages
