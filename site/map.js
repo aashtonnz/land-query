@@ -351,7 +351,7 @@ async function pickAt(wx, wy, wantId){ const x = wx-OX, y = wy-OY;
       let inside = wantId != null; if(!inside) for(let r=d.pr0[k]; r<d.pr0[k+1]; r++) if(insideRing(d, d.rs[r], d.rs[r+1], x, y)) inside = !inside;
       if(inside) return {piece:P, cpu:d, k, id:d.ids[k], x:wx, y:wy}; } }
   return null; }
-const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'Greater Wellington, national index'};
+const COUNCIL = {k:'Kāpiti Coast', p:'Porirua', n:'National index'};
 const details = new Map();
 async function select(hit){ selected = hit; draw(); const det = $('detail');
   if(!hit){ det.className = 'empty'; det.textContent = 'Select a parcel on the plan, or search for a legal description or address.'; return; }
@@ -366,10 +366,10 @@ async function select(hit){ selected = hit; draw(); const det = $('detail');
     items += `<dt>${esc(c.label)}</dt><dd>${esc(val(c, x))}</dd>`;
     // what the value refers to: the zone and its plan, or what the council's hazard area is
     const notes = ((meta.notes || {})[c.key] || []).map(f => r[f]).filter(Boolean);
-    if(notes.length) items += `<dt></dt><dd style="font-size:.78rem;color:var(--muted)">${notes.map(esc).join(' · ')}</dd>`; }
+    if(notes.length) items += `<dd class="note">${notes.map(esc).join(' · ')}</dd>`; }
   det.className = '';
   det.innerHTML = `<h3>${esc(r.appellation || 'Parcel ' + hit.id)}</h3>
-    <div class="mono" style="font-size:.8rem;color:var(--muted)">${esc(r.c==='n' ? (r.territorial_authority || 'Greater Wellington') : COUNCIL[r.c])} · LINZ id ${esc(hit.id)} · ${esc(r.parcel_intent)}</div>
+    <div class="mono" style="font-size:.8rem;color:var(--muted)">${esc(r.c==='n' ? (r.territorial_authority || 'New Zealand') : COUNCIL[r.c])} · LINZ id ${esc(hit.id)} · ${esc(r.parcel_intent)}</div>
     ${r.address ? `<div style="margin-top:6px">${esc(r.address)}</div>` : ''}
     <dl>${items}</dl>
     <div style="font-size:.78rem;color:var(--muted)">${r.c==='n' ? 'From the national index pilot: LINZ data only, ground on a 10 m grid. ' : ''}Measures this parcel has no value for (not mapped, not measured, or outside the source's coverage) are left out.${r.c==='p' ? ' Porirua has no three-waters data here.' : ''}</div>`; }
