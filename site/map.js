@@ -22,11 +22,11 @@ const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
 if(meta.national){ const h = document.querySelector('.hero h1'); if(h) h.textContent = 'Every land parcel in New Zealand, measured from public data.';
   const pv = document.createElement('p'); pv.className = 'label'; pv.style.color = 'var(--mark)';
-  pv.textContent = meta.full ? 'Preview: the whole-country index is reviewed but not yet published.' : 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
+  pv.textContent = meta.full ? 'The whole-country index is published and rebuilt monthly.' : 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
   document.querySelector('.hero').insertBefore(pv, $('councils')); }
 // council cards and run line
 const st = meta.stats, cc = $('councils');
-[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · preview, not yet published' : 'National index pilot']].forEach(([c,name,kind])=>{
+[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · published, rebuilt monthly' : 'National index pilot']].forEach(([c,name,kind])=>{
   const s = st[c]; if(!s) return; const div = document.createElement('div'); div.className='council';
   div.innerHTML = `<div class="label">${kind}</div><h3>${name}</h3>
     <div class="figs"><div class="fig"><b>${fmt(s.parcels)}</b><span>parcels</span></div>
@@ -323,7 +323,7 @@ function render(){
   if(waiting && !loadedOnce) say('Loading parcels for this area…'); else if(!waiting && !loadedOnce){ loadedOnce = true; say(status()); }
 }
 let loadedOnce = false;
-const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet published.` + (meta.full ? ' Search by the start of a legal description or address; select a parcel for its values.' : ' Street-level detail, search and parcel values cover Greater Wellington only for now.')
+const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: the whole country.` + (meta.full ? ' Search by the start of a legal description or address; select a parcel for its values.' : ' Street-level detail, search and parcel values cover Greater Wellington only for now.')
   : `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
 
 // ---- overlay: selected parcel, scale bar
