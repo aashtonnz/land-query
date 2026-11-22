@@ -22,11 +22,11 @@ const [OX, OY] = meta.origin, M = meta.measures.length, LV = meta.levels;
 
 if(meta.national){ const h = document.querySelector('.hero h1'); if(h) h.textContent = 'Every land parcel in New Zealand, measured from public data.';
   const pv = document.createElement('p'); pv.className = 'label'; pv.style.color = 'var(--mark)';
-  pv.textContent = meta.full ? 'Preview: the whole-country map is new and not yet reviewed.' : 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
+  pv.textContent = meta.full ? 'Preview: the whole-country index is reviewed but not yet published.' : 'Preview: the whole-country map is new and not yet reviewed. Street-level detail, search and parcel values cover Greater Wellington only for now.';
   document.querySelector('.hero').insertBefore(pv, $('councils')); }
 // council cards and run line
 const st = meta.stats, cc = $('councils');
-[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · preview, not yet reviewed' : 'National index pilot']].forEach(([c,name,kind])=>{
+[['k','Kāpiti Coast District','District'],['p','Porirua City','City'],['n', meta.national ? 'New Zealand' : 'Greater Wellington', meta.national ? 'National index · preview, not yet published' : 'National index pilot']].forEach(([c,name,kind])=>{
   const s = st[c]; if(!s) return; const div = document.createElement('div'); div.className='council';
   div.innerHTML = `<div class="label">${kind}</div><h3>${name}</h3>
     <div class="figs"><div class="fig"><b>${fmt(s.parcels)}</b><span>parcels</span></div>
@@ -323,7 +323,7 @@ function render(){
   if(waiting && !loadedOnce) say('Loading parcels for this area…'); else if(!waiting && !loadedOnce){ loadedOnce = true; say(status()); }
 }
 let loadedOnce = false;
-const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet reviewed.` + (meta.full ? ' Search by the start of a legal description or address; select a parcel for its values.' : ' Street-level detail, search and parcel values cover Greater Wellington only for now.')
+const status = () => meta.national ? `Showing ${fmt(meta.parcels)} parcels: a preview of the whole country, not yet published.` + (meta.full ? ' Search by the start of a legal description or address; select a parcel for its values.' : ' Street-level detail, search and parcel values cover Greater Wellington only for now.')
   : `Showing ${fmt(meta.parcels)} parcels. Search by legal description or address; select a parcel for its values.`;
 
 // ---- overlay: selected parcel, scale bar
@@ -372,7 +372,7 @@ async function select(hit){ selected = hit; draw(); const det = $('detail');
     <div class="mono" style="font-size:.8rem;color:var(--muted)">${esc(r.c==='n' ? (r.territorial_authority || 'New Zealand') : COUNCIL[r.c])} · LINZ id ${esc(hit.id)} · ${esc(r.parcel_intent)}</div>
     ${r.address ? `<div style="margin-top:6px">${esc(r.address)}</div>` : ''}
     <dl>${items}</dl>
-    <div style="font-size:.78rem;color:var(--muted)">${r.c==='n' ? 'From the national index pilot: LINZ data only, ground on a 10 m grid. ' : ''}Measures this parcel has no value for (not mapped, not measured, or outside the source's coverage) are left out.${r.c==='p' ? ' Porirua has no three-waters data here.' : ''}</div>`; }
+    <div style="font-size:.78rem;color:var(--muted)">${r.c==='n' ? 'From the national index: LINZ data, ground on a 10 m grid, and council zoning and hazard areas where published openly. ' : ''}Measures this parcel has no value for (not mapped, not measured, or outside the source's coverage) are left out.${r.c==='p' ? ' Porirua has no three-waters data here.' : ''}</div>`; }
 
 // ---- pan and zoom
 let drag = null, moved = false, pinch = null;

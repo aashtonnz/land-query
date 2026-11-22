@@ -183,7 +183,7 @@ def parcels():
     if NATIONAL:
         prov = json.load(open(os.path.join(NATIONAL, "provenance.json")))
         stats["n"] = dict(parcels=n_all, median_ground=nmed, national=True,
-                          run=f"national index, first whole-country build of {prov['built'][:10]} (commit {str(prov.get('commit'))[:7]}): a preview, not yet reviewed")
+                          run=f"national index built {prov['built'][:10]} (commit {str(prov.get('commit'))[:7]})")
     else:
         stats["n"] = dict(parcels=n_all, median_ground=nmed, run="national index pilot, built from " +
                           open(os.path.join(nd, "BUILT_FROM.txt")).read().strip())
