@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-16T09:10:24+00:00",
+ "checked": "2026-11-22T05:11:36+00:00",
  "sources": {
   "buildings_2021": {
    "count": 50623,
@@ -603,7 +603,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Cadastral/MapServer/0"
   },
   "sw_pipe": {
-   "count": 14802,
+   "count": 14825,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
@@ -641,7 +641,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/5"
   },
   "sw_point": {
-   "count": 17888,
+   "count": 17894,
    "fields": [
     "OBJECTID:OID",
     "Shape:Geometry",
@@ -672,7 +672,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/4"
   },
   "titles": {
-   "count": 33021,
+   "count": 33020,
    "kind": "linz",
    "layer": 50804
   },
@@ -730,7 +730,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Wind_and_Corrosion/MapServer/2"
   },
   "ws_pipe": {
-   "count": 33185,
+   "count": 33188,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
@@ -763,7 +763,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/2"
   },
   "ww_lateral": {
-   "count": 21186,
+   "count": 21191,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
@@ -789,7 +789,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/11"
   },
   "ww_node": {
-   "count": 10132,
+   "count": 10121,
    "fields": [
     "OBJECTID:OID",
     "Shape:Geometry",
@@ -820,7 +820,7 @@
    "url": "https://maps.kapiticoast.govt.nz/server/rest/services/Public/Services_Open_Data/MapServer/9"
   },
   "ww_pipe": {
-   "count": 9006,
+   "count": 9010,
    "fields": [
     "GlobalID:GlobalID",
     "OBJECTID:OID",
